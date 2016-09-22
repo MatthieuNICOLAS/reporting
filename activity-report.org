@@ -1,0 +1,67 @@
+* Journal de bord
+** Semaine du <2016-09-12 lun.> au <2016-09-16 ven.>
+*** Done
+- Faire un état de l'art des mécanismes d'authentification
+  - Différences entre OAuth et OpenID
+    - OAuth est un protocole d'*autorisation*
+    - Il permet à un utilisateur de donner accès à certaines données/actions de son compte à un service tiers
+      - Exemple avec Google +
+        - Récupérer les informations du profil
+        - Récupérer les informations des cercles d'amis de l'utilisateur
+        - Envoyer des mails au nom de l'utilisateur
+      - Exemple avec GitHub
+        - Récupérer les informations du profil
+        - Accéder aux repos de l'utilisateur
+        - Faire des commits en son nom
+    - Il ne s'agit cependant pas d'un protocole d'*authentification*
+      - On peut supposer que si Google ou GitHub nous donne accès au compte de l'utilisateur, c'est car ce dernier s'est authentifié correctement
+      - Mais rien n'empêche un site ayant obtenu un code (car l'utilisateur a donné l'autorisation à ce dernier) d'utiliser ce code pour usurper l'identité de l'utilisateur sur un autre site
+    - OpenID lui est un protocole d'*authentification*
+      - Il permet seulement de vérifier l'identité d'un utilisateur
+      - Il ne permet pas d'accéder à des données de son compte autre que celles du profil
+    - OpenID Connect est un protocole basé sur OAuth 2.0 qui ajoute une couche d'authentification au protocole
+    - Sources
+      - http://security.stackexchange.com/questions/44611/difference-between-oauth-openid-and-openid-connect-in-very-simple-term
+      - https://oauth.net/2/
+      - https://en.wikipedia.org/wiki/OpenID
+      - http://openid.net/connect/
+      - http://www.thread-safe.com/2012/01/problem-with-oauth-for-authentication.html
+  - Libraries/Frameworks
+    - Pour OAuth2: https://oauth.net/code/
+    - Pour OpenID Connect: http://openid.net/developers/libraries/
+*** Planned
+** Semaine du <2016-09-19 lun.> au <2016-09-23 ven.>
+*** Done
+- Faire un état de l'art des mécanismes d'authentification
+  - Réalisation des slides
+    - Disponibles ici : https://github.com/MatthieuNICOLAS/authentication-systems-2016-09-20/
+  - Ajout des nouvelles sources : 
+    - [[https://pdfs.semanticscholar.org/3733/2607f7a7ac8284c514845957fd00583e5614.pdf][Different Ways to Authenticate Users with the Pros and Cons of each Method]]
+      - Bonne définition de l'*Authentification*.
+      - Parle de l'authentification à facteurs multiples :
+        - Passwords
+        - Smart cards
+        - X509 certificate
+        - Biometrics
+      - Présente les avantages et inconvénients ainsi que les vulnérabilités de chacune.
+    - [[http://stackoverflow.com/questions/663402/what-are-the-differences-between-ldap-and-active-directory][What are the differences between LDAP and Active Directory?]]
+      - Donne les définitions de *Directory Service*, *Active Directory* et *Lightweight Directory Access Protocol*
+    - [[https://www.neustar.biz/blog/what-is-single-sign-on-deployment-pros-cons][The Pros & Cons of Implementing Single Sign-On]]
+      - Explique les différences entre *Full Sign-On*, *Reduced Sign-On* et *Federated Logins*
+    - [[https://tools.ietf.org/html/rfc6749][RFC 6749 - The OAuth 2.0 Authorization Framework]]
+      - Description du protocole OAuth 2.0
+    - [[http://wiki.oauth.net/w/page/27249271/OAuth%202%20for%20Native%20Apps][OAuth 2 for Native Apps]]
+    - [[https://tools.ietf.org/html/draft-ietf-oauth-native-apps-03][Authorization Flow for Native Apps Using App-Claimed URI Schemes]]
+    - [[http://nat.sakimura.org/2012/01/20/openid-connect-nutshell/][OpenID Connect in a nutshell]]
+    - [[http://wiki.openid.net/w/page/12995171/Introduction][OpenID explaination]]
+    - [[https://en.wikipedia.org/wiki/OAuth#/media/File:OpenIDvs.Pseudo-AuthenticationusingOAuth.svg][OpenID Authentication vs Pseudo-Authentication using OAuth]]
+    - [[https://www.owasp.org/index.php/Authentication_Cheat_Sheet][Authentication Cheat Sheet]]
+*** Planned
+**** DONE Faire un état de l'art des mécanismes d'authentification
+- Étudier les différents mécanismes existants et comment ils interagissent entre eux
+  - SAML
+  - SOAP
+  - OAuth
+  - OpenID
+  - LDAP
+
