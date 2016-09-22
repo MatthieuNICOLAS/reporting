@@ -56,6 +56,9 @@
     - [[http://wiki.openid.net/w/page/12995171/Introduction][OpenID explaination]]
     - [[https://en.wikipedia.org/wiki/OAuth#/media/File:OpenIDvs.Pseudo-AuthenticationusingOAuth.svg][OpenID Authentication vs Pseudo-Authentication using OAuth]]
     - [[https://www.owasp.org/index.php/Authentication_Cheat_Sheet][Authentication Cheat Sheet]]
+- Finaliser les slides sur les mécanismes d'authentification et les envoyer à TVPaint
+  - Ajout de références vers les articles lus/utilisés et pouvant s'avérer utiles pour leur compréhension
+  - Création d'un thread sur le forum de TVPaint pour linker les slides et les inviter à poser leurs questions
 *** Planned
 **** DONE Faire un état de l'art des mécanismes d'authentification
 - Étudier les différents mécanismes existants et comment ils interagissent entre eux
@@ -65,7 +68,7 @@
   - OpenID
   - LDAP
 
-**** TODO Finaliser les slides sur les mécanismes d'authentification et les envoyer à TVPaint
+**** DONE Finaliser les slides sur les mécanismes d'authentification et les envoyer à TVPaint
 - J'ai noté quelques sources qui pourraient s'avérer utiles pour TVPaint
 - Les ajouter aux slides
 - Envoyer les slides à TVPaint
