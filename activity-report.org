@@ -65,3 +65,14 @@
   - OpenID
   - LDAP
 
+**** TODO Finaliser les slides sur les mécanismes d'authentification et les envoyer à TVPaint
+- J'ai noté quelques sources qui pourraient s'avérer utiles pour TVPaint
+- Les ajouter aux slides
+- Envoyer les slides à TVPaint
+**** TODO Implémenter le bot de traduction
+- Dans le cadre de l'évaluation de l'équipe du 13 octobre, une démo de [[https://github.com/coast-team/mute-demo][MUTE]] est prévue
+- L'idée est de mettre en avant la fonctionnalité des bots à l'aide d'un bot qui traduirait pour nous le document
+- Le code du bot est disponible ici : https://github.com/coast-team/mute-bot-eve
+- Analyser le document pour détecter les parties du document à traduire
+- Interroger *Yandex* pour traduire le texte
+- Remplacer le texte par sa traduction
