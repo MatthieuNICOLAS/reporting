@@ -59,6 +59,11 @@
 - Finaliser les slides sur les mécanismes d'authentification et les envoyer à TVPaint
   - Ajout de références vers les articles lus/utilisés et pouvant s'avérer utiles pour leur compréhension
   - Création d'un thread sur le forum de TVPaint pour linker les slides et les inviter à poser leurs questions
+- MUTE : Implémenter le bot de traduction
+  - Problème avec la librairie *mute-client*
+    - *mute-client* embarque *AceEditorAdapter*
+    - Ce code JS suppose que *AceEditor* est dans le scope
+    - Ce n'est pas le cas dans le bot
 *** Planned
 **** DONE Faire un état de l'art des mécanismes d'authentification
 - Étudier les différents mécanismes existants et comment ils interagissent entre eux
@@ -72,7 +77,7 @@
 - J'ai noté quelques sources qui pourraient s'avérer utiles pour TVPaint
 - Les ajouter aux slides
 - Envoyer les slides à TVPaint
-**** TODO Implémenter le bot de traduction
+**** TODO MUTE : Implémenter le bot de traduction
 - Dans le cadre de l'évaluation de l'équipe du 13 octobre, une démo de [[https://github.com/coast-team/mute-demo][MUTE]] est prévue
 - L'idée est de mettre en avant la fonctionnalité des bots à l'aide d'un bot qui traduirait pour nous le document
 - Le code du bot est disponible ici : https://github.com/coast-team/mute-bot-eve
