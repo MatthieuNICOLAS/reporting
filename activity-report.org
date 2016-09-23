@@ -109,3 +109,8 @@
 - Analyser le document pour détecter les parties du document à traduire
 - Interroger *Yandex* pour traduire le texte
 - Remplacer le texte par sa traduction
+**** TODO PLM : Gérer les exercices n'ayant pas d'entité solution dans le langage de programmation par défaut
+- Actuellement, on considère que l'ensemble des exercices possèdent une entité solution en Java
+- Lors de leur instanciation à partir des sources, on essaie de calculer le(s) monde(s) objectif(s) à partir de cette entité solution
+- Ajouter un mécanisme de fallback vers un autre langage si l'entité solution Java n'est pas trouvée
+- Déclencher une erreur si aucune entité solution n'est trouvée
