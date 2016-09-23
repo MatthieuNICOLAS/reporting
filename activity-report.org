@@ -64,6 +64,25 @@
     - *mute-client* embarque *AceEditorAdapter*
     - Ce code JS suppose que *AceEditor* est dans le scope
     - Ce n'est pas le cas dans le bot
+- PLM : Activer Blockly
+  - Modification du code de *GitActor* pour gérer les langages de programmation visuels
+    - Stocker le code généré par l'outil de programmation visuel
+    - Mais aussi stocker le /code visuel/
+      - Pour pouvoir regénérer l'espace de travail de l'apprenant à sa prochaine connexion
+  - Modification du code de *PLMActor* pour gérer les langages de programmation visuels
+    - Envoi à *GitActor* le /code visuel/
+    - Lors de la récupération de la session de l'utilisateur, on ne récupère pas le code de l'élève
+      - Puisqu'il s'agit du code généré par l'outil de programmation visuel
+        - Par exemple du code Python dans le cas de Blockly
+    - Il faut récupérer plutôt le /code visuel/ pour regénérer l'espace de travail
+    - Pour le moment, on se contente de renvoyer un /code visuel/ vide
+  - Activation de Blockly
+    - Création d'une instance de *LangBlockly*
+    - Ajout de celle-ci dans les langages de programmation supportés
+  - Modification du code pour gérer les exercices ne supportant pas Blockly
+    - Passage automatique au langage de programmation par défaut si le langage courant n'est pas supporté
+    - Affichage d'un message d'avertissement lorsque l'utilisateur essaie de passer à un langage non-supporté par l'exo courant
+  - Mise à jour des sérialisation JSON des exercices
 *** Planned
 **** DONE Faire un état de l'art des mécanismes d'authentification
 - Étudier les différents mécanismes existants et comment ils interagissent entre eux
@@ -77,6 +96,12 @@
 - J'ai noté quelques sources qui pourraient s'avérer utiles pour TVPaint
 - Les ajouter aux slides
 - Envoyer les slides à TVPaint
+**** DONE PLM : Activer Blockly
+- [[http://www.pentilanero.com/][Pentila]] m'a recontacté à propos de PLM
+- Ils sont en train de travailler sur PLM pour voir comment ajouter de nouveaux exercices fonctionnant avec Blockly
+- Sauf que j'ai désactivé Blockly lors du refactoring
+- Activer de nouveau Blockly
+- Vérifier son bon fonctionnement
 **** TODO MUTE : Implémenter le bot de traduction
 - Dans le cadre de l'évaluation de l'équipe du 13 octobre, une démo de [[https://github.com/coast-team/mute-demo][MUTE]] est prévue
 - L'idée est de mettre en avant la fonctionnalité des bots à l'aide d'un bot qui traduirait pour nous le document
