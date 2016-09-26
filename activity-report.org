@@ -104,6 +104,14 @@
 - Vérifier son bon fonctionnement
 ** Semaine du <2016-09-26 lun.> au <2016-09-30 ven.>
 *** Done
+- TVPaint : Réviser les notions autour du *Business Process* et des *Workflows*
+  - L'activité /Call/ est-elle utilisable ou à éviter ?
+  - Que signifie la notion d'entité lorsqu'on parle de /Choreography/ ?
+    - Similaire à la notion de /Pool/ ?
+  - Différences entre /Choreography/ et /Collaboration/
+    - Pourquoi utiliser l'un et pas l'autre ?
+  - Une /Choreography/ est-elle forcément entre 2 entités ?
+    - Il n'y a jamais eu le besoin de définir une choréographie entre 3+ entités ?
 *** Planned
 **** TODO MUTE : Implémenter le bot de traduction
 - Dans le cadre de l'évaluation de l'équipe du 13 octobre, une démo de [[https://github.com/coast-team/mute-demo][MUTE]] est prévue
