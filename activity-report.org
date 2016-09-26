@@ -102,6 +102,9 @@
 - Sauf que j'ai désactivé Blockly lors du refactoring
 - Activer de nouveau Blockly
 - Vérifier son bon fonctionnement
+** Semaine du <2016-09-26 lun.> au <2016-09-30 ven.>
+*** Done
+*** Planned
 **** TODO MUTE : Implémenter le bot de traduction
 - Dans le cadre de l'évaluation de l'équipe du 13 octobre, une démo de [[https://github.com/coast-team/mute-demo][MUTE]] est prévue
 - L'idée est de mettre en avant la fonctionnalité des bots à l'aide d'un bot qui traduirait pour nous le document
@@ -114,3 +117,9 @@
 - Lors de leur instanciation à partir des sources, on essaie de calculer le(s) monde(s) objectif(s) à partir de cette entité solution
 - Ajouter un mécanisme de fallback vers un autre langage si l'entité solution Java n'est pas trouvée
 - Déclencher une erreur si aucune entité solution n'est trouvée
+**** TODO TVPaint : Réviser les notions autour du *Business Process* et des *Workflows*
+- Nécessaire pour pouvoir mieux appréhender la tâche consistant à définir un process pour représenter le déroulement de la réalisation d'un film avec TVPaint
+- Sources à utiliser:
+  - http://webloria.loria.fr/~charoy/uploads/Main/BPM2pp.pdf
+  - http://www.workflowpatterns.com/
+  - http://fr.bonitasoft.com/ressources
