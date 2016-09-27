@@ -117,7 +117,42 @@
     - Instancie un *Bot* pour être pouvoir être ajouté au réseau
     - Instancie un *Coordinator* lors de son ajout au réseau
     - Écoute l'évènement /update/ du *Coordinator* pour déclencher l'opération de traduction
+- PLM : Corriger l'exécution du code de l'apprenant en Python
+  - Le bug rencontré par Cédric n'est pas reproductible dans mon environnement de dev
+  - Par contre, dans un container Docker basé sur l'image de webPLM, je rencontre une erreur lié à *JRuby*
+    - Je n'inclus pas le jar de *JRuby* dans *PLM-engine*
+  - Ajout de *JRuby* dans *PLM-engine*
+    - Résous l'erreur lié à *JRuby*
+  - Je rencontre dorénavant l'erreur reportée par Cédric
+    - Cette erreur semble liée à la version de *Jython* utilisée
+  - Mise à jour de *Jython*
+  - Le plus troublant est que les juges arrivaient à exécuter du code Python
+    - *JRuby* était correctement inclus dans le jar de *PLM* fourni aux juges
+    - Mais ils auraient dû déclencher l'erreur liée à la version de *Jython*
 *** Planned
+**** DONE PLM : Corriger l'exécution du code de l'apprenant en Python
+- Cédric de Pentila m'a contacté à propos des problèmes qu'il rencontre pour exécuter du code Python
+- Il rencontre l'erreur suivante en essayant d'exécuter son programme Python
+#+BEGIN_SRC
+java.lang.NullPointerException
+  at org.python.core.Py.recursiveIsInstance(Py.java:1861)
+  at org.python.core.Py.isInstance(Py.java:1828)
+  at org.python.core.__builtin__.isinstance(__builtin__.java:725)
+  at org.python.core.Py.displayException(Py.java:1009)
+  at org.python.core.PyException.printStackTrace(PyException.java:79)
+  at org.python.core.PyException.toString(PyException.java:98)
+  at java.lang.Throwable.<init>(Throwable.java:311)
+  at java.lang.Exception.<init>(Exception.java:102)
+  at javax.script.ScriptException.<init>(ScriptException.java:65)
+  at org.python.jsr223.PyScriptEngine.scriptException(PyScriptEngine.java:192)
+  at org.python.jsr223.PyScriptEngine.eval(PyScriptEngine.java:43)
+  at org.python.jsr223.PyScriptEngine.eval(PyScriptEngine.java:33)
+  at javax.script.AbstractScriptEngine.eval(AbstractScriptEngine.java:264)
+  at plm.core.lang.ScriptingLanguage.runEntity(Unknown Source)
+  at plm.core.model.lesson.ExerciseRunner$3.run(Unknown Source)
+  at java.lang.Thread.run(Thread.java:745)
+#+END_SRC
+- Trouver l'origine de cette erreur et la résoudre
 **** TODO MUTE : Implémenter le bot de traduction
 - Dans le cadre de l'évaluation de l'équipe du 13 octobre, une démo de [[https://github.com/coast-team/mute-demo][MUTE]] est prévue
 - L'idée est de mettre en avant la fonctionnalité des bots à l'aide d'un bot qui traduirait pour nous le document
