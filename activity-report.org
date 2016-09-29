@@ -117,6 +117,19 @@
     - Instancie un *Bot* pour être pouvoir être ajouté au réseau
     - Instancie un *Coordinator* lors de son ajout au réseau
     - Écoute l'évènement /update/ du *Coordinator* pour déclencher l'opération de traduction
+    - Écoute l'évènement /operations/ du *Coordinator* pour transmettre les opérations générées localement aux pairs 
+    - Lors d'un /update/, parcourt le document pour trouver le texte à traduire
+      - Le texte à traduire est délimité par les balises suivantes
+        - /tl <langue source> <langue destination>
+        - end/
+    - Demande à *YandexTranslateService* de traduire le texte
+    - Remplace le texte à traduire + balises par le résultat renvoyé par *YandexTranslateService*
+  - Malheureusement, ce n'était pas le comportement attendu
+    - On souhaite insérer une balise dans le document
+    - Le bot doit
+      - Récupérer le texte précédent cette balise
+      - Le traduire
+      - L'insérer après la balise
 - PLM : Corriger l'exécution du code de l'apprenant en Python
   - Le bug rencontré par Cédric n'est pas reproductible dans mon environnement de dev
   - Par contre, dans un container Docker basé sur l'image de webPLM, je rencontre une erreur lié à *JRuby*
