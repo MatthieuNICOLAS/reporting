@@ -130,6 +130,15 @@
       - Récupérer le texte précédent cette balise
       - Le traduire
       - L'insérer après la balise
+  - Implémentation de ce comportement
+    - Ajout de *RealTimeTranslator*
+    - Détecte le tag de l'utilisateur /rt
+    - Le remplace par son propre tag
+      - Cela lui permet de récupérer l'ID LogootSplit de ce tag
+      - Cet ID est ensuite utilisé pour récupérer l'index du tag dans le document
+    - Traduit le texte
+      - Utilise /diff/ pour comparer l'ancienne traduction et la nouvelle
+      - Permet de seulement mettre à jour les parties de la traduction concernées par les modifications du texte initial
 - PLM : Corriger l'exécution du code de l'apprenant en Python
   - Le bug rencontré par Cédric n'est pas reproductible dans mon environnement de dev
   - Par contre, dans un container Docker basé sur l'image de webPLM, je rencontre une erreur lié à *JRuby*
