@@ -229,3 +229,11 @@ java.lang.NullPointerException
 - Les enseignements de ce module porte notamment sur la récursivité
 - Les leçons correspondantes ne sont pas activées dans la version actuelle de la PLM
 - Les activer et déployer la nouvelle version
+**** TODO PLM : Release une image de NGINX pour le mode développement
+- Depuis le rework du protocole de communication avec les juges, NGINX est utilisé comme reverse-proxy pour accéder à la queue de message
+  - Le port 15674 (utilisé par STOMP) n'est pas ouvert sur la machine de TN
+  - NGINX permet d'accéder à ce port via un reverse-proxy
+- Ceci empêche le docker-compose pour le mode développement de fonctionner correctement
+  - Il ne met pas en place de NGINX
+- Faire une image Docker de NGINX pour le développement
+- Mettre à jour le docker-compose correspondant
