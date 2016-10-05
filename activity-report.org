@@ -201,7 +201,19 @@ java.lang.NullPointerException
     - Est-ce que l'animatique "modifie" le storyboard ou produit une nouvelle donnée?
     - Qui s'occupe de l'élaboration du layout du shot?
     - Est-ce que l'élaboration du layout du shot inclus le typage de chaque clip?
+- Release d'une nouvelle version de PLM
+  - Transfert des commits modifiant l'UI dans une branche distincte
+  - Activation des leçons sur la récursivité
+  - Correction du nom des fichiers de consignes pour l'exercice *Occurrences*
+  - Correction de l'entité Java de l'exercice *IsMember*
+  - Augmentation de la limite de temps d'exécution de PLM-judge
+  - Release de webPLM:2.1.1 et de PLM-judge:2.1.1
 *** Planned
+**** DONE PLM : Release une nouvelle version de PLM
+- Pour le module de TOP à TN, les étudiants vont travailler sur PLM
+- Les enseignements de ce module porte notamment sur la récursivité
+- Les leçons correspondantes ne sont pas activées dans la version actuelle de la PLM
+- Les activer et déployer la nouvelle version
 **** TODO TVPaint : Définir le business process correspondant à la réalisation d'un film
 - Le process a été décrit sommairement dans l'image suivante
   #+CAPTION: Réalisation d'un film
@@ -224,11 +236,6 @@ java.lang.NullPointerException
   - Vérifier si l'instance obtenue possède des opérations solutions
   - Vérifier si les opérations solutions permettent bien d'atteindre l'état objectif ?
     - Je ne suis pas sûr qu'on puisse rejouer les opérations côté serveur actuellement
-**** TODO PLM : Release une nouvelle version de PLM
-- Pour le module de TOP à TN, les étudiants vont travailler sur PLM
-- Les enseignements de ce module porte notamment sur la récursivité
-- Les leçons correspondantes ne sont pas activées dans la version actuelle de la PLM
-- Les activer et déployer la nouvelle version
 **** TODO PLM : Release une image de NGINX pour le mode développement
 - Depuis le rework du protocole de communication avec les juges, NGINX est utilisé comme reverse-proxy pour accéder à la queue de message
   - Le port 15674 (utilisé par STOMP) n'est pas ouvert sur la machine de TN
