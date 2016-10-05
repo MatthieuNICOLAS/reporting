@@ -224,3 +224,8 @@ java.lang.NullPointerException
   - Vérifier si l'instance obtenue possède des opérations solutions
   - Vérifier si les opérations solutions permettent bien d'atteindre l'état objectif ?
     - Je ne suis pas sûr qu'on puisse rejouer les opérations côté serveur actuellement
+**** TODO PLM : Release une nouvelle version de PLM
+- Pour le module de TOP à TN, les étudiants vont travailler sur PLM
+- Les enseignements de ce module porte notamment sur la récursivité
+- Les leçons correspondantes ne sont pas activées dans la version actuelle de la PLM
+- Les activer et déployer la nouvelle version
