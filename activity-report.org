@@ -215,3 +215,12 @@ java.lang.NullPointerException
 - Lors de leur instanciation à partir des sources, on essaie de calculer le(s) monde(s) objectif(s) à partir de cette entité solution
 - Ajouter un mécanisme de fallback vers un autre langage si l'entité solution Java n'est pas trouvée
 - Déclencher une erreur si aucune entité solution n'est trouvée
+**** TODO PLM : Ajouter des tests d'intégration pour vérifier la sérialisation JSON
+- Semblerait que la sérialisation JSON foire de temps en temps
+  - Le JSON généré ne contient pas les opérations de la solution
+- Implémenter des tests d'intégration
+  - Vérifier si la sérialisation JSON existe
+  - Vérifier si la sérialisation JSON peut être désérialiser correctement
+  - Vérifier si l'instance obtenue possède des opérations solutions
+  - Vérifier si les opérations solutions permettent bien d'atteindre l'état objectif ?
+    - Je ne suis pas sûr qu'on puisse rejouer les opérations côté serveur actuellement
