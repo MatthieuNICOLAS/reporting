@@ -201,19 +201,37 @@ java.lang.NullPointerException
     - Est-ce que l'animatique "modifie" le storyboard ou produit une nouvelle donnée?
     - Qui s'occupe de l'élaboration du layout du shot?
     - Est-ce que l'élaboration du layout du shot inclus le typage de chaque clip?
-- Release d'une nouvelle version de PLM
+- PLM : Release d'une nouvelle version de PLM
   - Transfert des commits modifiant l'UI dans une branche distincte
   - Activation des leçons sur la récursivité
   - Correction du nom des fichiers de consignes pour l'exercice *Occurrences*
   - Correction de l'entité Java de l'exercice *IsMember*
   - Augmentation de la limite de temps d'exécution de PLM-judge
   - Release de webPLM:2.1.1 et de PLM-judge:2.1.1
+- PLM : Corriger l'exécution de code Java
+  - L'erreur ne semble se produire qu'en exécutant du code via les juges
+  - L'erreur est liée à 2 morceaux de code
+    - [[https://github.com/BuggleInc/PLM/blob/master/src/plm/core/lang/ProgrammingLanguage.java#L131-L139][ProgrammingLanguage.getProgrammingLanguage()]]
+    - [[https://github.com/BuggleInc/PLM/blob/master/src/plm/core/model/lesson/BlankExercise.java#L26-L27][BlankExercise()]]
+  - Lorsqu'on désérialise un exercice, on regénère les instances de *SourceFile* pour chaque langage de programmation
+  - Ainsi, on instancie le *SourceFile* et on le stocke dans une *Map* en l'associant au *ProgrammingLanguage* retourné par /getProgrammingLanguage()/
+  - Sauf que la fonction /getProgrammingLanguage()/ retourne une valeur par défaut s'il ne trouve pas de *ProgrammingLanguage* correspondant à la chaîne passée en paramètre
+  - Du coup, lorsqu'on rencontre un *ProgrammingLanguage* inconnu, on remplace le *SourceFile* associé au langage par défaut par celui nouvellement créé
+  - Ici, c'est *Blockly* qui n'est pas supporté par *PLM-judge* et qui pose problème
+  - Ajout du support de *Blockly*
+  - Ouverture d'une issue pour garder une trace du problème : https://github.com/BuggleInc/PLM/issues/477
 *** Planned
 **** DONE PLM : Release une nouvelle version de PLM
 - Pour le module de TOP à TN, les étudiants vont travailler sur PLM
 - Les enseignements de ce module porte notamment sur la récursivité
 - Les leçons correspondantes ne sont pas activées dans la version actuelle de la PLM
 - Les activer et déployer la nouvelle version
+**** DONE PLM : Corriger l'exécution de code Java
+- Depuis la mise à jour, l'exécution du code Java génère une erreur
+  #+BEGIN_SRC
+  Compilation error: Environment.java:0:class, interface, or enum expected
+  #+END_SRC
+- Trouver l'origine de l'erreur et la corriger
 **** TODO TVPaint : Définir le business process correspondant à la réalisation d'un film
 - Le process a été décrit sommairement dans l'image suivante
   #+CAPTION: Réalisation d'un film
