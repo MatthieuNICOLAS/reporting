@@ -220,6 +220,32 @@ java.lang.NullPointerException
   - Ici, c'est *Blockly* qui n'est pas supporté par *PLM-judge* et qui pose problème
   - Ajout du support de *Blockly*
   - Ouverture d'une issue pour garder une trace du problème : https://github.com/BuggleInc/PLM/issues/477
+- PLM : Corriger l'exercice Polygon360
+  - L'erreur ne provient pas de la sérialisation JSON stockée
+    - Supprimer la sérialisation de l'exercice et l'instancier depuis les sources ne corrige pas le problème
+  - Le plus troublant est l'affichage du monde objectif
+  - Une partie du polygone semble manquer dans le monde objectif
+    #+CAPTION: Partie manquante du polygone
+    #+NAME:   fig:polygon360-missingline.png
+    [[file:img/polygon360-missingline.png]]
+  - Représentation des lignes indiquées dans le message d'erreur
+    #+CAPTION: Lignes posant problème
+    #+NAME:   fig:polygon360-showlines.png
+    [[file:img/polygon360-showlines.png]]
+    - La ligne bleue correspond à la ligne manquante dans le monde objectif
+    - La ligne rouge correspond à la ligne manquante dans le monde courant
+  - On arrive à la même conclusion en listant les *Shapes* présentes dans chacun des mondes
+    #+BEGIN_SRC
+    // Lines of the current world with x1 or x2 > 262
+    CurrentWorld: Line (x262,263 y127,117 / x263,445 y135,028 / black)
+    CurrentWorld: Line (x262,923 y164,938 / x263,968 y154,996 / black)
+    CurrentWorld: Line (x263,445 y135,028 / x264,177 y149,000 / black)
+
+    // Lines of the answer world with x1 or x2 > 262
+    AnswerWorld: Line (x262,263 y127,117 / x263,445 y135,028 / black)
+    AnswerWorld: Line (x262,923 y164,938 / x263,968 y154,996 / black)
+    AnswerWorld: Line (x263,968 y154,996 / x264,177 y149,000 / black)
+    #+END_SRC
 *** Planned
 **** DONE PLM : Release une nouvelle version de PLM
 - Pour le module de TOP à TN, les étudiants vont travailler sur PLM
@@ -254,6 +280,13 @@ java.lang.NullPointerException
   - Vérifier si l'instance obtenue possède des opérations solutions
   - Vérifier si les opérations solutions permettent bien d'atteindre l'état objectif ?
     - Je ne suis pas sûr qu'on puisse rejouer les opérations côté serveur actuellement
+**** TODO PLM : Corriger l'exercice Polygon360
+- L'exercice Polygon360 ne peut pas être résolu actuellement
+- Lorsqu'on soumet le code de la correction, on n'arrive pas à atteindre le monde objectif
+  #+BEGIN_SRC
+  Le monde 'Polygon360' diffère: x1 diffère. (trouvé Line (x263.445 y135.028 / x264.177 y149.000 / black) au lieu de Line (x263.968 y154.996 / x264.177 y149.000 / black) ) 
+  #+END_SRC
+- L'erreur a été reportée ici : https://github.com/BuggleInc/webPLM/issues/130
 **** TODO PLM : Release une image de NGINX pour le mode développement
 - Depuis le rework du protocole de communication avec les juges, NGINX est utilisé comme reverse-proxy pour accéder à la queue de message
   - Le port 15674 (utilisé par STOMP) n'est pas ouvert sur la machine de TN
