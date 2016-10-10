@@ -258,6 +258,26 @@ java.lang.NullPointerException
   Compilation error: Environment.java:0:class, interface, or enum expected
   #+END_SRC
 - Trouver l'origine de l'erreur et la corriger
+** Semaine du <2016-10-10 lun.> au <2016-10-14 ven.>
+*** Done
+- TVPaint : Définir le business process correspondant à la réalisation d'un film
+  - Ajout des phases de vérification pour
+    - Le storyboard
+    - L'animation
+  - Ajout des données des formulaires
+    - Création du film
+    - Phases de vérification
+  - Difficultés rencontrées
+    - Bloque sur l'instanciation d'un *Storyboard* et d'une *Animation* à partir des fichiers soumis par les utilisateurs
+    - Aussi des difficultés sur la multi-instanciation du process pour gérer un shot
+      - On souhaite générer une instance du process pour chaque shot
+      - La liste des shots se trouvent dans l'instance de *Film*
+      - Mais je n'arrive pas accéder à la variable de process /movie/
+      - Pour l'instant, je passe par une autre variable de process /shots/
+  - Quelques questions sur les modèles de données
+    - À quoi correspond le modèle de données *Scene* ?
+    - Que contient le modèle de données *Animation* ?
+*** Planned
 **** TODO TVPaint : Définir le business process correspondant à la réalisation d'un film
 - Le process a été décrit sommairement dans l'image suivante
   #+CAPTION: Réalisation d'un film
