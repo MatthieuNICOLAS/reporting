@@ -302,7 +302,20 @@ java.lang.NullPointerException
     Ne faites pas attention à cela, je n'existe presque plus, et je le sais ; Dieu sait ce qui habite en moi à ma place.
     -- Dostoïevski dans son roman "Idiot"
     #+END_QUOTE
+- PLM : Release une image de NGINX pour le mode développement
+  - Ajout d'un répertoire pour indiquer que la config actuelle est celle pour TELECOM Nancy
+  - Modification de la configuration pour ajouter le reverse-proxy pour la queue de message
+  - Ajout d'une autre configuration pour le mode développement
+  - Génération des images Docker correspondantes
 *** Planned
+**** DONE PLM : Release une image de NGINX pour le mode développement
+- Depuis le rework du protocole de communication avec les juges, NGINX est utilisé comme reverse-proxy pour accéder à la queue de message
+  - Le port 15674 (utilisé par STOMP) n'est pas ouvert sur la machine de TN
+  - NGINX permet d'accéder à ce port via un reverse-proxy
+- Ceci empêche le docker-compose pour le mode développement de fonctionner correctement
+  - Il ne met pas en place de NGINX
+- Faire une image Docker de NGINX pour le développement
+- Mettre à jour le docker-compose correspondant
 **** TODO MUTE : Préparer la démo pour l'évaluation INRIA
 - Tester l'environnement de la démo
 - Établir le scénario de la démo
@@ -336,11 +349,3 @@ java.lang.NullPointerException
   Le monde 'Polygon360' diffère: x1 diffère. (trouvé Line (x263.445 y135.028 / x264.177 y149.000 / black) au lieu de Line (x263.968 y154.996 / x264.177 y149.000 / black) ) 
   #+END_SRC
 - L'erreur a été reportée ici : https://github.com/BuggleInc/webPLM/issues/130
-**** TODO PLM : Release une image de NGINX pour le mode développement
-- Depuis le rework du protocole de communication avec les juges, NGINX est utilisé comme reverse-proxy pour accéder à la queue de message
-  - Le port 15674 (utilisé par STOMP) n'est pas ouvert sur la machine de TN
-  - NGINX permet d'accéder à ce port via un reverse-proxy
-- Ceci empêche le docker-compose pour le mode développement de fonctionner correctement
-  - Il ne met pas en place de NGINX
-- Faire une image Docker de NGINX pour le développement
-- Mettre à jour le docker-compose correspondant
