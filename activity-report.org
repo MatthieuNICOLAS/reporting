@@ -302,6 +302,7 @@ java.lang.NullPointerException
     Ne faites pas attention à cela, je n'existe presque plus, et je le sais ; Dieu sait ce qui habite en moi à ma place.
     -- Dostoïevski dans son roman "Idiot"
     #+END_QUOTE
+  - Répétition de la démo
 - PLM : Release une image de NGINX pour le mode développement
   - Ajout d'un répertoire pour indiquer que la config actuelle est celle pour TELECOM Nancy
   - Modification de la configuration pour ajouter le reverse-proxy pour la queue de message
@@ -316,7 +317,7 @@ java.lang.NullPointerException
   - Il ne met pas en place de NGINX
 - Faire une image Docker de NGINX pour le développement
 - Mettre à jour le docker-compose correspondant
-**** TODO MUTE : Préparer la démo pour l'évaluation INRIA
+**** DONE MUTE : Préparer la démo pour l'évaluation INRIA
 - Tester l'environnement de la démo
 - Établir le scénario de la démo
 - Trouver un texte à taper et se le répartir
