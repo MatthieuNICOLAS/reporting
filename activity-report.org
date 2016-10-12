@@ -277,7 +277,36 @@ java.lang.NullPointerException
   - Quelques questions sur les modèles de données
     - À quoi correspond le modèle de données *Scene* ?
     - Que contient le modèle de données *Animation* ?
+- MUTE : Préparer la démo pour l'évaluation INRIA
+  - Philippe a installé les différents composants de la démo sur les Raspberries et configuré les interfaces réseaux
+  - Scénario :
+    - Introduction
+      - Au départ, seul MUTE est déployé
+      - Le bot est démarré, mais il n'est pas encore relié au réseau
+      - Gérald (qui projetera son écran) se connectera à un document pré-existant
+      - Collaboration rapide pour montrer l'aspect temps réel
+    - Ajout du bot
+      - On le connecte au réseau
+      - On l'invite dans l'édition collaborative
+      - On l'active
+      - On observe qu'il traduit le texte déjà existant et met ensuite à jour en temps réel (mais avec délai) la traduction
+    - Sans serveur
+      - On débranche la Raspberry correspondant au serveur
+      - On observe que la collaboration fonctionne toujours
+  - Texte à taper :
+    #+BEGIN_QUOTE
+    Pourquoi je veux vous réunir : pour vous ou pour moi?
+    Evidemment pour moi, cela résoudrait tout pour moi ; j'en ai décidé ainsi depuis longtemps...
+    On m'a raconté que votre soeur Adélaïde avait dit de mon portrait qu'avec une beauté pareille on pouvait bouleverser le monde.
+    Mais j'ai renoncé au monde ; cela vous paraît drôle venant de moi, alors que vous me rencontrez couverte de bijoux et de dentelles en compagnie d'ivrognes et de scélérats?
+    Ne faites pas attention à cela, je n'existe presque plus, et je le sais ; Dieu sait ce qui habite en moi à ma place.
+    -- Dostoïevski dans son roman "Idiot"
+    #+END_QUOTE
 *** Planned
+**** TODO MUTE : Préparer la démo pour l'évaluation INRIA
+- Tester l'environnement de la démo
+- Établir le scénario de la démo
+- Trouver un texte à taper et se le répartir
 **** TODO TVPaint : Définir le business process correspondant à la réalisation d'un film
 - Le process a été décrit sommairement dans l'image suivante
   #+CAPTION: Réalisation d'un film
