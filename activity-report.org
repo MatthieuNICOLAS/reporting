@@ -350,3 +350,48 @@ java.lang.NullPointerException
   Le monde 'Polygon360' diffère: x1 diffère. (trouvé Line (x263.445 y135.028 / x264.177 y149.000 / black) au lieu de Line (x263.968 y154.996 / x264.177 y149.000 / black) ) 
   #+END_SRC
 - L'erreur a été reportée ici : https://github.com/BuggleInc/webPLM/issues/130
+**** TODO PLM : Trouver l'origine du crash de webPLM du <2016-10-12 mer.>
+- L'application a de nouveau eu un crash le <2016-10-12 mer.>, de 17:54 jusqu'à 18h:26
+- Il a fallu que je redémarre manuellement le container de webPLM
+  - Pour une raison inconnue, il n'arrivait pas à redémarrer correctement
+  - Suppression du container et déploiement d'un nouveau
+- Voici les métriques récupérées par New Relic au moment du crash
+  #+CAPTION: Informations sur les transactions web au moment du crash
+  #+NAME:   fig:transactions.png
+  [[file:img/crash-webplm-2016-10-12T17:54/transactions.png]]
+  #+CAPTION: Informations sur les ressources utilisées par le serveur au moment du crash
+  #+NAME:   fig:server.png
+  [[file:img/crash-webplm-2016-10-12T17:54/server.png]]
+  #+CAPTION: Informations sur les ressources utilisées par les différents processus au moment du crash
+  #+NAME:   fig:processes.png
+  file:img/crash-webplm-2016-10-12T17:54/processes.png
+  #+CAPTION: Informations sur les ressources utilisées par les différents containers au moment du crash
+  #+NAME:   fig:dockers.png
+  [[file:img/crash-webplm-2016-10-12T17:54/dockers.png]]
+- Les logs ne montrent aucune erreur expliquant le crash, seulement des requêtes d'exécution
+  #+BEGIN_SRC
+  2016-10-12 15:53:11 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8700 - Received a message
+  2016-10-12 15:53:11 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8700 - {"cmd":"runExercise","args":{"lessonID":"recursion.logo", "exerciseID":"recursion.logo.koch.Koch","code":"def snowFlake (levels:Int, length:Double) {\n    snowSide(levels, length);\n    right(120);\n    setColor( Color.blue);\n    snowSide(levels, length);\n    right(120);\n    setColor(Color.orange);\n    snowSide(levels, length);\n    right(120);\n}\ndef snowSide(levels:Int, length:Double) {\n  if(levels==0){\n    return;\n  }else{\n    avance(length);\n    snowSide(levels-1,length/3);\n  }\n}"}}
+  2016-10-12 15:53:11 +0000 [ERROR] from application in ForkJoinPool-3-worker-15 - PLMActor: executionActor ? StartExecution timeout
+  2016-10-12 15:53:12 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8689 - Received a message
+  2016-10-12 15:53:12 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8689 - {"cmd":"getExercise","args":{"lessonID":"recursion.logo","exerciseID":"recursion.logo.koch.HexaKoch"}}
+  2016-10-12 15:53:15 +0000 [ERROR] from application in ForkJoinPool-3-worker-23 - PLMActor: executionActor ? StartExecution timeout
+  2016-10-12 15:53:15 +0000 [ERROR] from application in ForkJoinPool-3-worker-29 - PLMActor: executionActor ? StartExecution timeout
+  2016-10-12 15:53:17 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8651 - Received a message
+  2016-10-12 15:53:17 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8651 - {"cmd":"runExercise","args":{"lessonID":"recursion.logo","exerciseID":"recursion.logo.spiral.Spiral","code":"var length : Int = 5\n\nbaisseCrayon()\ndef spiral(steps:Int, angle:Int, length:Int, increment:Int) {\n avance(length)\n  gauche(45)\n  spiral(0,8, length+3, increment+1)\n  \n}"}}
+  2016-10-12 15:53:18 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8695 - Received a message
+  2016-10-12 15:53:18 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8695 - {"cmd":"runExercise","args":{"lessonID":"recursion.logo","exerciseID":"recursion.logo.koch.Koch","code":"def snowFlake (levels:Int, length:Double) {\n    snowSide(levels, length);\n    right(120);\n    setColor(Color.blue);\n    snowSide(levels, length);\n    right(120);\n    setColor(Color.orange);\n    snowSide(levels, length);\n    right(120);\n}\n\ndef snowSide(levels:Int, length:Double) \n{\n  \n  if(length == 0)\n  {\n    return;\n  }\n  \n  else\n  {\n    avance(200);\n  }\n  \n}"}}
+  2016-10-12 15:53:22 +0000 [ERROR] from application in ForkJoinPool-3-worker-5 - PLMActor: executionActor ? StartExecution timeout
+  2016-10-12 15:53:23 +0000 [ERROR] from application in ForkJoinPool-3-worker-1 - PLMActor: executionActor ? StartExecution timeout
+  2016-10-12 15:53:23 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8692 - Received a message
+  2016-10-12 15:53:23 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8692 - {"cmd":"runExercise","args":{"lessonID":"recursion.logo","exerciseID":"recursion.logo.koch.SquareKoch","code":"void snowSquare (int levels, double length) {\n    squareSide(levels, length);\n    right(90);\n    setColor(Color.blue);\n    squareSide(levels, length);\n    right(90);\n    setColor(Color.orange);\n    squareSide(levels, length);\n    right(90);\n    setColor(Color.magenta);\n    squareSide(levels, length);\n    right(90);\n}\nvoid squareSide(int levels, double length) {\n  if(levels==0){avance(length);}\n  else{\n    squareSide(levels-1,length/2);\n    gauche(90);\n    squareSide(levels-1,length/2);\n    droite(90);\n    squareSide(levels-1,length/2);\n    droite(90);\n    squareSide(levels-1,length/2);\n    gauche(90);\n    squareSide(levels-1,length/2);\n  }\n}"}}
+  2016-10-12 15:53:24 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8695 - Received a message
+  2016-10-12 15:53:24 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8695 - {"cmd":"runExercise","args":{"lessonID":"recursion.logo","exerciseID":"recursion.logo.koch.PentaKoch","code":"void pentaKoch(int levels, double length) {\n  if(levels==0){\n    avance(length);\n  }\n  else{\n  pentaKoch(levels-1,length*0.4);\n    left(180-(360/5);\n    pentaKoch(levels-1,length*0.4);\n    right(360/5);\n    pentaKoch(levels-1,length*0.4);\n    right(360/5);\n    pentaKoch(levels-1,length*0.4);\n    right(360/5);\n    pentaKoch(levels-1,length*0.4);\n    left(180-(360/5);\n    pentaKoch(levels-1,length*0.4);\n  }\n}"}}
+  2016-10-12 15:53:25 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8689 - Received a message
+  2016-10-12 15:53:25 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8689 - {"cmd":"runExercise","args":{"lessonID":"recursion.logo","exerciseID":"recursion.logo.koch.Koch","code":"def snowFlake (levels:Int, length:Double) {\n    snowSide(levels, length);\n    right(120);\n    setColor(Color.blue);\n    snowSide(levels, length);\n    right(120);\n    setColor(Color.orange);\n    snowSide(levels, length);\n    right(120);\n}\ndef snowSide(levels:Int, length:Double) {\n  avance(length)\n  snowSide(levels, length)\n  right(120)\n  snowSide(levels, length)\n  right(120)\n  snowSide(levels, length)\n}"}}
+  2016-10-12 15:53:27 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8689 - Received a message
+  2016-10-12 15:53:27 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8689 - {"cmd":"runExercise","args":{"lessonID":"recursion.logo","exerciseID":"recursion.logo.koch.Koch","code":"def snowFlake (levels:Int, length:Double) {\n    snowSide(levels, length);\n    right(120);\n    setColor(Color.blue);\n    snowSide(levels, length);\n    right(120);\n    setColor(Color.orange);\n    snowSide(levels, length);\n    right(120);\n}\ndef snowSide(levels:Int, length:Double) {\n  if(levels==0){\n    return;\n  }else{\n    avance(length);\n    snowSide(levels-1,length/3);\n  }\n}"}}
+  2016-10-12 15:53:30 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8689 - Received a message
+  2016-10-12 15:53:30 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8689 - {"cmd":"stopExecution","args":{}}
+  2016-10-12 16:27:11 +0000 [INFO] from application in application-akka.actor.default-dispatcher-2 - Execution Mode: TRIBUNAL
+  #+END_SRC
