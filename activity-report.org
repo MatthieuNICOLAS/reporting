@@ -326,6 +326,9 @@ java.lang.NullPointerException
 - Tester l'environnement de la démo
 - Établir le scénario de la démo
 - Trouver un texte à taper et se le répartir
+** Semaine du <2016-10-17 lun.> au <2016-10-21 ven.>
+*** Done
+*** Planned
 **** TODO TVPaint : Définir le business process correspondant à la réalisation d'un film
 - Le process a été décrit sommairement dans l'image suivante
   #+CAPTION: Réalisation d'un film
