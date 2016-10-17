@@ -274,6 +274,11 @@ java.lang.NullPointerException
       - La liste des shots se trouvent dans l'instance de *Film*
       - Mais je n'arrive pas accéder à la variable de process /movie/
       - Pour l'instant, je passe par une autre variable de process /shots/
+    - Je n'arrive plus non plus à créer un type /enum/ avec Bonita Soft
+  - Quelques questions sur le workflow
+    - Que se passe-t-il/que fait-on si un shot ne passe pas la dernière étape de validation?
+      - L'étape de validation concernée se trouve après l'activité /compositing/
+      - Est-ce qu'elle ne sert qu'à valider cette activité ou elle sert à valider l'ensemble des clips?
   - Quelques questions sur les modèles de données
     - À quoi correspond le modèle de données *Scene* ?
     - Que contient le modèle de données *Animation* ?
