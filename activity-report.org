@@ -345,6 +345,8 @@ java.lang.NullPointerException
 - Lister les tâches à effectuer
 - Les attribuer aux différentes étapes/versions du projet
 - Établir le coût de chacune des tâches
+**** TODO MUTE : Se former aux technologies choisies
+- Lire [[https://books.ninja-squad.com/angular2][Become A Ninja With Angular 2]] et [[https://www.gitbook.com/book/basarat/typescript/details][TypeScript Deep Dive]]
 **** TODO TVPaint : Définir le business process correspondant à la réalisation d'un film
 - Le process a été décrit sommairement dans l'image suivante
   #+CAPTION: Réalisation d'un film
