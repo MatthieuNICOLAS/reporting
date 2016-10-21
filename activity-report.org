@@ -328,7 +328,23 @@ java.lang.NullPointerException
 - Trouver un texte à taper et se le répartir
 ** Semaine du <2016-10-17 lun.> au <2016-10-21 ven.>
 *** Done
+- MUTE : Faire la roadmap du projet
+  - La liste des tâches est disponible sur [[https://app.asana.com/][Asana]]
+  - Définition des différentes étapes
+    - v1: MUTE--
+    - v2: Notepad equivalent
+    - v3: Fourre-tout
+  - Choix des technos
+    - Angular 2
+    - Angular Matérial 2
+    - Ava
+    - TSLint
 *** Planned
+**** TODO MUTE : Faire la roadmap du projet
+- Pour répondre au besoin d'INRIA
+- Lister les tâches à effectuer
+- Les attribuer aux différentes étapes/versions du projet
+- Établir le coût de chacune des tâches
 **** TODO TVPaint : Définir le business process correspondant à la réalisation d'un film
 - Le process a été décrit sommairement dans l'image suivante
   #+CAPTION: Réalisation d'un film
