@@ -328,6 +328,9 @@ java.lang.NullPointerException
 - Trouver un texte à taper et se le répartir
 ** Semaine du <2016-10-17 lun.> au <2016-10-21 ven.>
 *** Done
+- TVPaint : Définir le business process correspondant à la réalisation d'un film
+  - De nouvelles questions sur le workflow
+    - Est-ce que l'activité "Assignation outils/images" peut être entièrement automatisée ou pas?
 - MUTE : Faire la roadmap du projet
   - La liste des tâches est disponible sur [[https://app.asana.com/][Asana]]
   - Définition des différentes étapes
@@ -340,13 +343,42 @@ java.lang.NullPointerException
     - Ava
     - TSLint
 *** Planned
-**** TODO MUTE : Faire la roadmap du projet
+**** DONE MUTE : Faire la roadmap du projet
 - Pour répondre au besoin d'INRIA
 - Lister les tâches à effectuer
 - Les attribuer aux différentes étapes/versions du projet
 - Établir le coût de chacune des tâches
-**** TODO MUTE : Se former aux technologies choisies
+**** DONE MUTE : Se former aux technologies choisies
 - Lire [[https://books.ninja-squad.com/angular2][Become A Ninja With Angular 2]] et [[https://www.gitbook.com/book/basarat/typescript/details][TypeScript Deep Dive]]
+** Semaines du <2016-11-14 lun.> au <2016-11-25 ven.>
+*** Done
+- MUTE : Développement de la nouvelle version de MUTE
+  - Ajout de l'éditeur de texte *CodeMirror*
+  - Création du modèle de données *LogootSRopes* du document
+  - Détection des modifications de l'utilisateur et génération des *TextOperations* correspondantes
+    - *TextInsert* et *TextDelete*
+  - Mise à jour du modèle à partir de ces opérations textes
+  - Envoi des *LogootSOperations* correspondantes aux modifications aux collaborateurs
+  - Réception et ré-instantiation des *LogootSOperations*
+  - Mise à jour du modèle à partir des opérations *LogootSplit*
+  - Mise à jour de la vue du document
+  - Passage à la nouvelle version de /Mute-structs/
+  - Correction de bugs liées à la nouvelle version de /Mute-structs/
+    - Suppression d'une boucle infinie dans la recherche d'un noeud
+    - Correction des assertions effectuées lors des rotations
+    - Correction des expressions permettant d'indiquer si l'on peut /append/ ou /prepend/ du texte à un bloc
+** Semaine du <2016-11-28 lun.> au <2016-12-02 ven.>
+*** Done
+*** Planned
+**** TODO TVPaint : Envoyer le travail effectué
+**** TODO TVPaint : Étudier la gestion des ressources dans BonitaSoft
+- Voir pour générer des rôles
+- Voir pour générer des acteurs
+- Voir comment attribuer les tâches
+**** TODO TVPaint : Étudier comment interagir avec BonitaSoft par API
+- Voir comment spécifier le début et la fin d'une tâche par API
+**** TODO TVPaint : Étudier comment collaborer dans un projet réalisé avec BonitaSoft
+- Voir si on peut partager avec Git
 **** TODO TVPaint : Définir le business process correspondant à la réalisation d'un film
 - Le process a été décrit sommairement dans l'image suivante
   #+CAPTION: Réalisation d'un film
