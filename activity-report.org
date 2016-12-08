@@ -369,16 +369,54 @@ java.lang.NullPointerException
     - Correction des expressions permettant d'indiquer si l'on peut /append/ ou /prepend/ du texte à un bloc
 ** Semaine du <2016-11-28 lun.> au <2016-12-02 ven.>
 *** Done
+- TVPaint : Étudier comment collaborer dans un projet réalisé avec BonitaSoft
+  - D'après [[http://community.bonitasoft.com/questions-and-answers/does-bonita-support-git-repository][ce topic]] et [[http://documentation.bonitasoft.com/6.x-7.2/workspaces-and-repositories-1][cette doc]], on ne peut pas partager un projet dans *Bonita* avec la version /Community/
+  - La fonctionnalité est ajoutée dans la version /Subscription/
+  - La doc ne semble disponible que pour SVN par contre
+  - Et il manque les tarifs sur le site de *Bonita*, il faut prendre contact avec eux pour les obtenir
+- MUTE : Développement du bot de stockage
+  - Projet disponible [[https://github.com/coast-team/mute-bot-storage][ici]]
 *** Planned
-**** TODO TVPaint : Envoyer le travail effectué
+**** DONE TVPaint : Envoyer le travail effectué
+**** DONE TVPaint : Étudier comment collaborer dans un projet réalisé avec BonitaSoft
+- Voir si on peut partager avec Git
+**** DONE MUTE : Développement du bot de stockage
+** Semaine du <2016-12-05 lun.> au <2016-12-09 ven.>
+*** Done
+- MUTE : Lire l'article sur les barrières causales
+  - Happened before relation
+    - a -> b if a and b are events in the same process and a occured before b
+    - a -> b if a is the event of sending a message M in a process and b is the event of delivery of the same message to another process
+    - if a -> b and b -> c then a -> c
+    - if a -/> b and b -/> a then a and b are said to be concurrent and represented as a || b
+  - Reception != Delivery
+    - Réception du message par le protocole de causal ordering
+    - Livraison du message par le protocole de causal ordering à l'application
+  - Destination set
+    - Si on reçoit un message M2 ayant pour dépendance M1.
+    - Si on a pas reçu M1 car on ne fait pas parti de son destination set, alors on peut le retirer de la liste des dépendances et délivrer M2.
+  - Matrice Delivered
+    - En local stocke et tient à jour matrice NxN Delivered tel que
+      - Soit i le process courant, j et k 2 autres processes
+      - Delivered(i)[j, k] = x indique que tous les messages de Pj à destination de Pk ayant une clock <= x ont été délivrés
+	- Delivered(i) indique la matrice Delivered du process i
+  - Vecteur CB
+    - En local, maintien un vecteur CB de taille N de telle manière que si (k,x) appartiennent à CB(i)[j], cela implique que le prochain message de Pi à Pj devra être délivré uniquement après avoir reçu le Xième de Pk.
+    - CB(i) = { j: { (process_id, counter), ... }, ... }
+*** Planned
+**** DONE MUTE : Lire l'article sur les barrières causales
+- Maintenant que le bot de stockage est implémenté, on rencontre un problème lors de la synchronisation
+- Si un utilisateur possède une version plus récente du document que le bot de stockage, celle-ci va se faire écraser lors de la synchronisation
+- Alors qu'avec *LogootSplit*, on pourrait juste déterminer les opérations manquantes et synchroniser proprement les documents
+- Dans un 1er temps on va implémenter un vecteur d'état pour déterminer les opérations manquantes
+- Mais à terme, on pourra le remplacer par une barrière causale (ou mieux) pour optimiser le processus
+- Se renseigner sur les barrières causales
 **** TODO TVPaint : Étudier la gestion des ressources dans BonitaSoft
 - Voir pour générer des rôles
 - Voir pour générer des acteurs
 - Voir comment attribuer les tâches
 **** TODO TVPaint : Étudier comment interagir avec BonitaSoft par API
 - Voir comment spécifier le début et la fin d'une tâche par API
-**** TODO TVPaint : Étudier comment collaborer dans un projet réalisé avec BonitaSoft
-- Voir si on peut partager avec Git
 **** TODO TVPaint : Définir le business process correspondant à la réalisation d'un film
 - Le process a été décrit sommairement dans l'image suivante
   #+CAPTION: Réalisation d'un film
