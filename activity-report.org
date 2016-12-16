@@ -411,6 +411,62 @@ java.lang.NullPointerException
 - Dans un 1er temps on va implémenter un vecteur d'état pour déterminer les opérations manquantes
 - Mais à terme, on pourra le remplacer par une barrière causale (ou mieux) pour optimiser le processus
 - Se renseigner sur les barrières causales
+** Semaine du <2016-12-12 lun.> au <2016-12-16 ven.>
+- MUTE : Refactorer *DocService*
+  - Gestion des messages spécifiques à ce service dans *DocService*
+    - Réception des messages
+    - Sérialisation/Désérialisation des objets de /mute-structs/
+  - Remplacement des instances de *Subject* par des couples *Observable*/*Observer*
+    - Le but de *Subject* a l'air d'émettre une valeur, et non pas une suite d'évènements
+      - *AsyncSubject* peut posséder plusieurs valeurs au cours du temps, mais celle-ci n'est émise seulement qu'à la complétion du /stream/
+      - *BehaviorSubject* permet d'émettre plusieurs valeurs au cours du temps, mais il a besoin d'une valeur initiale et garde en mémoire la dernière valeur émise
+      - *ReplaySubject* permet d'émettre plusieurs valeurs au cours du temps, mais il rejoue l'historique des valeurs à chaque abonné
+    - C'est le couple *Observable*/*Observer* qui semble le plus indiqué dans ce cas
+      - Il permet d'émettre plusieurs valeurs au cours du temps
+      - Aucune valeur n'est nécessaire à sa création
+      - Si on s'y abonne "en retard", on ne recevra que les prochaines valeurs émises
+- MUTE : Ajouter *EditorService*
+  - Ajout de *EditorService*
+  - Modification de *DocService* pour lire les opérations locales à partir du stream
+  - Modification de *EditorComponent* pour émettre les opérations via *EditorService*
+- MUTE : Nettoyer les streams
+  - À la destruction de *EditorComponent*, le stream /operationStream/ n'est pas automatiquement détruit.
+  - Désabonnement aux streams à la destruction de *EditorComponent*
+  - Ajout d'une méthode /clean()/ à *DocService* pour déclencher le désabonnement aux streams
+  - Appel de /DocService.clean()/ à la destruction de *DocComponent*
+- MUTE : Trouver l'origine du bug empêchant d'envoyer les opérations locales
+  - Le problème provient plus exactement de la sérialisation de l'opération *LogootSAdd* ou *LogootSDel*
+  - Maintenant qu'on utilise la version corrigée de /mute-structs/, j'ai mis à jour la définition du message *Identifier* dans /protobuf/
+  - Au lieu d'envoyer une liste de /double/, j'envoie désormais une liste de /int32/
+  - Cependant, le /replicaNumber/ fourni par /sigver/ est potentiellement un /double/
+    - Voir https://github.com/coast-team/sigver/blob/master/src/sigver.js#L4 et https://github.com/coast-team/sigver/blob/master/src/sigver.js#L130
+  - Notification du problème @Philippe
+*** Planned
+**** DONE MUTE : Refactorer *DocService*
+- Actuellement, une partie de la logique de *DocService* se trouve dans *NetworkService*
+- La déplacer dans *DocService*
+- En profiter pour nettoyer le code
+**** DONE MUTE : Ajouter *EditorService*
+- Actuellement, *EditorComponent* interagit avec *DocService* pour lui fournir les opérations locales
+  - Il expose son stream à *DocService* qui s'y abonne
+- Cependant, lorsque *EditorComponent* est détruit (lorsque l'utilisateur retourne sur la liste des documents), *DocService* écoute toujours le stream des opérations locales
+- Déplacer le stream des opérations locales dans un service *EditorService*
+- Modifier *EditorComponent* pour qu'il émette les opérations par le biais de *EditorService*
+**** DONE MUTE : Nettoyer les streams
+- Actuellement, les différents *Services* et *Components* communiquent par le biais de /streams/
+- Cependant, ceux-ci ne sont pas nettoyés notamment à la destruction des *Components*
+  - Ceci semble provoquer des erreurs lors de la détection des changements puisqu'on essaie de mettre à jour vues qui ont été détruites
+  - Et il s'agit bien évidemment d'une fuite mémoire
+- Se désabonner des streams à la destruction des *Components*
+- Se désabonner des streams à la destructions des *Services*
+**** DONE MUTE : Trouver l'origine du bug empêchant d'envoyer les opérations locales
+- De temps en temps, l'éditeur plante après la génération de la 1ère opération locale
+- Cependant aucune erreur n'est générée
+- Ce bug semble lié à l'envoi de l'opération aux autres pairs
+  - Mais ce bug se déclenche même lorsqu'on édite le document seul
+- Trouver l'origine de ce bug
+**** TODO MUTE : Ajouter le stockage au sein du navigateur du document
+**** TODO MUTE : Ajouter le mécanisme de join propre
 **** TODO TVPaint : Étudier la gestion des ressources dans BonitaSoft
 - Voir pour générer des rôles
 - Voir pour générer des acteurs
