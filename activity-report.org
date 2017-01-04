@@ -412,6 +412,7 @@ java.lang.NullPointerException
 - Mais à terme, on pourra le remplacer par une barrière causale (ou mieux) pour optimiser le processus
 - Se renseigner sur les barrières causales
 ** Semaine du <2016-12-12 lun.> au <2016-12-16 ven.>
+*** Done
 - MUTE : Refactorer *DocService*
   - Gestion des messages spécifiques à ce service dans *DocService*
     - Réception des messages
@@ -465,7 +466,34 @@ java.lang.NullPointerException
 - Ce bug semble lié à l'envoi de l'opération aux autres pairs
   - Mais ce bug se déclenche même lorsqu'on édite le document seul
 - Trouver l'origine de ce bug
-**** TODO MUTE : Ajouter le stockage au sein du navigateur du document
+** Semaine du <2017-01-03 mar.> au <2017-01-06 ven.>
+*** Done
+- MUTE : Ajouter le stockage au sein du navigateur du document
+  - Plusieurs librairies sont disponibles pour utiliser une base de données au sein du navigateur
+    - [[https://pouchdb.com/][PouchDB]]
+      - Semble porté par sa communauté
+      - Celle-ci est importante (<2017-01-03 mar.>: 8022 stars, 236 contributeurs)
+    - [[https://localforage.github.io/localForage/][localForage]]
+      - Porté par *Mozilla*
+      - Dispose d'une communauté importante (<2017-01-03 mar.>: 7103 stars)
+    - [[http://jio.readthedocs.io/en/latest/][jIO]]
+      - Porté par *Nexedi*
+      - Dispose de connecteurs pour stocker les données sur un service distant
+  - Ces librairies reposent principalement sur /IndexedDB/, mais possèdent un mécanisme de fallback sur /WebSQL/ ou même /LocalStorage/
+  - Elles proposent toutes les 3 une syntaxe reposant sur les /Promises/ ou les /callbacks/
+  - Pour le moment, utilise *jIO*
+  - Ajout du service *StorageService*
+    - Instancie une base de données
+    - Dispose d'une méthode /put()/ pour enregistrer un objet
+    - Dispose d'une méthode /get()/ pour récupérer un objet
+  - Modification de *DocService*
+    - Lorsque le document est mis à jour, utilise *StorageService* pour stocker cette version du document
+    - Lorsqu'on crée une session de collaboration, initialise le document à partir de sa version stockée si possible
+*** Planned
+**** DONE MUTE : Ajouter le stockage au sein du navigateur du document
+**** TODO MUTE : Ajouter la gestion des documents stockées en local
+- Ajouter une page listant les documents stockées en local
+- Elle devrait permettre d'accéder à ces documents et de les supprimer
 **** TODO MUTE : Ajouter le mécanisme de join propre
 **** TODO TVPaint : Étudier la gestion des ressources dans BonitaSoft
 - Voir pour générer des rôles
