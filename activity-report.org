@@ -498,6 +498,79 @@ java.lang.NullPointerException
     - C'est ensuite dans *Configuration* que l'on peut ajouter un comportement aux filtres
       - Possibilité de filtrer par groupe, rôle ou appartenance
       - Possibilité de définir un ensemble d'utilisateurs spécifiques
+- TVPaint : Étudier comment interagir avec BonitaSoft par API
+  - S'authentifier
+    - http://localhost:8728/bonita/loginservice
+    - Paramètres:
+      - /username/
+      - /password/
+      - /redirect/: un booléen indiquant si on souhaite être dirigé après l'exécution de la requête
+	- /redirectURL/ si /redirect/ est égal à /true/
+    - Réponse:
+      - Le cookie obtenu dans la réponse est l'élément important qui permettra d'authentifier les requêtes suivantes
+    - Exemple:
+      - http://localhost:8728/bonita/loginservice?username=walter.bates&password=1234&redirect=true
+  - Récupérer l'identifiant de l'utilisateur
+    - http://localhost:8728/bonita/API/identity/user
+    - Paramètres
+      - /f/: le champ avec lequel on souhaite filtrer
+    - Exemple:
+      - http://localhost:8728/bonita/API/identity/user?f=userName=walter.bates
+    - Réponse:
+      #+BEGIN_SRC
+[
+  {
+    "firstname": "Walter",
+    "icon": "icons/default/icon_user.png",
+    "creation_date": "2016-10-03 10:58:50.106",
+    "userName": "walter.bates",
+    "title": "Mr",
+    "created_by_user_id": "-1",
+    "enabled": "true",
+    "lastname": "Bates",
+    "last_connection": "2017-01-05 11:42:22.132",
+    "password": "",
+    "manager_id": "3",
+    "id": "4",
+    "job_title": "Human resources benefits",
+    "last_update_date": "2016-10-03 10:58:50.106"
+  }
+]
+      #+END_SRC
+  - Récupérer les tâches assignées à l'utilisateur
+    - http://localhost:8728/bonita/API/bpm/humanTask
+    - Paramètres:
+      - /f/: le champ avec lequel on souhaite filtrer
+    - Exemple:
+      - http://localhost:8728/bonita/API/bpm/humanTask?f=assigned_id=4
+    - Réponse:
+      #+BEGIN_SRC
+[
+  {
+    "displayDescription": "",
+    "executedBy": "0",
+    "rootContainerId": "3002",
+    "assigned_date": "2017-01-05 13:17:45.454",
+    "displayName": "Create movie project",
+    "executedBySubstitute": "0",
+    "dueDate": "2017-01-05 12:25:15.246",
+    "description": "",
+    "type": "USER_TASK",
+    "priority": "normal",
+    "actorId": "315",
+    "processId": "5578352443955206281",
+    "caseId": "3002",
+    "name": "Create movie project",
+    "reached_state_date": "2017-01-05 11:25:15.251",
+    "rootCaseId": "3002",
+    "id": "60004",
+    "state": "ready",
+    "parentCaseId": "3002",
+    "last_update_date": "2017-01-05 11:25:15.251",
+    "assigned_id": "4"
+  }
+]
+      #+END_SRC      
 *** Planned
 **** DONE MUTE : Ajouter le stockage au sein du navigateur du document
 **** DONE TVPaint : Étudier la gestion des ressources dans BonitaSoft
