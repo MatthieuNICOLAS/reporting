@@ -489,16 +489,25 @@ java.lang.NullPointerException
   - Modification de *DocService*
     - Lorsque le document est mis à jour, utilise *StorageService* pour stocker cette version du document
     - Lorsqu'on crée une session de collaboration, initialise le document à partir de sa version stockée si possible
+- TVPaint : Étudier la gestion des ressources dans BonitaSoft
+  - Pour gérer les organisations, groupes, rôles et utilisateurs, il faut passer par *BPM Studio*
+    - Organization > Manage
+    - Un utilisateur appartient à un groupe ou plusieurs groupes d'une organisation et possède un rôle dans chacun de ces groupes
+  - Attribuer les tâches (/actor mapping/)
+    - Dans l'onglet *Actors* du workflow, on peut créer et supprimer les différents filtres utilisés pour faire du /actor mapping/
+    - C'est ensuite dans *Configuration* que l'on peut ajouter un comportement aux filtres
+      - Possibilité de filtrer par groupe, rôle ou appartenance
+      - Possibilité de définir un ensemble d'utilisateurs spécifiques
 *** Planned
 **** DONE MUTE : Ajouter le stockage au sein du navigateur du document
+**** DONE TVPaint : Étudier la gestion des ressources dans BonitaSoft
+- Voir pour générer des rôles
+- Voir pour générer des acteurs
+- Voir comment attribuer les tâches
 **** TODO MUTE : Ajouter la gestion des documents stockées en local
 - Ajouter une page listant les documents stockées en local
 - Elle devrait permettre d'accéder à ces documents et de les supprimer
 **** TODO MUTE : Ajouter le mécanisme de join propre
-**** TODO TVPaint : Étudier la gestion des ressources dans BonitaSoft
-- Voir pour générer des rôles
-- Voir pour générer des acteurs
-- Voir comment attribuer les tâches
 **** TODO TVPaint : Étudier comment interagir avec BonitaSoft par API
 - Voir comment spécifier le début et la fin d'une tâche par API
 **** TODO TVPaint : Définir le business process correspondant à la réalisation d'un film
