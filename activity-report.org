@@ -500,22 +500,22 @@ java.lang.NullPointerException
       - Possibilité de définir un ensemble d'utilisateurs spécifiques
 - TVPaint : Étudier comment interagir avec BonitaSoft par API
   - S'authentifier
-    - http://localhost:8728/bonita/loginservice
+    - POST http://localhost:8728/bonita/loginservice
     - Paramètres:
       - /username/
       - /password/
       - /redirect/: un booléen indiquant si on souhaite être dirigé après l'exécution de la requête
 	- /redirectURL/ si /redirect/ est égal à /true/
+    - Exemple:
+      - POST http://localhost:8728/bonita/loginservice?username=walter.bates&password=1234&redirect=true
     - Réponse:
       - Le cookie obtenu dans la réponse est l'élément important qui permettra d'authentifier les requêtes suivantes
-    - Exemple:
-      - http://localhost:8728/bonita/loginservice?username=walter.bates&password=1234&redirect=true
   - Récupérer l'identifiant de l'utilisateur
-    - http://localhost:8728/bonita/API/identity/user
+    - GET http://localhost:8728/bonita/API/identity/user
     - Paramètres
       - /f/: le champ avec lequel on souhaite filtrer
     - Exemple:
-      - http://localhost:8728/bonita/API/identity/user?f=userName=walter.bates
+      - GET http://localhost:8728/bonita/API/identity/user?f=userName=walter.bates
     - Réponse:
       #+BEGIN_SRC
 [
@@ -537,12 +537,12 @@ java.lang.NullPointerException
   }
 ]
       #+END_SRC
-  - Récupérer les tâches assignées à l'utilisateur
-    - http://localhost:8728/bonita/API/bpm/humanTask
+  - Récupérer les tâches disponibles ou assignées à l'utilisateur
+    - GET http://localhost:8728/bonita/API/bpm/humanTask
     - Paramètres:
       - /f/: le champ avec lequel on souhaite filtrer
     - Exemple:
-      - http://localhost:8728/bonita/API/bpm/humanTask?f=assigned_id=4
+      - GET http://localhost:8728/bonita/API/bpm/humanTask?f=assigned_id=4
     - Réponse:
       #+BEGIN_SRC
 [
@@ -571,18 +571,78 @@ java.lang.NullPointerException
   }
 ]
       #+END_SRC      
+    - Autre exemple:
+      - GET http://localhost:8728/bonita/API/bpm/humanTask?state=waiting
+    - Réponse:
+      #+BEGIN_SRC
+[
+  {
+    "displayDescription": "",
+    "executedBy": "0",
+    "rootContainerId": "3013",
+    "assigned_date": "",
+    "displayName": "Submit storyboard",
+    "executedBySubstitute": "0",
+    "dueDate": "2017-01-05 18:06:12.223",
+    "description": "",
+    "type": "USER_TASK",
+    "priority": "normal",
+    "actorId": "318",
+    "processId": "5720704175050565481",
+    "caseId": "3013",
+    "name": "Submit storyboard",
+    "reached_state_date": "2017-01-05 17:06:12.228",
+    "rootCaseId": "3013",
+    "id": "60038",
+    "state": "ready",
+    "parentCaseId": "3013",
+    "last_update_date": "2017-01-05 17:06:12.228",
+    "assigned_id": ""
+  }
+]
+      #+END_SRC
+  - Assigner une tâche
+    - PUT http://localhost:8728/bonita/API/bpm/humanTask/:humanTaskID
+    - Exemple:
+      - PUT http://localhost:8728/bonita/API/bpm/humanTask/60038
+        #+BEGIN_SRC
+{
+  "assigned_id":"4" 
+}
+        #+END_SRC
+    - Réponse:
+      - Réponse vide, juste le status *200* témoigne du bon fonctionnement de la requête
+  - Effectuer une tâche
+    - POST http://localhost:8728/bonita/API/bpm/userTask/:userTaskID/execution
+    - Paramètres:
+      - Dans l'URL
+	- /userTaskID/: l'identifiant de la tâche que l'on exécute
+      - Dans le corps de la requête
+	- Les éléments du formulaire si nécessaire
+    - Exemple:
+      - POST http://localhost:8728/bonita/API/bpm/userTask/60037/execution
+        #+BEGIN_SRC
+{
+  "name":"Scott Pilgrim 2",
+  "width":1920,
+  "height":1080,
+  "framerate":24
+}
+	#+END_SRC
+    - Réponse:
+      - Réponse vide, juste le status *204* témoigne du bon fonctionnement de la requête
 *** Planned
 **** DONE MUTE : Ajouter le stockage au sein du navigateur du document
 **** DONE TVPaint : Étudier la gestion des ressources dans BonitaSoft
 - Voir pour générer des rôles
 - Voir pour générer des acteurs
 - Voir comment attribuer les tâches
+**** DONE TVPaint : Étudier comment interagir avec BonitaSoft par API
+- Voir comment spécifier le début et la fin d'une tâche par API
 **** TODO MUTE : Ajouter la gestion des documents stockées en local
 - Ajouter une page listant les documents stockées en local
 - Elle devrait permettre d'accéder à ces documents et de les supprimer
 **** TODO MUTE : Ajouter le mécanisme de join propre
-**** TODO TVPaint : Étudier comment interagir avec BonitaSoft par API
-- Voir comment spécifier le début et la fin d'une tâche par API
 **** TODO TVPaint : Définir le business process correspondant à la réalisation d'un film
 - Le process a été décrit sommairement dans l'image suivante
   #+CAPTION: Réalisation d'un film
