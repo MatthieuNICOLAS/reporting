@@ -631,6 +631,32 @@ java.lang.NullPointerException
 	#+END_SRC
     - Réponse:
       - Réponse vide, juste le status *204* témoigne du bon fonctionnement de la requête
+- TVPaint : Définir le business process correspondant à la réalisation d'un film
+  - Présentation du business process lors de la réunion du <2017-01-06 ven.>
+  - Reste à développer la tâche /compositing/
+- MUTE : Ajouter la gestion des documents stockées en local
+  - Ajout d'un service *StorageManagerService*
+    - Garde une liste des services de stockage
+    - Expose une référence vers le service de stockage courant
+  - Ajout d'une classe abstraite *AbstractStorageService*
+    - S'enregistre auprès de *StorageManagerService*
+    - Expose deux fonctions:
+      - /isReachable(): Promise<boolean>/
+      - /getDocuments(): Promise<any>/
+  - Modification de *BotStorageService* pour hériter de *AbstractStorageService*
+  - Ajout du component *StorageComponent*
+    - Possède en paramètre un *AbstractStorageService*
+    - Vérifie si le service de stockage est disponible
+    - Permet d'accéder à la liste de ses documents si c'est le cas
+    - Se désactive sinon
+  - Modification de *NavComponent*
+    - Récupère dorénavant la liste des services de stockage à l'aide de *StorageManagerService*
+    - Instancie un *StorageComponent* pour chacun d'entre eux
+  - Modification de *DocsComponent*
+    - Récupère dorénavant la liste des documents à l'aide de *StorageManagerService*
+    - Reste à voir comment uniformiser le comportement des différents services de stockage
+      - Récupération du document
+      - Sauvegarde
 *** Planned
 **** DONE MUTE : Ajouter le stockage au sein du navigateur du document
 **** DONE TVPaint : Étudier la gestion des ressources dans BonitaSoft
@@ -639,11 +665,7 @@ java.lang.NullPointerException
 - Voir comment attribuer les tâches
 **** DONE TVPaint : Étudier comment interagir avec BonitaSoft par API
 - Voir comment spécifier le début et la fin d'une tâche par API
-**** TODO MUTE : Ajouter la gestion des documents stockées en local
-- Ajouter une page listant les documents stockées en local
-- Elle devrait permettre d'accéder à ces documents et de les supprimer
-**** TODO MUTE : Ajouter le mécanisme de join propre
-**** TODO TVPaint : Définir le business process correspondant à la réalisation d'un film
+**** DONE TVPaint : Définir le business process correspondant à la réalisation d'un film
 - Le process a été décrit sommairement dans l'image suivante
   #+CAPTION: Réalisation d'un film
   #+NAME:   fig:WorkflowExample2.png
@@ -651,6 +673,15 @@ java.lang.NullPointerException
 - Le réaliser sous *Bonita Studio*
   - Réfléchir aux données nécessaires
   - Voir comment représenter la réalisation des shots et des clips
+**** TODO TVPaint : Développer la tâche compositing
+- La tâche /compositing/ est une activité complexe
+- La décomposer en plusieurs sous-tâches
+  - Revoir les posts du forum qui y sont dédiés
+**** TODO TVPaint : Définir un workflow correspondant au scénario de test
+**** TODO MUTE : Ajouter la gestion des documents stockées en local
+- Ajouter une page listant les documents stockées en local
+- Elle devrait permettre d'accéder à ces documents et de les supprimer
+**** TODO MUTE : Ajouter le mécanisme de join propre
 **** TODO PLM : Gérer les exercices n'ayant pas d'entité solution dans le langage de programmation par défaut
 - Actuellement, on considère que l'ensemble des exercices possèdent une entité solution en Java
 - Lors de leur instanciation à partir des sources, on essaie de calculer le(s) monde(s) objectif(s) à partir de cette entité solution
