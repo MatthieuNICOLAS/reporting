@@ -673,14 +673,51 @@ java.lang.NullPointerException
 - Le réaliser sous *Bonita Studio*
   - Réfléchir aux données nécessaires
   - Voir comment représenter la réalisation des shots et des clips
+** Semaine du <2017-01-09 lun.> au <2017-01-13 ven.>
+*** Done
+- RH : Durée maximale de CDDs à Inria
+  - J'ai vu avec le service RH concernant la durée maximale que je peux passer en CDD à Inria
+  - Elle est de 5 ans et 11 mois
+  - Par contre, les thèses sont sous un autre régime
+  - Je peux donc effectuer une thèse auprès Inria après mon contrat
+- MUTE : Ajouter la gestion des documents stockées en local
+  - Renommage de *StorageService* en *LocalStorageService*
+  - Modification de *StorageManagerService*
+    - Injecte *LocalStorageService* et *BotStorageService* dans son constructeur
+    - Les enregistre lui-même dans sa liste des services de stockage
+    - Sinon, tant que ces services ne sont pas injectés par ailleurs, ils ne sont pas instanciés et enregistrés
+  - Modification de *LocalStorageService*
+    - Ajout de /getDocuments()/ pour renvoyer la liste des documents stockés en local
+  - Modification de *NetworkService*
+    - Ajout de la méthode /cleanWebChannel()/
+      - Auparavant effectué au cours du /join()/
+      - Séparation de ces 2 méthodes
+  - Modification de *DocComponent*
+    - On avait un problème lorsqu'on passait d'un document à l'autre
+    - Les *Services* sont instanciés à leur 1ère utilisation et sont conservés jusqu'à la fin de la session
+    - Cependant les *Components* eux sont détruits dès qu'ils ne sont plus affichés, et de nouveau instanciés lorsqu'on y accède de nouveau
+    - Si on change d'URL mais qu'il s'agit toujours du même *Component*, on conserve l'instance courante
+    - Ainsi, lorsqu'on passait d'un document à l'autre, il arrivait que les services n'arrivent plus à communiquer entre eux
+      - Certains streams étaient coupés à la destruction de *DocComponent*
+    - Ou qu'au contraire les services continuent d'envoyer des données correspondant à un autre document
+      - Notamment lorsqu'on revenait à la page de gestion des documents
+    - Destruction du *WebChannel* lors de la destruction de *DocComponent*
+    - Destruction du *WebChannel* précédent et génération d'un nouveau lors du passage d'un document à un autre
+*** Planned
+**** DONE MUTE : Ajouter la gestion des documents stockées en local
+- Ajouter une page listant les documents stockées en local
+- Elle devrait permettre d'accéder à ces documents et de les supprimer
 **** TODO TVPaint : Développer la tâche compositing
 - La tâche /compositing/ est une activité complexe
 - La décomposer en plusieurs sous-tâches
   - Revoir les posts du forum qui y sont dédiés
 **** TODO TVPaint : Définir un workflow correspondant au scénario de test
-**** TODO MUTE : Ajouter la gestion des documents stockées en local
-- Ajouter une page listant les documents stockées en local
-- Elle devrait permettre d'accéder à ces documents et de les supprimer
+**** TODO MUTE : Rendre générique l'utilisation des *StorageServices* par *DocService*
+- Actuellement, l'utilisation de *BotStorageService* et *LocalStorageService* est implémentée en dur dans le code de MUTE
+- De même, leur comportement est différent
+  - Le bot de stockage se comporte comme un utilisateur
+  - Alors que *LocalStorageService* fonctionne par le biais d'appels à une API
+- Uniformiser leur utilisation par *DocService*
 **** TODO MUTE : Ajouter le mécanisme de join propre
 **** TODO PLM : Gérer les exercices n'ayant pas d'entité solution dans le langage de programmation par défaut
 - Actuellement, on considère que l'ensemble des exercices possèdent une entité solution en Java
