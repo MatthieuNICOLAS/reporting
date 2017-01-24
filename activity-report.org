@@ -707,18 +707,61 @@ java.lang.NullPointerException
 **** DONE MUTE : Ajouter la gestion des documents stockées en local
 - Ajouter une page listant les documents stockées en local
 - Elle devrait permettre d'accéder à ces documents et de les supprimer
-**** TODO TVPaint : Développer la tâche compositing
-- La tâche /compositing/ est une activité complexe
-- La décomposer en plusieurs sous-tâches
-  - Revoir les posts du forum qui y sont dédiés
-**** TODO TVPaint : Définir un workflow correspondant au scénario de test
-**** TODO MUTE : Rendre générique l'utilisation des *StorageServices* par *DocService*
+** Semaine du <2017-01-16 lun.> au <2017-01-20 ven.>
+*** Done
+- MUTE : Refactoring du couplage entre les services
+  - Mapping des entrées/sorties des services dans le *Module* qui les fournit
+- MUTE : Rendre générique l'utilisation des *StorageServices* par *DocService*
+  - Puisque les services fonctionnent dorénavant par le biais d'entrées/sorties, cette tâche n'est plus pertinente
+- MUTE : Ajouter le mécanisme de join propre
+  - Ajout de *SyncService*
+    - Ajoute à chaque opération émise un couple /id/ et /clock/
+    - Maintient en parallèle un vecteur d'état indiquant pour chaque pair la /clock/ correspondant à sa plus récente opération reçue
+    - Lorsqu'on rejoint un document, émet ce vecteur d'état à un pair
+    - Celui-ci compare notre vecteur d'état avec le sien pour déterminer quelles sont les opérations que nous avons manquées
+  - Ajout de *SyncMessageService*
+    - Il s'agit du composant chargé de l'envoi et de la réception des messages de synchronisation
+    - Observe les sorties de *SyncService*, les encode avec /Protobuf/ et utilise *NetworkService* pour les transmettre aux autres pairs
+    - Observe *NetworkService* pour récupérer les messages lui étant destinés et instancie à partir de ces données les objets attendus par *SyncService*
+  - Ajout de *SyncStorageService*
+    - Il s'agit du composant chargé d'enregistrer l'état de *SyncService* pour le réutiliser à la prochaine session
+    - Observe les sorties de *SyncService* pour récupérer son état et le stocker
+    - Observe *NetworkService* pour détecter le document courant, récupérer l'état correspondant et le transmettre à *SyncService*
+  - Ajout du mapping de ces services dans *DocModule*
+*** Planned
+**** DONE MUTE : Refactoring du couplage entre les services
+- Actuellement, les services sont couplés
+  - On injecte dans le constructeur d'un service des instances des autres services dont il dépend
+- Ainsi, ajouter un nouveau composant telle que *SyncService* implique de modifier les services qui vont interagir avec lui
+- Refactorer les services pour qu'ils exposent leurs entrées et sorties sous forme de streams
+- Mapper les entrées/sorties des services dans un composant d'/orchestration/
+**** DONE MUTE : Ajouter le mécanisme de join propre
+**** CANCELLED MUTE : Rendre générique l'utilisation des *StorageServices* par *DocService*
 - Actuellement, l'utilisation de *BotStorageService* et *LocalStorageService* est implémentée en dur dans le code de MUTE
 - De même, leur comportement est différent
   - Le bot de stockage se comporte comme un utilisateur
   - Alors que *LocalStorageService* fonctionne par le biais d'appels à une API
 - Uniformiser leur utilisation par *DocService*
-**** TODO MUTE : Ajouter le mécanisme de join propre
+** Semaine du <2017-01-23 lun.> au <2017-01-27 ven.>
+*** Done
+- MUTE : Ajouter la seconde partie du mécanisme de synchronisation
+  - Ajout de *Interval* qui représente les opérations qu'il nous manque d'un pair
+    - /id/ identifie le pair
+    - /begin/ et /end/ délimitent l'interval des /clocks/ qu'il nous manque
+  - Modification du message *REPLYSYNC* pour qu'il comporte aussi un tableau d'*Intervals*
+  - Génération de ce tableau lors du traitement du message *QUERYSYNC* par *SyncService*
+*** Planned
+**** DONE MUTE : Ajouter la seconde partie du mécanisme de synchronisation
+- Actuellement, lorsqu'on se connecte, on envoie son vecteur d'état à un pair
+- Celui-ci détecte les opérations qu'il possède mais qu'il nous manque à partir de ce vecteur et du sien
+- Il nous envoie ces opérations
+- Il peut aussi détecter les opérations que l'on possède mais qu'il lui manque à partir de ces mêmes informations
+- Ajouter cette seconde passe
+**** TODO TVPaint : Développer la tâche compositing
+- La tâche /compositing/ est une activité complexe
+- La décomposer en plusieurs sous-tâches
+  - Revoir les posts du forum qui y sont dédiés
+**** TODO TVPaint : Définir un workflow correspondant au scénario de test
 **** TODO PLM : Gérer les exercices n'ayant pas d'entité solution dans le langage de programmation par défaut
 - Actuellement, on considère que l'ensemble des exercices possèdent une entité solution en Java
 - Lors de leur instanciation à partir des sources, on essaie de calculer le(s) monde(s) objectif(s) à partir de cette entité solution
