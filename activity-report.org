@@ -750,6 +750,11 @@ java.lang.NullPointerException
     - /begin/ et /end/ délimitent l'interval des /clocks/ qu'il nous manque
   - Modification du message *REPLYSYNC* pour qu'il comporte aussi un tableau d'*Intervals*
   - Génération de ce tableau lors du traitement du message *QUERYSYNC* par *SyncService*
+- MUTE : Refactorer la liste des documents
+  - Besoin de mettre en place un service intermédiaire *DocsStorage*
+  - Ce service devrait
+    - Récupérer les listes de documents provenant des différents services de stockage
+    - Fusionner les listes de documents pour ne conserver qu'une seule occurrence par document
 *** Planned
 **** DONE MUTE : Ajouter la seconde partie du mécanisme de synchronisation
 - Actuellement, lorsqu'on se connecte, on envoie son vecteur d'état à un pair
@@ -757,6 +762,137 @@ java.lang.NullPointerException
 - Il nous envoie ces opérations
 - Il peut aussi détecter les opérations que l'on possède mais qu'il lui manque à partir de ces mêmes informations
 - Ajouter cette seconde passe
+** Semaines du <2017-01-30 lun.> au <2017-02-17 ven.>
+*** Done
+- MUTE : Extraire la logique interne de MUTE dans une librairie /mute-core/
+  - Librairie disponible ici: https://github.com/coast-team/mute-core
+  - Comporte *CollaboratorsService*, *DocService*, *SyncService* et *SyncMessageService*
+  - Ajout de l'interface *MessageEmitter* permettant de spécifier le protocole et d'exposer
+    - Les messages à broadcaster
+    - Les messages à envoyer à un pair particulier
+    - Les messages à envoyer à un seul pair, mais choisi aléatoirement
+- MUTE : Corriger le déclenchement du message /QuerySync/
+  - Ajout d'un setter /setJoinAndStateSources(joinSource, stateSource?)/
+    - S'agit de la fusion des setters /set joinSource/ et /set storedStateSource/
+  - Le traitement des 2 sources étant lié, il est nécessaire de lier leur affectation
+  - /stateSource/ est un paramètre optionnel
+  - C'est sa présence ou non qui permet de définir le comportement à adopter
+- MUTE : Refactorer *EditorComponent* pour gérer correctement les tableaux de *TextOperations*
+  - La méthode /CodeMirror.Editor.operation(fn: () => void)/ est employée ici
+  - Consiste à exécuter un appel de la méthode passée en paramètre
+  - Elle permet de modifier le contenu de l'éditeur *CodeMirror* sans que celui-ci ne déclenche de rafraîchissements
+  - Ceci permet donc d'effectuer un grand nombre d'opérations avant d'afficher uniquement l'état final
+  - Amélioration des performances de l'application
+    - Initialisation plus rapide (de quelques secondes à 1 seule) de l'éditeur lors de la synchronisation via un pair ou le système de stockage avec 100+ opérations
+- MUTE : Ajouter la suppression d'un ou plusieurs documents depuis la liste des docs
+  - Ajout de /delete (name: string): Promise<void>/ et /deleteAll (): Promise<void>/ à *AbstractStorageService*
+  - Modification de *DocsComponent* pour utiliser ces fonctions
+  - Utilisation de *MdSnackBar* pour afficher le message d'erreur si une se produit
+    - Besoin de respecter un délai (~500ms) entre chaque message sous peine de faire planter l'UI
+*** Planned
+**** DONE MUTE : Extraire la logique interne de MUTE dans une librairie /mute-core/
+- Actuellement, la logique de l'application se trouve directement dans *MUTE*
+- Ceci pose des problèmes de duplication du code lorsqu'il s'agit d'écrire
+  - un bot
+  - une version /React/ de *MUTE*
+- Extraire la logique interne et la déplacer dans une librairie /mute-core/ permettrait une meilleure réusabilité du code
+**** DONE MUTE : Adapter /mute/ pour utiliser /mute-core/
+- Une fois /mute-core/ implémentée, il est nécessaire de refactorer /mute/ pour
+  - Supprimer les services obsolètes/dupliqués dans /mute-core/
+  - Instancier *MuteCore* et effectuer le mapping de ses entrées/services avec les composants de /mute/
+  - Gérer la destruction de l'instance de *MuteCore*
+**** DONE MUTE : Refactorer *CursorsService* en *CursorsDirective*
+- Un *Service* Angular ne devrait pas affecter l'interface graphique selon moi
+- Cependant, *CursorsService* le fait
+- L'utilisation d'un *Component* ou d'une *Directive* est plus indiquée dans ce cas de figure
+- Ici, il s'agirait plutôt d'une *Directive*
+  - On souhaite ajouter un comportement à un *Component* existant, l'éditeur
+- Ceci permettra en plus
+  - De passer des paramètres à la directive via les /@Input()/
+  - De profiter des lifehooks proposés par Angular
+**** DONE MUTE : Remplacer les couples *Observable/Observers* par des *Subjects*
+- Jugeant que *AsyncSubject*, *BehaviorSubject* et *ReplaySubject* ne correspondaient pas à ce que je voulais faire, j'ai utilisé à la place des couples *Observable/Observers*
+  - Génère et expose un *Observable*
+  - Maintient la liste des *Observers* qui ont /subscribe()/ à l'*Observable*
+- Ceci complexifie inutilement le code
+  - Lors de la génération de l'*Observable*, on retrouve généralement le code suivant
+    #+BEGIN_SRC
+    this.observable = Observable.create((observer) => {
+      // Ajout du nouvel observer à la liste des observers lors d'un subscribe() 
+      this.observers.push(observer)
+    })
+    #+END_SRC
+  - Puis, lors de l'émission d'une nouvelle valeur
+    #+BEGIN_SRC
+    this.observers.forEach((observer) => {
+      observer.next(valeur)
+    })
+    #+END_SRC
+- Philippe vient de m'apprendre qu'il existe le type *Subject* qui implémente déjà ce comportement
+- Utiliser *Subject* à la place de ces couples
+**** DONE MUTE : Remplacer les /Observable.map()/ par des *Subscriptions* + *Subjects*
+- Actuellement, certains *Observables* exposés par des composants de l'application sont générés en effectuant un mapping sur un flux en entrée
+- Cependant ceci pose plusieurs problèmes
+  - Le composant ne possède pas le moindre contrôle sur l'*Observable* généré par le mapping
+    - Il se contente de transformer les valeurs qu'il reçoit et les retransmettre
+    - Il ne peut donc pas émettre d'évènement /complete/ si besoin, notamment lors de sa destruction
+  - Le flux de sortie n'est pas généré tant que le flux d'entrée n'a pas été passé au composant
+    - Ainsi, essayer de s'abonner au flux de sortie avant d'avoir fourni le flux d'entrée génèrera une erreur
+- Ce comportement me paraît donc /error-prone/
+- Il serait préférable d'instancier en interne des *Subjects* et de les exposer sous forme d'*Observables*
+- Le composant doit donc s'abonner aux flux d'entrées, effectuer les opérations de transformation et émettre les nouvelles valeurs via les *Subjects*
+**** DONE MUTE : Corriger le déclenchement du message /QuerySync/
+- La condition de déclenchement du message /QuerySync/ est un peu particulière
+  #+BEGIN_SRC
+  if storageService
+    wait(JoinEvent, IsReadyEvent) // où IsReadyEvent indique quand on a fini d'initialiser le document à partir de la version stockée dans le système de stockage 
+  else
+     wait(JoinEvent)
+  #+END_SRC
+- Actuellement, le code gérant ce déclenchement est brouillon
+- Améliorer ça
+**** DONE MUTE : Coder en dur le nom des services lorsqu'ils émettent des messages
+- Un message est composé de contenu mais aussi d'un champ /service/
+- Ce champ permet aux services, lorsqu'ils reçoivent un message, de filtrer uniquement les messages les concernant
+- Actuellement, lorsqu'un service émet un message, il renseigne ce champ en utilisant /this.constructor.name/ afin que ce nom soit unique
+- Cependant, lorsqu'on build l'application pour le mode production, une minification du code est effectuée
+- Et il semblerait que suite à cette minification, plusieurs services se retrouvent avec un constructeur de même nom
+- Les services essaient donc de parser et de traiter des messages qui ne leurs sont pas destinés
+- Remplacer les /this.constructor.name/ par des constantes
+**** DONE MUTE : Refactorer /mute-core/ pour pouvoir traiter des tableaux de *LogootSOperations*
+- Comme on émet les *LogootSOperations* une par une, /mute-core/ est designé pour les recevoir une par une
+- Ainsi, lorsqu'une *RichLogootSOperation* est reçue
+  - Elle est transformée en *LogootSoperation* par *SyncService*
+  - Elle est appliquée au modèle par *DocService*
+  - Puis *DocService* émet la *TextOperation* correspondante
+- Cependant, nous pouvons recevoir plusieurs *RichLogootSOperations* d'un coup maintenant
+  - Lors de l'initialisation en utilisant le système de stockage
+  - Lors de la synchronisation avec un autre pair
+- Nous envoyons donc une multitude de messages inutilement
+- Ces messages peuvent eux-mêmes déclencher des rafraichissements de l'interface
+**** DONE MUTE : Refactorer *EditorComponent* pour gérer correctement les tableaux de *TextOperations*
+- Maintenant que *DocService* émet plusieurs *TextOperations* en un seul message, il est nécessaire d'adapter *EditorComponent*
+- Améliorer les performances de l'application en désactivant le rafraichissement de *CodeMirror* dès que son contenu est modifié
+  - Rafraichir *CodeMirror* qu'une fois qu'on a fini d'appliquer l'ensemble des *TextOperations*
+**** DONE MUTE : Ajouter la suppression d'un ou plusieurs documents depuis la liste des docs
+- Maintenant que nous proposons une liste des documents, il est nécessaire de pouvoir la gérer
+- Il faut donc pouvoir supprimer un ou plusieurs documents
+**** TODO MUTE : Améliorer le pipe /slice/ d'Angular pour les *Strings*
+- Angular propose un pipe /slice/ permettant de limiter le nombre de caractères que nous souhaitons afficher d'une *String*
+- Cependant, rien n'indique dans le résultat si la chaîne de caractères a effectivement été tronquée ou non
+- Créer un pipe /sliceString/ ajoutant '...' au résultat si la chaîne a été coupée
+**** TODO CRDT : Lire *CRDT notes*
+- Disponible ici: https://github.com/pfrazee/crdt_notes
+- Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
+**** TODO CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
+- Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
+**** TODO MUTE : Refactorer la liste des documents
+- Actuellement, on affiche la liste de tous les objets contenus dans la BDD pour former la liste des documents
+- Sauf que certains objets ne devraient pas en faire partie
+  - Les données conservées pour chaque document pour *SyncService* par exemple
+- De plus, on différencie les documents en fonction des systèmes de stockage où ils sont conservées
+- Cela peut s'avérer perturbant pour les utilisateurs
+- Unifier la liste des documents
 **** TODO TVPaint : Développer la tâche compositing
 - La tâche /compositing/ est une activité complexe
 - La décomposer en plusieurs sous-tâches
@@ -828,3 +964,4 @@ java.lang.NullPointerException
   2016-10-12 15:53:30 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8689 - {"cmd":"stopExecution","args":{}}
   2016-10-12 16:27:11 +0000 [INFO] from application in application-akka.actor.default-dispatcher-2 - Execution Mode: TRIBUNAL
   #+END_SRC
+  
