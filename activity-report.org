@@ -1029,8 +1029,32 @@ java.lang.NullPointerException
       - Peut vouloir déléguer l'exécution des tâches si elles sont lourdes
       - Retrouve la notion de bot ?
     - Besoin de répliquer les données de l'expérience si délégation de l'exécution
+- MUTE : Débugger la liste des documents
+  - [ ] Réinitialiser *NavComponent* lors de son affichage
+    - Dans ce cas, sélectionner un dossier déclencherait une mise à jour de /activeFile/
+  - [ ] Distinguer /activeDoc/ et /activeFolder/
+    - *DocsComponent* a besoin de connaitre /activeFolder/ à son initialisation pour générer la liste des documents
+    - *NavComponent* permet de mettre à jour /activeFolder/ lorsqu'un changement du dossier sélectionné est détecté
+    - *DocComponent* peut mettre à jour /activeDoc/ à son initialisation et à sa destruction
+    - *ToolbarComponent* a besoin de connaitre /activeFolder/ et /activeDoc/
+      - Si /activeDoc/ est défini, alors affiche ses infos
+      - Sinon, affiche les infos de /activeFolder/
+      - Peut facilement être implémenté avec /combineLatest/ de *RxJS*
+        #+BEGIN_SRC
+        activeFolderSource
+         .combineLatest(activeDocSource)
+         .map(([folder: Folder, doc: Doc]) => {
+           if (doc) {
+             return doc
+           }
+           return folder
+         })
+         .subscribe((file: File) => {
+           // Do something
+         })
+        #+END_SRC
 *** Planned
-**** TODO MUTE : Débugger la gestion des documents
+**** DONE MUTE : Débugger la gestion des documents
 - Depuis la mise à jour de la liste des documents, la sauvegarde en locale des documents n'est plus disponible
 - On enregistre les meta-données du document
   - Titre
@@ -1038,6 +1062,21 @@ java.lang.NullPointerException
   - Stockages utilisés
 - Mais plus son contenu
 - Débugger ça
+**** TODO MUTE : Débugger la liste des documents
+- Lorsqu'on souhaite re-afficher la liste des documents alors que nous étions sur la page d'un document, la liste ne se génère pas dans tous les cas
+- La liste de *DocsComponent* est générée à partir de la valeur /activeFile/
+  - S'il s'agit d'un *Folder*, récupère et affiche la liste de ses documents
+  - Sinon ne fait rien
+- La valeur de /activeFile/ est mise à jour à plusieurs endroits
+  - Lorsque l'utilisateur sélectionne un nouveau dossier dans *NavComponent*
+    - Dans ce cas, /activeFile/ prend pour valeur ce dossier
+  - Lorsqu'on accède à un document
+    - Alors /activeFile/ prend pour valeur ce document
+- Cependant, comme *NavComponent* n'est jamais détruit, il se "souvient" du précédent dossier selectionné
+- Ainsi, si on sélectionne le même, aucun changement n'est détecté
+  - La valeur de /activeFile/ n'est donc pas mise à jour
+- Ainsi, comme /activeFile/ correspond toujours au dernier document ouvert, *DocsComponent* ne génère pas de liste
+- Corriger ce comportement
 **** TODO MUTE : Ajouter la gestion du titre du document
 - Le titre du document peut être l'objet de modifications concurrentes
 - Il est donc nécessaire de s'assurer qu'il converge chez tous les utilisateurs
