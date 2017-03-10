@@ -983,6 +983,8 @@ java.lang.NullPointerException
   - *JoinEvent* ne permettra que de déclencher une synchronisation
 ** Semaine du <2017-03-06 lun.> au <2017-03-10 ven.>
 *** Done
+- MUTE : Refactorer la liste des documents
+  - Philippe s'en est chargé
 - MUTE : Ajouter la gestion du titre du document
   - Un simple *LWW-Register* suffit
   - La seule difficulté concerne la génération du timestamp utilisé pour ordonner les titres
@@ -1053,7 +1055,39 @@ java.lang.NullPointerException
            // Do something
          })
         #+END_SRC
+- PIDR : Réflexion avec Quentin et Gérald
+  - Lien entre l'automate qu'on souhaite obtenir et le fonctionnement interne d'une chaîne de Markov par exemple
+  - La question était "Pourquoi ne pas effectuer les actions du bot directement plutôt que de générer un fichier ?"
+    - Reproductibilité de l'expérience
+    - Permet de découpler le modèle d'apprentissage et l'implémentation du comportement
+    - Comme le fichier suit le formalisme d'une grammaire, peut facilement utiliser un parser pour implémenter le comportement
+- PIDR : Réflexion avec Vinh et Le
+  - Le résultat de l'analyseur de traces doit être une machine à états ou sa représentation
+    - Sinon, de quoi pourrait-il s'agir ?
+      - Une séquence d'actions ?
+	- Dans ce cas, on aurait un ou plusieurs comportements fixés pour un groupe d'utilisateurs donné
+	- Est-ce représentatif ?
+	- Mais au moins, ça serait reproductible
+  - Une chaîne de Markov a pour but de prédire la prochaine action en fonction de l'état actuel
+    - L'état actuel doit contenir toutes les informations nécessaires pour faire le choix
+  - Une chaîne de Markov ne correspondrait donc pas si ce que l'on cherche à obtenir est un automate
+  - Conseillent de regarder plutôt du côté du /process mining/
+    - Vinh recommande [[http://www.processmining.org/prom/start][Prom]]
+    - Permettrait d'extraire une machine à états pondérée à partir de séquences d'actions
+- MUTE : Débugger l'ouverture d'un nouveau document
+  - Bug dû à l'enchainement des évènements
+  - Actuellement, lorsque *EditorComponent* détecte un changement de l'instance *DocService*, il s'abonne à /onDocValue/ pour récupérer la nouvelle valeur
+  - Lorsqu'une nouvelle valeur du document lui est fourni, il met à jour le contenu du document
+  - Mais depuis la refonte pour utiliser /onInit/, /onDocValue/ est déclenché avant que *EditorComponent* se soit abonné
+  - Attendre que *EditorComponent* soit initialisé pour appeler /muteCore.init()/ dans *DocComponent*
 *** Planned
+**** CANCELLED MUTE : Refactorer la liste des documents
+- Actuellement, on affiche la liste de tous les objets contenus dans la BDD pour former la liste des documents
+- Sauf que certains objets ne devraient pas en faire partie
+  - Les données conservées pour chaque document pour *SyncService* par exemple
+- De plus, on différencie les documents en fonction des systèmes de stockage où ils sont conservées
+- Cela peut s'avérer perturbant pour les utilisateurs
+- Unifier la liste des documents
 **** DONE MUTE : Débugger la gestion des documents
 - Depuis la mise à jour de la liste des documents, la sauvegarde en locale des documents n'est plus disponible
 - On enregistre les meta-données du document
@@ -1062,6 +1096,19 @@ java.lang.NullPointerException
   - Stockages utilisés
 - Mais plus son contenu
 - Débugger ça
+** Semaine du <2017-03-13 lun.> au <2017-03-17 ven.>
+*** Done
+*** Planned
+**** TODO MUTE : Débugger l'ouverture d'un nouveau document
+- Si on est sur *DocComponent* et qu'on ouvre un nouveau document, le contenu du document n'est pas remis à 0
+- Résoudre ce bug
+**** TODO TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
+- Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
+  - Créer un film
+  - Associer des shots au film
+    - Besoin potentiellement de créer les shots
+  - Associer des clips au shot
+    - Besoin potentiellement de créer les clips
 **** TODO MUTE : Débugger la liste des documents
 - Lorsqu'on souhaite re-afficher la liste des documents alors que nous étions sur la page d'un document, la liste ne se génère pas dans tous les cas
 - La liste de *DocsComponent* est générée à partir de la valeur /activeFile/
@@ -1094,13 +1141,6 @@ java.lang.NullPointerException
 - Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
 **** TODO CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
 - Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
-**** TODO MUTE : Refactorer la liste des documents
-- Actuellement, on affiche la liste de tous les objets contenus dans la BDD pour former la liste des documents
-- Sauf que certains objets ne devraient pas en faire partie
-  - Les données conservées pour chaque document pour *SyncService* par exemple
-- De plus, on différencie les documents en fonction des systèmes de stockage où ils sont conservées
-- Cela peut s'avérer perturbant pour les utilisateurs
-- Unifier la liste des documents
 **** TODO TVPaint : Développer la tâche compositing
 - La tâche /compositing/ est une activité complexe
 - La décomposer en plusieurs sous-tâches
@@ -1172,7 +1212,9 @@ java.lang.NullPointerException
   2016-10-12 15:53:30 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8689 - {"cmd":"stopExecution","args":{}}
   2016-10-12 16:27:11 +0000 [INFO] from application in application-akka.actor.default-dispatcher-2 - Execution Mode: TRIBUNAL
   #+END_SRC
-  
+**** TODO PLM : Ajouter [[plumbr.eu][plumbr]] à PLM
+- S'agit d'une solution de monitoring pour JVM
+- Voir comment elle s'intègre avec Docker et si conflit avec New Relic
 * Glossaire
 - Eventual convergence property
   #+BEGIN_QUOTE
