@@ -877,6 +877,175 @@ java.lang.NullPointerException
 **** DONE MUTE : Ajouter la suppression d'un ou plusieurs documents depuis la liste des docs
 - Maintenant que nous proposons une liste des documents, il est nécessaire de pouvoir la gérer
 - Il faut donc pouvoir supprimer un ou plusieurs documents
+** Semaine du <2017-02-20 lun.> au <2017-02-24 ven.>
+*** Done
+- CRDT : Lire *CRDT notes*
+  - Pessimistic Replication
+    - Système de lock
+    - Lorsqu'un client essaie d'accéder ou de modifier la donnée repliquée, un système de synchronisation empêche les réplicas de diverger
+    - Semble lourd (quid de la disponibilité ?) mais semble utilisable dans certains cas
+      #+BEGIN_QUOTE
+      But, in local area networks, it can be acceptable because the latency to contact another replica is low.
+      #+END_QUOTE
+  - Active Replication
+    - Lorsqu'un client essaie de modifier la donnée répliquée, l'ensemble des replicas est modifié au cours de la transaction
+      - Ne peut pas avoir une divergence des replicas
+*** Planned
+** Semaine du <2017-02-27 lun.> au <2017-03-03 ven.>
+*** Done
+- TVPaint
+  - Récupérer la liste des process
+    - GET http://localhost:8728/bonita/API/bpm/process?s
+    - Paramètres
+      - /s/: le champ avec lequel on souhaite filtrer
+    - Exemple:
+      - GET http://localhost:8728/bonita/API/bpm/process?s=Demo Movie Management
+    - Réponse:
+      #+BEGIN_SRC
+[
+  {
+    "displayDescription": "",
+    "deploymentDate": "2017-02-27 16:55:39.076",
+    "displayName": "Demo Movie Management",
+    "name": "Demo Movie Management",
+    "description": "",
+    "deployedBy": "4",
+    "id": "5736144163858952046",
+    "activationState": "ENABLED",
+    "version": "1.0",
+    "configurationState": "RESOLVED",
+    "last_update_date": "2017-02-27 16:55:39.208",
+    "actorinitiatorid": "502"
+  },
+  {
+    "displayDescription": "",
+    "deploymentDate": "2017-02-20 15:37:44.819",
+    "displayName": "Movie Management",
+    "name": "Movie Management",
+    "description": "",
+    "deployedBy": "4",
+    "id": "9107737410621326053",
+    "activationState": "ENABLED",
+    "version": "1.0",
+    "configurationState": "RESOLVED",
+    "last_update_date": "2017-02-20 15:37:45.103",
+    "actorinitiatorid": "401"
+  }
+]
+      #+END_SRC
+  - Récupérer le contrat d'instantiation d'un process
+    - GET http://localhost:8728/bonita/API/bpm/process/:processId/contract
+    - Exemple:
+      - GET http://localhost:8728/bonita/API/bpm/process/5736144163858952046/contract
+    - Réponse:
+      #+BEGIN_SRC
+{
+  "inputs": [],
+  "constraints": []
+}
+      #+END_SRC
+  - Instancier un process
+    - POST http://localhost:8728/bonita/API/bpm/process/:processId/instantiation
+    - Exemple:
+      - POST http://localhost:8728/bonita/API/bpm/process/5736144163858952046/instantiation
+    - Réponse:
+      #+BEGIN_SRC
+{
+  "caseId": 5004
+}
+      #+END_SRC
+- MUTE : Modifier *MuteCore* pour qu'il n'attende plus un *JoinEvent* pour démarrer
+  - Ajout de /initSubject/ dans *MuteCore* et de la méthode /init(key: string)/ pour signaler que le modèle est initialisé
+  - Modification de *DocService* pour dépendre de *InitEvent* et non plus *JoinEvent*
+  - Modification de *SyncService* pour récupérer l'id de l'utilisateur lors de la construction de l'objet
+  - Modification de *NetworkService* pour déclencher le join après l'initialisation
+  - Modification de *StorageService* pour récupérer l'état après l'initialisation
+  - Modification de *DocComponent*
+    - Génération de l'id de l'utilisateur
+      - On ne dispose à ce moment d'aucune information sur les autres pairs
+      - Il faut donc générer un identifiant (*int32*) et espérer qu'il soit unique
+      - /Math.random()/ permet de le faire
+      - Mais utiliser un générateur de nombres aléatoires à sécurité cryptographique permet de s'assurer un comportement plus aléatoire
+      - [[https://developer.mozilla.org/en-US/docs/Web/API/RandomSource/getRandomValues][getRandomValues()]] permet de faire ça dans le browser
+*** Planned
+**** DONE MUTE : Modifier *MuteCore* pour qu'il n'attende plus un *JoinEvent* pour démarrer
+- Actuellement, *JoinEvent* est l'évènement initial qui permet au modèle
+  - De s'instancier
+  - De récupérer l'état stocké en local
+  - De se synchroniser avec un pair
+- Cet évènement est seulement déclenché lorsqu'on rejoint le réseau
+- Si un problème empêche l'utilisateur de rejoindre le réseau, alors l'éditeur est inutilisable
+- Alors que rien n'empêche de travailler en mode déconnecté pour le moment et de tenter de se reconnecter plus tard
+- Modifier la logique interne de *MuteCore* pour
+  - Ajouter un *InitEvent* indiquant au modèle
+    - De s'instancier
+    - De récupérer l'état stocké en local
+  - *JoinEvent* ne permettra que de déclencher une synchronisation
+** Semaine du <2017-03-06 lun.> au <2017-03-10 ven.>
+*** Done
+- MUTE : Ajouter la gestion du titre du document
+  - Un simple *LWW-Register* suffit
+  - La seule difficulté concerne la génération du timestamp utilisé pour ordonner les titres
+  - Une horloge de Lamport ne semble pas suffire
+    - Permet d'assurer que pour des opérations /a/ et /b/ et une fonction /C(x)/ retournant le timestamp d'une opération /x/, alors /a -> b => C(a) < C(b)/
+    - Mais ne permet pas de s'assurer que /C(a) < C(b) => a -> b/
+    - En effet /C(a) < C(b)/ peut aussi indiquer que les opérations sont en concurrence
+  - Besoin d'ajouter un élément pour créer un ordre total
+    - Dans le cas d'une égalité entre les horloges, l'identifiant de l'utilisateur peut être utilisé pour ordonner les timestamps
+    - Exemple pour deux timestamps /<ts, id>/ et /<ts', id'>/ :
+      #+BEGIN_SRC
+      if (ts > ts') return <ts, id>
+      if (ts' > ts) return <ts', id'>
+      if (id > id') return <ts, id>
+      return <ts', id'>
+      #+END_SRC
+- Thèse : Discussion avec Claudia
+  - Discussion autour du sujet de thèse
+  - Continuer les travaux autour du modèle de confiance
+  - Amélioration de l'expérience basée sur le trust game
+    - Ajout d'un mécanisme de réputation
+      - La confiance est
+      - La réputation, elle, est établie sur un groupe d'utilisateurs
+    - Comparaison du comportement des utilisateurs par rapport à la confiance et/ou à la réputation
+  - Application du modèle de confiance à l'édition collaborative
+    - Evaluation de la qualité des contributions d'un utilisateur
+    - Déterminer les compromis d'une collaboration
+    - Prédiction des actions d'un utilisateur en fonction
+    - Gestion des droits d'accès par rapport au score de confiance
+- Thèse : Discussion avec Gérald
+  - Problème de renaming pas adapté à l'équipe
+    - Pas exactement le domaine de compétence et le type de problème habituellement traité
+  - Idée d'interactions entre un système externe et un CRDT
+    - Un document et son modèle CRDT correspondant pourraient être stockés dans git
+    - Un utilisateur, avec une application externe, pourrait vouloir modifier le document
+    - Comment détecter les changements et mettre à jour son modèle CRDT
+    - Comment transmettre ces modifications à l'éditeur
+  - Faire le lien avec les cahiers scientifiques
+    - De plus en plus de cahiers scientifiques sont rédigés pour des raisons de reproductibilité
+      - Plusieurs formats: IPython, ORG-mode
+    - Pourraient être rédigés de façon collaborative
+    - Embarque des morceaux de code à exécuter
+    - Où exécuter les tâches ?
+      - Peut vouloir déléguer l'exécution des tâches si elles sont lourdes
+      - Retrouve la notion de bot ?
+    - Besoin de répliquer les données de l'expérience si délégation de l'exécution
+*** Planned
+**** TODO MUTE : Débugger la gestion des documents
+- Depuis la mise à jour de la liste des documents, la sauvegarde en locale des documents n'est plus disponible
+- On enregistre les meta-données du document
+  - Titre
+  - Clé
+  - Stockages utilisés
+- Mais plus son contenu
+- Débugger ça
+**** TODO MUTE : Ajouter la gestion du titre du document
+- Le titre du document peut être l'objet de modifications concurrentes
+- Il est donc nécessaire de s'assurer qu'il converge chez tous les utilisateurs
+- Utiliser *LogootSplit* pour gérer le titre semble un peu /overkill/
+- Un simple *LWW-Register* suffirait
+- Voir pour lier le document et son titre
+  - Le titre peut être amener à évoluer suite à des modifications du document
+  - Lier l'état du document et l'état du titre?
 **** TODO MUTE : Améliorer le pipe /slice/ d'Angular pour les *Strings*
 - Angular propose un pipe /slice/ permettant de limiter le nombre de caractères que nous souhaitons afficher d'une *String*
 - Cependant, rien n'indique dans le résultat si la chaîne de caractères a effectivement été tronquée ou non
@@ -965,3 +1134,33 @@ java.lang.NullPointerException
   2016-10-12 16:27:11 +0000 [INFO] from application in application-akka.actor.default-dispatcher-2 - Execution Mode: TRIBUNAL
   #+END_SRC
   
+* Glossaire
+- Eventual convergence property
+  #+BEGIN_QUOTE
+  Copies of shared objects are identical at all sites if updates cease and all generated updates are propagated to all sites.
+  #+END_QUOTE
+- Precedence property
+  #+BEGIN_QUOTE
+  If one update /Oa/ causally precedes another update /Ob/, then,
+  at each site, the execution of /Oa/ happens before the execution of /Ob/.
+  #+END_QUOTE
+- Intention-preservation
+  #+BEGIN_QUOTE
+  For any update /O/, the effect of executing /O/ at all sites is the same as the intention of /O/ when executed at the site that originated it,
+  and the effect of executing /O/ does not change the effect of non concurrent operations.
+  #+END_QUOTE
+- Associativity
+  #+BEGIN_QUOTE
+  Associativity means that you can apply a function in any order:
+    ~f(a,f(b,c)) = f(f(a,b),c)~
+  #+END_QUOTE
+- Commutativity
+  #+BEGIN_QUOTE
+  Commutativity means that a function's arguments are order-insensitive:
+    ~f(a,b) = f(b,a))~
+  #+END_QUOTE
+- Idempotence
+  #+BEGIN_QUOTE
+  Idempotence means you can call a function on the same input any number of times and get the same result:
+    ~f(f(x))=f(x) (e.g., max(42, max(42, 42)) = 42))~
+  #+END_QUOTE
