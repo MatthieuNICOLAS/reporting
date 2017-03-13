@@ -1098,10 +1098,31 @@ java.lang.NullPointerException
 - Débugger ça
 ** Semaine du <2017-03-13 lun.> au <2017-03-17 ven.>
 *** Done
+- MUTE : Débugger l'ouverture d'un nouveau document
+  - Ajout de l'évènement /isReady/ dans *EditorComponent*
+    - Déclenché initialement lors de /ngOnInit()/
+    - Puis ensuite à chaque /ngOnChanges()/
+  - Modification de *DocComponent* pour qu'il attende cet évènement pour déclencher /muteCore.init()/
+- MUTE : Affichage du digest du document
+  - Modification de *DocService*
+    - Ajout du stream /onDocDigest/
+    - Permet d'émettre la valeur du digest
+    - Le digest est généré une fois dans l'état /idle/ depuis 1s
+      - Permet d'éviter de le calculer à chaque modification locale ou distante
+  - Modification de *DocComponent*
+    - S'abonne au stream /onDocDigest/
+    - Transmet les différentes valeurs à *UiService*
+  - Modification de *DevLabelComponent*
+    - Récupère le digest par le biais de *UiService*
+    - Affiche le digest
 *** Planned
-**** TODO MUTE : Débugger l'ouverture d'un nouveau document
+**** DONE MUTE : Débugger l'ouverture d'un nouveau document
 - Si on est sur *DocComponent* et qu'on ouvre un nouveau document, le contenu du document n'est pas remis à 0
 - Résoudre ce bug
+**** DONE MUTE : Affichage du digest du document
+- Pour s'assurer que toutes les copies du document convergent, une fonction /digest()/ existe
+- Celle-ci retourne un entier représentant le contenu du document
+- Afficher le digest du document pour faciliter la comparaison des copies
 **** TODO TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
 - Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
   - Créer un film
