@@ -1,3 +1,5 @@
+#+TODO: TODO IN-PROGRESS CANCELLED DONE
+
 * Journal de bord
 ** Semaine du <2016-09-12 lun.> au <2016-09-16 ven.>
 *** Done
@@ -1115,6 +1117,58 @@ java.lang.NullPointerException
   - Modification de *DevLabelComponent*
     - Récupère le digest par le biais de *UiService*
     - Affiche le digest
+- TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
+  - Erreur lors du lancement du programme
+    - =error while loading shared libraries: libPocoFoundation=
+  - POCO s'avère être un ensemble de librairies pour développer des applications web en C++
+    - https://github.com/pocoproject/poco
+  - Installation de POCO
+    #+BEGIN_SRC
+    ./configure
+    make -s
+    sudo make install
+    #+END_SRC
+  - Mise à jour de /ldconfig/
+    - =sudo ldconfig=
+  - Le serveur démarre dorénavant
+    - Si exécuté en tant qu'utilisateur: /Instruction non permise/
+    - Si exécuté en tant que root: rend la main mais ne semble pas démarré
+- CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
+  - Objectifs:
+    - Tous les replicas doivent converger vers le même état
+    - Aucun input ne doit être perdu
+      - Exclu les *LWW-Registers*
+    - Fonctionne avec un réseau P2P
+    - Les communications peuvent être chiffrées
+  - Le format JSON est une structure à plusieurs niveaux
+    - Implique qu'il faut pouvoir gérer des opérations concurrentes à différents niveaux de l'arbre
+  - Comportement
+    - Si modifie un registre en concurrence, conserve l'ensemble des valeurs (*Multi-Value Register*)
+    - Si modifie une liste en concurrence, merge les listes
+    - Si modifie un registre composé de plusieurs registres, merge les modifications
+      - Du coup, on peut se retrouver avec un scénario /bizarre/
+      - Si un utilisateur supprime l'objet alors qu'un utilisateur met à jour une de ses propriétés en concurrence
+      - Le résultat de la fusion sera alors que la propriété mise à jour
+      - L'objet n'est plus cohérent
+- Emacs : Configuration de l'éditeur
+  - Activation du gestionnaire de packages *MELPA*
+    #+BEGIN_SRC
+    (require 'package) ;; You might already have this line
+    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+    (when (< emacs-major-version 24)
+      ;; For important compatibility libraries like cl-lib 
+      (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+    (package-initialize) ;; You might already have this line
+    #+END_SRC
+  - Installation de packages
+    - Affichage de la liste des paquets: =M-x list-packages=
+    - Installer un paquet:
+      - Touche =i= pour marquer le paquet comme à installer
+      - Puis =x= pour quitter le menu et passer à l'installation
+    - Activer un thème: =M-x load-theme=
+  - Liens intéressants
+    - Sur les commandes de Emacs: https://www.gnu.org/software/emacs/refcards/pdf/refcard.pdf
+    - Sur les fonctionnalités de base de *ORG-MODE*: http://orgmode.org/worg/org-tutorials/org4beginners.html
 *** Planned
 **** DONE MUTE : Débugger l'ouverture d'un nouveau document
 - Si on est sur *DocComponent* et qu'on ouvre un nouveau document, le contenu du document n'est pas remis à 0
@@ -1254,15 +1308,15 @@ java.lang.NullPointerException
 - Associativity
   #+BEGIN_QUOTE
   Associativity means that you can apply a function in any order:
-    ~f(a,f(b,c)) = f(f(a,b),c)~
+    =f(a,f(b,c)) = f(f(a,b),c)=
   #+END_QUOTE
 - Commutativity
   #+BEGIN_QUOTE
   Commutativity means that a function's arguments are order-insensitive:
-    ~f(a,b) = f(b,a))~
+    =f(a,b) = f(b,a))=
   #+END_QUOTE
 - Idempotence
   #+BEGIN_QUOTE
   Idempotence means you can call a function on the same input any number of times and get the same result:
-    ~f(f(x))=f(x) (e.g., max(42, max(42, 42)) = 42))~
+    =f(f(x))=f(x) (e.g., max(42, max(42, 42)) = 42))=
   #+END_QUOTE
