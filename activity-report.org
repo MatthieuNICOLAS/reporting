@@ -1,3 +1,4 @@
+#+STARTUP: inlineimages
 #+TODO: TODO IN-PROGRESS CANCELLED DONE
 
 * Journal de bord
@@ -1133,6 +1134,426 @@ java.lang.NullPointerException
   - Le serveur démarre dorénavant
     - Si exécuté en tant qu'utilisateur: /Instruction non permise/
     - Si exécuté en tant que root: rend la main mais ne semble pas démarré
+  - Jordan a réussi à débugger le serveur
+    - Le problème semblait provenir de librairies qui étaient incluses dans le build mais non nécessaires
+  - Initialisation du serveur
+    - Ne pas cliquer sur le 1er bouton !
+    - Besoin de générer la BDD au 1er lancement
+      - Create New Database -> Warp Factor 2.5
+      - Sélectionner un dossier vide qui va contenir la BDD
+      - Crash de l'appli normal
+    - 2nd lancement
+      - Sélectionner la base de données précédemment créée dans la liste de droite
+  - Serveur dorénavant disponible à [[http://localhost:9980]]
+  - API
+    - Colorspaces
+      - Récupérer la liste des colorspaces
+        #+BEGIN_SRC
+$ curl http://localhost:9980/colorspace
+<html>
+<head>
+<title>Colorspace list</title>
+</head>
+<body>
+<ul>
+    <li><a href="/colorspace/8199c8bd-35d8-44d8-8992-1c5a6d091817">8199c8bd-35d8-44d8-8992-1c5a6d091817</a></li>
+    <li><a href="/colorspace/7920bf82-9054-47a9-b248-f1f4de67e619">7920bf82-9054-47a9-b248-f1f4de67e619</a></li>
+    <li><a href="/colorspace/cf95b451-abae-4194-8cb2-30fee386d4d9">cf95b451-abae-4194-8cb2-30fee386d4d9</a></li>
+    <li><a href="/colorspace/70201f7f-c4aa-40df-99f7-0da45ddd6bbd">70201f7f-c4aa-40df-99f7-0da45ddd6bbd</a></li>
+    <li><a href="/colorspace/35b6b6a6-533f-4b0f-92da-cd142d057ae4">35b6b6a6-533f-4b0f-92da-cd142d057ae4</a></li>
+    <li><a href="/colorspace/7a8357db-595c-4379-80c7-ae4f0d17c474">7a8357db-595c-4379-80c7-ae4f0d17c474</a></li>
+    <li><a href="/colorspace/56546542-3c5c-482b-9e2d-0bd7d674ccb2">56546542-3c5c-482b-9e2d-0bd7d674ccb2</a></li>
+    <li><a href="/colorspace/7a832038-9c47-481d-8fc5-0cba01875471">7a832038-9c47-481d-8fc5-0cba01875471</a></li>
+    <li><a href="/colorspace/7335efb6-a311-458a-8e6e-adbe6bc35dc2">7335efb6-a311-458a-8e6e-adbe6bc35dc2</a></li>
+    <li><a href="/colorspace/426a891a-ed0b-4c06-8614-0aa893ca8d33">426a891a-ed0b-4c06-8614-0aa893ca8d33</a></li>
+    <li><a href="/colorspace/87089522-ff78-4e99-81b1-24240595592a">87089522-ff78-4e99-81b1-24240595592a</a></li>
+    <li><a href="/colorspace/3790cd83-9e7b-4e8b-9356-6b6e78bb1ca7">3790cd83-9e7b-4e8b-9356-6b6e78bb1ca7</a></li>
+    <li><a href="/colorspace/652e0344-33f3-4f20-ac43-dcfb2493e623">652e0344-33f3-4f20-ac43-dcfb2493e623</a></li>
+    <li><a href="/colorspace/51658695-398b-44cf-9591-b35ab304d1b7">51658695-398b-44cf-9591-b35ab304d1b7</a></li>
+    <li><a href="/colorspace/32c28afa-f8e7-441b-81ec-2599cf5091ce">32c28afa-f8e7-441b-81ec-2599cf5091ce</a></li>
+    <li><a href="/colorspace/809f1634-1a8f-45bd-87bf-8aec9c67a621">809f1634-1a8f-45bd-87bf-8aec9c67a621</a></li>
+    <li><a href="/colorspace/040b7ff1-1975-4e03-93c9-0a15671cfe41">040b7ff1-1975-4e03-93c9-0a15671cfe41</a></li>
+    <li><a href="/colorspace/4d1ac0d3-5943-457d-901d-95322a8d39c7">4d1ac0d3-5943-457d-901d-95322a8d39c7</a></li>
+    <li><a href="/colorspace/a2b11f5c-0144-4691-a92a-529a594e929f">a2b11f5c-0144-4691-a92a-529a594e929f</a></li>
+</ul>
+</body>
+</html>
+        #+END_SRC       
+    - Clips
+      - Récupérer la liste des clips
+        #+BEGIN_SRC
+$ curl http://localhost:9980/clip
+<html>
+<head>
+<title>Clip list</title>
+</head>
+<body>
+<ul>
+    <li><a href="/clip/c8635487-54a0-4cc3-ba6a-774a4c3f2628">c8635487-54a0-4cc3-ba6a-774a4c3f2628</a></li>
+</ul>
+</body>
+</html>
+        #+END_SRC
+      - Récupérer un clip
+	#+BEGIN_SRC
+$ curl http://localhost:9980/clip/c8635487-54a0-4cc3-ba6a-774a4c3f2628
+<object class="::nClip::cClip" instanceauid="c8635487-54a0-4cc3-ba6a-774a4c3f2628">
+    <state>
+        <data2state>
+            <object class="::nData2::nStructure::cStructPersistentState">
+                <state mName="data2state" mValue="void" />
+                <children>
+                    <object class="::nData2::nValue::cWString">
+                        <state mName="documentname">
+                            <mValue format="string-utf8">clip1</mValue>
+                        </state>
+                    </object>
+                    <object class="::nData2::nValue::cWString">
+                        <state mName="documentcopyright">
+                            <mValue format="string-utf8">@copyleft</mValue>
+                        </state>
+                    </object>
+                    <object class="::nData2::nValue::cWString">
+                        <state mName="documentcomment">
+                            <mValue format="string-utf8">@So cute :)</mValue>
+                        </state>
+                    </object>
+                    <object class="::nData2::nValue::cInteger">
+                        <state mName="width" mValue="100" mStep="1" />
+                    </object>
+                    <object class="::nData2::nValue::cInteger">
+                        <state mName="height" mValue="200" mStep="1" />
+                    </object>
+                    <object class="::nData2::nValue::cDouble">
+                        <state mName="framerate" mValue="24" mStep="1" />
+                    </object>
+                    <object class="::nData2::nValue::cInteger">
+                        <state mName="currentframe" mValue="0" mStep="1" />
+                    </object>
+                    <object class="::nDocument::nData2::nValue::cFavorites">
+                        <state mName="favorites">
+                            <mValue>
+                                <mRoot>
+                                    <mName format="string-utf8">Root</mName>
+                                    <mContent />
+                                </mRoot>
+                            </mValue>
+                        </state>
+                    </object>
+                </children>
+            </object>
+        </data2state>
+        <userdata>
+            <object class="::nData2::{Data2.UserData.cpp}::cUserDataStructPersistentState">
+                <state mName="userdata" mValue="void" />
+                <children>
+                    <object class="::nData2::nStructure::cStruct">
+                        <state mName="timeline" mValue="void" />
+                        <children>
+                            <object class="::nData2::nValue::cDouble">
+                                <state mName="framestart" mValue="0" mStep="1" />
+                            </object>
+                            <object class="::nData2::nValue::cDouble">
+                                <state mName="framesize" mValue="20" mStep="1" />
+                            </object>
+                            <object class="::nData2::nValue::cInteger">
+                                <state mName="newlayerindex" mValue="0" mStep="1" />
+                            </object>
+                        </children>
+                    </object>
+                </children>
+            </object>
+        </userdata>
+    </state>
+    <relations>
+        <UsedInShots kind="unordered">
+            <target object="ea7a9721-4291-4043-b589-37e0932a806b" />
+        </UsedInShots>
+        <RootLayer kind="1">
+            <target object="dd7abe7c-5a02-4ed0-aca2-ea41fd779445" />
+        </RootLayer>
+        <Colorspace kind="1">
+            <target object="8199c8bd-35d8-44d8-8992-1c5a6d091817" />
+        </Colorspace>
+        <StoredIn kind="unordered">
+            <target object="aac82be6-d624-46c0-98a8-ec3209f87c4d" />
+        </StoredIn>
+        <Content kind="unordered" />
+    </relations>
+</object>
+        #+END_SRC
+      - Créer un clip
+        #+BEGIN_SRC
+$ curl -X POST -d name=clip1 -d width=100 -d height=200 -d framerate=24 -d colorspace=8199c8bd-35d8-44d8-8992-1c5a6d091817 http://localhost:9980/clip
+<newobject class="::nClip::cClip" instanceauid="1b00f271-1754-4d71-8f2f-24e49a568fb0" />
+        #+END_SRC
+      - Associer un clip à un shot
+        #+BEGIN_SRC
+$ curl -X PUT http://localhost:9980/shot/ea7a9721-4291-4043-b589-37e0932a806b/append/c8635487-54a0-4cc3-ba6a-774a4c3f2628
+<html>
+<head>
+<title>OK</title>
+</head>
+<body>
+LINK ESTABLISHED</body>
+</html>
+        #+END_SRC
+    - Shots
+      - Récupérer la liste des shots
+        #+BEGIN_SRC
+$ curl http://localhost:9980/shot
+<html>
+<head>
+<title>Shot list</title>
+</head>
+<body>
+<ul>
+    <li><a href="/shot/ea7a9721-4291-4043-b589-37e0932a806b">ea7a9721-4291-4043-b589-37e0932a806b</a></li>
+    <li><a href="/shot/bde3202e-5dcf-4e5d-9a2c-b014abfc76b8">bde3202e-5dcf-4e5d-9a2c-b014abfc76b8</a></li>
+    <li><a href="/shot/3c773691-f34c-4950-94a1-bc8b4e4a66c3">3c773691-f34c-4950-94a1-bc8b4e4a66c3</a></li>
+</ul>
+</body>
+</html>
+        #+END_SRC
+      - Récupérer un shot
+        #+BEGIN_SRC
+$ curl http://localhost:9980/shot/ea7a9721-4291-4043-b589-37e0932a806b
+<object class="::nFilm::cShot" instanceauid="ea7a9721-4291-4043-b589-37e0932a806b">
+    <state>
+        <data2state>
+            <object class="::nData2::nStructure::cStructPersistentState">
+                <state mName="data2state" mValue="void" />
+                <children>
+                    <object class="::nData2::nValue::cWString">
+                        <state mName="documentname">
+                            <mValue format="string-utf8">shot1</mValue>
+                        </state>
+                    </object>
+                    <object class="::nData2::nValue::cWString">
+                        <state mName="documentcopyright">
+                            <mValue format="string-utf8">@copyleft</mValue>
+                        </state>
+                    </object>
+                    <object class="::nData2::nValue::cWString">
+                        <state mName="documentcomment">
+                            <mValue format="string-utf8">@So cute :)</mValue>
+                        </state>
+                    </object>
+                    <object class="::nData2::nValue::cDoubleBounded">
+                        <state mName="opacity" mValue="1" mStep="1" mMinValue="0" mMaxValue="1" />
+                    </object>
+                    <object class="::nData2::nValue::cEnum">
+                        <state mName="backgroundmode" mValue="::nClip::eBackground::kNone" />
+                    </object>
+                    <object class="::nData2::nValue::cColor">
+                        <state mName="backgroundcolor" mValue="[0.964203,1.000000,0.824890,1.000000]" />
+                    </object>
+                    <object class="::nData2::nValue::cColor">
+                        <state mName="backgroundcolor1" mValue="[0.436035,0.222473,0.013916,1.000000]" />
+                    </object>
+                    <object class="::nData2::nValue::cColor">
+                        <state mName="backgroundcolor2" mValue="[0.385101,0.716919,0.097076,1.000000]" />
+                    </object>
+                    <object class="::nDocument::nData2::nValue::cFavorites">
+                        <state mName="favorites">
+                            <mValue>
+                                <mRoot>
+                                    <mName format="string-utf8">Root</mName>
+                                    <mContent />
+                                </mRoot>
+                            </mValue>
+                        </state>
+                    </object>
+                </children>
+            </object>
+        </data2state>
+        <userdata>
+            <object class="::nData2::{Data2.UserData.cpp}::cUserDataStructPersistentState">
+                <state mName="userdata" mValue="void" />
+                <children>
+                    <object class="::nData2::nStructure::cStruct">
+                        <state mName="timeline" mValue="void" />
+                        <children>
+                            <object class="::nData2::nValue::cDouble">
+                                <state mName="framestart" mValue="0" mStep="1" />
+                            </object>
+                            <object class="::nData2::nValue::cDouble">
+                                <state mName="framesize" mValue="20" mStep="1" />
+                            </object>
+                            <object class="::nData2::nValue::cInteger">
+                                <state mName="currentframe" mValue="0" mStep="1" />
+                            </object>
+                        </children>
+                    </object>
+                </children>
+            </object>
+        </userdata>
+    </state>
+    <relations>
+        <Clips kind="ordered">
+            <target object="c8635487-54a0-4cc3-ba6a-774a4c3f2628">
+                <properties>
+                    <property name="plane" object="5f57bd5e-b57a-4f87-96f9-de2e48edb0f9" />
+                </properties>
+            </target>
+        </Clips>
+        <Parents kind="unordered">
+            <target object="3fac5b0e-fcd6-4432-837d-b1252dd8285b" />
+            <target object="3fac5b0e-fcd6-4432-837d-b1252dd8285b" />
+        </Parents>
+        <StoredIn kind="unordered">
+            <target object="b6ff362e-7001-4328-8079-4e82fa698501" />
+        </StoredIn>
+        <Content kind="unordered" />
+    </relations>
+</object> 
+	#+END_SRC
+      - Créer un shot
+        #+BEGIN_SRC
+$ curl -X POST -d name=shot1 http://localhost:9980/shot
+<newobject class="::nFilm::cShot" instanceauid="0d52f072-f6bb-4271-9cd0-669e4ad7ec36" />
+        #+END_SRC
+      - Associer un shot à un film
+        #+BEGIN_SRC
+$ curl -X PUT http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de9c2d767/append/ea7a9721-4291-4043-b589-37e0932a806b
+<html>
+<head>
+<title>OK</title>
+</head>
+<body>
+LINK ESTABLISHED</body>
+</html>
+        #+END_SRC
+    - Films
+      - Récupérer la liste des films
+	#+BEGIN_SRC
+$ curl http://localhost:9980/film
+<html>
+<head>
+<title>Film list</title>
+</head>
+<body>
+<ul>
+    <li><a href="/film/9491a3d8-1e2e-4b54-a6d7-806de9c2d767">9491a3d8-1e2e-4b54-a6d7-806de9c2d767</a></li>
+    <li><a href="/film/997a7a0e-b6de-44a7-9c5d-ebe45903bab1">997a7a0e-b6de-44a7-9c5d-ebe45903bab1</a></li>
+</ul>
+</body>
+</html>
+        #+END_SRC
+      - Récupérer un film
+        #+BEGIN_SRC
+$ curl http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de9c2d767
+<object class="::nFilm::cFilm" instanceauid="9491a3d8-1e2e-4b54-a6d7-806de9c2d767">
+    <state>
+        <data2state>
+            <object class="::nData2::nStructure::cStructPersistentState">
+                <state mName="data2state" mValue="void" />
+                <children>
+                    <object class="::nData2::nValue::cWString">
+                        <state mName="documentname">
+                            <mValue format="string-utf8">tagada</mValue>
+                        </state>
+                    </object>
+                    <object class="::nData2::nValue::cWString">
+                        <state mName="documentcopyright">
+                            <mValue format="string-utf8">@copyleft</mValue>
+                        </state>
+                    </object>
+                    <object class="::nData2::nValue::cWString">
+                        <state mName="documentcomment">
+                            <mValue format="string-utf8">@So cute :)</mValue>
+                        </state>
+                    </object>
+                </children>
+            </object>
+        </data2state>
+        <userdata>
+            <object class="::nData2::{Data2.UserData.cpp}::cUserDataStructPersistentState">
+                <state mName="userdata" mValue="void" />
+                <children>
+                    <object class="::nData2::nStructure::cStruct">
+                        <state mName="timeline" mValue="void" />
+                        <children>
+                            <object class="::nData2::nValue::cDouble">
+                                <state mName="zoom" mValue="1" mStep="1" />
+                            </object>
+                            <object class="::nData2::nValue::cInteger">
+                                <state mName="newshotindex" mValue="0" mStep="1" />
+                            </object>
+                        </children>
+                    </object>
+                </children>
+            </object>
+        </userdata>
+    </state>
+    <relations>
+        <RootScene kind="1">
+            <target object="3fac5b0e-fcd6-4432-837d-b1252dd8285b" />
+        </RootScene>
+        <CameraSettings kind="1">
+            <target object="1ee1f8e0-0dca-4d2e-9208-8c579e59150a" />
+        </CameraSettings>
+        <StoredIn kind="unordered">
+            <target object="0f76db8d-1ca3-4e05-8ede-a84d7e6cc74b" />
+        </StoredIn>
+        <Content kind="unordered" />
+    </relations>
+</object>
+        #+END_SRC
+      - Créer un film
+        #+BEGIN_SRC
+$ curl -X POST -d name=tagada http://localhost:9980/film
+<newobject class="::nFilm::cFilm" instanceauid="997a7a0e-b6de-44a7-9c5d-ebe45903bab1" />
+        #+END_SRC
+  - Problème pour récupérer le lien entre le film et ses shots
+    - Actuellement, un film comporte une *RootScene*
+    - C'est en récupérant les informations de la *RootScene* que nous sommes capables de retrouver les shots du film
+      #+BEGIN_SRC
+$ curl http://localhost:9980/object/3fac5b0e-fcd6-4432-837d-b1252dd8285b
+<object class="::nFilm::cRootScene" instanceauid="3fac5b0e-fcd6-4432-837d-b1252dd8285b">
+    <state>
+        <data2state>
+            <object class="::nData2::nStructure::cStructPersistentState">
+                <state mName="data2state" mValue="void" />
+                <children>
+                    <object class="::nData2::nValue::cWString">
+                        <state mName="documentname">
+                            <mValue format="string-utf8">@Untitled-07</mValue>
+                        </state>
+                    </object>
+                    <object class="::nData2::nValue::cWString">
+                        <state mName="documentcopyright">
+                            <mValue format="string-utf8">@copyleft</mValue>
+                        </state>
+                    </object>
+                    <object class="::nData2::nValue::cWString">
+                        <state mName="documentcomment">
+                            <mValue format="string-utf8">@So cute :)</mValue>
+                        </state>
+                    </object>
+                </children>
+            </object>
+        </data2state>
+    </state>
+    <relations>
+        <Film kind="1">
+            <target object="9491a3d8-1e2e-4b54-a6d7-806de9c2d767" />
+        </Film>
+        <Children kind="ordered">
+            <target object="ea7a9721-4291-4043-b589-37e0932a806b" />
+            <target object="ea7a9721-4291-4043-b589-37e0932a806b" />
+            <target object="ea7a9721-4291-4043-b589-37e0932a806b" />
+        </Children>
+        <Parents kind="unordered" />
+        <StoredIn kind="unordered" />
+        <Content kind="unordered" />
+    </relations>
+</object>
+      #+END_SRC
+    - Mais cette URL est censée être temporaire
+    - Comment récupérer la liste des shots d'un film à terme ?
+      - Semblerait que les shots conservent une référence vers la *RootScene*
+      - Utiliser ce lien ?
 - CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
   - Objectifs:
     - Tous les replicas doivent converger vers le même état
@@ -1169,7 +1590,35 @@ java.lang.NullPointerException
   - Liens intéressants
     - Sur les commandes de Emacs: https://www.gnu.org/software/emacs/refcards/pdf/refcard.pdf
     - Sur les fonctionnalités de base de *ORG-MODE*: http://orgmode.org/worg/org-tutorials/org4beginners.html
+- PLM : Ajouter [[plumbr.eu][Plumbr]] à PLM
+  - Ajout de nouvelles images Docker
+    - Ajout d'un *VOLUME* contenant le jar de *Plumbr*
+    - Modifie *ENTRYPOINT* ou *CMD* pour référencer ce jar
+  - Il s'avère que des fichiers sont manquants
+    #+BEGIN_SRC
+    plm_1           | *************************************************************************************
+    plm_1           | * Plumbr is missing the following required properties: serverUrl,logConf,accountId. *
+    plm_1           | * Either make sure the plumbr.properties file is present next to plumbr.jar         *
+    plm_1           | * or specify individual properties via -D parameters in your startup script.        *
+    plm_1           | *                                                                                   *
+    plm_1           | * Check out https://plumbr.eu/support/agent-configuration                           *
+    plm_1           | * for more information or contact support@plumbr.eu                                 *
+    plm_1           | *************************************************************************************
+    #+END_SRC
+  - Ajout des fichiers manquants
 *** Planned
+**** IN-PROGRESS CRDT : Lire *CRDT notes*
+- Disponible ici: https://github.com/pfrazee/crdt_notes
+- Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
+**** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
+- Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
+**** IN-PROGRESS TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
+- Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
+  - Créer un film
+  - Associer des shots au film
+    - Besoin potentiellement de créer les shots
+  - Associer des clips au shot
+    - Besoin potentiellement de créer les clips
 **** DONE MUTE : Débugger l'ouverture d'un nouveau document
 - Si on est sur *DocComponent* et qu'on ouvre un nouveau document, le contenu du document n'est pas remis à 0
 - Résoudre ce bug
@@ -1177,13 +1626,9 @@ java.lang.NullPointerException
 - Pour s'assurer que toutes les copies du document convergent, une fonction /digest()/ existe
 - Celle-ci retourne un entier représentant le contenu du document
 - Afficher le digest du document pour faciliter la comparaison des copies
-**** TODO TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
-- Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
-  - Créer un film
-  - Associer des shots au film
-    - Besoin potentiellement de créer les shots
-  - Associer des clips au shot
-    - Besoin potentiellement de créer les clips
+**** DONE PLM : Ajouter [[plumbr.eu][Plumbr]] à PLM
+- S'agit d'une solution de monitoring pour JVM
+- Voir comment elle s'intègre avec Docker et si conflit avec New Relic
 **** TODO MUTE : Débugger la liste des documents
 - Lorsqu'on souhaite re-afficher la liste des documents alors que nous étions sur la page d'un document, la liste ne se génère pas dans tous les cas
 - La liste de *DocsComponent* est générée à partir de la valeur /activeFile/
@@ -1211,11 +1656,6 @@ java.lang.NullPointerException
 - Angular propose un pipe /slice/ permettant de limiter le nombre de caractères que nous souhaitons afficher d'une *String*
 - Cependant, rien n'indique dans le résultat si la chaîne de caractères a effectivement été tronquée ou non
 - Créer un pipe /sliceString/ ajoutant '...' au résultat si la chaîne a été coupée
-**** TODO CRDT : Lire *CRDT notes*
-- Disponible ici: https://github.com/pfrazee/crdt_notes
-- Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
-**** TODO CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
-- Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
 **** TODO TVPaint : Développer la tâche compositing
 - La tâche /compositing/ est une activité complexe
 - La décomposer en plusieurs sous-tâches
@@ -1287,9 +1727,6 @@ java.lang.NullPointerException
   2016-10-12 15:53:30 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8689 - {"cmd":"stopExecution","args":{}}
   2016-10-12 16:27:11 +0000 [INFO] from application in application-akka.actor.default-dispatcher-2 - Execution Mode: TRIBUNAL
   #+END_SRC
-**** TODO PLM : Ajouter [[plumbr.eu][plumbr]] à PLM
-- S'agit d'une solution de monitoring pour JVM
-- Voir comment elle s'intègre avec Docker et si conflit avec New Relic
 * Glossaire
 - Eventual convergence property
   #+BEGIN_QUOTE
