@@ -1607,18 +1607,6 @@ $ curl http://localhost:9980/object/3fac5b0e-fcd6-4432-837d-b1252dd8285b
     #+END_SRC
   - Ajout des fichiers manquants
 *** Planned
-**** IN-PROGRESS CRDT : Lire *CRDT notes*
-- Disponible ici: https://github.com/pfrazee/crdt_notes
-- Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
-**** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
-- Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
-**** IN-PROGRESS TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
-- Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
-  - Créer un film
-  - Associer des shots au film
-    - Besoin potentiellement de créer les shots
-  - Associer des clips au shot
-    - Besoin potentiellement de créer les clips
 **** DONE MUTE : Débugger l'ouverture d'un nouveau document
 - Si on est sur *DocComponent* et qu'on ouvre un nouveau document, le contenu du document n'est pas remis à 0
 - Résoudre ce bug
@@ -1629,6 +1617,18 @@ $ curl http://localhost:9980/object/3fac5b0e-fcd6-4432-837d-b1252dd8285b
 **** DONE PLM : Ajouter [[plumbr.eu][Plumbr]] à PLM
 - S'agit d'une solution de monitoring pour JVM
 - Voir comment elle s'intègre avec Docker et si conflit avec New Relic
+**** IN-PROGRESS TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
+- Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
+  - Créer un film
+  - Associer des shots au film
+    - Besoin potentiellement de créer les shots
+  - Associer des clips au shot
+    - Besoin potentiellement de créer les clips
+**** IN-PROGRESS CRDT : Lire *CRDT notes*
+- Disponible ici: https://github.com/pfrazee/crdt_notes
+- Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
+**** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
+- Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
 **** TODO MUTE : Débugger la liste des documents
 - Lorsqu'on souhaite re-afficher la liste des documents alors que nous étions sur la page d'un document, la liste ne se génère pas dans tous les cas
 - La liste de *DocsComponent* est générée à partir de la valeur /activeFile/
