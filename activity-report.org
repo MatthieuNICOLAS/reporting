@@ -1606,6 +1606,11 @@ $ curl http://localhost:9980/object/3fac5b0e-fcd6-4432-837d-b1252dd8285b
     plm_1           | *************************************************************************************
     #+END_SRC
   - Ajout des fichiers manquants
+  - En fait, il n'y avait pas besoin de générer des images custom pour utiliser les agents
+    - Dans /docker-compose.yml/, on peut ajouter des volumes au conteneur et modifier la commande utilisée
+    - Il est donc possible de définir l'utilisation d'agents que dans le /docker-compose.yml/
+    - Ceci permet d'avoir une image de base et de personnaliser son comportement en fonction de la config
+  - Mise à jour des /docker-compose.yml/
 *** Planned
 **** DONE MUTE : Débugger l'ouverture d'un nouveau document
 - Si on est sur *DocComponent* et qu'on ouvre un nouveau document, le contenu du document n'est pas remis à 0
