@@ -1648,6 +1648,18 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
 **** DONE PLM : Ajouter [[plumbr.eu][Plumbr]] à PLM
 - S'agit d'une solution de monitoring pour JVM
 - Voir comment elle s'intègre avec Docker et si conflit avec New Relic
+** Semaine du <2017-03-20 lun.> au <2017-03-24 ven.>
+*** Done
+- MUTE : Écrire la partie /Re-synchronisation hors-ligne et collaboration ad-hoc/
+  - Explication du couple /<id, clock>/ ajouté à chacune des opérations
+  - Explication du vecteur d'états
+  - Explication du comportement de l'algo à la réception d'une opération
+  - Explication du comportement de l'algo à la réception d'un vecteur d'état
+*** Planned
+**** DONE MUTE : Écrire la partie /Re-synchronisation hors-ligne et collaboration ad-hoc/
+- Dans un des livrables pour *Open-Paas::NG*, une partie porte sur le mécanisme de synchronisation implémenté dans /mute-core/
+  - https://github.com/coast-team/mute-core/blob/master/lib-src/sync/SyncService.ts
+- Rédiger cette partie
 **** IN-PROGRESS TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
 - Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
   - Créer un film
