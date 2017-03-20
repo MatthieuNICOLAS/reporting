@@ -1145,7 +1145,7 @@ java.lang.NullPointerException
     - 2nd lancement
       - Sélectionner la base de données précédemment créée dans la liste de droite
   - Serveur dorénavant disponible à [[http://localhost:9980]]
-  - API
+  - API de TVPaint Server
     - Colorspaces
       - Récupérer la liste des colorspaces
         #+BEGIN_SRC
@@ -1554,6 +1554,32 @@ $ curl http://localhost:9980/object/3fac5b0e-fcd6-4432-837d-b1252dd8285b
     - Comment récupérer la liste des shots d'un film à terme ?
       - Semblerait que les shots conservent une référence vers la *RootScene*
       - Utiliser ce lien ?
+  - En fait, on peut s'en sortir sans avoir besoin d'accéder directement à la *RootScene*
+    - Il suffit de vérifier que la *RootScene* référencée dans *Film* est bien aussi référencée par les *Shots*
+  - Parser du XML en JS
+    - Une librairie semble se démarquer: [[https://github.com/Leonidas-from-XIV/node-xml2js]]
+    - Exemple d'utilisation
+      #+BEGIN_SRC
+this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de9c2d767",
+  (error, response, body) => {
+     xml2js.parseString(body, function (err, result) {
+     console.dir(result);
+  });
+      #+END_SRC
+    - Résultat
+      #+BEGIN_SRC
+{ object:
+   { '$':
+      { class: '::nFilm::cFilm',
+        instanceauid: '9491a3d8-1e2e-4b54-a6d7-806de9c2d767' },
+     state: [ [Object] ],
+     relations: [ [Object] ] } }
+      #+END_SRC
+  - L'authentification avec Bonita
+    - Besoin d'ajouter /redirect=false/ à la query string
+    - C'est la seule manière de récupérer un code de status de 500 si l'authentification échoue
+    - Sans ce paramètre, peu importe le résultat de l'authentification, le code de status est de 200
+      - Il faut dans ce cas comparer le contenu de la réponse pour déterminer si l'authentification a réussi ou échoué
 - CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
   - Objectifs:
     - Tous les replicas doivent converger vers le même état
