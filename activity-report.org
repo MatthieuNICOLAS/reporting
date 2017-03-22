@@ -1655,6 +1655,43 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
   - Explication du vecteur d'états
   - Explication du comportement de l'algo à la réception d'une opération
   - Explication du comportement de l'algo à la réception d'un vecteur d'état
+- Discussion avec Weihai
+  - Problème de collision d'identifiants
+    - Dans la théorie, on admet que l'identifiant de site est unique et sert de désambiguiteur
+    - En pratique, il s'avère que générer cet identifant unique n'est pas trivial
+      - Comme nous supportons les partitions, nous n'avons pas accès à l'ensemble des identifiants des autres pairs lors de la connexion
+      - Nous pouvons donc pas nous assurer que l'identifiant que nous générons n'est pas partagé avec un autre utilisateur
+    - Pour réduire les chances d'obtenir une collision d'identifiant, nous pouvons utiliser un identifiant long
+    - Mais comme l'identifiant de site est utilisé pour générer les identifiants de blocs, ceci impacte les performances du modèle
+      - Existe-t-il des études sur l'impact de la taille de l'identifiant sur les performances?
+    - Mais même en utilisant des identifiants longs il sera toujours possible d'obtenir des collisions
+    - Il faudrait donc un mécanisme de /recovery/ pour gérer ce cas
+  - La probabilité d'obtenir une collision d'identifiants en fonction de la taille de l'identifiant est décrite ici
+    - /Birthday attack/: https://en.wikipedia.org/wiki/Birthday_attack
+  - Mais obtenir une collision sur l'identifiant de site n'est pas une fatalité
+  - Le problème survient si plusieurs utilisateurs génère des blocs différents avec le même identifiant
+    - La probabilité de cet évènement est plus difficile à déterminer
+      - Probabilité d'obtenir une collision d'identifiants
+      - Probabilité que les nombres aléatoires générés soit égaux
+	- Dépend de l'emplacement de l'insertion
+	- Puisque l'interval de génération du nombre aléatoire dépend du bloc précédent et du suivant
+      - Probabilité que les horloges logiques soient égales
+  - L'idée de Weihai est de
+    - Utiliser des identifiants de site par session plutôt qu'à vie pour limiter la casse
+    - Posséder pour chaque session
+      - Un identifiant de site long, qui servira de désambiguiteur
+      - Un identifiant de site court, qui servira pour générer les opérations
+    - Lorsqu'un utilisateur démarre une session, son identifiant long est ajouté au log d'opérations
+    - Lorsqu'un utilisateur quitte une session, une opération est ajoutée au log
+    - Lorsqu'un utilisateur rejoint un réseau, il doit vérifier s'il n'y a pas eu de collisions d'identifiants de bloc
+      - Doit reparcourir le log pour faire ça ?
+      - Comment identifier la paternité de l'opération dans le cas suivant ?
+	- /open longId1 shortId/
+	- /open longId2 shortId/
+	- /insert shortId/
+    - S'il y a eu une collision, utiliser le /longId/ comme désambiguiteur
+      - Renaming des opérations ?
+      - Suppression des opérations ?
 *** Planned
 **** DONE MUTE : Écrire la partie /Re-synchronisation hors-ligne et collaboration ad-hoc/
 - Dans un des livrables pour *Open-Paas::NG*, une partie porte sur le mécanisme de synchronisation implémenté dans /mute-core/
