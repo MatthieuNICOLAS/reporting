@@ -1692,6 +1692,27 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
     - S'il y a eu une collision, utiliser le /longId/ comme désambiguiteur
       - Renaming des opérations ?
       - Suppression des opérations ?
+- TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
+  - Librairies de clients REST
+    - [X] request: [[https://github.com/request/request]]
+      - Très populaire
+      - "Bas" niveau
+    - [ ] node-rest-client: [[https://github.com/aacerox/node-rest-client]]
+      - Plus élaboré et "haut" niveau que request
+      - Largement moins populaire
+      - Manque la gestion des cookies
+  - Outils de génération de doc
+    - [ ] TSDoc: [[https://github.com/xperiments/TSDoc]]
+      - Pas maintenu
+    - [X] typedoc: [[https://github.com/TypeStrong/typedoc]]
+      - Plus populaire
+      - Maintenu
+      - Mais la documentation de l'outil est peu fournie
+  - Implémentation de *BonitaClient*
+    - Fournit des méthodes de base pour interagir avec Bonita
+      - /retrieveProcessId()/
+      - /instantiateProcess()/
+      - /retrieveTaskIds()/
 *** Planned
 **** DONE MUTE : Écrire la partie /Re-synchronisation hors-ligne et collaboration ad-hoc/
 - Dans un des livrables pour *Open-Paas::NG*, une partie porte sur le mécanisme de synchronisation implémenté dans /mute-core/
