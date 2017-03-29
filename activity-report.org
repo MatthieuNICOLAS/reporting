@@ -1728,11 +1728,20 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
   - Quand /isSync/ passe à /true/, traite les opérations contenues dans le buffer
   - Puis ensuite traite les opérations reçues dès qu'elles arrivent
     - Plus de mise en buffer
+- MUTE : Ne plus répondre à des messages /querySync/ tant qu'on est pas synchronisé
+  - Réutilise /isSync/
+  - Met en buffer les requêtes tant que /isSync/ est /false/
+  - Traite les requêtes dès que /isSync/ passe à /true/
+  - Puis ensuite traite les requêtes reçues dès qu'elles arrivent
 *** Planned
 **** DONE MUTE : Ne plus accepter d'opérations tant qu'on est pas synchronisé
 - Actuellement, on accepte les opérations distantes avant même que l'on se soit synchronisé avec un pair
 - Ceci a conduit à un bug où une opération a été délivrée avant que la synchronisation se soit effectuée
   - Ceci est aussi dû au fait que l'on accepte les opérations dès que /clock > v.get(id)/
+- Corriger cela
+**** DONE MUTE : Ne plus répondre à des messages /querySync/ tant qu'on est pas synchronisé
+- De la même façon, on répond aux messages /querySync/ avant même que l'on soit soi-même synchronisé
+- Du coup, un utilisateur peut se croire synchroniser, et se retrouver avec un document vide, alors qu'en fait des opérations existent
 - Corriger cela
 **** IN-PROGRESS TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
 - Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
