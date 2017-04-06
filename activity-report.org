@@ -1708,6 +1708,7 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
       - Plus populaire
       - Maintenu
       - Mais la documentation de l'outil est peu fournie
+      - Commande pour générer la doc : =typedoc --out docs/ --mode file --module commonjs --target ES6 src=
   - Implémentation de *BonitaClient*
     - Fournit des méthodes de base pour interagir avec Bonita
       - /retrieveProcessId()/
@@ -1733,6 +1734,16 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
   - Met en buffer les requêtes tant que /isSync/ est /false/
   - Traite les requêtes dès que /isSync/ passe à /true/
   - Puis ensuite traite les requêtes reçues dès qu'elles arrivent
+- MUTE : Ne plus accepter d'opérations sans posséder les précedentes
+  - Ajout de /isAlreadyApplied()/ pour vérifier si une opération a déjà été délivrée ou non
+  - Ajout de /isAppliable()/ pour vérifier si l'on peut délivrer une opération ou non
+  - Lorsqu'on reçoit une opération, vérifie si /isAppliable()/
+    - Si l'opération est applicable, la délivre
+    - Sinon
+      - Met l'opération en buffer
+      - Set le flag /isSync/ à /false/
+	- Dorénavant, les opérations reçues et les demandes de synchronisation seront mise en attente
+      - Envoi d'un message /querySync/
 *** Planned
 **** DONE MUTE : Ne plus accepter d'opérations tant qu'on est pas synchronisé
 - Actuellement, on accepte les opérations distantes avant même que l'on se soit synchronisé avec un pair
@@ -1743,6 +1754,58 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
 - De la même façon, on répond aux messages /querySync/ avant même que l'on soit soi-même synchronisé
 - Du coup, un utilisateur peut se croire synchroniser, et se retrouver avec un document vide, alors qu'en fait des opérations existent
 - Corriger cela
+**** DONE MUTE : Ne plus accepter d'opérations sans posséder les précedentes
+- Actuellement, une opération est acceptée tant que sa /clock/ est supérieure à celle que l'on connaît pour cet /id/
+- Cependant, des opérations intermédiaires peuvent être manquantes
+- Accepter cette opération masque donc ce fait
+- Résoudre ce problème
+** Semaine du <2017-04-03 lun.> au <2017-04-07 ven.>
+*** Done
+- MUTE : Supprimer le système de flag /isSync/
+  - Suppression des systèmes de bufferisation liés à ce flag
+  - Simplification de la gestion des opérations distantes reçues
+    - Auparavant, si une opération reçue n'était pas applicable, on rejetait la liste d'opérations, marquait /isSync/ comme /false/ et déclenchait le mécanisme d'anti-entropie
+    - Les opérations ainsi que les messages /querySync/ reçus pendant ce temps étaient mis en attente
+    - Maintenant, si une opération reçue n'est pas applicable, on se contente de mettre l'opération concernée en attente
+    - Récupérer l'opération manquante sera la tâche du mécanisme d'anti-entropie
+- MUTE : Déclencher le mécanisme de synchronisation périodiquement
+  - Tous les 10±5 secondes, envoi un message /querySync/
+- MUTE : Ajouter un bouton pour pouvoir facilement exporter le log d'opérations
+  - Ajout d'un bouton /Log/ dans *DevLabelComponent*
+  - Ajout de la méthode /exportLog()/ dans *DevLabelComponent*
+    - Récupére le /docID/ du document courant
+    - Extrait le log d'opérations depuis la base de données
+    - Génère un *ObjectURL* à partir de ce log pour pouvoir le télécharger
+    - Génère un nom de fichier de la forme /log-<docID>-<digest>.json/
+    - Met à jour une balise /<a>/ pour pointer vers ce fichier
+    - Simule un click de l'utilisateur sur ce lien
+- MUTE : Ajouter un bouton pour pouvoir facilement exporter le modèle
+*** Planned
+**** DONE MUTE : Supprimer le système de flag /isSync/
+- On a constaté plusieurs problèmes liés à ce flag
+- Le 1er est qu'il existe un scénario dans lequel aucun pair n'est marqué comme synchronisé
+  - Ceci se produit si le 1er utilisateur quitte sans avoir répondu au message /querySync/ du 2nd utilisateur
+  - Le 2nd utilisateur n'ayant jamais reçu de /replySync/, son flag /isSync/ est bloqué à /false/
+  - Ainsi, chaque opération reçue ou /querySync/ par le 2nd utilisateur sera bufferisée
+  - Les utilisateurs qui se connecteront par la suite n'arriveront jamais à se synchroniser dans ce cas
+- Le 2nd problème est que le mécanisme de bufferisation s'avère perturbant pour les utilisateurs
+  - Soudainement, car une opération qui a été reçue n'a pu être délivrée, l'ensemble des opérations distantes sont mises en attente
+  - L'utilisateur ne perçoit donc plus les modifications distantes tant que la synchronisation ne s'est pas de nouveau correctement effectuée
+  - De plus, on peut de nouveau tomber dans le cas du 1er problème si le pair avec lequel nous essayons de nous synchroniser se déconnecte sans avoir émis de réponse
+- Puisque ce mécanisme semble apporter plus de problèmes qu'il n'en résout, le supprimer
+**** DONE MUTE : Déclencher le mécanisme de synchronisation périodiquement
+- Puisqu'on a simplifié le mécanisme de synchronisation en retirant le système de flag, on peut dorénavant le déclencher périodiquement
+- Ceci permettrait de récupérer les opérations qui n'ayant pas été reçues
+**** DONE MUTE : Ajouter un bouton pour pouvoir facilement exporter le log d'opérations
+- Lorsqu'une divergence est constatée, nous extrayons les logs d'opérations des différentes copies pour essayer d'identifier l'origine du problème
+- Actuellement, j'ai un snippet de code à exécuter directement dans la console du navigateur pour exporter le log
+- Ajouter un bouton pour automatiser l'exécution de ce code et faciliter la tâche pour les utilisateurs s'avéra sûrement très utile
+**** DONE MUTE : Ajouter un bouton pour pouvoir facilement exporter le modèle
+- Nous avons eu un cas particulier où les digests des différentes copies du document divergés, mais où les contenus des copies étaient identiques
+- En extrayant les logs d'opérations, nous n'avons pas réussi à reproduire la divergence des digests
+- Comparer les modèles nous permettrait d'identifier l'origine de cet étrange résultat
+- Logger les différentes versions du modèle me paraît inutilement lourd
+- Un bouton pour exporter la sérialisation du modèle me semble plus adapté
 **** IN-PROGRESS TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
 - Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
   - Créer un film
