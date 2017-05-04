@@ -1806,6 +1806,50 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
 - Comparer les modèles nous permettrait d'identifier l'origine de cet étrange résultat
 - Logger les différentes versions du modèle me paraît inutilement lourd
 - Un bouton pour exporter la sérialisation du modèle me semble plus adapté
+** Semaine du <2017-04-24 lun.> au <2017-04-28 ven.>
+*** Done
+*** Planned
+** Semaine du <2017-05-02 mar.> au <2017-05-05 ven.>
+*** Done
+- <<bug-ct44>> MUTE : Checker le log du document /ct44/ fourni par Victorien avec l'insertion foireuse
+  - On trouve dans ce log un problème de causalité
+    - L'opération *LogootSDel* supprimant le bloc /{ base: [ 2146186868, -1138834828, 9, 28, 836704880, 669113997, 0 ], begin: 0, end: 0 }/ est exécutée avant l'opération insérant ce bloc
+    - L'opération *LogootSDel* est exécutée en 485 tandis que l'opération *LogootSAdd* concernée est exécutée en 506
+  - En examinant le déroulement de l'algorithme, nous avons remarqué que l'opération de suppression ci-dessus n'est pas ignorée lorsqu'on ne trouve pas le noeud correspondant
+  - À la place, on effectue une suppression dans un autre noeud
+  - Ceci entraîne un état inconsistent de cet autre noeud et donc du modèle
+  - Des modifications futures de ce bloc échouent donc
+- MUTE : Modifier la méthode /delBlock()/ pour gérer le cas où certains identifiants ont déjà été retirés du bloc
+- MUTE : Modifier la méthode /delBlock()/ pour ne pas effectuer de suppression dans le cas où le bloc n'existe pas
+  - Plus précisement, ce bug était dû au fait que la suppression concernait le bloc résultant d'un split et provenait du comportement de /searchPos()/
+  - Dans /delBlock()/, on utilise /searchPos()/ pour trouver le bloc possédant l'identifiant /id/ du début de l'interval à supprimer
+  - Dans /searchPos()/
+    - On prend la racine comme 1er noeud de comparaison
+    - On compare l'identifiant /id/ recherché par rapport aux identifiants de début /id1/ et de fin /id2/ du noeud courant
+      - Si /id/ < /id1/ alors on continue la recherche à partir du fils gauche du noeud courant
+      - Si /id2/ < /id/ alors on continue la recherche à partir du fils droit du noeud courant
+      - Sinon, on considère qu'on a trouvé le noeud comportant l'identifiant recherché et on arrête la recherche
+  - Dans notre cas, on comparait un identifiant /id/ avec un noeud délimité par /id1/ et /id2/ tels que
+    - /id1/ est de la forme /{ base: [ random1, site1, clock1], last: 0 }/
+    - /id2/ est de la forme /{ base: [ random1, site1, clock1], last: 10 }/
+    - /id/ est de la forme /{ base: [ random1, site1, clock1, 5, random2, site2, clock2 }, last: 0/
+  - Ainsi, on a /id1/ < /id/ < /id2/, /searchPos()/ considère alors qu'on a trouvé le bon noeud
+  - Alors que les bases des 2 identifiants sont différentes
+  - Modification de /searchPos()/ pour comparer les bases lorsque /id1/ < /id/ < /id2/ pour s'assurer d'avoir trouvé le bon noeud
+*** Planned
+**** DONE MUTE : Checker le log du document /ct44/ fourni par Victorien avec l'insertion foireuse
+- Une opération *LogootSAdd* présente dans ce log d'opération semble avoir mal été générée
+- On aurait /begin/ > /end/
+- Ce qui viole une assertion lors de son application au document
+- Vérifier que l'assertion levée correspond bien au cas où /begin/ > /end/
+- Si c'est le cas, trouver l'origine de cette opération malformée
+**** DONE MUTE : Modifier la méthode /delBlock()/ pour gérer le cas où certains identifiants ont déjà été retirés du bloc
+- Il est possible que plusieurs opérations de suppression concurrentes essaient de supprimer la même partie d'un bloc
+- À l'heure actuelle, cela entraîne un /split()/ 
+**** DONE MUTE : Modifier la méthode /delBlock()/ pour ne pas effectuer de suppression dans le cas où le bloc n'existe pas
+- Comme remarqué dans [[bug-ct44]], si un bloc est introuvable lorsqu'on essaie de le supprimer, il s'avère que /delBlock()/ effectue une suppression dans un autre bloc
+- Ceci rend inconsistent le modèle
+- Il est donc nécessaire de modifier /delBlock()/ pour ne plus effectuer de suppression si la recherche du bloc n'aboutit pas
 **** IN-PROGRESS TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
 - Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
   - Créer un film
