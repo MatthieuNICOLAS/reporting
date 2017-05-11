@@ -1850,6 +1850,54 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
 - Comme remarqué dans [[bug-ct44]], si un bloc est introuvable lorsqu'on essaie de le supprimer, il s'avère que /delBlock()/ effectue une suppression dans un autre bloc
 - Ceci rend inconsistent le modèle
 - Il est donc nécessaire de modifier /delBlock()/ pour ne plus effectuer de suppression si la recherche du bloc n'aboutit pas
+** Semaine du <2017-05-09 mar.> au <2017-05-12 ven.>
+*** Done
+- TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
+  - <<tvpaint-frontend-transaction>>Comme me l'a fait remarqué Quentin, la robustesse du front-end est primordiale
+    - C'est lui qui pilote les /transactions/
+      - Exemple avec la création d'un film:
+	- Requête *TVPaint Server* pour créer la ressource
+	- Récupère l'identifiant de film contenu dans la réponse du serveur
+	- Requête *Bonita* pour instancier le processus avec en paramètre l'identifiant du film
+    - Actuellement si une erreur survient au cours de l'échange, la transaction n'est pas annulée
+    - Des incohérences peuvent donc apparaître en cas de panne
+      - Présence dans la BDD de films associés à aucun processus par exemple
+  - Plusieurs philosophies possibles pour le front-end
+    - [ ] S'efface au maximum, minimise son rôle
+      - Agit uniquement comme un proxy quand possible
+	- Par exemple lors d'une requête pour récupérer une ressource
+      - Ne comprend pas les données qui transitent
+	- Pas de notion de *Movie* et autres
+      - Mais parser les données s'avère nécessaire dans certains cas
+	- Besoin de lire la réponse de *TVPaintServer* pour extraire l'identifiant lors de la création d'une nouvelle ressource
+      - Finalement son comportement est bâtard
+    - [X] Connaît en détail la logique de l'application
+      - Connaît le type des données qui transitent, ou du moins une version allégée
+	- Notion de *Movie* et autres
+	- Capable d'instancier ces objets à partir des réponses de TVPaint Server
+	- Capable de réécrire ces objets sous un autre format
+      - Mais dans ce cas, il est plus fortement couplé à TVPaint Server
+        - Modifier le type *Movie* implique une mise à jour du front-end
+  - Pour le prototype, j'ai choisi la 2nde option
+    - Me paraît plus cohérent comme fonctionnement
+  - Ajout d'un client REST générique *RestClient*
+    - Construit à partir du /hostname/ et du /port/ du service interrogé et du /name/ de la ressource
+    - Pour une ressource d'un type *T* donné, permet de
+      - récupérer la liste des identifiants des objets de type *T* avec /getResources(): string[]/
+      - récupérer le détail d'une ressource avec /getResource(id: string/): T/
+      - créer une nouvelle ressource et récupérer son identifiant avec /post(body: any): string/
+  - Ajout d'une extension de ce client REST générique pour interagir spécifiquement avec le serveur de TVPaint, *TVPaintClient*
+    - Fournit une implémentation par défaut des méthodes de *RestClient*
+    - Requiert une /factory/ pour instancier un objet *T* à partir de la réponse XML, provenant du le serveur de TVPaint, dans /getResource(id)/
+  - Mais certaines ressources disposent d'actions supplémentaires
+    - On peut associer des *Shots* à un *Movie* et des *Clips* à un *Shot*
+  - Il est nécessaire de fournir une nouvelle extension du client REST
+  - De nouveau, un choix de conception se pose
+    - [ ] Faut-il contraindre avec /append()/ le type de la donnée ajoutée
+      - /append(appendable: T1, appendee: T2)/
+    - [ ] ou juste se contenter de manipuler des identifiants
+      - /append(id1: string, id2: string)/
+*** Planned
 **** IN-PROGRESS TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
 - Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
   - Créer un film
@@ -1862,6 +1910,11 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
 - Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
 **** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
 - Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
+**** TODO TVPaint : Mener une refléxion sur l'implémentation ou non d'un mécanisme de transaction
+- Voir [[tvpaint-frontend-transaction]]
+- Est-ce qu'un mécanisme de transaction doit être implémenté ?
+- Ou est-ce que l'on peut s'en passer ?
+  - En designant le système pour être tolérant aux pannes par exemple
 **** TODO MUTE : Débugger la liste des documents
 - Lorsqu'on souhaite re-afficher la liste des documents alors que nous étions sur la page d'un document, la liste ne se génère pas dans tous les cas
 - La liste de *DocsComponent* est générée à partir de la valeur /activeFile/
