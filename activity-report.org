@@ -1894,10 +1894,25 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
   - Il est nécessaire de fournir une nouvelle extension du client REST
   - De nouveau, un choix de conception se pose
     - [ ] Faut-il contraindre avec /append()/ le type de la donnée ajoutée
-      - /append(appendable: T1, appendee: T2)/
-    - [ ] ou juste se contenter de manipuler des identifiants
+      - /append(obj: T1, appendee: T2)/
+      - Dans ce cas, il faut réussir à exprimer le lien entre *T1* et *T2*
+	- Que *T2* est /appendable/ à *T1*
+      - Et il faut s'assurer que les objets fournis au front-end lors de cette requêtes soient bien du bon type
+	- S'assurer que l'objet /obj/ correspond bien à un *T1* au niveau du serveur TVPaint
+    - [X] ou juste se contenter de manipuler des identifiants
       - /append(id1: string, id2: string)/
+      - On délègue au serveur TVPaint de vérifier que les objets manipulés sont du bon type
+	- Puisque dans tous les cas, il faudra effectuer des vérifications sur les données manipulées au niveau du serveur TVPaint
+- MUTE : Étudier les logs du document /ct25/ pour trouver l'origine de la divergence
+  - En rejouant le log d'opérations /chamber-bazooka-mercy/, pas de problème de causalité
+  - Par contre, avec les logs /patron-user-arcade/ et /trapeze-arnold-sheriff/, on en rencontre
+    - L'opération 3523 essaie de supprimer un bloc n'existant pas encore dans le cas de /patron-user-arcade/
+    - L'opération 1849 essaie de supprimer un bloc n'existant pas encore dans le cas de /trapeze-arnold-sheriff/
+  - Il s'agit donc à 1ère vue d'un problème de causalité
 *** Planned
+**** DONE MUTE : Étudier les logs du document /ct25/ pour trouver l'origine de la divergence
+- Une divergence a été constatée à la fin de la réunion du /ct25/
+- Comparer les logs pour déterminer son origine
 **** IN-PROGRESS TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
 - Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
   - Créer un film
@@ -1942,6 +1957,7 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
 - Angular propose un pipe /slice/ permettant de limiter le nombre de caractères que nous souhaitons afficher d'une *String*
 - Cependant, rien n'indique dans le résultat si la chaîne de caractères a effectivement été tronquée ou non
 - Créer un pipe /sliceString/ ajoutant '...' au résultat si la chaîne a été coupée
+**** TODO CRDT : Lire *Kaleido*
 **** TODO TVPaint : Développer la tâche compositing
 - La tâche /compositing/ est une activité complexe
 - La décomposer en plusieurs sous-tâches
