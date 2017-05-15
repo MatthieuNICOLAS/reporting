@@ -1903,6 +1903,46 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
       - /append(id1: string, id2: string)/
       - On délègue au serveur TVPaint de vérifier que les objets manipulés sont du bon type
 	- Puisque dans tous les cas, il faudra effectuer des vérifications sur les données manipulées au niveau du serveur TVPaint
+  - Moyen de récupérer l'ensemble des tâches pour un utilisateur
+    #+BEGIN_SRC
+$ curl http://localhost:8728/bonita/API/bpm/humanTask?p=0&c=10&f=user_id=4
+[
+  {
+    "displayDescription": "",
+    "executedBy": "0",
+    "rootContainerId": "14001",
+    "assigned_date": "",
+    "displayName": "Add shots",
+    "executedBySubstitute": "0",
+    "dueDate": "2017-05-12 11:40:35.199",
+    "description": "",
+    "type": "USER_TASK",
+    "priority": "normal",
+    "actorId": "1601",
+    "processId": "8562487203032783503",
+    "caseId": "14001",
+    "name": "addShots",
+    "reached_state_date": "2017-05-12 10:40:35.216",
+    "rootCaseId": "14001",
+    "id": "280002",
+    "state": "ready",
+    "parentCaseId": "14001",
+    "last_update_date": "2017-05-12 10:40:35.216",
+    "assigned_id": ""
+  }
+]
+    #+END_SRC
+  - Moyen de récupérer une variable d'un /case/
+    #+BEGIN_SRC
+$ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
+{
+  "case_id": "14001",
+  "name": "movieId",
+  "description": "",
+  "type": "java.lang.String",
+  "value": "1a60e1ad-d14e-4b64-a088-7cc3c63c4bdd"
+}
+    #+END_SRC
 - MUTE : Étudier les logs du document /ct25/ pour trouver l'origine de la divergence
   - En rejouant le log d'opérations /chamber-bazooka-mercy/, pas de problème de causalité
   - Par contre, avec les logs /patron-user-arcade/ et /trapeze-arnold-sheriff/, on en rencontre
@@ -1913,6 +1953,63 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
 **** DONE MUTE : Étudier les logs du document /ct25/ pour trouver l'origine de la divergence
 - Une divergence a été constatée à la fin de la réunion du /ct25/
 - Comparer les logs pour déterminer son origine
+** Semaine du <2017-05-15 lun.> au <2017-05-19 ven.>
+*** Done
+- PIDR : Étudier et commenter la v2 du rapport
+  - Formulation trop familière, vocabulaire trop vague
+  - I. Intro
+    - A. Contexte
+      - Parle de /tests à effectuer sur les éditeurs collaboratifs/, lesquels ?
+    - D. Motivations
+      - Parle de /travail interdisciplinaire/, pourquoi insister sur le /interdisciplinaire/ ?
+      - Revoir le paragraphe sur les différences entre les éditeurs collaboratifs
+        - Semble incomplet (parle d'OT mais pas de CRDT)
+        - OT ne scale pas, même en pair-à-pair
+        - Bien faire la distinction entre algorithmes de réplication et architecture des applications
+      - La conclusion de cette partie ne me paraît pas clair
+        - Manque une transition avec le reste de la partie
+        - Insister sur l'hétérogénéité des applications
+        - La réponse ne doit pas "s'adapter", elle doit être générique
+      - Finalement l'objectif n'apparaît pas encore clairement
+  - II. Etat de l'art
+    - A. Différents types d'écriture collaborative
+      - Est-ce que les comportements observés dépendent du type d'outil (synchrone ou asynchrone) ?
+      - Manque la citation vers Docuviz ou autre document illustrant ces comportements
+    - C. Représentation du comportement d'un utilisateur
+      - 1. Nécessité de cette représentation
+	- Pourquoi cette partie existe toujours ?
+	- Fusionner avec *Motivations*
+      - 2. Réprésentation à l'aide de grammaires
+	- Si la figure a été récupérée d'un document, indiquer sa source
+    - Manque finalement de recontextualisation
+      - Présente des choses (comportements, actions...) mais sans dire comme cela va vous être utile
+  - III. Contribution
+    - B. Modélisation de la session de travail collaborative
+      - Mauvaise position dans l'article
+	- Interrompt la réflexion sur les grammaires proposées
+      - Pas assez claire
+      - Insister sur la notion d'/orchestration/ des bots dans la 1ère approche
+        - Le comportement des bots est déterminé par le chef d'orchestre
+	- Les bots se contentent de suivre un comportement prédéfini
+      - Insister sur la notion de /décentralisation/ des bots dans la 2nde approche
+	- Les bots sont capables de déterminer les comportements à employer pour effectuer la tâche
+	- Ils sont capables de se répartir le travail
+    - C. Ecriture d’une grammaire qui modélise un automate à états finis
+      - Des limites à cette nouvelle grammaire ?
+  - IV. Validation
+    - A. Implémentation de la solution via Python
+      - Justification des critères choisis pour la comparaison des AST ?
+      - D'après ces critères, recommandez-vous un outil plutôt que l'autre ?
+    - Pourquoi une seule sous-partie ?
+  - V. Perspectives
+    - Est-ce que l'application /permet de voir comment l'éditeur gère les conflits/ ?
+    - Pourquoi ces actions /lire/ et /communiquer/ ? Qu'est-ce qu'elles apportent ?
+  - VI. Conclusion
+    - Pas besoin d'être exhaustif sur les implémentations
+    - Revenir sur les contributions en mettant en valeur la principale (la grammaire v2)
+    - Le reste a déjà été énoncé dans problématique
+*** Planned
+**** IN-PROGRESS PIDR : Étudier et commenter la v2 du rapport
 **** IN-PROGRESS TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
 - Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
   - Créer un film
