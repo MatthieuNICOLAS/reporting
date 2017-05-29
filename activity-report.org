@@ -1974,6 +1974,8 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - II. Etat de l'art
     - A. Différents types d'écriture collaborative
       - Est-ce que les comportements observés dépendent du type d'outil (synchrone ou asynchrone) ?
+      - Justifier la citation
+      - Intérêt de parler des système d'éditions collaboratifs asynchrones ?
       - Manque la citation vers Docuviz ou autre document illustrant ces comportements
     - C. Représentation du comportement d'un utilisateur
       - 1. Nécessité de cette représentation
@@ -2008,25 +2010,137 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Pas besoin d'être exhaustif sur les implémentations
     - Revenir sur les contributions en mettant en valeur la principale (la grammaire v2)
     - Le reste a déjà été énoncé dans problématique
+- TVPaint: Implémenter le prototype orchestrant TVPaint server et Bonita
+  - Modification de GET /film
+    - Auparavant, récupérer l'ensemble des films de la BDD
+    - Maintenant, liste seulement les films pour lesquels l'utilisateur a des tâches en cours/disponibles
+    - Format de la réponse:
+      #+BEGIN_SRC
+      [ { caseId: '16001',  movieId: 'c803d583-f4b3-47ea-be3d-555ba2dc0da8' } ]
+      #+END_SRC
+  - Ajout d'une route GET /film/:movieId/task
+    - Nécessite de passer en paramètre le /caseId/ qui correspond au /movieId/
+    - Permet de récupérer la liste des tâches concernant ce film/cette instance de process pour l'utilisateur courant
+    - Format de la réponse:
+      #+BEGIN_SRC
+      [ { displayDescription: '',
+          executedBy: '0',
+          rootContainerId: '16001',
+          assigned_date: '',
+          displayName: 'Add shots',
+          executedBySubstitute: '0',
+          dueDate: '2017-05-17 12:34:29.730',
+          description: '',
+          type: 'USER_TASK',
+          priority: 'normal',
+          actorId: '1901',
+          processId: '7285702430994004787',
+          caseId: '16001',
+          name: 'addShots',
+          reached_state_date: '2017-05-17 11:34:29.747',
+          rootCaseId: '16001',
+          id: '320002',
+          state: 'ready',
+          parentCaseId: '16001',
+          last_update_date: '2017-05-17 11:34:29.747',
+          assigned_id: '' } ]
+      #+END_SRC
+  - Ajout d'un script simulant un client
+    - Crée un film
+    - Récupère la liste des films
+    - Récupère les tâches concernant le film précédemment créé
+    - S'assigne la tâche /addShots/
+    - Récupère les shots
+    - Complète la tâche /addShots/
+  - Comportements à discuter
+    - GET /film
+      - Retourne l'ensemble des films ?
+      - Retourne les films en cours de l'utilisateur ?
+	- Interroge *Bonita* pour récupérer les tâches associés à l'utilisateur pour savoir quels films le concernent
+    - GET /shot et GET /clip
+      - Retourne l'ensemble des ressources ?
+      - Retourne un sous-ensemble jugé "accessible" par l'utilisateur ?
+	- Quels critères utiliser ?
+    - Mécanisme de transaction
+      - voir [[tvpaint-frontend-transaction]]
 *** Planned
-**** IN-PROGRESS PIDR : Étudier et commenter la v2 du rapport
-**** IN-PROGRESS TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
+**** DONE PIDR : Étudier et commenter la v2 du rapport
+** Semaine du <2017-05-22 lun.> au <2017-05-24 mer.>
+*** Done
+- PIDR : Noter le rapport des étudiants de PIDR
+  - Des éléments de fonds intéressants
+  - Éléments regrettables
+    - La notion de grande échelle de l'expérience est manquante dans l'introduction
+      - Il faut attendre la fin de la motivation pour voir apparaître cet aspect
+      - Du coup, on ne comprend moins la nécessité de simuler les utilisateurs
+    - La liste des actions élémentaires est aussi absente
+      - Besoin d'attendre la 1ère grammaire pour connaître ces actions
+  - Entachés par la forme
+    - Quelques paragraphes mal organisé
+      - 1er paragraphe de Contribution
+    - Discours trop familier, trop oral
+  - Quelques confusions sur le fond semblent aussi persistées
+    - Exemples
+      - CRDT et P2P
+      - L'expérience permettra de voir comment l'éditeur gère les conflits
+      - Différents types d'écriture collaborative et Différents types de comportements
+    - Est-ce à cause d'une mauvaise maitrise de ces éléments ?
+    - Ou juste est-ce qu'ils se sont mal exprimés ?
+  - On ressent un manque de rigueur
+    - Au niveau du langage utilisé
+    - Mais aussi sur le fond présenté
+      - Donne des chiffres sur le nombres d'actions par état sans raison apparente
+- PIDR : Noter le travail des étudiants de PIDR
+  - Points positifs
+    - Idée de la grammaire pour représenter l'automate
+  - Points négatifs
+    - Ressenti un manque d'implication dans le projet
+      - Plusieurs semaines, le travail fourni semblait léger par rapport à nos attentes
+      - Quand interrogés sur la quantité de travail fourni, les étudiants répondaient qu'ils avaient dû travailler d'autres projets
+      - Lors des réunions, du moins au début, la prise de notes était limitée
+	- Besoin de nous-même prendre en photo et de leur envoyer l'automate réaliser au tableau au cours d'une réunion
+      - Lorsque demandés de chercher des parsers-lexers pour Python, les résultats fournis étaient les 1ers retournés par Google
+	- Un d'entre eux ne correspondait absolument pas au projet (API de Python pour modifier le parser du langage)
+*** Planned
+**** DONE PIDR : Noter le rapport des étudiants de PIDR
+**** DONE PIDR : Noter le travail des étudiants de PIDR
+**** DONE TVPaint : Implémenter le prototype orchestrant TVPaint server et Bonita
 - Devrait orchestrer les 2 serveurs pour jouer les tâches suivantes :
   - Créer un film
   - Associer des shots au film
     - Besoin potentiellement de créer les shots
   - Associer des clips au shot
     - Besoin potentiellement de créer les clips
+**** DONE TVPaint : Mener une refléxion sur l'implémentation ou non d'un mécanisme de transaction
+- Voir [[tvpaint-frontend-transaction]]
+- Est-ce qu'un mécanisme de transaction doit être implémenté ?
+- Ou est-ce que l'on peut s'en passer ?
+  - En designant le système pour être tolérant aux pannes par exemple
+**** DONE TVPaint : Définir un workflow correspondant au scénario de test
+**** DONE Thèse : Préparer le dossier de candidature pour la thèse
+- Doit fournir les pièces suivantes
+  - [X] CV
+    - Retravailler la section sur *MUTE* dans *Projets* pour parler de *OpenPaas::NG* à la place
+    - Ajouter une section *Logiciels* indiquant la participation aux logiciels
+      - Se baser sur [[file:~/T%C3%A9l%C3%A9chargements/softwarecriteria-ce_2011-08-01.pdf][ce document]] pour spécifier l'état de maturité des logiciels
+  - [X] Lettre de motivation
+  - [X] Lettres de recommandation
+  - [X] Sujet de thèse
+  - [X] Mémoire d'ingénieur
+  - [X] Diplôme TN
+  - [X] Notes TN
+  - [X] Diplôme DUT
+  - [X] Notes DUT
+  - [X] Diplôme BAC
+  - [X] Notes BAC
+** Semaine du <2017-05-29 lun.> au <2017-06-02 ven.>
+*** Done
+*** Planned
 **** IN-PROGRESS CRDT : Lire *CRDT notes*
 - Disponible ici: https://github.com/pfrazee/crdt_notes
 - Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
 **** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
 - Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
-**** TODO TVPaint : Mener une refléxion sur l'implémentation ou non d'un mécanisme de transaction
-- Voir [[tvpaint-frontend-transaction]]
-- Est-ce qu'un mécanisme de transaction doit être implémenté ?
-- Ou est-ce que l'on peut s'en passer ?
-  - En designant le système pour être tolérant aux pannes par exemple
 **** TODO MUTE : Débugger la liste des documents
 - Lorsqu'on souhaite re-afficher la liste des documents alors que nous étions sur la page d'un document, la liste ne se génère pas dans tous les cas
 - La liste de *DocsComponent* est générée à partir de la valeur /activeFile/
@@ -2059,7 +2173,6 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - La tâche /compositing/ est une activité complexe
 - La décomposer en plusieurs sous-tâches
   - Revoir les posts du forum qui y sont dédiés
-**** TODO TVPaint : Définir un workflow correspondant au scénario de test
 **** TODO PLM : Gérer les exercices n'ayant pas d'entité solution dans le langage de programmation par défaut
 - Actuellement, on considère que l'ensemble des exercices possèdent une entité solution en Java
 - Lors de leur instanciation à partir des sources, on essaie de calculer le(s) monde(s) objectif(s) à partir de cette entité solution
