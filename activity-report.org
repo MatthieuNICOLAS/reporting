@@ -2135,13 +2135,28 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - [X] Notes BAC
 ** Semaine du <2017-05-29 lun.> au <2017-06-02 ven.>
 *** Done
+- TVPaint : Rédiger README pour Bonita
+  - [X] Décrire la version à installer
+    - 7.3
+  - [ ] Décrire le rôle des différents diagrammes
+  - [X] Décrire comment changer
+    - [X] Le port utilisé par Bonita
+    - [X] L'utilisateur par défaut
+- TVPaint : Rédiger README pour front-end
+  - [X] Décrire le processus d'installation
+  - [X] Documenter le scénario joué par le script simulant client
+  - [ ] Récapituler les questions existantes
+    - [ ] Gestion des transactions
+    - [ ] Gestion des droits d'accès aux ressources
+      - Plus précisement, aux shots et clips
+    - [ ] Technologies à utiliser
+      - Inciter à regarder du côté de Go
+** Semaine du <2017-06-19 lun.> au <2017-06-23 ven.>
+*** Done
 *** Planned
-**** IN-PROGRESS CRDT : Lire *CRDT notes*
-- Disponible ici: https://github.com/pfrazee/crdt_notes
-- Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
-**** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
-- Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
-**** TODO MUTE : Débugger la liste des documents
+**** DONE TVPaint : Rédiger README pour Bonita
+**** DONE TVPaint : Rédiger README pour front-end
+**** CANCELLED MUTE : Débugger la liste des documents
 - Lorsqu'on souhaite re-afficher la liste des documents alors que nous étions sur la page d'un document, la liste ne se génère pas dans tous les cas
 - La liste de *DocsComponent* est générée à partir de la valeur /activeFile/
   - S'il s'agit d'un *Folder*, récupère et affiche la liste de ses documents
@@ -2156,6 +2171,76 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - La valeur de /activeFile/ n'est donc pas mise à jour
 - Ainsi, comme /activeFile/ correspond toujours au dernier document ouvert, *DocsComponent* ne génère pas de liste
 - Corriger ce comportement
+**** CANCELLED TVPaint : Développer la tâche compositing
+- La tâche /compositing/ est une activité complexe
+- La décomposer en plusieurs sous-tâches
+  - Revoir les posts du forum qui y sont dédiés
+** Semaine du <2017-07-03 lun.> au <2017-07-07 ven.>
+*** Done
+- Suivi la formation NVIDIA sur Deep Learning
+  - Présentation de l'écosystème NVIDIA
+  - Présentation de NVIDIA Digits
+    - Environnement d'apprentissage en ligne
+  - Formation s'est déroulée sur NVIDIA Digits
+    - Bases du Machine Learning
+      - Génération d'un dataset
+      - Génération d'un réseau de neurones à partir d'un modèle pré-existant
+      - Sélection des hyperparamètres
+      - Entraînement du modèle
+      - Validation
+    - Intéressant de revoir les bases mais je pensais qu'on allait aborder des sujets plus bas niveaux
+- Suivi la formation NVIDIA sur OpenACC
+  - Présentation de l'écosystème NVIDIA
+  - Présentation de OpenACC
+    - Pour langages C/C++ et Fortran principalement
+    - Permet d'ajouter des directives pour que le compilateur rende parallèle des portions du code et les exécutent sur le GPU
+      - Pas de refactoring du code
+    - Ressemble de fait à OpenMP
+  - Suivi d'un tutoriel pour prendre en main OpenACC
+    - Mise en évidence du problème de transfert des données de la mémoire du système vers le GPU
+      - Transférer inutilement des données peut ralentir le programme au point qu'il soit moins performant que sa version séquentielle tournant sur le CPU 
+    - Étapes du tuto
+      - Détection d'une zone parallélisable
+      - Profiling du résultat de la parallèlisation
+      - Correction des problèmes de parallélisation initiaux
+	- Par exemple, transfert de données inutiles entre le CPU et le GPU
+      - Optimisation du réglage des paramètres de parallélisation en fonction de l'environnement cible
+	- Par exemple, réglages spécifiques pour un GPU NVIDIA
+- MUTE : Ajouter des tests d'intégration se basant sur les logs d'opérations
+  - On a finalement peu de logs sur lesquels se baser pour ce genre de tests
+  - Généralement, je récupère un log par digest pour observer et comprendre les différences
+  - Je n'ai donc peu de logs de différents utilisateurs qui convergent
+  - Écriture du test d'intégration
+    - Création d'une macro de test /everyLogsConvergeMacro/
+      - À partir d'un set de fichiers de log, extrait les opérations et les rejoue pour obtenir le modèle de chaque utilisateur
+      - Compare ensuite les digests et contenus des modèles entre eux
+      - Permet de vérifier si les documents convergent ou non, en fonction du résultat attendu
+    - Génération de 3 tests à partir de cette macro
+      - L'ensemble de ces tests reposent sur des logs issus du document /ct3/
+      - 1er set : les logs de Claudia et Long convergent
+      - 2nd set : les logs de Le et Philippe convergent
+      - 3eme set : les logs de Claudia et Philippe ne convergent pas
+- MUTE : Corriger /hasPlaceAfter/Before()/ dans le cas où /last/ approche d'une borne
+  - Modification de /hasPlaceAfter/Before()/ pour prendre en compte la valeur de /last/
+  - Ajout de tests unitaires pour ces cas
+*** Planned
+**** DONE MUTE : Ajouter des tests d'intégration se basant sur les logs d'opérations
+- Puisqu'on dispose de traces d'utilisation sur MUTE, nous pouvons récupérer plusieurs logs d'opérations pour ajouter des tests supplémentaires
+- Ces tests consisteraient à rejouer des logs d'opérations différents mais convergents pour s'assurer qu'ils convergent toujours après nos modifications
+  - Comment choisir ces logs ?
+- Des logs supplémentaires divergents pourraient être ajoutés pour s'assurer que ces scénarios divergent toujours
+**** DONE MUTE : Corriger /hasPlaceAfter/Before()/ dans le cas où /last/ approche d'une borne
+- /hasPlaceAfter/Before()/ sont utilisées avant un append/prepend pour vérifier qu'on peut effectuer cette opération
+- Cependant, ces fonctions ne vérifient pas si append/prepend à ce bloc ne déclencherait pas un over/underflow
+**** IN-PROGRESS MUTE : Fusionner blocs adjacents issus d'un split après la suppression
+- Lors d'un split, un bloc est coupé en deux et un nouveau bloc est inséré au milieu
+- Après la suppression du bloc inséré, on pourrait fusionner les deux parties du bloc initial pour le recréer
+- Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
+**** IN-PROGRESS CRDT : Lire *CRDT notes*
+- Disponible ici: https://github.com/pfrazee/crdt_notes
+- Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
+**** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
+- Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
 **** TODO MUTE : Ajouter la gestion du titre du document
 - Le titre du document peut être l'objet de modifications concurrentes
 - Il est donc nécessaire de s'assurer qu'il converge chez tous les utilisateurs
@@ -2169,10 +2254,6 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - Cependant, rien n'indique dans le résultat si la chaîne de caractères a effectivement été tronquée ou non
 - Créer un pipe /sliceString/ ajoutant '...' au résultat si la chaîne a été coupée
 **** TODO CRDT : Lire *Kaleido*
-**** TODO TVPaint : Développer la tâche compositing
-- La tâche /compositing/ est une activité complexe
-- La décomposer en plusieurs sous-tâches
-  - Revoir les posts du forum qui y sont dédiés
 **** TODO PLM : Gérer les exercices n'ayant pas d'entité solution dans le langage de programmation par défaut
 - Actuellement, on considère que l'ensemble des exercices possèdent une entité solution en Java
 - Lors de leur instanciation à partir des sources, on essaie de calculer le(s) monde(s) objectif(s) à partir de cette entité solution
