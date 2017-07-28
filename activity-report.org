@@ -2232,15 +2232,67 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 **** DONE MUTE : Corriger /hasPlaceAfter/Before()/ dans le cas où /last/ approche d'une borne
 - /hasPlaceAfter/Before()/ sont utilisées avant un append/prepend pour vérifier qu'on peut effectuer cette opération
 - Cependant, ces fonctions ne vérifient pas si append/prepend à ce bloc ne déclencherait pas un over/underflow
-**** IN-PROGRESS MUTE : Fusionner blocs adjacents issus d'un split après la suppression
-- Lors d'un split, un bloc est coupé en deux et un nouveau bloc est inséré au milieu
-- Après la suppression du bloc inséré, on pourrait fusionner les deux parties du bloc initial pour le recréer
-- Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
+** Semaine du <2017-07-10 lun.> au <2017-07-13 jeu.>
+*** Done
+- MUTE : Refactorer la génération des identifiants par *IdFactory*
+  - Modification de la méthode /createBetweenPosition()/
+  - Pour le moment, se contente de recopier les 4 éléments du tuple si on ne peut pas générer un nombre aléatoire entre les 2 1ers éléments des tuples
+*** Planned
+** Semaine du <2017-07-17 lun.> au <2017-07-21 ven.>
+*** Done
+- MUTE : Setup Travis CI pour /mute-structs/
+  - Pour release facilement la nouvelle version, besoin d'ajouter la clé d'API
+  - Pour la chiffrer et l'ajouter directement à la configuration de Travis
+    - travis encrypt api_key="myAPIKey" --add deploy.api_key
+*** Planned
+** Semaine du <2017-07-24 lun.> au <2017-07-28 ven.>
+*** Done
+- Mettre à jour la version d'un projet via npm
+  - npm version major | minor | patch -m "chore: Update version number to %s"
+- MUTE : Étudier la fusion de /last/ avec /base/
+  - Création de *IdentifierTuple*, objet composé de /random/, /replicaNumber/, /clock/ et /offset/
+  - Modification de *Identifier* pour remplacer /base/ et /last/ par /tuples: IdentifierTuple[]/
+- MUTE : Ajout de *SafeAny*
+  - On a remarqué que le type *any* contourne totalement le compilateur de TypeScript, notamment pour la gestion des /null/
+  - Exemple :
+      #+BEGIN_SRC
+      let id: Identifier 
+      let toto: any = null
+      id = toto // Le compilateur devrait indiquer que toto est p-e null
+      id.compareTo(...) // Déclenche une NullPointerException
+      #+END_SRC
+  - Comme *any* ne se comporte pas comme on le souhaite, on a ajouté *SafeAny*
+  - Ce type nous permet d'identifier une variable comme *any* mais permet de conserver les indicateurs du compilateur lorsqu'on la manipule
+*** Planned
+**** IN-PROGRESS MUTE : Étudier la fusion de /last/ avec /base/
+- Actuellement, dans un *Identifier*, nous conservons séparé la /base/ de /last/
+- Cependant, dès que nous avons besoin de comparer des identifiants, nous concaténons /last/ à /base/
+- Voir si fusionner ces deux paramètres pose un problème particulier
+**** IN-PROGRESS MUTE : Refactorer la génération des identifiants par *IdFactory*
+- À l'heure actuelle, *IdFactory* implémente la version /optimisée/ de génération des identifiants
+- Concrètement, dès qu'un intervalle suffisant est détecté pour générer un nombre aléatoire, *IdFactory* insère le tuple <rnd, replicaNumber, clock, offset>
+- Par exemple, avec id1 = [rnd1, replicaNumber1, clock1, offset1] et id3 = [rnd3, replicaNumber3, clock3, offset3], *IdFactory* génère :
+  - id2 = [rnd2, replicaNumber2, clock2, last2] si rnd3 - rnd1 > 2
+  - id2 = [rnd, rnd2, replicaNumber2, clock2, last2]  si replicaNumber3 - replicaNumber1 > 2
+  - id2 = [rnd, replicaNumber1, rnd2, replicaNumber2, clock2, last2] si clock3 - clock1 > 2
+  - id2 = [rnd, replicaNumber1, clock1, rnd2, replicaNumber2, clock2, last2] si last3 - last1 > 2
+  - id2 = [rnd, replicaNumber1, clock1, last1, rnd2, replicaNumber2, clock2 last2] sinon
+- Par la suite, nous allons donc potentiellement comparer des éléments de types différents (rnd avec replicaNumber par exemple)
+- Ceci fonctionne car nous utilisons le même type de données pour chacun de ces éléments
+- Ceci peut être amené à évoluer
+- Il ne faudait qu'effectuer la comparaison sur rnd, et le cas échéant, recopier l'ensemble du préfixe
 **** IN-PROGRESS CRDT : Lire *CRDT notes*
 - Disponible ici: https://github.com/pfrazee/crdt_notes
 - Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
 **** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
 - Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
+**** TODO MUTE : Ajouter l'intégration continue dans /mute-core/
+- Il serait temps d'ajouter des tests dans /mute-core/
+- Ajouter la configuration pour Travis de façon à les exécuter fréquemment
+**** TODO MUTE : Fusionner blocs adjacents issus d'un split après la suppression
+- Lors d'un split, un bloc est coupé en deux et un nouveau bloc est inséré au milieu
+- Après la suppression du bloc inséré, on pourrait fusionner les deux parties du bloc initial pour le recréer
+- Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
 **** TODO MUTE : Ajouter la gestion du titre du document
 - Le titre du document peut être l'objet de modifications concurrentes
 - Il est donc nécessaire de s'assurer qu'il converge chez tous les utilisateurs
