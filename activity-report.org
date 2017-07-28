@@ -2238,6 +2238,19 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Modification de la méthode /createBetweenPosition()/
   - Pour le moment, se contente de recopier les 4 éléments du tuple si on ne peut pas générer un nombre aléatoire entre les 2 1ers éléments des tuples
 *** Planned
+**** DONE MUTE : Refactorer la génération des identifiants par *IdFactory*
+- À l'heure actuelle, *IdFactory* implémente la version /optimisée/ de génération des identifiants
+- Concrètement, dès qu'un intervalle suffisant est détecté pour générer un nombre aléatoire, *IdFactory* insère le tuple <rnd, replicaNumber, clock, offset>
+- Par exemple, avec id1 = [rnd1, replicaNumber1, clock1, offset1] et id3 = [rnd3, replicaNumber3, clock3, offset3], *IdFactory* génère :
+  - id2 = [rnd2, replicaNumber2, clock2, last2] si rnd3 - rnd1 > 2
+  - id2 = [rnd, rnd2, replicaNumber2, clock2, last2]  si replicaNumber3 - replicaNumber1 > 2
+  - id2 = [rnd, replicaNumber1, rnd2, replicaNumber2, clock2, last2] si clock3 - clock1 > 2
+  - id2 = [rnd, replicaNumber1, clock1, rnd2, replicaNumber2, clock2, last2] si last3 - last1 > 2
+  - id2 = [rnd, replicaNumber1, clock1, last1, rnd2, replicaNumber2, clock2 last2] sinon
+- Par la suite, nous allons donc potentiellement comparer des éléments de types différents (rnd avec replicaNumber par exemple)
+- Ceci fonctionne car nous utilisons le même type de données pour chacun de ces éléments
+- Ceci peut être amené à évoluer
+- Il ne faudait qu'effectuer la comparaison sur rnd, et le cas échéant, recopier l'ensemble du préfixe
 ** Semaine du <2017-07-17 lun.> au <2017-07-21 ven.>
 *** Done
 - MUTE : Setup Travis CI pour /mute-structs/
@@ -2281,24 +2294,26 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - Actuellement, dans un *Identifier*, nous conservons séparé la /base/ de /last/
 - Cependant, dès que nous avons besoin de comparer des identifiants, nous concaténons /last/ à /base/
 - Voir si fusionner ces deux paramètres pose un problème particulier
-**** IN-PROGRESS MUTE : Refactorer la génération des identifiants par *IdFactory*
-- À l'heure actuelle, *IdFactory* implémente la version /optimisée/ de génération des identifiants
-- Concrètement, dès qu'un intervalle suffisant est détecté pour générer un nombre aléatoire, *IdFactory* insère le tuple <rnd, replicaNumber, clock, offset>
-- Par exemple, avec id1 = [rnd1, replicaNumber1, clock1, offset1] et id3 = [rnd3, replicaNumber3, clock3, offset3], *IdFactory* génère :
-  - id2 = [rnd2, replicaNumber2, clock2, last2] si rnd3 - rnd1 > 2
-  - id2 = [rnd, rnd2, replicaNumber2, clock2, last2]  si replicaNumber3 - replicaNumber1 > 2
-  - id2 = [rnd, replicaNumber1, rnd2, replicaNumber2, clock2, last2] si clock3 - clock1 > 2
-  - id2 = [rnd, replicaNumber1, clock1, rnd2, replicaNumber2, clock2, last2] si last3 - last1 > 2
-  - id2 = [rnd, replicaNumber1, clock1, last1, rnd2, replicaNumber2, clock2 last2] sinon
-- Par la suite, nous allons donc potentiellement comparer des éléments de types différents (rnd avec replicaNumber par exemple)
-- Ceci fonctionne car nous utilisons le même type de données pour chacun de ces éléments
-- Ceci peut être amené à évoluer
-- Il ne faudait qu'effectuer la comparaison sur rnd, et le cas échéant, recopier l'ensemble du préfixe
 **** IN-PROGRESS CRDT : Lire *CRDT notes*
 - Disponible ici: https://github.com/pfrazee/crdt_notes
 - Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
 **** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
 - Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
+**** TODO MUTE : Étudier la suppression de *LogootSBlock*
+- L'utilisation de *LogootSBlock* semble limitée
+  - Conserve une référence vers un *IdentifierInterval*
+  - Cet *IdentifierInterval* ne peut que grossir
+  - Conserve le nombre d'éléments de cet *IdentifierInterval* qui existent encore
+  - Permet de déterminer si les éléments de cet *IdentifierInterval* nous appartiennent
+    - Pour voir si on peut append ou prepend
+- C'est ensuite une ou plusieurs instances de *RopesNodes* qui référencent un *LogootSBlock*
+- Les instances de *LogootSBlock* sont aussi référencées dans /mapBaseToBlock/
+  - Cette map nous permet de récupérer un bloc via sa base
+  - Elle est utilisée pour récupérer un bloc s'il existe, ou pour déterminer qu'il faut le créer
+- Serait-il possible de supprimer *LogootSBlock* ?
+  - L'objectif serait de simplifier la structure de données
+  - Il faudrait en contrepartie enrichir *RopesNodes* ou *LogootSRopes*
+  - Voir si ça permettrait effectivement de simplifier le code
 **** TODO MUTE : Ajouter l'intégration continue dans /mute-core/
 - Il serait temps d'ajouter des tests dans /mute-core/
 - Ajouter la configuration pour Travis de façon à les exécuter fréquemment
