@@ -2263,6 +2263,19 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       #+END_SRC
   - Comme *any* ne se comporte pas comme on le souhaite, on a ajouté *SafeAny*
   - Ce type nous permet d'identifier une variable comme *any* mais permet de conserver les indicateurs du compilateur lorsqu'on la manipule
+- MUTE : Nettoyage de *RopesNode*
+  - Renommage de /offset/ en /actualBegin/ pour rendre plus clair le code
+  - Refonte de /maxOffset()/ en /actualEnd/ pour rendre plus clair le code
+- MUTE : Nettoyage de *IteratorHelperIdentifier*
+  - Renommage de /id1/ et /id2/ en /idInterval1/ et /idInterval2/ pour éviter une confusion sur le type de ces propriétés
+- MUTE : Nettoyage de *LogootSBlock*
+  - Renommage de /id/ en /idInterval/ pour éviter une confusion sur le type de cette propriété
+  - Suppression des paramètres /begin/ et /end/ de /delBlock()/ qui étaient inutilisés
+- MUTE : Amélioration des tests effectués sur les logs d'opérations existants
+  - Jusqu'à maintenant, on ne vérifiait pas si le log contenait une opération sérialisée incorrectement
+  - Ainsi, le test pouvait planter à l'exécution à cause d'une *NullPointerException*
+  - Modification du test pour /fail/ proprement si on détecte une opération sérialisée incorrectement
+  - Modification du test pour /fail/ proprement si on détecte un log vide
 *** Planned
 **** IN-PROGRESS MUTE : Étudier la fusion de /last/ avec /base/
 - Actuellement, dans un *Identifier*, nous conservons séparé la /base/ de /last/
