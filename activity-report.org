@@ -2290,6 +2290,16 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Modification du test pour /fail/ proprement si on détecte une opération sérialisée incorrectement
   - Modification du test pour /fail/ proprement si on détecte un log vide
 *** Planned
+** Semaine du <2017-07-31 Mon> au <2017-08-04 Fri>
+*** Done
+- MUTE : Ajouter des tests pour *IteratorHelperIdentifier*
+  - Ajout d'une méthode /compareBaseMacro()/ permettant d'appeler /compareBase()/ sur 2 *IdentifierInterval* et de comparer le résultat à la valeur attendue
+  - Implémentation de tests se basant sur cette macro pour vérifier le comportement de /compareBase()/ pour les différents cas possibles
+*** Planned
+**** DONE MUTE : Ajouter des tests pour *IteratorHelperIdentifier*
+- Cette partie du code est critique puisque c'est elle qui détermine où on insère un bloc par rapport à un autre
+- Cependant, aucun test n'est écrit pour /compareBase()/
+- Les ajouter
 **** IN-PROGRESS MUTE : Étudier la fusion de /last/ avec /base/
 - Actuellement, dans un *Identifier*, nous conservons séparé la /base/ de /last/
 - Cependant, dès que nous avons besoin de comparer des identifiants, nous concaténons /last/ à /base/
