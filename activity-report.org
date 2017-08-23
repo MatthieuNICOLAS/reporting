@@ -2262,7 +2262,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 *** Done
 - Mettre à jour la version d'un projet via npm
   - npm version major | minor | patch -m "chore: Update version number to %s"
-- MUTE : Étudier la fusion de /last/ avec /base/
+- Mute : Étudier la fusion de /last/ avec /base/
   - Création de *IdentifierTuple*, objet composé de /random/, /replicaNumber/, /clock/ et /offset/
   - Modification de *Identifier* pour remplacer /base/ et /last/ par /tuples: IdentifierTuple[]/
 - MUTE : Ajout de *SafeAny*
@@ -2300,6 +2300,74 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - Cette partie du code est critique puisque c'est elle qui détermine où on insère un bloc par rapport à un autre
 - Cependant, aucun test n'est écrit pour /compareBase()/
 - Les ajouter
+** Semaine du <2017-08-07 Mon> au <2017-08-11 Fri>
+*** Done
+- MUTE : Ajouter l'intégration continue dans /mute-core/
+  - Modification de l'architecture du repo pour coller à celle de /mute-structs/ et /mute/
+  - Difficulté avec les fichiers de /Protobuf/
+    - À l'origine, les dossiers /src/, /test/ et /proto/ sont au même niveau
+    - Mais une fois le code transpilé, on obtient les répertoires /proto/, /dist/src/ et /dist/test/
+    - L'import des fichiers de /Protobuf/ échoue donc, le chemin relatif ne correspondant plus
+    - Pour le moment, se contente de /cp -r proto dist/proto/
+  - Ajout de tests pour *SyncMessageService*
+    - [X] Test la sérialisation, envoi puis désérialisation d'une liste de *RichLogootSOperation*
+    - [X] Test de la sérialisation, envoi puis désérialisation d'une *QuerySync*
+    - [X] Test que le *ReplySyncEvent* en réponse à une *QuerySync* est bien destiné au bon utilisateur
+    - [X] Test la sérialisation, envoi puis désérialisation d'un *ReplySyncEvent*
+- Soutenance blanche - Quentin TARDIVON
+  - "De janvier à août 2017"
+    - On ne sait pas que tu as le fait le PIDR, et t'es censé parlé du stage uniquement non ?
+  - Slide 6: On veut surtout illustrer nos travaux
+  - Slide 7 et 9: Écrire les objectifs ?
+  - Slide 12: Mettre la(es) référence(s) ?
+  - Slide 15:
+    - Reformuler "Mise en place de cette API"
+  - Slide 16:
+    - Animer le schéma ?
+    - Grossir la taille des flèches ?
+  - Slide 19:
+    - À mon sens, pas clair dans ton discours la différence entre /signaling/ et /P2P/
+*** Planned
+**** DONE MUTE : Ajouter l'intégration continue dans /mute-core/
+- Il serait temps d'ajouter des tests dans /mute-core/
+- Ajouter la configuration pour Travis de façon à les exécuter fréquemment
+** Semaine du <2017-08-22 Tue> au <2017-08-25 Fri>
+*** Done
+- MUTE : Ajout de *LogootSOperation* et de *TextOperation*
+  - Ajout de ces nouveaux types
+  - Pas pu les déclarer dans des fichiers /.d.ts/
+  - Ils n'étaient alors pas exportés
+  - Il a donc été nécessaire de les déclarer dans des fichiers /.ts/
+- MUTE : Amélioration de la génération du /digest/ et du /tree/
+  - Création d'un flux /updateSubject/
+    - Ce flux indique quand un nouveau /digest/ et un nouveau /tree/ doivent être émis
+  - /subscribe/ à ce flux, couplé à l'opérateur /debounceTime/
+  - Suppression des /subscribes/ en double liés aux fluxs de *TextOperations* ou de *LogootSOperations*
+  - Modification des /subscribes/ aux fluxs de *TextOperations* ou de *LogootSOperations* pour aussi émettre une nouvelle valeur via /updateSubject/
+- MUTE : Suppression de /docValueSubject/
+*** Planned
+**** DONE MUTE : Ajout de *LogootSOperation* et de *TextOperation*
+- Actuellement, plusieurs variables sont du type *LogootSAdd | LogootSDel* ou *TextDelete | TextInsert*
+- Ces unions de types alourdissent le code
+- Ajouter de nouveaux types correspondant à ces unions
+**** DONE MUTE : Amélioration de la génération du /digest/ et du /tree/
+- Actuellement, le /digest/ et le /tree/ correspondant sont générés suite à la réception d'une *TextOperation* locale ou d'une *LogootSOperation* distante
+- Pour éviter de générer des valeurs inutiles, on utilise l'opérateur /debounceTime/ pour attendre que le document se stabilise
+- On a donc plusieurs /subscribes/ pour un même flux
+  - Un premier appliquant chaque opération reçue au modèle et émettant la ou les opérations résultantes
+  - Un second, agrémenté de l'opération /debounceTime/ pour générer le /digest/
+- Le fait de /subscribe/ plusieurs fois au même flux à pour effet de dupliquer ce flux, et donc les traitements qui sont appliqués aux données
+  - On a pu observer ce comportement étrange via des logs qui se sont retrouvés dupliqués
+- Aussi, on observe que les /debounceTime/ n'étant pas liés entre eux, on génère tout de même des /digests/ intermédiaires inutiles
+- Améliorer ce comportement
+**** DONE MUTE : Suppression de /docValueSubject/
+- Cet attribut est utilisé pour émettre le texte correspondant au modèle
+- Cette valeur est émise à l'initialisation du document
+- Ceci nous permet de réinitialiser le contenu de l'éditeur lorsque l'utilisateur change de document
+- Mais le modèle étant vide à son initialisation, la chaîne de caractère l'est aussi
+- On peut donc simplifier le comportement de l'éditeur pour réinitialiser son contenu
+- Ce flux n'a donc plus d'utilité
+- Le supprimer
 **** IN-PROGRESS MUTE : Étudier la fusion de /last/ avec /base/
 - Actuellement, dans un *Identifier*, nous conservons séparé la /base/ de /last/
 - Cependant, dès que nous avons besoin de comparer des identifiants, nous concaténons /last/ à /base/
@@ -2309,6 +2377,13 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
 **** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
 - Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
+**** TODO MUTE : Ajouter des tests pour *DocService*
+**** TODO MUTE : Ajouter des tests pour *SyncService*
+**** TODO MUTE : Ajouter le /docId/ en tant que paramètre du constructeur de *DocService*
+- Cet attribut est actuellement initialisé via le flux /initSource/
+- Celui-ci émet l'identifiant du document actuel à son initialisation
+- Cependant, l'initialisation du document correspond à l'instantiation du *DocService*
+- Nous pouvons donc simplifier le code en ajoutant /docId/ en tant que paramètre du constructeur
 **** TODO MUTE : Étudier la suppression de *LogootSBlock*
 - L'utilisation de *LogootSBlock* semble limitée
   - Conserve une référence vers un *IdentifierInterval*
@@ -2324,9 +2399,6 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - L'objectif serait de simplifier la structure de données
   - Il faudrait en contrepartie enrichir *RopesNodes* ou *LogootSRopes*
   - Voir si ça permettrait effectivement de simplifier le code
-**** TODO MUTE : Ajouter l'intégration continue dans /mute-core/
-- Il serait temps d'ajouter des tests dans /mute-core/
-- Ajouter la configuration pour Travis de façon à les exécuter fréquemment
 **** TODO MUTE : Fusionner blocs adjacents issus d'un split après la suppression
 - Lors d'un split, un bloc est coupé en deux et un nouveau bloc est inséré au milieu
 - Après la suppression du bloc inséré, on pourrait fusionner les deux parties du bloc initial pour le recréer
