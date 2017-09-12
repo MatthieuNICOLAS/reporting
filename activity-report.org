@@ -2345,6 +2345,11 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Suppression des /subscribes/ en double liés aux fluxs de *TextOperations* ou de *LogootSOperations*
   - Modification des /subscribes/ aux fluxs de *TextOperations* ou de *LogootSOperations* pour aussi émettre une nouvelle valeur via /updateSubject/
 - MUTE : Suppression de /docValueSubject/
+- MUTE : Ajouter des tests pour *DocService*
+  - Ajout du test /textOperation-correct-send-and-delivery/
+    - Connecte 2 instances de *DocService*, /docServiceIn/ et /docServiceOut/
+    - Fournit des *TextOperations* locales à l'instance /docServiceIn/
+    - Vérifie que /docServiceOut/ émet bien les *TextOperations* distantes correspondantes
 *** Planned
 **** DONE MUTE : Ajout de *LogootSOperation* et de *TextOperation*
 - Actuellement, plusieurs variables sont du type *LogootSAdd | LogootSDel* ou *TextDelete | TextInsert*
@@ -2368,6 +2373,52 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - On peut donc simplifier le comportement de l'éditeur pour réinitialiser son contenu
 - Ce flux n'a donc plus d'utilité
 - Le supprimer
+**** DONE MUTE : Ajouter des tests pour *DocService*
+** Semaine du <2017-08-28 Mon> au <2017-09-01 Fri>
+*** Done
+- Commandes pour la démo
+  - Effectuer le build de la démo
+    - ~npm run build -- -e demo~
+  - Uploader l'appli
+    - ~scp -r /path/to/source pi@192.168.0.101:/home/pi/html~
+- MUTE : Identifier l'origine des digests différents pour un contenu identique
+  - On rejouant les logs, labellés avec des digests différents, on obtient bien un seul et même digest
+  - Le contenu des documents s'avère aussi identique
+  - En listant les digests intermédiaires des logs, on ne retrouve pas les digests obtenus au cours de la session collaborative
+  - En jouant un rapide scénario, j'ai pu obtenir des digests différents pour un même document
+    - Utilisateur 1 insère "a\n" en 0
+    - Utilisateur 2 insère "c" en 2
+    - Une partition se produit
+    - Utilisateur 1 insère "d" en 3
+    - Utilisateur 2 insère "b" en 1
+    - Résolution de la partition
+  - Les arbres sont en fait équilibrés différement
+  - Mais en rejouant le log (en rechargeant la page), cette fois-ci les digests convergent
+    - Ce qui est troublant, pourquoi les digests ne continuent-ils pas de diverger ?
+- MUTE : Génération du build correspondant à la nouvelle version de MUTE
+  - Installation de https://github.com/google/zopfli
+  - Modification de la valeur de DIR dans /scripts/brotli_build_compression.js/
+  - Installation de https://github.com/google/brotli
+*** Planned
+** Semaine du <2017-09-11 Mon> au <2017-09-15 Fri>
+*** Done
+- MUTE : Identifier l'origine des digests différents pour un contenu identique
+  - Je n'ai pas réussi à reproduire ce problème à l'aide du scénario précédent
+  - Les digests obtenus sont égaux, même si les arbres sont équilibrés différemment
+    - Ce nouveau résultat s'avère tout aussi troublant
+  - Ajout d'un test /convergent-trees/
+    - Permet de vérifier qu'on obtient un arbre balancé de la même manière en exécutant des opérations dans un ordre différent
+    - Échoue à l'heure actuelle
+    - Permet de vérifier si https://github.com/coast-team/mute-structs/issues/11 est résolue
+  - Ajout d'un test /non-convergent-balanced-trees-different-digests/
+    - Permet de vérifier qu'on obtient un digest différent pour des arbres équilibrés de manière différente
+    - Échoue à l'heure actuelle
+    - Permet de vérifier si https://github.com/coast-team/mute-structs/issues/12 est résolue
+*** Planned
+**** IN-PROGRESS MUTE : Identifier l'origine des digests différents pour un contenu identique
+- On a obtenu plusieurs fois des digests différents alors que le contenu du document semblait identique
+- Recharger la page permettait de regénérer le digest attendu
+- Vérifier les logs
 **** IN-PROGRESS MUTE : Étudier la fusion de /last/ avec /base/
 - Actuellement, dans un *Identifier*, nous conservons séparé la /base/ de /last/
 - Cependant, dès que nous avons besoin de comparer des identifiants, nous concaténons /last/ à /base/
@@ -2377,7 +2428,6 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
 **** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
 - Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
-**** TODO MUTE : Ajouter des tests pour *DocService*
 **** TODO MUTE : Ajouter des tests pour *SyncService*
 **** TODO MUTE : Ajouter le /docId/ en tant que paramètre du constructeur de *DocService*
 - Cet attribut est actuellement initialisé via le flux /initSource/
