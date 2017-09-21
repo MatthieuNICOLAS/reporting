@@ -2414,7 +2414,49 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Permet de vérifier qu'on obtient un digest différent pour des arbres équilibrés de manière différente
     - Échoue à l'heure actuelle
     - Permet de vérifier si https://github.com/coast-team/mute-structs/issues/12 est résolue
+- MUTE : Séparer *StateVector* de *SyncService*
+  - Déplacement de l'implémentation du vecteur d'état dans *StateVector*
+  - Ajout de tests pour *StateVector*
+    - Constructeur
+    - set
+  - Mise à jour de *SyncService* pour utiliser *StateVector*
 *** Planned
+**** DONE PLM : Implémenter un script monitorant les juges
+- /WebPLM/ est utilisée de nouveau à TELECOM Nancy
+- Cependant, nous avons toujours un problème avec les juges
+  - Ils peuvent devenir des /zombies/ après avoir exécuté le code d'un étudiant
+  - Dans cet état, ils se comportent d'une des manières suivantes
+**** DONE MUTE : Séparer *StateVector* de *SyncService*
+- À l'heure actuelle, l'implémentation du vecteur d'état est faite au sein du composant *SyncService*
+- Afin de tester l'implémentation du vecteur d'état (son initialisation, sa mise à jour, le calcul des opérations manquantes), il est nécessaire de les séparer
+- Implémenter *StateVector*
+** Semaine du <2017-09-20 Wed> au <2017-09-22 Fri>
+*** Done
+- TEACHING : Notes sur le cours 2
+  - Slide 7 : confusion possible avec la notation des fonctions
+- MUTE : Utiliser *StateVector* dans *SyncMessageService*
+  - Mise à jour des *Subject* concernés dans *SyncMessageService* et *SyncService*
+  - Mise à jour des méthodes /generateQuerySyncMsg()/ et /handleQuerySyncMsg()/
+- MUTE : Compléter les tests pour *StateVector*
+  - Ajout des tests pour :
+    - /isAlreadyDelivered()/
+    - /isDeliverable()/
+    - /computeMissingIntervals()/
+- MongoDB : Pense-bête
+  - Lister les databases: /db.adminCommand( { listDatabases: 1 } )/
+  - Lister les collections: /show collections/
+  - Lister les documents d'une collection: /db.<collection>.find({})/
+  - Faire une requête dans une collection: /db.<collection>.find({ <fieldName>: "<value>"}/)
+  - Faire une requête dans une collection en utilisant une regexp: /db.<collection>.find({ <fieldName>: /^regexp/ })/
+*** Planned
+**** DONE MUTE : Utiliser *StateVector* dans *SyncMessageService*
+- Auparavant, on transmettait des *Map<number, number>* lors de /querySync/ et /replySync/
+- Transmettre des *StateVector* permettrait de plus contraindre les données envoyées
+**** DONE MUTE : Compléter les tests pour *StateVector*
+- Ajouter des tests pour :
+  - /isAlreadyDelivered()/
+  - /isDeliverable()/
+  - /computeMissingIntervals()/
 **** IN-PROGRESS MUTE : Identifier l'origine des digests différents pour un contenu identique
 - On a obtenu plusieurs fois des digests différents alors que le contenu du document semblait identique
 - Recharger la page permettait de regénérer le digest attendu
@@ -2429,6 +2471,12 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 **** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
 - Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
 **** TODO MUTE : Ajouter des tests pour *SyncService*
+- *SyncService* est un composant critique de MUTE
+- Écrire des tests pour *SyncService* permettrait:
+  - S'assurer de son bon fonctionnement
+  - Prévenir toute régression
+- Il n'est cependant pas facile à tester
+- Besoin de le refactorer ?
 **** TODO MUTE : Ajouter le /docId/ en tant que paramètre du constructeur de *DocService*
 - Cet attribut est actuellement initialisé via le flux /initSource/
 - Celui-ci émet l'identifiant du document actuel à son initialisation
