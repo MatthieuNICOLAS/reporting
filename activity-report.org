@@ -2448,6 +2448,54 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Lister les documents d'une collection: /db.<collection>.find({})/
   - Faire une requête dans une collection: /db.<collection>.find({ <fieldName>: "<value>"}/)
   - Faire une requête dans une collection en utilisant une regexp: /db.<collection>.find({ <fieldName>: /^regexp/ })/
+- MUTE : Identifier l'origine des digests différents pour un contenu identique
+  - J'ai rejoué le scénario de la démo pour essayer de produire ce bug
+  - Je n'ai pas réussi à le reproduire à l'aide du scénario de test retranscrit dans /convergent-trees/
+  - Ce scénario semble donc ne pas correspondre
+  - En modifiant le scénario, j'ai finalement *réussi à reproduire le bug*
+    - Le scénario reprend les différentes étapes du précédent : /création d'un groupe, collaboration, partition, travail séparé, reconnexion, resynchronisation/
+    - La modification concerne la partie /reconnexion/
+    - Au cours de la /reconnexion/, un pair émet de nouvelles opérations
+  - Le document *testABCDEFGHIJKLMN* est une reproduction de ce nouveau scénario
+    - Les opérations générées au cours de la phase de /reconnexion/ sont les opérations /29/ à /38/ de l'utilisateur /-600040289/
+    - Elles correspondant au texte "Ayé la reconnexion va se produire..."
+  - On constate un *problème lié au mécanisme de synchronisation*
+    - Dès que la reconnexion est effectuée, les opérations nouvellement générées sont transmises aux autres pairs
+    - Mais la synchronisation n'a pas encore eu lieu
+    - Ces opérations ne sont donc pas encore délivrables, elles sont bufferisées
+    - Elles sont ensuite délivrées (lors de la resynchronisation probablement)
+    - Mais elles sont de nouveau bufferisées par la suite (toujours lors de la synchronisation ?)
+  - On constate un *problème lié au modèle*
+    - On observe un saut dans le déplacement du curseur lorsqu'on arrive à la position "Ayé la reconnex|ion va se produire..."
+    - Le saut observé est différent selon l'utilisateur
+    - Ceci indiquerait un problème aux niveaux des identifiants au sein de la structure de données
+  - Après un rechargement de la page par le Chromebook, les digests convergent
+  - Il est nécessaire de creuser plusieurs points :
+  - Pourquoi certaines opérations sont bufferisées plusieurs fois ?
+    - Probablement, au cours de la synchronisation, l'opération /28/ est délivrée
+    - On délivre alors en cascade les opérations en attente
+    - Puis on continue de traiter le message de synchronisation
+    - Voir pourquoi ces opérations sont rebufferisées
+  - Pourquoi ce saut de curseur ?
+    - Pourquoi les modèles divergent ?
+  - Pourquoi en rechargeant la page, les digests convergent ?
+    - Comparer les logs du Chromebook avant/après reload pour voir s'ils diffèrent
+    - Comparer les arbres du Chromebook avant/après reload pour voir s'ils diffèrent
+- Meeting:
+  - Spend most of the summer working on /mute-structs/
+    - Start to refactor the identifiers
+    - Since we rely heavily on it, had to refactor many parts of the library
+    - Clean the code and add tests and documentation
+    - Still not merge
+  - Also work on /mute-core/
+    - A intern told us it would be neat to have tests in /mute-core/
+    - Not a bad idea
+    - Specially helpful for the update to the next version of /mute-structs/
+    - So setup continuous integration and add tests
+  - Finally investigating a bug with the digests
+    - Not the same digests for same content
+    - Was able to reproduce the bug
+    - Retrieve as much data as possible (logs, trees, console.log...)
 *** Planned
 **** DONE MUTE : Utiliser *StateVector* dans *SyncMessageService*
 - Auparavant, on transmettait des *Map<number, number>* lors de /querySync/ et /replySync/
@@ -2457,7 +2505,70 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - /isAlreadyDelivered()/
   - /isDeliverable()/
   - /computeMissingIntervals()/
-**** IN-PROGRESS MUTE : Identifier l'origine des digests différents pour un contenu identique
+** Semaine du <2017-09-25 Mon> au <2017-09-29 Fri>
+*** Done
+- TEACHING : Notes sur le cours 3
+  - Slide 3
+    - "Mauvais pratique" d'associer 1 évènement JS à un élément HTML
+      - Pourquoi ?
+      - Comment faire alors ?
+  - Slide 9
+    - Mettre un lien vers une doc pour la syntaxe des queries ?
+  - Slide 20
+    - "Il faut être sûr que le dom est entièrement chargé pour enregistrer un handler"
+      - Pour être sûr que le noeud existe ?
+  - Slide 24
+    - Faute de frappe "onlick"
+- MUTE : Identifier l'origine des digests différents pour un contenu identique
+  - Pourquoi ce saut de curseur ?
+    - On comparant les arbres récupérés, on s'aperçoit que les arbres divergent
+      #+BEGIN_SRC
+                                #
+                        Id[2139784055,-600040289,1, 0 .. 0]
+                                #
+                Id[1534008470,931389836,0, 0 .. 0]
+                                #
+                        Id[-233297242,-600040289,3, 11 .. 32]
+                                        #
+                                Id[-233297242,-600040289,3, 0 .. 10]
+                                        #
+        Id[-1537848274,-600040289,0, 1 .. 5]
+                                #
+                        Id[-1537848274,-600040289,0,0,-460848852,931389836,1, 0 .. 0]
+                                #
+                Id[-1537848274,-600040289,0, 0 .. 0]
+                        #
+----------------------------------------------
+                                #
+                        Id[2139784055,-600040289,1, 0 .. 0]
+                                #
+                Id[1534008470,931389836,0, 0 .. 0]
+                                #
+                        Id[-233297242,-600040289,3, 0 .. 32]
+                                #
+        Id[-1537848274,-600040289,0, 1 .. 5]
+                                #
+                        Id[-1537848274,-600040289,0,0,-460848852,931389836,1, 0 .. 0]
+                                #
+                Id[-1537848274,-600040289,0, 0 .. 0]
+                        #
+      #+END_SRC
+    - Le bloc /<-233297242,-600040289, 3, [0..32]>/ est coupé en deux parties chez le collaborateur qui a reçu ces contributions
+    - Les contenus sont donc identiques, mais les structures différentes
+    - Les logs ne présentent aucune raison justifiant ce résultat
+      - Les opérations sont correctements ordonnées, ne sont pas dupliquées
+    - L'ordre des opérations dans le log ne correspond donc pas à l'ordre des opérations réellement joué
+      - Ceci explique pourquoi recharger la page permet de faire converger les logs
+    - Écriture d'un test pour vérifier l'ordre dans lequel les opérations sont effectivement transmises au *DocService* par le *SyncService*
+      - Test disponible ici: https://github.com/coast-team/mute-core/blob/69a7ac541289e99c7d489989a15365a79e3c1fb6/test/SyncService.test.ts#L38-L66
+      - Il s'avère que les opérations bufferisées sont finalement délivrées dans l'ordre inverse
+      - Modification de *SyncService* pour corriger ce bug
+  - Pourquoi certaines opérations sont bufferisées plusieurs fois ?
+    - Il s'avère qu'on bufferise une opération si /isDeliverable()/ renvoie /false/
+    - Cependant une opération n'est pas /isDeliverable()/ si elle a déjà été délivrée
+    - Modification de *SyncService* pour ne bufferiser uniquement les opérations n'étant ni délivrables ni délivrées
+*** Planned
+**** DONE MUTE : Identifier l'origine des digests différents pour un contenu identique
 - On a obtenu plusieurs fois des digests différents alors que le contenu du document semblait identique
 - Recharger la page permettait de regénérer le digest attendu
 - Vérifier les logs
