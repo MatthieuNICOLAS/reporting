@@ -2567,11 +2567,43 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Il s'avère qu'on bufferise une opération si /isDeliverable()/ renvoie /false/
     - Cependant une opération n'est pas /isDeliverable()/ si elle a déjà été délivrée
     - Modification de *SyncService* pour ne bufferiser uniquement les opérations n'étant ni délivrables ni délivrées
+- MUTE : Améliorer la gestion de la position des curseurs
+  - /mute-core/
+    - Déclaration d'une interface *Position* représentant la position dans un bloc d'un curseur
+    - Renommage de /idFromIndex()/ en /positionFromIndex()/
+    - Déclaration du package /sync/ dans /sync.proto/
+      - Nécessaire de déclarer un package pour pouvoir importer les messages définis
+  - /mute/
+    - Suppression et remplacement de *MuteCorePosition* par *Position*
+    - Modification de *PositionMsg* pour utiliser *IdentifierMsg*
+- MUTE : Étudier la fusion de /last/ avec /base/
+  - /mute-structs/
+    - Ajout du getter /base()/ dans *Identifier* et *IdentifierInterval* pour préserver /mapBaseToBlock/ dans *LogootSRopes*
+    - Mise à jour du code de *LogootSRopes* pour correspondre à la nouvelle implémentation de la librairie
+    - Export de *IdentifierTuple* pour rendre ce type accessible aux librairies/applications externes
+    - Modification du build pour seulement exclure les fichiers de tests portant sur les /logs/ et les /trees/
+    - Il est finalement temps de déployer cette nouvelle version
+    - Il faut donc mettre à jour /mute-core/ et /mute/
+  - /mute-core/
+    - Mise à jour de /generateRichLogootSOps()/ de *Helpers*
+    - Mise à jour de /positionFromIndex()/ de *DocService*
+    - Mise à jour de /sync.proto/
+  - /mute/
+    - Mise à jour des fichiers générés à partir /cursor.proto/
+      - Le message *PositionMsg* dépend de *sync.IdentifierMsg*
+      - Les champs de *IdentifierMsg* ayant été modifiés, il est nécessaire de regénérer les fichiers /cursor_pb.js/ et /cursor_pb.d.ts/ pour qu'ils correspondent à la nouvelle implémentation
 *** Planned
 **** DONE MUTE : Identifier l'origine des digests différents pour un contenu identique
 - On a obtenu plusieurs fois des digests différents alors que le contenu du document semblait identique
 - Recharger la page permettait de regénérer le digest attendu
 - Vérifier les logs
+**** DONE MUTE : Améliorer la gestion de la position des curseurs
+- Pour représenter la position des curseurs distants dans /mute/, nous utilisons la position du curseur de l'utilisateur dans un bloc
+- Pour obtenir cette position au sein du bloc, /mute/ interagit avec /mute-core/
+- Cependant, les structures de données utilisées ne sont pas explicitement liées
+  - L'interface *MuteCorePosition*, déclarée dans /cursors.directive/, n'est pas explicitement sensée correspondre au type de retour de /idFromIndex()/ de *DocService*
+  - Les messages definis dans /cursor.proto/ déclarent des structures de données équivalentes à celles définies dans /sync.proto/
+- Ces structures de données étant modifiées dans la nouvelle version de /mute-structs/, les lier permettrait d'effectuer la mise à jour plus aisément
 **** IN-PROGRESS MUTE : Étudier la fusion de /last/ avec /base/
 - Actuellement, dans un *Identifier*, nous conservons séparé la /base/ de /last/
 - Cependant, dès que nous avons besoin de comparer des identifiants, nous concaténons /last/ à /base/
@@ -2581,6 +2613,13 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
 **** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
 - Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
+**** TODO MUTE : Faire une liste des scénarios à tester d'une version à l'autre
+**** TODO MUTE : Rendre permanent l'identifiant et les clocks d'un utilisateur pour un document
+- Pour l'historique, il est important de conserver la liste des collaborateurs ayant collaboré sur un document
+- Pour faciliter l'implémentation de cette liste, il faut modifier le code pour réutiliser le même identifiant pour un même utilisateur au fil des sessions
+- À noter que les clocks aussi doivent être conservée pour prévenir tout bug
+  - Clock de /mute-structs/ pour éviter de générer un bloc avec le même identifiant
+  - Clock de /mute-core/ pour éviter de labeller des messages avec le même couple /<identifiant, clock>/
 **** TODO MUTE : Ajouter des tests pour *SyncService*
 - *SyncService* est un composant critique de MUTE
 - Écrire des tests pour *SyncService* permettrait:
