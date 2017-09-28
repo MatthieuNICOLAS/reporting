@@ -2592,6 +2592,28 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Mise à jour des fichiers générés à partir /cursor.proto/
       - Le message *PositionMsg* dépend de *sync.IdentifierMsg*
       - Les champs de *IdentifierMsg* ayant été modifiés, il est nécessaire de regénérer les fichiers /cursor_pb.js/ et /cursor_pb.d.ts/ pour qu'ils correspondent à la nouvelle implémentation
+- Présentation Quentin
+  - Slide 3
+    - Besoin des sous-points ?
+    - Tu te contentes de les lire
+  - Slide 4
+    - Churn -> "Random connections/disconnections"
+    - Pas plutôt "Frequent connections/disconnections" ?
+  - Slide 5
+    - Manque la légende non ?
+  - Slide 7
+    - Nécessaire ?
+    - J'ai l'impression qu'elle casse le rythme
+  - Slide 8
+    - Le numéro de la slide déconne
+    - "Newcomer" tient en un seul mot
+  - Slide 14
+    - Pas compris ce que tu voulais mettre en avant avec les données confidentielles
+  - Slide 16
+    - J'ai l'impression que le schéma porte à confusion
+    - Entre données accessibles et données répliquées
+  - Slide 18
+    - Donne des noms aux pairs pour faciliter les explications
 *** Planned
 **** DONE MUTE : Identifier l'origine des digests différents pour un contenu identique
 - On a obtenu plusieurs fois des digests différents alors que le contenu du document semblait identique
