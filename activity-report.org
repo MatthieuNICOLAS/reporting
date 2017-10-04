@@ -2592,6 +2592,31 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Mise à jour des fichiers générés à partir /cursor.proto/
       - Le message *PositionMsg* dépend de *sync.IdentifierMsg*
       - Les champs de *IdentifierMsg* ayant été modifiés, il est nécessaire de regénérer les fichiers /cursor_pb.js/ et /cursor_pb.d.ts/ pour qu'ils correspondent à la nouvelle implémentation
+  - Réalisation de tests
+    - Les utilisateurs collaborent au travers de différents scénarios
+      - On cherche à vérifier que les copies convergent
+	- Observation du digest
+      - On cherche à vérifier que les curseurs distants fonctionnent correctement
+      - Récupération de logs si convergence, les trees en plus si divergence
+    - Scénario 1
+      - Tout le monde connecté tout au long de la session de collaboration
+      - Document https://www.coedit.re:8080/doc/hKib6coBIh
+      - A convergé
+      - Digest obtenu : /clark-total-disco/
+    - Scénario 2
+      - Des membres du groupe se déconnecte/reconnecte au cours de la session de collaboration
+      - Document https://www.coedit.re:8080/doc/3ShRFwGD0f
+      - A convergé
+      - Digest obtenu : /regular-chant-samba/
+    - Scénario 3
+      - Collaboration perturbée par des partitions
+      - Document https://www.coedit.re:8080/doc/HtCcFpETan
+      - A convergé
+      - Digest obtenu : /classic-penguin-magic/
+    - Bug observé au niveau des curseurs lors du 1er test
+      - Les curseurs des autres collaborateurs n'étaient pas affichés
+      - Aucune erreur n'était répertoriée dans les logs
+      - Pas réussi à le reproduire
 - Présentation Quentin
   - Slide 3
     - Besoin des sous-points ?
@@ -2626,15 +2651,78 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - L'interface *MuteCorePosition*, déclarée dans /cursors.directive/, n'est pas explicitement sensée correspondre au type de retour de /idFromIndex()/ de *DocService*
   - Les messages definis dans /cursor.proto/ déclarent des structures de données équivalentes à celles définies dans /sync.proto/
 - Ces structures de données étant modifiées dans la nouvelle version de /mute-structs/, les lier permettrait d'effectuer la mise à jour plus aisément
-**** IN-PROGRESS MUTE : Étudier la fusion de /last/ avec /base/
+**** DONE MUTE : Étudier la fusion de /last/ avec /base/
 - Actuellement, dans un *Identifier*, nous conservons séparé la /base/ de /last/
 - Cependant, dès que nous avons besoin de comparer des identifiants, nous concaténons /last/ à /base/
 - Voir si fusionner ces deux paramètres pose un problème particulier
+** Semaine du <2017-10-02 Mon> au <2017-10-06 Fri>
+*** Done
+- TEACHING : Notes sur le cours 4
+  - Pas de mentions du système de module intégré en ES6 ?
+- TEACHING : Notes sur le cours 5
+  - Slide 5
+    - Faire un lien entre les fonctions utilitaires de jQuery et /filter()/ et /map()/ ?
+  - Slide 20
+    - Retirer la zone de titre ?
+- TEACHING : Notes sur le TD 1
+  - Exercice 3.2
+    - Leur faire utiliser /reduce()/ plutôt ?
+  - Exercice 4.7
+    - Pourquoi /dateNaiss.getMonth() === month-1/ dans la correction ?
+- ECSCW 2017 : Payer la facture
+  - Appeler le +44 114 225 5668 pour régler la facture
+- DISTRIBUTED SYSTEMS : Lire *Perspectives on the CAP Theorem*
+  - La consistence est une propriété classique de /safety/
+  - La disponibilité est une propriété classique de /liveness/
+  - À partir du moment où les communications entre pairs sont asynchrones, il n'est pas possible de garantir la /safety/ et la /liveness/ du système
+  - Exemple du registre répliqué
+    - Un ensemble de serveurs /{p1, p2, ..., pn}/ permettent de manipuler un registre répliqué (lire sa valeur / modifier sa valeur)
+    - Si une partition se produit, on est obligé de sacrifié la /safety/ ou la /liveness/ du système
+    - Pour garantir la /liveness/ lors d'une requête de lecture, un serveur doit fournir une réponse
+      - Mais comme le serveur /pi/ traitant la requête de lecture peut être coupé des autres, il ne peut être sûr de la consistence de la valeur du registre
+      - Il doit alors retourner une valeur qui peut ne pas être consistente
+    - Pour garantir la /safety/ lors d'une requête de lecture, un serveur doit attendre que la partition soit résolue
+      - Mais la partition peut ne jamais se résoudre
+      - Il ne répondrait donc jamais à la requête
+  - Si les communications sont asynchrones, un pair ne peut pas faire la distinction entre le retard d'un message ou l'apparition d'une partition
+  - Passe au résultat du /FLP theorem/ : le consensus est impossible dans un système pouvant avoir des pannes avec des communications asynchrones
+  - Exemple du consensus
+    - Le consensus et la validité sont des propriétés de /safety/
+    - La terminaison est une propriété de /liveness/
+    - Plus complexe que le problème du registre répliqué
+    - Donc pas possible d'assurer la /safety/ et la /liveness/ en cas de partition
+    - Le /FLP theorem/ montre aussi que les algorithmes de consensus garantissant la /safety/ boucle indéfiniement dans certains scénarios ou si un pair ne répond plus : perte de la /liveness/
+  - 2 pistes de réflexions
+    - À quel point le réseau doit-il être fiable pour pouvoir assurer la /safety/ et la /liveness/ ?
+    - Quel niveau de consistence peut-on assurer si le réseau n'est pas fiable ?
+  - Fiabilité du réseau
+    - Utilisation d'un réseau synchrone
+      - À creuser, je ne comprends pas exactement ce qu'est un réseau synchrone et comment cela fonctionne
+      - Cependant, un système de détection d'erreurs offrirait les mêmes garanties qu'un réseau synchrone
+      - Un système d'élection de leader équivaudrait à un système de détection d'erreurs
+    - /eventual synchrony/ : un réseau peut alterner entre des phases asynchrones et des phases synchrones
+    - /f + 2/ rounds (où /f/ est le nombre de noeud pouvant crasher) sont nécessaires avec un réseau synchrone pour atteindre un consensus
+    - Dans un système où le réseau est /eventual synchronous/, on peut résoudre le consensus si moins de /n ÷ 2/ noeuds crashent (où /n/ est le nombre de noeuds)
+  - Niveau de consistence
+    - Introduction du problème du /set agreement/
+      - Plutôt que d'arriver à un consensus, on renvoie ici un /k-set/ de valeurs, /k/ étant un nombre compris entre 1 et /n/ (où /n/ est le nombre de noeuds)
+    - Il a été démontré que, pour résoudre le problème du /k-set/, seulement /k - 1/ erreurs ne peuvent se produire
+    - Il a aussi été démontré que pour résoudre le problème du /k-set/, /t ÷ k + 1/ rounds sont nécessaires (où /t/ est le nombre d'erreurs)
+*** Planned
 **** IN-PROGRESS CRDT : Lire *CRDT notes*
 - Disponible ici: https://github.com/pfrazee/crdt_notes
 - Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
 **** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
 - Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
+**** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
+- *Perspectives on the CAP Theorem* cite ce papier de la manière suivante
+  #+BEGIN_QUOTE
+  In many ways, a failure detector exactly encapsulates the synchrony requirements for consensus.
+  They showed that a particular failure detector Ω is the weakest failure detector for solving consensus.
+  The failure detector Ω essentially encapsulates a leader election service
+  #+END_QUOTE
+- Je ne comprends pas le lien entre /failure detector/ et /synchrony requirements for consensus/
+- Ce papier m'aidera p-e à comprendre
 **** TODO MUTE : Faire une liste des scénarios à tester d'une version à l'autre
 **** TODO MUTE : Rendre permanent l'identifiant et les clocks d'un utilisateur pour un document
 - Pour l'historique, il est important de conserver la liste des collaborateurs ayant collaboré sur un document
@@ -2767,18 +2855,33 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   For any update /O/, the effect of executing /O/ at all sites is the same as the intention of /O/ when executed at the site that originated it,
   and the effect of executing /O/ does not change the effect of non concurrent operations.
   #+END_QUOTE
-- Associativity
-  #+BEGIN_QUOTE
-  Associativity means that you can apply a function in any order:
-    =f(a,f(b,c)) = f(f(a,b),c)=
-  #+END_QUOTE
-- Commutativity
-  #+BEGIN_QUOTE
-  Commutativity means that a function's arguments are order-insensitive:
-    =f(a,b) = f(b,a))=
-  #+END_QUOTE
-- Idempotence
-  #+BEGIN_QUOTE
-  Idempotence means you can call a function on the same input any number of times and get the same result:
-    =f(f(x))=f(x) (e.g., max(42, max(42, 42)) = 42))=
-  #+END_QUOTE
+- Mathematics operations properties
+  - Associativity
+    #+BEGIN_QUOTE
+    Associativity means that you can apply a function in any order:
+      =f(a,f(b,c)) = f(f(a,b),c)=
+    #+END_QUOTE
+  - Commutativity
+    #+BEGIN_QUOTE
+    Commutativity means that a function's arguments are order-insensitive:
+      =f(a,b) = f(b,a))=
+    #+END_QUOTE
+  - Idempotence
+    #+BEGIN_QUOTE
+    Idempotence means you can call a function on the same input any number of times and get the same result:
+      =f(f(x))=f(x) (e.g., max(42, max(42, 42)) = 42))=
+    #+END_QUOTE
+- Systems properties
+  - Safety
+    #+BEGIN_QUOTE
+    Informally, an algorithm is safe if nothing bad ever happens. -- Perspectives on the CAP Theorem
+    #+END_QUOTE
+  - Liveness
+    #+BEGIN_QUOTE
+    By contrast, an algorithm is live if eventually something good happens. -- Perspectives on the CAP Theorem
+    #+END_QUOTE
+  - Unreliable
+    #+BEGIN_QUOTE
+    There are many different ways in which a system can be unreliable. There may be partitions, 
+    crash failures, message loss, malicious attacks (or Byzantine failures), etc. -- Perspectives on the CAP Theorem
+    #+END_QUOTE
