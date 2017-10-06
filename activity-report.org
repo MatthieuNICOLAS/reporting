@@ -2671,7 +2671,11 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Pourquoi /dateNaiss.getMonth() === month-1/ dans la correction ?
 - ECSCW 2017 : Payer la facture
   - Appeler le +44 114 225 5668 pour régler la facture
-- DISTRIBUTED SYSTEMS : Lire *Perspectives on the CAP Theorem*
+  - Fait
+  - Pas reçu de confirmation de paiement de leur part
+  - Mais le virement a du moins bien été effectué
+  - Reste à apporter la preuve de paiement à Sylvie
+- <<perspective-cap-theorem>> DISTRIBUTED SYSTEMS : Lire *Perspectives on the CAP Theorem*
   - La consistence est une propriété classique de /safety/
   - La disponibilité est une propriété classique de /liveness/
   - À partir du moment où les communications entre pairs sont asynchrones, il n'est pas possible de garantir la /safety/ et la /liveness/ du système
@@ -2708,14 +2712,91 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Plutôt que d'arriver à un consensus, on renvoie ici un /k-set/ de valeurs, /k/ étant un nombre compris entre 1 et /n/ (où /n/ est le nombre de noeuds)
     - Il a été démontré que, pour résoudre le problème du /k-set/, seulement /k - 1/ erreurs ne peuvent se produire
     - Il a aussi été démontré que pour résoudre le problème du /k-set/, /t ÷ k + 1/ rounds sont nécessaires (où /t/ est le nombre d'erreurs)
+- <<dottedb>> DISTRUBUTED SYSTEMS : Lire *DottedDB: Anti-Entropy without Merkle Trees, Deletes without Tombstones*
+  - *DottedDB* est un  /Dynamo-like key-value store/
+  - Les données sont répliquées parmi un certain nombre de noeud en fonction du facteur de réplication
+  - Les clients ne possèdent pas une réplique des données, ils y accèdent et les modifient par le biais des noeuds
+  - Répond à 3 problèmes des bases de données répliquées
+    - La croissance du /version vector/ liée au /node churn/
+      - À chaque fois qu'un noeud rencontre une erreur, il est remplacé
+      - Mais on conserve dans le /version vector/ l'entrée du noeud défaillant et on ajoute une nouvelle entrée pour le noeud
+    - La nécessité de conserver des /tombstones/
+      - Pour empêcher un objet de "ressurgir" après sa suppression, à cause de la relivraison d'une opération précédente, les systèmes actuels conservent une /tombstone/
+      - Ainsi, l'espace de stockage utilisé ne peut que croître puisque supprimer un objet laisse quand même des méta-données
+    - L'utilisation "lourde" de Merkle Trees pour le système d'anti-entropie
+      - /Bloom Filter/ et /Merkle Trees/ sont présentées comme étant les structures de données les plus communément utilisées dans un mécanisme d'anti-entropie
+      - /Bloom Filter/ est dit comme ne scalant pas en fonction du nombre de données
+      - /Merkle Trees/ permet d'effectuer un compromis entre la précision du mécanisme d'anti-entropie et la quantité de méta-données échangées
+	- Le mécanisme d'anti-entropie va comparer les racines des arbres des différents noeuds pour détecter une différence
+	- Si une différence est détectée, on va comparer en profondeur les /Merkle Trees/ pour en trouver l'origine
+	- Mais la hauteur de l'arbre dépend du nombre d'objets stockés par feuille
+	- Si on stocke un objet par feuille, on aura une précision de 100% mais il faudra beaucoup de rounds pour déterminer l'origine de la différence
+	- Si on stocke plusieurs objets par feuille, le nombre de rounds nécessaires est réduit mais on va potentiellement renvoyer plusieurs objets inutilement
+  - Propose le framework /Node-wide Dot-based Clocks (NDC)/
+    - L'idée principale est de factoriser/compacter les méta-données normalement ajoutées à chaque objet stocké en les déplaçant sur le noeud
+    - Ajoute à chaque version d'un objet
+      - Un /dot/ : un couple /(nodeId, nodeClock)/ identifiant la version de façon unique
+      - Un /causal context/ : les dots des versions précédentes de l'objet
+	- Le /causal context/ d'un objet peut être supprimé si le noeud possède toutes les versions précédentes de l'objet
+    - Ajoute au niveau du noeud 4 structures de données
+      - /Node Clock (NC)/
+	- Liste des /dots/ (et donc versions des objets) connus par le noeud
+      - /Dot-Key Map (DKM)/
+	- Map associant un /dot/ à la clé d'un objet
+	- Permet de retrouver l'objet divergent à partir d'un de ses /dots/ au cours du mécanisme d'anti-entropie
+	- Une fois le /dot/ connu par l'ensemble des pairs, il peut être retiré de cette map
+      - /Watermark (WM)/
+	- Matrice des /NC/ de chaque noeud
+	- Au cours du déroulément du mécanisme d'anti-entropie, un noeud envoie son /NC/ à un autre noeud
+	- Celui-ci le stocke alors son /NC/ avant de pouvoir déterminer quand retirer un /dot/ de /DKM/
+      - /Non-Stripped Keys (NSK)/
+	- Liste des objets dont le /causal context/ n'est pas vide
+	  - Possible si on a loupé des versions de l'objet
+      - /Storage (ST)/
+	- Map associant une clé à un objet
+  - Évaluation
+    - L'évaluation a été réalisé en comparant *DottedDB* à *MerkleDB*
+      - *MerkleDB* un fork de *DottedDB* utilisant un /Merkle Tree/ pour le mécanisme d'anti-entropie et /Dotted Version Vectors/ comme mécanisme de traçage de la causalité
+    - Taille des méta-données
+      - Mécanisme de causalité
+	- La taille de /NC/ de *DottedDB* augmente principalement lors de la perte de messages
+	  - On peut compacter les /dots/ contigus d'un noeud en ne stockant que la /nodeClock/ la plus élevée
+	  - Lorsqu'un message non-contigu est reçu, on doit alors stocker sa /nodeClock/ séparément
+	  - Ces méta-données supplémentaires sont supprimées dès que les noeuds convergent
+	- Tandis que la taille du /Dotted Version Vector/ dans le cas de *MerkleDB* croît avec le nombre noeuds vus, et donc avec le /node churn/
+      - Anti-entropie
+- Meeting
+  - Last week
+    - Solved issue in /mute-core/ which resulted in the different digests for same content
+    - Caused by the delivery mechanism
+    - Was delivering messages in reverse order in some particular cases
+    - Deployed the version to test with 6-7 users
+  - This week
+    - Start the PhD !
+    - Had a reunion this morning with Olivier & Gérald to discuss where to start, how to start
+    - Start reading *Perspectives on the CAP Theorem*
+      - Some interesting results about consensus in eventually synchrone network
+	- How many failures it can support
+	- How many rounds does it need
+      - Some trouble to understand /synchrone network/
+	- Which properties does it need to respect ?
+	- How does it behave ?
+	- How does it recover ?
+	- Need to dig deeper on it
+    - Also start reading *DottedDB: Anti-Entropy without Merkle Trees, Deletes without Tombstones*
+      - Dynamo-like key-value store
+      - Instead of adding all the metadata to each object, they put it in the node to be able to factorize/compact it
+	- Only add a dot (a couple made of the /nodeId/ and the /nodeClock/) per version of the object
+      - Compare to version vector instead of causal barrier, which is weird
+	- It blames version vector for its ever-growing size
+	- Which is a flaw of version vector addressed by causal barrier
 *** Planned
-**** IN-PROGRESS CRDT : Lire *CRDT notes*
-- Disponible ici: https://github.com/pfrazee/crdt_notes
-- Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
-**** IN-PROGRESS CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
-- Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
+**** IN-PROGRESS DISTRIBUTED SYSTEMS : Lire *Perspectives on the CAP Theorem*
+- Disponible ici : https://groups.csail.mit.edu/tds/papers/Gilbert/Brewer2.pdf
+**** IN-PROGRESS DISTRIBUTED SYSTEMS : Lire *DottedDB: Anti-Entropy without Merkle Trees, Deletes without Tombstones*
+- Disponible ici : http://haslab.uminho.pt/tome/files/dotteddb_srds.pdf
 **** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
-- *Perspectives on the CAP Theorem* cite ce papier de la manière suivante
+- *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
   #+BEGIN_QUOTE
   In many ways, a failure detector exactly encapsulates the synchrony requirements for consensus.
   They showed that a particular failure detector Ω is the weakest failure detector for solving consensus.
@@ -2723,6 +2804,15 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   #+END_QUOTE
 - Je ne comprends pas le lien entre /failure detector/ et /synchrony requirements for consensus/
 - Ce papier m'aidera p-e à comprendre
+**** TODO DISTRIBUTED SYSTEMS: Lire *Dynamo: amazon’s highly available key-value store*
+- *DottedDB* ([[dotteddb]]) est une base de données clé-valeur /Dynamo-like/
+- Lire ce papier me permettrait p-e de mieux comprendre *DottedDB*
+- Disponible ici : https://dl.acm.org/citation.cfm?id=1294281
+**** TODO CRDT : Lire *CRDT notes*
+- Disponible ici: https://github.com/pfrazee/crdt_notes
+- Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
+**** TODO CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
+- Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
 **** TODO MUTE : Faire une liste des scénarios à tester d'une version à l'autre
 **** TODO MUTE : Rendre permanent l'identifiant et les clocks d'un utilisateur pour un document
 - Pour l'historique, il est important de conserver la liste des collaborateurs ayant collaboré sur un document
