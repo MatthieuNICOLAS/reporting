@@ -2712,7 +2712,19 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Plutôt que d'arriver à un consensus, on renvoie ici un /k-set/ de valeurs, /k/ étant un nombre compris entre 1 et /n/ (où /n/ est le nombre de noeuds)
     - Il a été démontré que, pour résoudre le problème du /k-set/, seulement /k - 1/ erreurs ne peuvent se produire
     - Il a aussi été démontré que pour résoudre le problème du /k-set/, /t ÷ k + 1/ rounds sont nécessaires (où /t/ est le nombre d'erreurs)
-- <<dottedb>> DISTRUBUTED SYSTEMS : Lire *DottedDB: Anti-Entropy without Merkle Trees, Deletes without Tombstones*
+  - Insiste sur la possibilité d'effectuer le compromis entre consistence et disponibilité au cas par cas dans une application selon plusieurs dimensions
+    - Type de données
+      - Certaines données peuvent être critiques tandis que d'autres négligeables
+      - On peut donc nécessiter une forte consistence pour les données critiques et préférer une grande disponibilités pour les autres données
+    - Type d'opérations
+      - Même raisonnement que pour les données
+      - Les opérations de lectures peuvent nécessiter une forte disponibilité tandis que les opérations de modifications requièrent une forte consistence
+    - Décomposition fonctionnelle
+      - On peut décomposer l'applications en sous-services, chacun effectuant son propre compromis entre consistence et disponiblité
+    - Décomposition géographique / par utilisateurs
+      - Idée de faire des data-centers proches des utilisateurs
+      - Les noeuds d'un data-center étant proches, on peut faire des suppositions sur la fiabilité du réseau et mettre l'accent sur la consistence offerte
+- <<dottedb>> DISTRIBUTED SYSTEMS : Lire *DottedDB: Anti-Entropy without Merkle Trees, Deletes without Tombstones*
   - *DottedDB* est un  /Dynamo-like key-value store/
   - Les données sont répliquées parmi un certain nombre de noeud en fonction du facteur de réplication
   - Les clients ne possèdent pas une réplique des données, ils y accèdent et les modifient par le biais des noeuds
@@ -2765,6 +2777,15 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 	  - Ces méta-données supplémentaires sont supprimées dès que les noeuds convergent
 	- Tandis que la taille du /Dotted Version Vector/ dans le cas de *MerkleDB* croît avec le nombre noeuds vus, et donc avec le /node churn/
       - Anti-entropie
+	- Avec *MerkleDB*, la taille des méta-données liées au système d'anti-entropie croît avec le nombre de clés (les feuilles de l'arbre)
+	- Avec *DottedDB*, la taille des méta-données augmente dans le cas de divergences entre noeuds mais diminue à chaque synchronisation
+	  - Une fois le système stable, seuls /NC/ (un version vector) et /WM/ (une matrice de version vectors) ne sont pas vides
+	- L'empreinte réseau semble plus faible avec *DottedDB* (de 10 à 100 KB/s) comparé avec *MerkleDB* (de 100 à 700 KB/s)
+  - Remarques
+    - Dans ce contexte d'utilisation, il n'y a pas besoin d'obtenir toutes les versions d'un objet
+    - Seule la dernière version nous intéresse
+    - Comparer leur mécanisme à /causal barrier/ n'est donc pas adapté
+      - On ne veut pas imposer une livraison causale des opérations
 - Meeting
   - Last week
     - Solved issue in /mute-core/ which resulted in the different digests for same content
@@ -2791,10 +2812,26 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 	- It blames version vector for its ever-growing size
 	- Which is a flaw of version vector addressed by causal barrier
 *** Planned
-**** IN-PROGRESS DISTRIBUTED SYSTEMS : Lire *Perspectives on the CAP Theorem*
-- Disponible ici : https://groups.csail.mit.edu/tds/papers/Gilbert/Brewer2.pdf
-**** IN-PROGRESS DISTRIBUTED SYSTEMS : Lire *DottedDB: Anti-Entropy without Merkle Trees, Deletes without Tombstones*
+**** DONE DISTRIBUTED SYSTEMS : Lire *DottedDB: Anti-Entropy without Merkle Trees, Deletes without Tombstones*
 - Disponible ici : http://haslab.uminho.pt/tome/files/dotteddb_srds.pdf
+**** DONE DISTRIBUTED SYSTEMS : Lire *Perspectives on the CAP Theorem*
+- Disponible ici : https://groups.csail.mit.edu/tds/papers/Gilbert/Brewer2.pdf
+** Semaine du <2017-10-09 Mon> au <2017-10-13 Fri>
+*** Done
+- TEACHING : Notes sur le TD1
+  - Je viens de remarquer que les exercices 3 et 4 du TD1 portent sur les notions abordées dans le cours 2
+  - Les retirer du TD1 ?
+  - Oui, il s'agit d'un oubli
+  - [X] Déplacer les exercices 3 et 4 du TD1 au TD2
+  - [X] Mettre à jour le sujet du TD1 sur Arche
+  - [X] Mettre un placeholder pour /min()/ et /max()/ dans e1.js
+  - [X] Mettre à jour le squelette HTML sur Arche
+  - [X] Déposer le sujet du TD2 sur Arche
+*** Planned
+**** TODO DISTRIBUTED SYSTEMS: Lire *Dynamo: amazon’s highly available key-value store*
+- *DottedDB* ([[dotteddb]]) est une base de données clé-valeur /Dynamo-like/
+- Lire ce papier me permettrait p-e de mieux comprendre *DottedDB*
+- Disponible ici : https://dl.acm.org/citation.cfm?id=1294281
 **** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
 - *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
   #+BEGIN_QUOTE
@@ -2804,10 +2841,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   #+END_QUOTE
 - Je ne comprends pas le lien entre /failure detector/ et /synchrony requirements for consensus/
 - Ce papier m'aidera p-e à comprendre
-**** TODO DISTRIBUTED SYSTEMS: Lire *Dynamo: amazon’s highly available key-value store*
-- *DottedDB* ([[dotteddb]]) est une base de données clé-valeur /Dynamo-like/
-- Lire ce papier me permettrait p-e de mieux comprendre *DottedDB*
-- Disponible ici : https://dl.acm.org/citation.cfm?id=1294281
+**** TODO CRDT : Lire *Replicated Data Types: Specification, Verification, Optimality*
 **** TODO CRDT : Lire *CRDT notes*
 - Disponible ici: https://github.com/pfrazee/crdt_notes
 - Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
