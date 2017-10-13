@@ -9,13 +9,13 @@
     - OAuth est un protocole d'*autorisation*
     - Il permet à un utilisateur de donner accès à certaines données/actions de son compte à un service tiers
       - Exemple avec Google +
-        - Récupérer les informations du profil
-        - Récupérer les informations des cercles d'amis de l'utilisateur
-        - Envoyer des mails au nom de l'utilisateur
+	- Récupérer les informations du profil
+	- Récupérer les informations des cercles d'amis de l'utilisateur
+	- Envoyer des mails au nom de l'utilisateur
       - Exemple avec GitHub
-        - Récupérer les informations du profil
-        - Accéder aux repos de l'utilisateur
-        - Faire des commits en son nom
+	- Récupérer les informations du profil
+	- Accéder aux repos de l'utilisateur
+	- Faire des commits en son nom
     - Il ne s'agit cependant pas d'un protocole d'*authentification*
       - On peut supposer que si Google ou GitHub nous donne accès au compte de l'utilisateur, c'est car ce dernier s'est authentifié correctement
       - Mais rien n'empêche un site ayant obtenu un code (car l'utilisateur a donné l'autorisation à ce dernier) d'utiliser ce code pour usurper l'identité de l'utilisateur sur un autre site
@@ -38,7 +38,7 @@
 - Faire un état de l'art des mécanismes d'authentification
   - Réalisation des slides
     - Disponibles ici : https://github.com/MatthieuNICOLAS/authentication-systems-2016-09-20/
-  - Ajout des nouvelles sources : 
+  - Ajout des nouvelles sources :
     - [[https://pdfs.semanticscholar.org/3733/2607f7a7ac8284c514845957fd00583e5614.pdf][Different Ways to Authenticate Users with the Pros and Cons of each Method]]
       - Bonne définition de l'*Authentification*.
       - Parle de l'authentification à facteurs multiples :
@@ -122,7 +122,7 @@
     - Instancie un *Bot* pour être pouvoir être ajouté au réseau
     - Instancie un *Coordinator* lors de son ajout au réseau
     - Écoute l'évènement /update/ du *Coordinator* pour déclencher l'opération de traduction
-    - Écoute l'évènement /operations/ du *Coordinator* pour transmettre les opérations générées localement aux pairs 
+    - Écoute l'évènement /operations/ du *Coordinator* pour transmettre les opérations générées localement aux pairs
     - Lors d'un /update/, parcourt le document pour trouver le texte à traduire
       - Le texte à traduire est délimité par les balises suivantes
         - /tl <langue source> <langue destination>
@@ -573,7 +573,7 @@ java.lang.NullPointerException
     "assigned_id": "4"
   }
 ]
-      #+END_SRC      
+      #+END_SRC
     - Autre exemple:
       - GET http://localhost:8728/bonita/API/bpm/humanTask?state=waiting
     - Réponse:
@@ -610,7 +610,7 @@ java.lang.NullPointerException
       - PUT http://localhost:8728/bonita/API/bpm/humanTask/60038
         #+BEGIN_SRC
 {
-  "assigned_id":"4" 
+  "assigned_id":"4"
 }
         #+END_SRC
     - Réponse:
@@ -821,7 +821,7 @@ java.lang.NullPointerException
   - Lors de la génération de l'*Observable*, on retrouve généralement le code suivant
     #+BEGIN_SRC
     this.observable = Observable.create((observer) => {
-      // Ajout du nouvel observer à la liste des observers lors d'un subscribe() 
+      // Ajout du nouvel observer à la liste des observers lors d'un subscribe()
       this.observers.push(observer)
     })
     #+END_SRC
@@ -848,7 +848,7 @@ java.lang.NullPointerException
 - La condition de déclenchement du message /QuerySync/ est un peu particulière
   #+BEGIN_SRC
   if storageService
-    wait(JoinEvent, IsReadyEvent) // où IsReadyEvent indique quand on a fini d'initialiser le document à partir de la version stockée dans le système de stockage 
+    wait(JoinEvent, IsReadyEvent) // où IsReadyEvent indique quand on a fini d'initialiser le document à partir de la version stockée dans le système de stockage
   else
      wait(JoinEvent)
   #+END_SRC
@@ -1178,7 +1178,7 @@ $ curl http://localhost:9980/colorspace
 </ul>
 </body>
 </html>
-        #+END_SRC       
+        #+END_SRC
     - Clips
       - Récupérer la liste des clips
         #+BEGIN_SRC
@@ -1406,7 +1406,7 @@ $ curl http://localhost:9980/shot/ea7a9721-4291-4043-b589-37e0932a806b
         </StoredIn>
         <Content kind="unordered" />
     </relations>
-</object> 
+</object>
 	#+END_SRC
       - Créer un shot
         #+BEGIN_SRC
@@ -1603,7 +1603,7 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
     (require 'package) ;; You might already have this line
     (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
     (when (< emacs-major-version 24)
-      ;; For important compatibility libraries like cl-lib 
+      ;; For important compatibility libraries like cl-lib
       (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
     (package-initialize) ;; You might already have this line
     #+END_SRC
@@ -1845,7 +1845,7 @@ this.cookieRequest.get("http://localhost:9980/film/9491a3d8-1e2e-4b54-a6d7-806de
 - Si c'est le cas, trouver l'origine de cette opération malformée
 **** DONE MUTE : Modifier la méthode /delBlock()/ pour gérer le cas où certains identifiants ont déjà été retirés du bloc
 - Il est possible que plusieurs opérations de suppression concurrentes essaient de supprimer la même partie d'un bloc
-- À l'heure actuelle, cela entraîne un /split()/ 
+- À l'heure actuelle, cela entraîne un /split()/
 **** DONE MUTE : Modifier la méthode /delBlock()/ pour ne pas effectuer de suppression dans le cas où le bloc n'existe pas
 - Comme remarqué dans [[bug-ct44]], si un bloc est introuvable lorsqu'on essaie de le supprimer, il s'avère que /delBlock()/ effectue une suppression dans un autre bloc
 - Ceci rend inconsistent le modèle
@@ -2198,7 +2198,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Ressemble de fait à OpenMP
   - Suivi d'un tutoriel pour prendre en main OpenACC
     - Mise en évidence du problème de transfert des données de la mémoire du système vers le GPU
-      - Transférer inutilement des données peut ralentir le programme au point qu'il soit moins performant que sa version séquentielle tournant sur le CPU 
+      - Transférer inutilement des données peut ralentir le programme au point qu'il soit moins performant que sa version séquentielle tournant sur le CPU
     - Étapes du tuto
       - Détection d'une zone parallélisable
       - Profiling du résultat de la parallèlisation
@@ -2269,7 +2269,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - On a remarqué que le type *any* contourne totalement le compilateur de TypeScript, notamment pour la gestion des /null/
   - Exemple :
       #+BEGIN_SRC
-      let id: Identifier 
+      let id: Identifier
       let toto: any = null
       id = toto // Le compilateur devrait indiquer que toto est p-e null
       id.compareTo(...) // Déclenche une NullPointerException
@@ -2827,8 +2827,151 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - [X] Mettre un placeholder pour /min()/ et /max()/ dans e1.js
   - [X] Mettre à jour le squelette HTML sur Arche
   - [X] Déposer le sujet du TD2 sur Arche
+- <<dynamo>> DISTRIBUTED SYSTEMS: Lire *Dynamo: amazon’s highly available key-value store*
+  - *Dynamo* est un key-value store décentralisé fortement disponible
+    - Sacrifie la consistence pour assurer cette disponibilité
+  - Laisse à l'application la possibilité de tweaker le compromis entre consistence et disponibilité
+  - Les données sont partitionnées et répliquées en utilisant /consistent hashing/
+  - Un /version vector/ est attaché à chaque version d'un objet
+  - *Dynamo* permet de répondre aux besoins suivants
+    - Système simple de requêtes
+      - Généralement besoin de récupérer ou de mettre à jour une valeur associée à une clé
+      - Pas besoin d'un système relationnel ou de pouvoir effectuer une requête sur un ensemble d'objets
+      - Pas besoin non plus d'un mécanisme de transactions
+	- Ceci nuirait à la disponibilité du système, mais offrirait une plus grande consistence
+    - Hautes performances
+      - Les services reposant sur *Dynamo* devant fournir une réponse rapide aux clients, *Dynamo* se doit d'être efficace pour ne pas nuire aux performances des applications
+      - C'est d'autant plus vrai que la réponse à la requête d'un client peut être composée des résultats de plus de 150 services
+    - Flexible
+      - Ajouter/retirer un noeud doit pouvoir être fait facilement et ne pas impacter les performances du système
+    - Symétrie
+      - Chaque noeud doit avoir le même rôle, afin de ne pas complexifier le système
+    - Compatible avec l'hétérogénité des noeuds
+      - Les noeuds peuvent disposer d'une puissance de calcul différente
+      - Il faut donc que *Dynamo* permette de répartir la charge efficacement sur les différents noeuds en fonction de leurs ressources
+    - Hypothèses
+      - /Amazon/ déployant et manageant ses instances de *Dynamo*, on considère que l'environnement est non-hostile
+  - Pour augmenter la disponibilité du système, repose sur des mécanismes de réplication optimiste
+  - Mais nécessité de résoudre les conflits à un moment donné, lors du /read/ ou du /write/
+  - Ils expliquent que le mécanisme de résolution de conflits peut faire échouer l'opération si il est executé lors du /write/, notamment dans le cas d'une partition réseau
+    - De quel mécanisme de résolution de conflits parlent-ils ?
+  - Pour ne pas perdre d'opérations d'utilisateurs, ils déplacent donc la résolution de conflits sur l'opération de /read/
+  - Nécessité aussi de déterminer qui se charge de résoudre les conflits : l'application ou le système
+    - *Dynamo* propose des mécanismes de résolution de conflits par défaut (LWW par exemple)
+    - Mais permet à l'application d'utiliser son propre mécanisme à la place
+  - API du système
+    - /get(key)/
+      - Détermine les noeuds possédant une réplique de l'objet
+      - Récupère chaque version de l'objet ainsi que leur contexte respectif
+      - Renvoie la ou les versions de l'objet ainsi que les contextes
+    - /put(key, context, object)/
+      - Détermine les noeuds auxquels ils faut fournir une réplique de l'objet
+      - Stocke la nouvelle version de l'objet ainsi que le contexte attaché dans chacun de ces noeuds
+  - Partitionnement des données
+    - Repose sur /consistent hashing/
+    - Les noeuds sont placés sur un anneau
+    - Les clés, grâce à une fonction de hash, sont mappés à une position /p/ sur cette anneau
+    - Les /N/ premiers noeuds se trouvant après la position de la clé vont se voir assigner l'objet à répliquer, /N/ étant le /replication factor/
+    - Lorsqu'un nouveau noeud est démarré
+      - Son arrivée décale le rang/classement des autres noeuds par rapport à une position donnée et donc par rapport à une clé
+      - Les noeuds qui "perdent" la responsabilité de clés et d'objets suite à ce déclassement transmettent ces données au nouveau noeud
+    - Possibilité d'utiliser des noeuds virtuels
+      - Possibilité de générer un ou plusieurs noeuds virtuels par noeud physique
+      - Permet ainsi de répartir la charge plus équitablement entre des noeuds ayant des ressources différentes
+    - Notion de /coordinator/
+      - Le noeud le plus proche de la position d'une clé est le /coordinateur/
+      - C'est lui qui se charge de répliquer l'objet sur les /N-1/ noeuds suivants
+    - Notion de /preference list/
+      - La /preference list/ répertorie les noeuds en charge de stocker un objet
+      - Chaque noeud du système peut générer/obtenir cette liste pour une clé donnée
+      - La /preference list/ contient en fait plus que /N/ noeuds, afin de résister aux pannes
+  - Versionnement
+    - Pour un même objet, plusieurs versions peuvent être stockés
+      - Exemple du panier d'un client (/v0/)
+      - Si un client met à jour son panier (/v1/) mais qu'une partition réseau empêche les noeuds de se synchroniser
+      - Il est possible que la prochaine lecture renvoie une version dépassée (/v0/)
+      - Puisqu'on souhaite ne perdre aucune modification effectuée par le client, le client doit pouvoir continuer de mettre à jour le panier (/v1'/)
+      - L'ensemble de ces versions pourront être récupérées lors d'une prochaine opération /get()/, si la partition réseau est resolue
+    - Un /vector clock/ est attaché à chaque version de l'objet (dans son contexte)
+    - En comparant les /vector clocks/, le système est capable de déterminer si des versions sont causalement dépendantes ou concurrentes
+    - Le système peut ainsi rejeter une version dépassée si elle est tout de même retournée par /get()/
+    - Pour éviter que le /vector clock/ ne croisse indéfiniement, sa taille est limitée à 10 entrées
+      - À chaque pair /node, clock/, un timestamp est associé
+      - Lorsque le /vector clock/ atteint sa taille limite, on retire l'entrée correspondante au timestamp le plus ancien
+      - Peut perdre des informations de causalité à cause de ce troncage
+      - Mais ce risque est mitigé, puisque ce sont les /coordinators/ qui sont chargés normalement de faire les mises à jour de l'objet
+      - Les entrées les plus anciennes ont donc de grandes chances de correspondre à des noeuds de back-up
+  - Mécanisme de cohérence
+    - *Dynamo* utilise un protocole similaire à ceux utilisé pour les quorums, d'après le papier
+    - Ce protocole possède deux variables
+      - /R/: Le nombre de noeuds minimum nécessaire pour effectuer une opération de lecture
+      - /W/: Le nombre de noeuds minimum nécessaire pour effectuer une opération d'écriture
+    - Si on a /R + W > N/ (où /N/ est le nombre de noeuds), on obtient un système /quorum-like/
+    - Pour des raisons de performances, généralement /R/ et /W/ sont inférieurs à /N/
+  - /Hinted Handoff/
+    - Afin de tolérer les pannes, une écriture ne se fait pas sur les /N/ premiers noeuds de la /preference list/ mais les /N/ premiers noeuds en vie (où /N/ est le /replica factor/)
+    - Si un noeud de back-up reçoit une écriture (à cause d'une panne par exemple), une méta-donnée indiquant le destinataire initial y est ajoutée
+    - Périodiquement, ce noeud va vérifier s'il peut transmettre au destinataire initial l'écriture
+  - Anti-entropie
+    - Repose sur un /Merkle Tree/
+    - Chaque noeud possède un /Merkle Tree/ contenant les objets appartenant à un /key range/, pour chaque /key range/ auquel il appartient
+    - Puisqu'on repose sur /consistent hashing/, ce nombre correspond au /replication factor/
+  - Membership
+    - Démarrer/Arrêter un noeud sont des opérations manuelles
+    - Chaque noeud a la liste des noeuds du système
+    - Lorsqu'un nouveau noeud est démarré, un noeud est chargé de mettre à jour la liste des noeuds du système
+    - Via un algorithme de /gossiping/, cette modification est transmises aux autres noeuds
+    - Les données indiquant à quelle partition de l'anneau un noeud appartient sont aussi transmises en parallèle via le même mécanisme
+  - Seed
+    - Pour éviter que des partitions logiques ne soient créées (démarrage de 2 noeuds en concurrence), des noeuds font jouer le rôle de seed
+    - Les seeds sont découverts par un moyen alternatif
+  - Détection de panne
+    - Dès qu'un noeud B ne répond plus aux messages du noeud A, A en déduit que B rencontre une panne
+    - A va ensuite recontacter B périodiquement pour vérifier s'il la panne est résolue
+  - Stratégies de partitionnement avec /consistent hashing/
+    - Pour assurer une répartition uniforme de la charge sur les différents noeuds, /Amazon/ a étudié plusieurs méthodes de partitionnement de l'anneau
+    - Stratégie 1 : /T random tokens per node and partition by token value/
+      - Stratégie naïve décrite précédemment
+      - Problème du bootstrapping
+	- Au démarrage, un noeud doit "voler" des clés aux autres noeuds
+	- Mais pendant ce temps, ces noeuds doivent toujours assurer leurs tâches
+	- Cet échange de clé doit donc se faire en tâche de fond et avec une faible priorité
+	- Ceci a conduit à des scénarios où un noeud mettait 1 journée pour démarrer
+      - Problème de la regénération du /Merkle Tree/
+	- Lors de l'arrivée ou du départ d'un noeud, les groupes de clés gérés par l'ensemble des noeuds changent
+	- Il faut donc regénérer les /Merkle Trees/ en conséquence
+	- Cette tâche peut s'avérer gourmande en ressource
+      - Problème de l'archivage
+	- Les clés étant éparpillés sur les différents noeuds de façon aléatoire, il n'y avait pas de moyen simple de faire un snapshot
+	- Le seul moyen consistait à contacter chacun des noeuds pour récupérer les clés
+      - Problème du couplage entre /data partitioning/ et /partition placement/
+	- Insérer des noeuds modifient le partitionnement de l'anneau et provoquent des transferts de données, ce qui génère de la charge supplémentaire
+    - Stratégie 2 : /T random tokens per node and equal sized partitions/
+      - Divise l'anneau en /Q/ partitions de même taille
+	- Avec /Q >> N/ où /N/ est le /replication factor/
+	- Avec /Q >> S*T/ où /S/ est le nombre de noeuds et /T/ le nombre de tokens par noeud
+      - Permet de découpler le nombre de partitions de leur placement
+      - Des partitions peuvent ne pas avoir de noeud d'assigné
+    - Stratégie 3 : /Q/S tokens per node, equal-sized partitions/
+      - Divise l'anneau en /Q/ partitions de même taille
+      - Chaque noeud se voit attribuer /Q / S/ tokens au démarrage
+	- Il peut les voler aux autres noeuds
+      - Ces tokens sont redistribués aux autres noeuds à son départ
+      - Offre les meilleures performances de /load balancing/
+      - Puisque les partitions sont connues, peut facilement conserver la liste des clés pour chacune d'entre elles
+      - Permet un bootstrapping plus performant (pas besoin de récupérer la liste des clés en contactant chaque noeud)
+      - Permet du coup de faire des snapshots du système pour archiver l'ensemble des données
+      - Par contre, plus difficile à gérer pour maintenir les bonnes propriétés
+  - Remarques / Questions
+    - Mécanisme de résolution de conflits
+      - Ils expliquent que le mécanisme de résolution de conflits peut faire échouer l'opération si il est executé lors du /write/, notamment dans le cas d'une partition réseau
+      - De quel mécanisme de résolution de conflits parlent-ils ?
+    - Ajout/Suppression de noeud
+      - Le papier explique qu'il faut ajouter un round de confirmation à la suite du transfert de clés lors de l'ajout d'un noeud pour éviter que des objets ne soient transférés en double
+      - Comment ce scénario est-il possible ?
+      - Voir si /consistent hashing/ aborde ce problème
 *** Planned
-**** TODO DISTRIBUTED SYSTEMS: Lire *Dynamo: amazon’s highly available key-value store*
+**** DONE DISTRIBUTED SYSTEMS: Lire *Dynamo: amazon’s highly available key-value store*
 - *DottedDB* ([[dotteddb]]) est une base de données clé-valeur /Dynamo-like/
 - Lire ce papier me permettrait p-e de mieux comprendre *DottedDB*
 - Disponible ici : https://dl.acm.org/citation.cfm?id=1294281
@@ -2916,7 +3059,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - L'exercice Polygon360 ne peut pas être résolu actuellement
 - Lorsqu'on soumet le code de la correction, on n'arrive pas à atteindre le monde objectif
   #+BEGIN_SRC
-  Le monde 'Polygon360' diffère: x1 diffère. (trouvé Line (x263.445 y135.028 / x264.177 y149.000 / black) au lieu de Line (x263.968 y154.996 / x264.177 y149.000 / black) ) 
+  Le monde 'Polygon360' diffère: x1 diffère. (trouvé Line (x263.445 y135.028 / x264.177 y149.000 / black) au lieu de Line (x263.968 y154.996 / x264.177 y149.000 / black) )
   #+END_SRC
 - L'erreur a été reportée ici : https://github.com/BuggleInc/webPLM/issues/130
 **** TODO PLM : Trouver l'origine du crash de webPLM du <2016-10-12 mer.>
@@ -3006,6 +3149,6 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     #+END_QUOTE
   - Unreliable
     #+BEGIN_QUOTE
-    There are many different ways in which a system can be unreliable. There may be partitions, 
+    There are many different ways in which a system can be unreliable. There may be partitions,
     crash failures, message loss, malicious attacks (or Byzantine failures), etc. -- Perspectives on the CAP Theorem
     #+END_QUOTE
