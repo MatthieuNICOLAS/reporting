@@ -2963,6 +2963,22 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Permet du coup de faire des snapshots du système pour archiver l'ensemble des données
       - Par contre, plus difficile à gérer pour maintenir les bonnes propriétés
   - Remarques / Questions
+    - Méta-données
+      - /vector clock/
+	- *Dynamo* ajoute un /vector clock/ est attaché à chaque version d'un objet
+	- À chaque entrée du /vector clock/, un timestamp est aussi associé
+	- Sa taille est limitée à 10
+	  - Dès qu'elle dépasse 10, l'entrée la plus ancienne est retirée
+      - /Merkle Trees/
+	- *Dynamo* doit conserver un /Merkle Tree/ pour chaque /key range/ auquel il appartient
+	- Ce nombre correspond au /replication factor/
+	- La taille de chaque /Merkle Tree/ dépend directement du nombre d'objets stockés dans le système
+      - Membership
+	- Chaque noeud doit conserver la liste des noeuds du système
+	- Il doit aussi pouvoir récupérer la /preference list/ pour chaque clé
+    - /Garbage collection/
+      - Ne mentionne pas de mécanisme de /garbage collection/
+      - Mais qu'y aurait-il à supprimer ?
     - Mécanisme de résolution de conflits
       - Ils expliquent que le mécanisme de résolution de conflits peut faire échouer l'opération si il est executé lors du /write/, notamment dans le cas d'une partition réseau
       - De quel mécanisme de résolution de conflits parlent-ils ?
@@ -2975,6 +2991,9 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - *DottedDB* ([[dotteddb]]) est une base de données clé-valeur /Dynamo-like/
 - Lire ce papier me permettrait p-e de mieux comprendre *DottedDB*
 - Disponible ici : https://dl.acm.org/citation.cfm?id=1294281
+** Semaine du <2017-10-16 Mon> au <2017-10-20 Fri>
+*** Done
+*** Planned
 **** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
 - *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
   #+BEGIN_QUOTE
