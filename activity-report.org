@@ -2986,6 +2986,10 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Le papier explique qu'il faut ajouter un round de confirmation à la suite du transfert de clés lors de l'ajout d'un noeud pour éviter que des objets ne soient transférés en double
       - Comment ce scénario est-il possible ?
       - Voir si /consistent hashing/ aborde ce problème
+    - Tombstones
+      - Il n'y a aucune mention de tombstones dans le papier
+      - D'un autre côté, il n'y a pas d'opération /delete()/
+      - Pour supprimer un objet, est-ce qu'ils ne génèrent pas une nouvelle version vide de l'objet avec /put()/ ?
 *** Planned
 **** DONE DISTRIBUTED SYSTEMS: Lire *Dynamo: amazon’s highly available key-value store*
 - *DottedDB* ([[dotteddb]]) est une base de données clé-valeur /Dynamo-like/
@@ -2993,7 +2997,123 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - Disponible ici : https://dl.acm.org/citation.cfm?id=1294281
 ** Semaine du <2017-10-16 Mon> au <2017-10-20 Fri>
 *** Done
+- <<dotted-version-vector>> DISTRIBUTED SYSTEMS : Lire *Scalable and Accurate Causality Tracking for Eventually Consistent Stores*
+  - Propose une nouvelle /logical clock/ : /Dotted Version Vectors/
+  - Modèle du système
+    - /dynamo-like key-value store/
+    - API du système
+      - /get(key)/
+	- Renvoie un tuple /(version(s), context)/
+      - /put(key, value, context)/
+	- Le /context/ doit contenir suffisamment d'informations pour pouvoir établir la relation /happen-before/ entre 2 opérations
+    - Système distribué où les noeuds communiquent par le biais de messages asynchrones
+    - Nb clients >> Nb noeuds
+    - Nb noeuds >> /replication factor/
+    - Pas d'affinités entre clients et noeuds
+      - Les requêtes successives d'un client peuvent s'exécuter sur des noeuds différents
+    - Pas de /byzantine failures/
+      - Les noeuds peuvent rencontrer une panne mais arriveront par la suite à se rétablir dans un état consistent
+  - *Les structures de données présentées correspondent qu'à une seule clé du /key-value store/*
+    - Il faut en construire et maintenir une *pour chaque objet* du système
+  - Problèmes adressés
+    - Besoin d'attacher une horloge logique aux écritures pour détecter la causalité et la concurrence des différentes opérations
+    - Les mécanismes d'horloges logiques existants ne scalent pas
+      - Par exemple, dans /version vectors/, on stocke une entrée par replicas
+      - La taille du vecteur croît donc de façon linéaire avec le nombre de replicas
+    - Pour pallier à ce problème, certains systèmes choisissent de retirer au cours du temps des informations de l'horloge afin de conserver une taille constante
+      - Voir [[dynamo]]
+  - /Dotted Version Vectors/
+    - Notée /dvv/
+    - /dvv = ((i, n), v)/ où
+      - /i/ représente l'identifiant du replica
+      - /n/ représente la valeur du compteur du replica /i/
+      - /v/ représente le /version vector/ correspondant au contexte causal de l'opération
+	- Pour /dvv = ((i, n), v)/, /v[i] = n - 1/
+    - Indique ainsi l'entrée du /version vector/ qui a été mise à jour
+    - Permet de conserver les informations de causalité nécessaires pour comparer 2 versions et déterminer si elles sont concurrentes ou si une l'emporte sur l'autre
+    - Permet de comparer deux horloges en temps constant (au lieu d'en temps linéaire pour les /version vectors/)
+      - /((i, n), u) < ((j, m), v)/ si /n <= v[i]/)
+      - si /!(dvv < dvv') && !(dvv' < dvv)/, les deux évènements sont concurrents
+  - Cependant, dans les applications, on va se retrouver à conserver et à traiter plusieurs versions concurrentes d'un même objet
+  - Chacune de ces versions concurrentes va conserver un /dvv/
+    - /{ (dvv1, vers1), (dvv2, vers2), ... }/
+  - Pour éviter de dupliquer inutilement des informations, ils proposent une structure adaptée pour gérer ce cas de figure : /Dotted Version Vectors Set/
+    - Notée /dvvs/
+    - /dvvs = { (i, n, [vers1, vers2]), (j, m, [vers3]), ... }/
+    - Permet de factoriser les dots des opérations concurrentes effectuées sur le même noeud
+    - La position de la /vers/ dans la liste permet de déterminer son /dot/
+      - Dans l'exemple précédent, on a :
+	- le /dot/ de /vers1/ est /(i, n)/
+	- le /dot/ de /vers2/ est /(i, n-1)/
+	- le /dot/ de /vers3/ est /(j, m)/
+  - Propose un framework pour traiter les opérations /get()/ et /put()/ en se basant sur les horloges logiques
+    - Ce framework propose 4 opérations
+      - /sync()/ :
+	- Prend en paramètres deux sets de clocks
+	- Renvoie un nouveau set composé uniquement des clocks n'étant pas obsolètes
+      - /join()/ :
+	- Prend en paramètre un set de clocks
+	- Renvoie une nouvelle clock correspondant au contexte commun de toutes les clocks du set initial
+      - /discard()/ :
+	- Prend en paramètre un set de clocks /S/ et une clock /C/
+	- Supprime de /S/ toutes les clocks qui sont couvertes par /C/
+      - /event()/ :
+	- Prend en paramètre un set de clocks /S/, une clock /C/ et un identifiant de noeud /r/
+	- Renvoie une nouvelle clock (ne rentrant pas en conflit avec S), l'emportant sur C, représentant la nouvelle version
+    - Traitement de /get(key)/
+      - Récupère les différentes versions de l'objet auprès des replicas
+      - Les fusionne au besoin en appliquant /sync()/ 2 à 2
+      - Ne conserve que leur contexte causal commun avec /join()/
+      - Renvoie un tuple /(version(s), context)/
+    - Traitement de /put(key, value, context)/
+      - Le noeud traitant la requête /put()/ effectue les opérations suivantes
+	- Il supprime ses versions de l'objet rendues obsolètes par le nouveau contexte
+	- Génère une nouvelle clock /c/ grâce à /event()/
+	- Ajout de l'entrée /(c, value)/ dans le set des versions courantes de l'objet
+      - Il obtient en résultat de ce traitement un nouveau set /S/ des versions courantes de l'objet
+      - Il transfère alors /S/ aux autres réplicas
+      - Ces derniers utilisent alors /sync()/ pour mettre à jour leur(s) version(s) de l'objet
+  - Évaluation
+    - Ils ont comparé /Dotted Version Vectors/ et /Dotted Version Vectors Set/ avec d'autres mécanismes (/LWW/, /VV/)
+      #+CAPTION: Évaluation de Dotted Version Vectors
+      #+NAME:   fig:dotted-vv-evaluation
+      [[file:img/dotted-vv-evaluation-org.png]]
+    - Intéressant de noter que la complexité de /dvv/ et de /dvvs/ croît linéairement avec le nombre de réplicas /R/ et le nombre de versions concurrentes /V/
+    - Alors que /vv/ croît de façon linéaire avec le nombre de clients /C/ et de façon quadratique avec le nombre de versions concurrentes /V/
+- Réunion mécanismes de gestion de clés de groupe
+  - n-party DH
+    - Dispose en anneau les noeuds
+    - Les noeuds conviennent d'un générateur /g/
+    - Les noeuds disposent d'un secret
+    - 1er round
+      - Les noeuds mettent successivement à l'exponentielle le générateur
+	- Le noeud A va calculer /g^a/ puis va transmettre la valeur au noeud B qui va calculer /g^ab/
+      - Lorsque le dernier noeud E reçoit la valeur intermédiaire, on passe au round 2
+    - 2nd round
+      - Le noeud E broadcast la valeur /g^abcd/
+      - Chaque noeud va retirer son exponentielle de la valeur et la retourner à E
+	- Le noeud A va renvoyer /g^bcd/ par exemple
+    - 3ème round
+      - Le noeud E va mettre à l'exponentielle toutes les valeurs reçues dans le round précédent et renvoyer la valeur au noeud correspondant
+	- Il va calculer /g^bcde/ et envoyer cette valeur au noeud A
+      - Le noeud A peut alors remettre à l'exponentielle cette valeur avec son secret pour obtenir la clé de groupe
+  - Version centralisée
+    - Génère une clé de groupe via une fonction /f(K1, K2)/
+    - /K1/ n'est connue que des membres du groupe
+    - Ajoute un serveur tiers qui a pour responsabilité de générer /K2/
+    - Les membres de groupe ont la possibilité de récupérer /K2/ en effectuant une requête à ce serveur
+    - Le serveur peut récupérer les clés
+    - Lors d'un changement du groupe, /K2/ doit être modifiée pour assurer la confidentialité des prochains messages
+    - Le serveur ne doit jamais avoir accès à /K1/ pour pas qu'il ne puisse obtenir la clé de groupe
+    - Nécessaire de mettre en place un mécanisme de /membership/
+      - Pour que le serveur puisse s'assurer qu'un utilisateur ait le droit de récupérer /K2/
+      - Par exemple, un utilisateur peut obtenir /K1/ en étant invité à une collaboration sur un document
+      - Si il est exclus par la suite, il ne doit plus pouvoir générer la clé de groupe
+      - Il doit donc ne plus avoir accès aux valeurs de /K2/ pour ce document
 *** Planned
+**** DONE DISTRIBUTED) SYSTEMS : Lire *Scalable and Accurate Causality Tracking for Eventually Consistent Stores*
+- Ce papier propose une nouvelle /logical clock/, /Dotted Version Vectors/, permettant de capturer la causalité des opérations dans un système distribué
+- Cette clock serait plus scalable que les solutions existantes telles que les /version vectors/ sans sacrifier les informations de causalité
 **** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
 - *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
   #+BEGIN_QUOTE
