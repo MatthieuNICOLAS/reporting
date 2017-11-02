@@ -3110,10 +3110,215 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Par exemple, un utilisateur peut obtenir /K1/ en étant invité à une collaboration sur un document
       - Si il est exclus par la suite, il ne doit plus pouvoir générer la clé de groupe
       - Il doit donc ne plus avoir accès aux valeurs de /K2/ pour ce document
+- Meeting
+  - Read *Scalable and Accurate Causality Tracking for Eventually Consistent Stores* (DAIS, 2014)
+    - Introduce /Dotted Version Vector (dvv)/
+      - Logical clock to track causality of the versions of an object
+      - Achieve better scaling than /Version Vectors/ without sacrifying causality
+    - Introduce /Dotted Version Vector Set (dvvs)/, an optimized data structure to manage several concurrent versions of an object
+      - Since applications usually have to keep several concurrent versions
+    - Propose a framework to serve /get/ and /put/ requests in /Dynamo-like key-value stores/
+      - Composed of several kernel operations relying on a logical clock
+      - Implement these operations for /dvv/ and /dvvs/
 *** Planned
-**** DONE DISTRIBUTED) SYSTEMS : Lire *Scalable and Accurate Causality Tracking for Eventually Consistent Stores*
+**** DONE DISTRIBUTED SYSTEMS : Lire *Scalable and Accurate Causality Tracking for Eventually Consistent Stores*
 - Ce papier propose une nouvelle /logical clock/, /Dotted Version Vectors/, permettant de capturer la causalité des opérations dans un système distribué
 - Cette clock serait plus scalable que les solutions existantes telles que les /version vectors/ sans sacrifier les informations de causalité
+** Semaine du <2017-10-23 Mon> au <2017-10-27 Fri>
+*** Done
+- TEACHING : TD3
+  - [X] Préparer le TD3
+    - [X] Mettre à jour la correction pour ES6
+    - [X] Utiliser des noms plus explicites pour les classes
+    - [X] Faire un squelette pour les étudiants
+    - [X] Voir si certaines consignes d'exercices doivent être retravaillées
+      - Ajout d'un exercice pour commencer à ajouter des handlers avant de manipuler les classes
+      - Ajout de /rappels/ pour leur donner des indices
+  - [X] Voir si certaines slides ont besoin d'être retravaillées
+    - Modification de l'ordre des slides sur la sélection d'élements dans le *DOM*
+      - Déjà avec /getElementById(), .../, ensuite avec /querySelector()/
+    - Ajout d'une slide dédiée aux /CSS Selectors/
+    - Découpage de la slide sur le parcours du *DOM* en plusieurs
+  - [X] Déposer les ressources sur Arche (Cours, TD, Squelette)
+- <<interval-tree-clock>> DISTRIBUTED SYSTEMS : Lire *Interval Tree Clocks: A Logical Clock for Dynamic Systems*
+  - Propose une nouvelle /logical clock/ : /Interval Tree Clock/
+  - Problèmes adressés
+    - Dans les systèmes distribués dynamiques, le groupe de participant n'est pas fixe
+    - Au fur et à mesure, de nouveaux participants vont rejoindre le groupe tandis que d'autres vont le quitter
+    - Les mécanismes de causalité existants gèrent mal ce /churn/
+      - /Version Vector/ va conserver ad vitam æternam une entrée pour chaque noeud
+      - Certains systèmes comme [[Dynamo]] tronquent les /version vectors/ pour conserver une taille fixe
+      - Mais ceci entraîne une perte d'informations de causalité qui peut ainsi conduire à la répétition d'une ancienne opération
+      - Des travaux ont tenté de répondre au problème de la suppression des noeuds inactifs, sans succès
+	- Certains mécanismes utilisent un /agreement/ au niveau du groupe pour déterminer si l'on peut supprimer une entrée de l'horloge
+	- Mais il ne suffit alors que d'un seul noeud défaillant pour qu'on ne puisse plus supprimer d'entrées
+  - /Fork-Event-Join Model/
+    - Représente les mécanismes de causalité à l'aide des opérations /fork/, /event/ et /join/ qui s'appliquent sur des /stamps (logical clocks)/
+    - /logical clock/
+      - De la forme /(i, e)/ où
+	- /i/ représente l'identifiant de l'utilisateur et de son horloge logique
+	- /e/ représente les informations de causalités connues
+      - Pour comparer 2 horloges logiques, on compare leurs informations de causalité
+	- Un ordre partiel doit être établi pour comparer 2 contexte causal : /(E, ≤)/
+    - /fork/
+      - Permet de générer une nouvelle /clock/ à partir d'une autre
+      - /fork(i, e) = ((i1, e), (i2, e))/ avec /i1 ≠ i2/
+	- Généralement /i1 = i/
+	- /i2/ est une nouvelle identité
+    - /peek/
+      - Cas particulier de /fork/
+      - Permet de créer un snapshot d'une clock
+      - Génère une clock anonyme immutable
+      - /peek(i, e) = ((i, e)(0, e))/ où /0/ est une identité "null"
+      - Permet d'attacher cette clock à des messages ou faire des snapshots pour débugger
+    - /event/
+      - Permet de faire avancer une clock en faisant évoluer son contexte causal /e/
+      - /event(i, e) = (i, e')/ avec /e < e'/
+      - Le nouveau contexte causal /e/ ne doit ni dominé ni être dominé par des contextes concurrents
+	- si /e1 ≰ e2/ alors /e1' ≰ e2/
+	- si /e2 ≰ e1/ alors /e2 ≰ e1'/ avec /e1' ≠ e2/
+    - /join/
+      - Fusionne deux clocks en une nouvelle
+      - /join((i1, e1), (i2, e2)) = (i3, e3)/ avec
+	- /e1 ≤ e3/ et /e2 ≤ e3/
+	- /e3/ ne doit ni dominé ni être dominé par des contextes concurrents
+      - L'identité obtenue doit être fonction des identités fournies et doit de nouveau être unique
+	- /i3 = f(i1, i2)/
+	- Généralement, on se contente de réutiliser une des identités fournies en paramètre
+	  - /f(i1, i2) = i1/ par exemple
+	- Mais on peut utiliser une fonction plus complexe, notamment si on souhaite pouvoir recycler les identifiants
+      - Cas particuliers
+	- /join((i1, e1), (0, e2)) = (i1, e3)/ représente la réception d'un message
+	- /join((0, e1), (0, e2)) = (0, e3)/ représente l'aggrégation de messages
+    - Les opérations classiques des systèmes peuvent ainsi être composées à partir de ces opérations élémentaires
+    - /send/
+      - Se décompose en un /event/ suivi d'un /fork/
+      - /send(i, e) = ((i, e'), (0, e'))/
+    - /receive/
+      - Se décompose en un /join/ suivi d'un /event/
+      - /receive((i, e1), (0, e2)) = (i, e3')/
+	- /event(join((i, e1), (0, e2))) = event(i, e3)/
+    - /sync/
+      - Se décompose en un /join/ suivi d'un /fork/
+      - /sync((i1, e1), (i2, e2)) = ((i1, e3), (i2, e3))/
+	- /sync((i1, e1), (i2, e2)) = fork(join((i1, e1), (i2, e2)) = fork(f(i1, i2), e3) = ((i1, e3), (i2, e3))/
+  - /Function space based Clock Mechanisms/
+    - On dispose d'une fonction O tel que /O(x) = 0/
+    - L'idée est d'utiliser une fonction charactéristique /i/ comme identité
+      - /i(x) = 1 ∀x ∈ A, A ⊂ dom(f)/
+      - /i(x) = 0 sinon/
+    - L'identité permet de déterminer l'ensemble des entrées du contexte causal que l'on peut incrémenter lors d'un évènement
+      - Les entrées d'un /vector clock/ par exemple
+    - La fonction servant d'identité doit donc satisfaire plusieurs contraintes
+      - /∀i1 ≠ i2, i1 * i2 = O/
+      - Concrètement, aucun autre utilisateur ne doit pouvoir modifier la même entrée que moi dans le contexte causal
+    - On peut ainsi redéfinir les opérations élémentaires avec cette nouvelle fonction servant d'identité
+    - /join/
+      - /join((i1, e1), (i2, e2)) = (i1 + i2, e1 ∪ e2)/
+      - Fusionner 2 clocks permet d'obtenir une nouvelle identité correspondant à la composition de /i1/ et /i2/
+      - Au cours d'un prochain /event/, on pourra donc incrémenter une ou plusieurs entrées du contexte couvertes par /i1/ et /i2/
+    - /fork/
+      - /fork(i, e) = ((i1, e), (i2, e))/ avec
+	- /i = i1 + i2/
+	- /i1 * i2 = O/
+      - On répartit la responsabilité des éléments du contexte entre les nouvelles identités
+      - On s'assure qu'aucun élément du contexte ne peut être modifié par chaque nouvelle identité
+    - /peek/
+      - /peek((i, e)) = ((O, e), (i, e))/
+      - Comme /O/ renvoie 0 pour n'importe quelle valeur, la clock /(O, e)/ ne peut donc pas produire d'évènements
+    - /event/
+      - /event((i, e)) = (i, e + f * i)/
+	- Avec /f/ une fonction telle que /f * i ⊃ O/
+	- C'est à dire que /range(f * i) = {0, 1}/
+	  - /f ⊃ g/ signifie que /range(f) ⊃ range(g)/
+  - /Interval Tree Clocks/
+    - Représente /id/ à l'aide d'un arbre
+      - /(1, (0, 1)/ est un exemple d'identité valide
+    - Représente /e/ à l'aide un arbre binaire valué
+      - /(0, (0, 0, 0), 1) est un exemple de contexte valide
+    - Dispose d'une fonction /norm/ permettant de simplifier les arbres binaires
+      - Essaie de remonter les valeurs des feuilles dans les noeuds supérieurs pour pouvoir à terme représenter l'arbre à l'aide d'un entier
+      - Exemples
+	- /norm((2, 1, 1)) = 3/
+	- /norm((2, (2, 1, 0), 3)) = (4, (0, 1, 0), 1)/
+    - Essaie au maximum de limiter la taille des arbres
+      - Lors d'un /event/, en fonction de l'identité de l'utilisateur
+	- Essaie de combler les "trous" de l'arbre de façon à pouvoir le normaliser
+	- Ou alors incrémente un des noeuds les plus proches possibles de la racine
+      - Lors d'un /join/, normalise l'arbre
+  - Remarques
+    - Faiblesses du système d'identités
+      - Le mécanisme d'identité repose sur un espace qui va être au fur et à mesure divisé et partagé entre les participants
+      - Il est nécessaire qu'un utilisateur divise l'espace qui lui est alloué pour qu'un autre utilisateur puisse obtenir une identité
+      - Concrètement, plusieurs façons de fournir l'identité au nouveau participant
+	- Un utilisateur doit être présent au moment où le nouveau participant se connecte pour lui donner une identité
+	  - Problème de disponibilité, un utilisateur doit toujours être présent
+	- L'identité est fournie dans le lien de l'invitation
+	  - Problème d'usabilité, chaque utilisateur doit être invité via un lien unique
+      - Nécessaire de répartir la responsabilité d'attribuer une identité
+	- À chaque attribution d'identité à un nouvel utilisateur, un ancien utilisateur disponible divise en 2 son espace d'identifiants et en donne la moitié au nouvel arrivant
+	- En fonction de l'espace utilisé pour les identifiants, on peut rapidement arriver à un point où un utilisateur n'a plus la possibilité de diviser son identité
+	- Si un utilisateur devient indisponible, il scelle tout un espace d'identifiants et réduit le nombre de participants possibles
+	- C'est d'autant plus vrai si l'utilisateur fait partie des premiers participants
+    - Pour normaliser l'arbre des évènements et ramener sa représentation à un entier
+      - Il est nécessaire que chaque utilisateur effectue le même nombre d'opérations depuis le dernier /fork/
+      - Plus le nombre d'utilisateurs est conséquent, plus cela semble difficilement atteignable
+    - Différences entre /vector clocks/ et /version vectors/
+      - /vector clock/ identifie un évènement
+      - /version vector/ identifie l'état sur lequel s'est appliqué l'évènement
+    - Du mal à voir à quoi on pourrait transposer ce mécanisme de récupération des identifiants et ce que ça apporterait
+    - Dans *LogootSplit*, récupérer des identifiants nous permettrait de pouvoir réutiliser blocs existants
+      - Plutôt que de générer de nouveaux blocs lors d'insertions, on pourrait effectuer des appends/prepends
+      - Le gain semble alors plutôt faible comparé au coût nécessaire pour mettre en place la solution
+	- L'utilisation et la gestion d'un arbre binaire pour représenter l'identité des utilisateurs
+      - Si on arrive à mettre en place un mécanisme de fusion des blocs basé sur l'ownership, ça pourrait devenir intéressant
+    - À voir si d'autres CRDTs profiteraient davantage de ce mécanisme
+- Meeting
+  - Read *Interval Tree Clocks: A Logical Clock for Dynamic System*
+    - Present a new logical clock : /Interval Tree Clock/
+    - Adress several issues of logical clocks
+      - No need for a global id
+      - Can retire id and reuse them
+      - Size of the data structure grows and shrinks according to the numbers of users
+    - Use binary trees as identity and the actual clock
+      - Increase the depth of the identity tree when adding a user
+      - Decrease it when a user leave
+      - Each user can only update a precise part of the clock tree according to its identity
+    - Some questions left
+      - On which conditions does the clock shrink ?
+      - Can we determine the numbers of events separating two clocks ?
+	- Would be useful to compare my clock to the one attached to a message
+	- If yes, could be use as it is in operation-based systems
+	- Otherwise, would have to store the last seen ITC of each user and replay the inflation to ensure FIFO delivery
+	- Anyway can use it in state-based systems
+*** Planned
+**** DONE DISTRIBUTED SYSTEMS : Lire *Interval Tree Clocks: A Logical Clock for Dynamic Systems*
+- Disponible ici : http://gsd.di.uminho.pt/members/cbm/ps/itc2008.pdf
+** Semaine du <2017-11-02 Thu> au <2017-11-03 Fri>
+*** Done
+- MUTE : Préparer la démo pour la réunion avec Marius Shekow
+  - Répétition du scénario pour ECSCW 2017
+    - Des utilisateurs répartis sur 2 réseaux collaborent sur un document
+    - Une partition se produit, coupant le groupe en 2 sous-groupes
+    - Ils continuent à collaborer en local
+    - Puis la partition se résout
+    - L'ensemble des modifications est partagé entre les sous-groupes
+    - Tout le monde converge
+  - Fonctionne toujours
+*** Planned
+**** DONE MUTE : Préparer la démo pour la réunion avec Marius Shekow
+- Dans le cadre de la rencontre avec Marius Shekow, nous allons présenter les travaux de l'équipe
+- Une de ces présentations va consister en une démo de MUTE
+- Vérifier que le scénario de la démo de ECSCW 2017 fonctionne toujours
+**** TODO ADMINISTRATIF : Remplir le formulaire *Charges d’enseignement pour Doctorant contractuel*
+**** TODO CONSENSUS : Lire *The part-time parliament*
+- *Spanner* a l'air de reposer fortement sur des /Paxos state machines/
+- Lire le papier sur *Paxos* permettrait p-e de faciliter la compréhension de *Spanner*
+- Disponible ici : https://dl.acm.org/citation.cfm?id=279229
+**** TODO DISTRIBUTED SYSTEMS : Lire *Spanner: Google’s Globally Distributed Database*
+- Disponible ici : https://dl.acm.org/citation.cfm?id=2491245
+**** TODO DISTRIBUTED SYSTEMS : Lire *Beyond TrueTime:  Using AugmentedTime for Improving Spanner*
+- Disponible ici : https://www.cse.buffalo.edu//~demirbas/publications/augmentedTime.pdf
 **** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
 - *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
   #+BEGIN_QUOTE
