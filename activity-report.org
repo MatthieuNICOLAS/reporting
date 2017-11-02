@@ -3310,6 +3310,14 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - Dans le cadre de la rencontre avec Marius Shekow, nous allons présenter les travaux de l'équipe
 - Une de ces présentations va consister en une démo de MUTE
 - Vérifier que le scénario de la démo de ECSCW 2017 fonctionne toujours
+**** TODO PHD DAY : Rédiger un abstract sur le sujet de thèse
+     SCHEDULED: <2017-11-15 Wed>
+- Doit fournir le sujet de thèse et un abstract (environ 200 mots) pour le PhD Day
+  - Emphasize on what is your research problem, who else are working on the same/similar problem, what is your specific approach, and what is/are your expected results
+**** TODO PHD DAY : Préparer une présentation sur le sujet de thèse
+     SCHEDULED: <2017-12-07 Thu>
+- Dans le cadre du PhD Day, je dois effectuer une présentation de 5min
+  - Emphasize on what is your research problem, who else are working on the same/similar problem, what is your specific approach, and what is/are your expected results
 **** TODO ADMINISTRATIF : Remplir le formulaire *Charges d’enseignement pour Doctorant contractuel*
 **** TODO CONSENSUS : Lire *The part-time parliament*
 - *Spanner* a l'air de reposer fortement sur des /Paxos state machines/
