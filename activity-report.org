@@ -3305,11 +3305,106 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - L'ensemble des modifications est partagé entre les sous-groupes
     - Tout le monde converge
   - Fonctionne toujours
+- CONSENSUS : Lire *The part-time parliament*
+  - J'ai commencé à lire le papier
+  - Il s'avère plutôt compliqué
+  - Guillaume m'a suggéré de chercher des articles traitant de Paxos plutôt que d'essayer de décortiquer le papier
+  - Ça me paraît être une bonne idée
+- <<2pc>> CONSENSUS : Two-phase commit (2PC)
+  - En parcourant des articles sur [[paxos]], je suis tombé sur des articles traitant de 2PC
+    - 2PC s'avère être un cas particulier de Paxos
+  - Autant prendre notes sur le sujet tant que j'y suis
+  - Problème adressé
+    - Problème du consensus
+      - Faire en sorte qu'un ensemble de noeuds d'un système distribué s'accordent sur une valeur, une action ou autre
+    - Possibles utilisations
+      - Décider de valider ou d'abandonner une transaction dans une base de données distribuée
+      - Élire un leader
+      - Avancer à la prochaine étape d'un algorithme distribué (/replicated state machine/ approach)
+    - Mais le consensus est connu comme étant impossible à obtenir dans le cas d'un système avec réseau asynchrone si les noeuds peuvent tomber en panne
+      - Voir FLP theorem
+  - Formalisation
+    - Safety properties
+      - Agreement : Chaque noeud du système choisit la même valeur
+      - Validity : La valeur choisie a été proposée par un des noeuds
+    - Liveness property
+      - Termination : Chaque noeud prend finalement une décision
+  - Protocole
+    - Un noeud a le rôle de coordinateur
+      - C'est lui qui va s'assurer du bon déroulement du protocole
+      - Le noeud coordinateur n'a pas besoin d'être élu, n'importe quel noeud peut spontanément démarrer un 2PC
+    - Les autres noeuds jouent le rôle de participants
+    - Le protocole décompose en 2 étapes
+    - 1. Proposition
+      - Le coordinateur propose une valeur à l'ensemble des participants
+      - Les participants renvoie au coordinateur leur réponse
+	- Un simple booléen pour indiquer si oui ou non le noeud accepte cette valeur
+    - 2. Validation ou abandon
+      - Si le coordinateur reçoit une réponse favorable de la part de chaque participant
+	- Il indique à l'ensemble des participants que la valeur a été choisie
+      - Sinon abandonne le 2PC
+  - Limites
+    - Comme dit précédemment, le consensus n'est pas possible si un des noeuds peut tomber en panne
+    - Ce résultat s'applique ici aussi
+    - On rencontre plusieurs problèmes, principalement de terminaison, en fonction du rôle du noeud qui tombe en panne et du moment de la panne
+    - Le coordinateur tombe en panne au cours de la phase 1, alors qu'il envoyait les propositions
+      - Seulement un sous-ensemble des participants reçoivent la proposition et votent
+      - Ces derniers se retrouveront alors bloqués, attendant le résultat du vote
+      - Ils ne peuvent pas timeout de façon sûre puisqu'il existe (pour eux) la possibilité que le coordinateur se réveille et passe à l'étape de validation
+    - On retrouve le même problème dans le cas d'une panne du coordinateur durant la phase 2
+    - Pour contourner problème, on peut ajouter un 3ème type de noeud jouant le rôle fallback en cas de panne du coordinateur
+      - Reprend la gestion de la transaction dans le cas d'une panne du coordinateur
+      - Recontacte chaque noeud pour récupérer de nouveau son vote effectué lors de la phase 1
+	- Nécessité pour les noeuds de conserver une trace de leurs votes
+      - Cependant, si un participant vient à crasher à ce moment, on ne peut plus résoudre le consensus
+	- Peut pas annuler car p-e que le participant a lui validé
+	- Peut pas valider car p-e que le participant a lui refusé lors de la phase 1
+  - Ressources
+    - http://the-paper-trail.org/blog/consensus-protocols-two-phase-commit/
+- <<3pc>> CONSENSUS : Three-phase commit (3PC)
+  - Il s'agit d'une évolution de [[2pc]]
+  - Vise à fournir un protocole plus résistant aux défaillances pour obtenir le consensus
+  - Ajoute pour cela une phase intermédiaire à 2PC
+  - Protocole
+    - 1. Proposition
+      - Même étape que dans 2PC
+    - 2. Préparation à validation
+      - Le coordinateur envoie ce message à tous les participants s'ils ont voté unanimement "oui"
+      - Permet d'informer les participants du vote de son résultat
+      - Permet aux participants de verrouiller la transaction, mais sans modifier de façon irréversible leur état
+      - Les participants notifient ensuite le coordinateur qu'ils sont prêts à valider la transaction
+      - Ainsi, si n'importe quel noeud rencontre une panne, l'état du protocole sera toujours disponible via un des noeuds
+    - 3. Validation ou abandon
+      - Même étape que dans 2PC
+  - Lors de la récupération d'un crash
+    - Si tous les noeuds disponibles indiquent avoir reçu le message 2 alors on peut poursuivre et valider la transaction
+    - Sinon, on peut annuler la transaction de façon sûre puisque le coordinateur ne serait pas passé à l'étape 3
+  - Limites
+    - Une panne du coordinateur + une partition des participants peuvent provoquer une divergence
+      - Si l'ensemble des noeuds d'une partition ont passé l'étape 2, alors le mécanisme de recovery va poursuivre et valider la transaction
+      - Alors qu'il suffit qu'un seul noeud du second sous-groupe n'ait pas reçu le message de l'étape 2 pour que le mécanisme de recovery décide d'annuler la transaction
+      - La fusion des sous-groupes lors de la résolution de la partition entraînera donc l'apparition d'une divergence entre les participants
+    - Une divergence est possible dans un autre scénario où le coordinateur récupère d'une panne et interfère avec le coordinateur de fallback
+      - Si le coordinateur plante après avant d'avoir reçu toutes les réponses au message "prepare-to-commit"
+      - Le coordinateur de fallback va prendre la main, récupérer l'état de la transaction et la poursuivre jusqu'à sa validation
+      - Cependant, si le coordinateur initial recouvre de sa panne, il va annuler la transaction (n'ayant pas reçu les réponses au "prepare-to-commit")
+      - Les participants vont donc valider ou annuler la transaction en fonction du message qu'ils reçoivent en 1er
+  - Ressources
+    - http://the-paper-trail.org/blog/consensus-protocols-three-phase-commit/
+- <<paxos>> CONSENSUS : Paxos
+  - Ressources
+    - http://the-paper-trail.org/blog/consensus-protocols-paxos/
+    - https://www.quora.com/In-distributed-systems-what-is-a-simple-explanation-of-the-Paxos-algorithm
+    - https://www.youtube.com/watch?v=JEpsBg0AO6o
 *** Planned
 **** DONE MUTE : Préparer la démo pour la réunion avec Marius Shekow
 - Dans le cadre de la rencontre avec Marius Shekow, nous allons présenter les travaux de l'équipe
 - Une de ces présentations va consister en une démo de MUTE
 - Vérifier que le scénario de la démo de ECSCW 2017 fonctionne toujours
+**** CANCELLED CONSENSUS : Lire *The part-time parliament*
+- *Spanner* a l'air de reposer fortement sur des /Paxos state machines/
+- Lire le papier sur *Paxos* permettrait p-e de faciliter la compréhension de *Spanner*
+- Disponible ici : https://dl.acm.org/citation.cfm?id=279229
 **** TODO PHD DAY : Rédiger un abstract sur le sujet de thèse
      SCHEDULED: <2017-11-15 Wed>
 - Doit fournir le sujet de thèse et un abstract (environ 200 mots) pour le PhD Day
@@ -3319,10 +3414,6 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - Dans le cadre du PhD Day, je dois effectuer une présentation de 5min
   - Emphasize on what is your research problem, who else are working on the same/similar problem, what is your specific approach, and what is/are your expected results
 **** TODO ADMINISTRATIF : Remplir le formulaire *Charges d’enseignement pour Doctorant contractuel*
-**** TODO CONSENSUS : Lire *The part-time parliament*
-- *Spanner* a l'air de reposer fortement sur des /Paxos state machines/
-- Lire le papier sur *Paxos* permettrait p-e de faciliter la compréhension de *Spanner*
-- Disponible ici : https://dl.acm.org/citation.cfm?id=279229
 **** TODO DISTRIBUTED SYSTEMS : Lire *Spanner: Google’s Globally Distributed Database*
 - Disponible ici : https://dl.acm.org/citation.cfm?id=2491245
 **** TODO DISTRIBUTED SYSTEMS : Lire *Beyond TrueTime:  Using AugmentedTime for Improving Spanner*
