@@ -3477,12 +3477,59 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Finalement, seul le Proposer sait de manière sûre si une valeur a été choisie
       - Pour obtenir cette information, chaque Acceptor doit exécuter /Basic Paxos/ à son tour
   - Multi Paxos
+    - Pas spécifié dans la littérature, contrairement à Basic Paxos
+    - Il n'y a donc pas de preuve non plus
+    - Utilise plusieurs rounds de Basic Paxos pour sélectionner une valeur pour chaque entrée d'un log
+    - Apporte plusieurs changements à Basic Paxos afin de le rendre utilisable et plus performant dans ce scénario
+    - Peut exécuter en concurrence le protocole pour des entrées différentes
+      - Ajoute un index aux messages /Prepare/ et /Accept/ pour indiquer l'entrée du log concernée par ce round
+    - Protocole
+      - Lorsqu'une requête d'un client est reçue
+	- Détermine la 1ère entrée du log qui n'est pas choisie
+	  - Mais on peut déjà posséder une valeur pour cette entrée
+	- Exécute /Basic Paxos/ pour cette entrée avec la valeur du client
+	- Si une des réponses au message /Prepare/ contient une /acceptedValue/
+	  - Choisit cette valeur pour cette entrée
+	  - Recommence le protocole afin de traiter la requête du client
+	- Sinon poursuit le protocole l'exécution de Basic Paxos avec la valeur du client
+      - Décrit slide 20 de [[file:resources/paxos.pdf]]
+    - Élection de leader
+      - Utiliser Basic Paxos tel quel est inefficace
+	- Possible d'avoir plusieurs Proposers concurrents qui vont générer des conflits
+	- Besoin de 2 rounds de query/response pour chaque valeur (/Prepare/, /Accept/)
+      - Élire un leader permet
+	- De réduire à 1 le nombre de Proposer à un moment donné, et donc limiter les possibilités de conflits
+	- D'éliminer la nécessité de messages /Prepare/ dans la majorité des cas
+      - Protocole d'élection
+	- Le serveur avec l'identifiant maximum à un moment donné obtient le rôle de leader
+	- Chaque serveur envoie un heartbeat de façon périodique à tous les autres serveurs
+	- Si un serveur ne reçoit aucun heartbeat d'un autre serveur possédant un ID supérieur depuis un certain temps, il devient le leader
+	- Présenté slide 23 de [[file:resources/paxos.pdf]]
+    - Suppression de messages /Prepare/
+      - /Prepare/ permet de
+	- Bloquer les anciennes propositions
+	- Obtenir les valeurs potentiellement choisies
+      - On peut ainsi éliminer /Prepare/ si
+	- Les numéros de propositions ne sont pas par entrée mais pour le log entier
+	- On ajoute à la réponse à /Prepare/ un booléen /noMoreAccepted/
+	  - Indique si pour toutes les entrées suivantes, aucune proposition n'a été acceptée
+      - Ainsi, si un Acceptor répond à /Prepare/ avec le flag /noMoreAccepted/
+	- Plus besoin de /Prepare/ avec cet Acceptor
+      - De plus, si une majorité d'Acceptors ont répondu avec ce flag
+	- Plus besoin de /Prepare/ pour l'ensemble des noeuds
+    - Partage des informations
+      - Plusieurs données ne sont pas partagées avec l'ensemble des noeuds
+	- Seulement une majorité des noeuds reçoit la valeur choisie pour une entrée, et non pas tous les noeuds
+	- De plus, seul le Proposer sait si cette entrée a été choisie
+      - Dans le cas d'une /Replicated State Machine/, les commandes composant le log doivent être appliquées dans l'ordre
+      - Les slides 25 à 27 de file:resources/paxos.pdf décrivent comment répliquer ces informations
   - Ressources
     - http://the-paper-trail.org/blog/consensus-protocols-paxos/
     - https://www.quora.com/In-distributed-systems-what-is-a-simple-explanation-of-the-Paxos-algorithm
     - https://www.youtube.com/watch?v=JEpsBg0AO6o
     - https://ramcloud.stanford.edu/~ongaro/userstudy/
 *** Planned
+**** DONE ADMINISTRATIF : Remplir le formulaire *Charges d’enseignement pour Doctorant contractuel*
 **** TODO PHD DAY : Rédiger un abstract sur le sujet de thèse
      SCHEDULED: <2017-11-15 Wed>
 - Doit fournir le sujet de thèse et un abstract (environ 200 mots) pour le PhD Day
@@ -3491,7 +3538,6 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
      SCHEDULED: <2017-12-07 Thu>
 - Dans le cadre du PhD Day, je dois effectuer une présentation de 5min
   - Emphasize on what is your research problem, who else are working on the same/similar problem, what is your specific approach, and what is/are your expected results
-**** TODO ADMINISTRATIF : Remplir le formulaire *Charges d’enseignement pour Doctorant contractuel*
 **** TODO DISTRIBUTED SYSTEMS : Lire *Spanner: Google’s Globally Distributed Database*
 - Disponible ici : https://dl.acm.org/citation.cfm?id=2491245
 **** TODO DISTRIBUTED SYSTEMS : Lire *Beyond TrueTime:  Using AugmentedTime for Improving Spanner*
