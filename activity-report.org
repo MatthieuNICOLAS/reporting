@@ -3334,7 +3334,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - C'est lui qui va s'assurer du bon déroulement du protocole
       - Le noeud coordinateur n'a pas besoin d'être élu, n'importe quel noeud peut spontanément démarrer un 2PC
     - Les autres noeuds jouent le rôle de participants
-    - Le protocole décompose en 2 étapes
+    - Le protocole se décompose en 2 étapes
     - 1. Proposition
       - Le coordinateur propose une valeur à l'ensemble des participants
       - Les participants renvoie au coordinateur leur réponse
@@ -3391,11 +3391,6 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Les participants vont donc valider ou annuler la transaction en fonction du message qu'ils reçoivent en 1er
   - Ressources
     - http://the-paper-trail.org/blog/consensus-protocols-three-phase-commit/
-- <<paxos>> CONSENSUS : Paxos
-  - Ressources
-    - http://the-paper-trail.org/blog/consensus-protocols-paxos/
-    - https://www.quora.com/In-distributed-systems-what-is-a-simple-explanation-of-the-Paxos-algorithm
-    - https://www.youtube.com/watch?v=JEpsBg0AO6o
 *** Planned
 **** DONE MUTE : Préparer la démo pour la réunion avec Marius Shekow
 - Dans le cadre de la rencontre avec Marius Shekow, nous allons présenter les travaux de l'équipe
@@ -3405,6 +3400,89 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - *Spanner* a l'air de reposer fortement sur des /Paxos state machines/
 - Lire le papier sur *Paxos* permettrait p-e de faciliter la compréhension de *Spanner*
 - Disponible ici : https://dl.acm.org/citation.cfm?id=279229
+** Semaine du <2017-11-06 Mon> au <2017-11-09 Thu>
+*** Done
+- <<paxos>> CONSENSUS : Paxos
+  - L'approche Paxos se décompose en plusieurs protocoles
+    - Basic Paxos qui adresse le problème du consensus
+    - Multi Paxos qu combine plusieurs rounds de Basic Paxos pour obtenir un consensus sur plusieurs valeurs et sur leur ordre
+  - Basic Paxos
+    - Assez proche de [[2pc]]
+    - Requirements
+      - Safety
+	- Une seule valeur est choisie
+	- Aucun noeud n'obtient une valeur qui n'a pas été choisie
+      - Liveness
+	- Hypothèses : une majorité de noeuds sont disponibles et peuvent communiquer dans des délais raisonnables
+	- Une valeur est finalement choisie
+	- Si une valeur est choisie, tous les noeuds l'obtiennent en finalité
+    - Rôles
+      - Proposer
+	- Gère la requête du client
+	- Va soumettre au vote des Acceptors une valeur candidate
+	- Va connaître la valeur choisie
+      - Acceptors
+	- Se contente de voter sur la valeur transmise par le Proposer
+	- Va conserver des informations sur les propositions reçues, les réponses effectuées et les valeurs choisies
+	- Ne participe pas forcément à tous les votes
+	- Va donc chercher à obtenir la valeur choisie
+      - Un noeud peut potentiellement cumuler ces rôles
+    - Ordonnancement des proposals
+      - Le réseau étant asynchrone, l'ordre de réception des propositions peut être perturbé
+      - Ceci peut conduire à des divergences
+      - Les propositions doivent être ordonnables de façon à pouvoir accepter que la plus récente
+      - Donne un identifiant unique à chaque proposition
+	- Permet de comparer et d'ordonner les propositions avec leur identifiant
+	- 2 noeuds ne doivent pas pouvoir générer le même identifiant
+	- Un noeud doit toujours pouvoir générer un identifiant plus grand pour pouvoir écraser une ancienne proposition
+      - Identifiant de la forme /<round, serverId>/ où
+	- /round/ est le numéro du round actuel
+	- /serverId/ est l'identifiant unique du noeud
+      - Chaque noeud stocke /maxRound/ qui est la plus grande valeur de /round/ observée
+      - Quand un noeud génère un nouvel identifiant, il génère le couple /<maxRound + 1, server>/
+    - Protocole
+      - Données stockées par noeud
+	- /minProposal/ : Le numéro de la plus petite proposition que ce noeud va accepter, 0 s'il n'a toujours pas reçu de proposition
+	- /acceptedProposal/ : Le numéro de la dernière proposition acceptée, 0 initialement
+	- /acceptedValue/ : La valeur associée à la dernière proposition acceptée, null initialement
+	- /maxRound/ : Le numéro du plus grand round observé
+      - Le protocole se décompose en 2 étapes
+      - 1. Proposition
+	- Le Proposer
+	  - génère un nouveau proposal number /n/
+	  - broadcast un message /Prepare(n)/ à tous les noeuds
+	- Les Acceptors recevant ce message
+	  - Mettent à jour leur variable /minProposal/ si /n > minProposal/
+	  - Répondent avec /<acceptedProposal, acceptedValue>/
+      - 2. Validation
+	- Quand le Proposer reçoit une majorité de réponses positives des Acceptors
+	  - Récupère la valeur /acceptedValue/ pour laquelle /acceptedProposal/ est maximum
+	  - Broadcast le message /Accept(n, value)/
+	- Les Acceptors recevant ce message
+	  - Si /n ≥ minProposal/
+	    - /acceptedProposal = n/
+	    - /minProposal = n/
+	    - /acceptedValue = value/
+	  - Dans tous les cas, renvoie ensuite /Return(minProposal)/
+	- Quand le Proposer reçoit une majorité de réponses des Acceptors
+	  - Si une seule réponse renvoie une valeur /result/ tel que /result > n/, alors on recommence le protocole
+	  - Sinon, la valeur est choisie
+      - Représenté slide 12 de [[file:resources/paxos.pdf]]
+    - Limites
+      - Le protocole peut ne pas finir dans certains cas
+      - Notamment le cas où deux Proposers se battent pour avoir le /proposalNumber/ le plus élevé
+	- Si leurs messages /Prepare/ s'entrecroisent, chaque /Prepare/ d'un Proposer va déprécier le message /Accept/ de l'autre Proposer
+	- Tant que les deux Proposers ne se seront pas observés et qu'un d'entre eux n'aura pas céder sa place, aucune valeur ne sera choisie
+	- Voir slide 16 de [[file:resources/paxos.pdf]]
+      - Finalement, seul le Proposer sait de manière sûre si une valeur a été choisie
+      - Pour obtenir cette information, chaque Acceptor doit exécuter /Basic Paxos/ à son tour
+  - Multi Paxos
+  - Ressources
+    - http://the-paper-trail.org/blog/consensus-protocols-paxos/
+    - https://www.quora.com/In-distributed-systems-what-is-a-simple-explanation-of-the-Paxos-algorithm
+    - https://www.youtube.com/watch?v=JEpsBg0AO6o
+    - https://ramcloud.stanford.edu/~ongaro/userstudy/
+*** Planned
 **** TODO PHD DAY : Rédiger un abstract sur le sujet de thèse
      SCHEDULED: <2017-11-15 Wed>
 - Doit fournir le sujet de thèse et un abstract (environ 200 mots) pour le PhD Day
