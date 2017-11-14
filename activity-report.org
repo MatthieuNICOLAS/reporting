@@ -3528,9 +3528,11 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - https://www.quora.com/In-distributed-systems-what-is-a-simple-explanation-of-the-Paxos-algorithm
     - https://www.youtube.com/watch?v=JEpsBg0AO6o
     - https://ramcloud.stanford.edu/~ongaro/userstudy/
+- PHD DAY : Rédiger un abstract sur le sujet de thèse
+  - Disponible à https://github.com/MatthieuNICOLAS/phd-day-2017/blob/master/abstract/main.pdf
 *** Planned
 **** DONE ADMINISTRATIF : Remplir le formulaire *Charges d’enseignement pour Doctorant contractuel*
-**** TODO PHD DAY : Rédiger un abstract sur le sujet de thèse
+**** DONE PHD DAY : Rédiger un abstract sur le sujet de thèse
      SCHEDULED: <2017-11-15 Wed>
 - Doit fournir le sujet de thèse et un abstract (environ 200 mots) pour le PhD Day
   - Emphasize on what is your research problem, who else are working on the same/similar problem, what is your specific approach, and what is/are your expected results
