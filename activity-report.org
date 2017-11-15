@@ -3536,6 +3536,113 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
      SCHEDULED: <2017-11-15 Wed>
 - Doit fournir le sujet de thèse et un abstract (environ 200 mots) pour le PhD Day
   - Emphasize on what is your research problem, who else are working on the same/similar problem, what is your specific approach, and what is/are your expected results
+** Semaine du <2017-11-14 Tue> au <2017-11-17 Fri>
+*** Done
+- <<raft>> CONSENSUS : Raft
+  - Adresse le problème du consensus pour répliquer un log
+    - Permet de répliquer une machine à état
+  - Conçu pour être simple à comprendre
+  - Tout en offrant les mêmes garanties et performances que Paxos
+  - Afin de simplifier son fonctionnement, Raft repose sur l'utilisation d'un leader
+    - Supprime les conflits
+  - Rôles
+    - Leader
+      - Gère les requêtes des clients
+      - Envoie des messages /AppendEntries/
+	- Permet de répliquer son log
+	- Sert aussi de /heartbeat/ pour maintenir son leadership
+    - Candidate
+      - État intermédiaire
+      - Envoie des messages /RequestVote/ afin d'être élu comme leader
+    - Follower
+      - Se contente de traiter et de répondre aux différents messages qu'il reçoit
+    - Dès qu'un noeud découvre un noeud avec un terme supérieur, il redevient un Follower
+    - Représenté slide 10 de https://raft.github.io/slides/uiuc2016.pdf#page=10
+  - Termes
+    - L'exécution du protocole se fait au cours de termes successifs
+    - Un terme est composé
+      - D'une phase d'élection
+      - D'une phase d'opérations normales
+    - Si l'élection échoue, le terme n'a pas de leader
+      - Aucune requête ne peut être traité durant ce terme
+    - Chaque noeud conserve la valeur du terme courant
+      - Joint à chaque message
+      - Si un noeud reçoit un message contenant un identifiant de terme plus grand, redevient un follower
+      - Si un noeud reçoit un message contenant un identifant de terme plus petit, répond une erreur
+    - Permet d'identifier les messages obsolètes
+    - Représenté slide 11 de https://raft.github.io/slides/uiuc2016.pdf#page=11
+  - Propriétés du log
+    - Si différents noeuds possèdent une entrée du log avec le même index et le même terme
+      - Ces entrées correspondent à la même commande
+      - Les entrées précédentes des logs sont identiques
+    - Si une entrée du log est /committed/
+      - Toutes les entrées précédentes le sont aussi
+  - Protocole
+    - Le protocole se décompose en plusieurs sous-problèmes
+    - 1. Leader election
+      - Décrit slide 12 de https://raft.github.io/slides/uiuc2016.pdf#page=12
+      - Propriété de safety
+	- Au maximum un seul leader peut être élu par terme
+	- Pour assurer cette propriété
+	  - Un noeud ne peut voter qu'une fois par terme
+	  - Un noeud a besoin d'une majorité de votes positifs pour remporter l'élection
+      - Propriété de liveness
+	- Un candidat doit être élu finalement
+	- Pour assurer cette propriété
+	  - Le délai observé par les noeuds avant de passer au terme suivant n'est pas le même pour chacun
+	  - Ainsi, dans le cas où une élection échoue à cause de l'absence d'une majorité, un noeud démarre une nouvelle élection avant les autres et parvient généralement à être élu
+    - 2. Normal operation (basic log replication)
+      - Le leader traite les requêtes envoyées par le client
+      - Ajoute la commande à son log
+      - La partage avec les autres noeuds via un message /AppendEntries/
+      - Si l'entrée /e/ et l'entrée suivante /e+1/ sont connues par une majorité de noeuds, alors /e/ est dite /committed/
+      - Une fois l'entrée /committed/
+	- Le leader exécute la commande sur sa machine à état et renvoie le résultat au client
+	- Le leader indique via les prochains messages /AppendEntries/ que l'entrée est /committed/
+	- Les followers peuvent à leur tour exécuter la commande /committed/ à la réception d'un des prochains messages
+    - 3. Safety and consistency after leader changes
+      - Une fois une opération /committed/, tous les leaders futurs devront posséder cette entrée
+	- Permet d'assurer qu'un nouveau leader ne va pas rentrer en conflit avec le log
+      - Pour empêcher les noeuds en retard d'être élu
+	- Chaque candidat inclut l'index et le terme de sa dernière entrée du log dans les messages /RequestVote/
+	- Lorsqu'un noeud reçoit un message /RequestVote/ avec un terme ou un index obsolète, il le rejette
+	- Ainsi, seul un noeud possédant la dernière opération /committed/ peut être élu
+      - Le log du leader est considéré comme le log véritable
+      - Les logs inconsistents vont être corrigés par le biais des messages /AppendEntries/
+	- Le message contient le couple <index, terme> de l'entrée précédante les nouvelles
+	- Si le noeud ne possède pas l'entrée correspondante, il rejecte la requête
+	- Le leader va remonter dans le log jusqu'à trouver la dernière opération commune et va lui envoyer le log à partir de celle-ci
+	- Algorithme décrit slide 18 de  https://raft.github.io/slides/uiuc2016.pdf#page=18
+    - 4. Neutralizing old leaders
+      - Un leader peut perdre son rôle autrement qu'à cause d'un crash
+      - Notamment dans le cas d'une partition réseau
+      - Pendant ce temps, le groupe élit un nouveau leader et traite les requêtes des clients
+      - À la reconnexion de l'ancien leader, il faut l'empêcher de rentrer en conflit avec le reste du groupe
+      - Utilise la valeur de son terme courant
+	- Joint à chaque message
+	- Un noeud recevant un de ses messages va donc lui répondre que sa valeur de terme est obsolète
+	- L'ancien leader va redevenir un follower et va mettre à jour sa valeur de terme
+    - 5. Client interactions
+      - Envoie ses requêtes au leader
+      - Si une requête timeout
+	- Par exemple si le leader crash
+	- Contacte un autre noeud
+	- Va éventuellement être redirigé vers le nouveau leader
+	- Va pouvoir resoumettre sa requête
+      - Mais une requête peut timeout après que la commande ait été /committed/ et exécutée mais avant que la réponse ne soit envoyée au client
+	- Afin d'éviter d'exécuter 2 fois la même commande, le client ajoute un id unique à chaque commande
+	- Cet id est conservé dans l'entrée du log
+	- Lorsque le leader reçoit une requête, il vérifie que l'id de la commande n'est pas déjà présent dans le log
+	- Si oui, se contente de renvoyer le résultat de cette entrée
+      - Permet d'assurer une /exactly-once delivery/
+    - 6. Configuration changes
+      - Voir slides 27 à 30 de https://ramcloud.stanford.edu/~ongaro/userstudy/raft.pdf#page=27
+  - Ressources
+    - https://raft.github.io
+    - https://ramcloud.stanford.edu/~ongaro/userstudy/
+    - https://www.infoq.com/presentations/raft
+    - https://raft.github.io/slides/uiuc2016.pdf
+*** Planned
 **** TODO PHD DAY : Préparer une présentation sur le sujet de thèse
      SCHEDULED: <2017-12-07 Thu>
 - Dans le cadre du PhD Day, je dois effectuer une présentation de 5min
