@@ -3643,12 +3643,44 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - https://www.infoq.com/presentations/raft
     - https://raft.github.io/slides/uiuc2016.pdf
 *** Planned
+** Semaine du <2017-11-20 Mon> au <2017-11-24 Fri>
+*** Done
+- <<spanner>> DISTRIBUTED SYSTEMS : Lire *Spanner: Google’s Globally Distributed Database*
+  - Distributed multiversion database
+    - General-purpose transactions (ACID)
+    - SQL query language
+    - Schematized tables
+    - Semi-relational data model
+  - Allow to shard and replicate the data
+  - Achieve lock-free distributed read transactions
+    - Able to do so thanks to Spanner's property : distributed transactions are externally consistent
+  - External consistency
+    - Commit order of the transactions is the same as the order in which you observe the transactions
+  - Use 2 Phase-Locking (2PL) to ensure serializability of the write on the database
+  - Add a timestamp to each transaction
+  - Synchronizing snapshosts
+    - Use a global wall-clock time
+      - Equivalent to the External Consistency
+      - Commit order respects global wall-time order
+      - Use timestamp and maintain timestamp order === commit order
+  - TrueTime
+    - Global wall-clock time with bounded uncertainty
+    - /TT.now().latest/ returns the maximum timestamp given /now()/ and the bounded uncertainty
+    - /TT.now().earliest/ returns the minimum timestamp given /now()/ and the bounded uncertainty
+  - Generating timestamps
+    - Assign timestamp while two-phase locking is ongoing
+    - At the beginning, once the locks acquired, pick /s = TT.now().latest/
+    - Do not release the locks until /TT.now().earliest > s/
+  - Able to mask the commit wait by performing the consensus or the 2PC meanwhile
+  - Ressources
+    - https://www.youtube.com/watch?v=NthK17nbpYs
+*** Planned
+**** DONE DISTRIBUTED SYSTEMS : Lire *Spanner: Google’s Globally Distributed Database*
+- Disponible ici : https://dl.acm.org/citation.cfm?id=2491245
 **** TODO PHD DAY : Préparer une présentation sur le sujet de thèse
      SCHEDULED: <2017-12-07 Thu>
 - Dans le cadre du PhD Day, je dois effectuer une présentation de 5min
   - Emphasize on what is your research problem, who else are working on the same/similar problem, what is your specific approach, and what is/are your expected results
-**** TODO DISTRIBUTED SYSTEMS : Lire *Spanner: Google’s Globally Distributed Database*
-- Disponible ici : https://dl.acm.org/citation.cfm?id=2491245
 **** TODO DISTRIBUTED SYSTEMS : Lire *Beyond TrueTime:  Using AugmentedTime for Improving Spanner*
 - Disponible ici : https://www.cse.buffalo.edu//~demirbas/publications/augmentedTime.pdf
 **** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
