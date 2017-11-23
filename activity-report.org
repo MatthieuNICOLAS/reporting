@@ -3674,6 +3674,54 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Able to mask the commit wait by performing the consensus or the 2PC meanwhile
   - Ressources
     - https://www.youtube.com/watch?v=NthK17nbpYs
+- CRDT : Idée pour le renommage
+  - Modèle du système
+    - Système distribué à large échelle
+    - Réseau asynchrone
+    - Partition-tolerant
+    - Eventual consistent
+    - Préservation de l'intention des utilisateurs
+  - Opération de renommage
+    - Fusionne tous les éléments existants d'un état donné en un seul nouvel élément ayant pour identifiant /id'/
+    - /rename(state) = (state', id')/
+      - L'état peut être associé à /version vector/
+    - Génère donc un nouvel état de la structure de donnée avec le même contenu mais des méta-données différentes et compactées
+    - Un seul noeud peut effectuer l'opération de renommage
+    - Des noeuds peuvent être déconnectés lors de la génération de cette opération
+    - Nécessite une livraison causale
+      - Ne peut effectuer l'opération de renommage que si on possède toutes les opérations précédentes
+    - Marque le début/fin d'une époch
+      - Permet de filtrer les opérations obsolètes ou trop avancées pour notre copie
+  - Application de l'opération de renommage
+    1. Dépile/Undo les opérations connues en local qui sont concurrentes avec l'opération de renommage, récupère les opérations textes correspondantes
+    2. Obtient alors l'état sur lequel a été effectué l'opération de renommage
+    3. Remplace le modèle courant par celui de l'opération de renommage
+    4. Rempile/Redo les opérations textes sur le nouvel état
+    5. Propage les opérations ainsi générées
+  - Problème
+    - Si chacun se contente uniquement de rejouer ses opérations, on peut perdre au cours du renommage des opérations
+      - Potentiellement, un utilisateur ne va jamais se reconnecter et donc jamais rejouer ses opérations
+    - Si chacun rejoue les opérations de tous les utilisateurs, on risque de dupliquer l'intention
+      - Si plusieurs utilisateurs ont observé la même opération concurrente à l'opération de renommage, ils vont chacun la ré-appliquer
+  - Idée
+    - On peut modifier la stratégie de génération de l'identifiant lorsqu'on rejoue les opérations concurrentes
+    - Si on génère de façon déterministe l'identifiant obtenu en rejouant l'opération, on ne duplique plus l'intention
+      - Chaque utilisateur va générer la même opération distante pour une opération concurrente donnée
+  - Générer de manière déterministe un identifiant pour une opération donnée
+    - Données
+      - État
+      - Ancien identifiant
+	- Peut tout utiliser ou juste une partie
+      - Ordre?
+    - À partir de ces données, doit définir une stratégie déterministe de génération du nouvel identifiant
+  - Réflexions
+    - La complexité est proportionnelle au nombre d'opérations concurrentes à l'opération de renommage
+    - En fonction de la stratégie de génération des identifiants choisie, les identifiants des opérations concurrentes peuvent grossir par rapport à leur identifiants initiaux
+      - Peut argumenter que ces derniers seront réduits lors du prochain renommage
+    - Pas forcément gourmand pour le réseau
+      - Opération de renommage consiste juste en un identifiant associé à une version du modèle
+      - L'état du document est obtenu lors de la phase 2
+      - Taille de l'opération de renommage proportionnel au nombre de noeuds
 *** Planned
 **** DONE DISTRIBUTED SYSTEMS : Lire *Spanner: Google’s Globally Distributed Database*
 - Disponible ici : https://dl.acm.org/citation.cfm?id=2491245
