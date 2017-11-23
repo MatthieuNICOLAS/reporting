@@ -3698,22 +3698,73 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     3. Remplace le modèle courant par celui de l'opération de renommage
     4. Rempile/Redo les opérations textes sur le nouvel état
     5. Propage les opérations ainsi générées
-  - Problème
-    - Si chacun se contente uniquement de rejouer ses opérations, on peut perdre au cours du renommage des opérations
-      - Potentiellement, un utilisateur ne va jamais se reconnecter et donc jamais rejouer ses opérations
-    - Si chacun rejoue les opérations de tous les utilisateurs, on risque de dupliquer l'intention
-      - Si plusieurs utilisateurs ont observé la même opération concurrente à l'opération de renommage, ils vont chacun la ré-appliquer
+  - Problèmes
+    - Si chaque noeud se contente uniquement de rejouer ses opérations, on peut perdre au cours du renommage des opérations
+      - Potentiellement, un noeud peut ne jamais se reconnecter et donc jamais rejouer ses opérations
+    - Si chaque noeud rejoue les opérations de tous les utilisateurs, on risque de dupliquer l'intention
+      - Si plusieurs noeuds ont observé la même opération concurrente à l'opération de renommage, ils vont chacun la ré-appliquer
   - Idée
     - On peut modifier la stratégie de génération de l'identifiant lorsqu'on rejoue les opérations concurrentes
     - Si on génère de façon déterministe l'identifiant obtenu en rejouant l'opération, on ne duplique plus l'intention
       - Chaque utilisateur va générer la même opération distante pour une opération concurrente donnée
+  - Reformulation du problème de recherche
+    - Peut-on proposer une ou des stratégies déterministes de génération des identifiants pour une opération rejouée ?
   - Générer de manière déterministe un identifiant pour une opération donnée
-    - Données
-      - État
-      - Ancien identifiant
+    - Données communes
+      - État commun
+	- Commence à rejouer les opérations sur un état commun (état obtenu après le renaming)
+      - Ancien identifiant de l'élément
 	- Peut tout utiliser ou juste une partie
-      - Ordre?
+    - Données pouvant varier
+      - La séquence d'opérations
+	- Potentiellement, des opérations communes à plusieurs noeuds peuvent avoir été observées dans des ordres différents
+	- La séquence peut aussi des comporter des opérations n'apparaissant pas chez tous les noeuds
     - À partir de ces données, doit définir une stratégie déterministe de génération du nouvel identifiant
+  - Formalisation
+    - Étant donné
+      - un état S
+      - une opération /view(S)/ permettant de récupérer le contenu de la structure de données pour un état donné
+    - Peut-on définir des opérations /undo/ et /redo/ tels que
+      - /undo(S, remoteOp) = (S', redoOp)/
+	- Annuler une opération distante change l'état et renvoie une opération locale enrichie de façon à pouvoir la ré-appliquer
+      - /redo(S, redoOp) = (S', remoteOp)/
+	- Ré-appliquer une opération locale enrichie
+      - Vérifiant les invariants suivants
+	1. /undo/ puis /redo/ une opération doit préserver le contenu de la structure de données
+	   - Permet de s'assurer qu'on ne perd pas l'intention au cours du /undo/ /redo/
+	   - Par contre, l'état final ainsi que l'opération regénérée peuvent être différent de l'état de départ et de l'opération annulée
+	   - /view(S) = view(S')/ où
+	     - /(S_temp, redoOp) = undo(S, op)/
+	     - /(S', _) = redo(S_temp, redoOp)/
+	2. L'état obtenu après avoir /undo/ une séquence d'opérations ne doit pas dépendre de l'ordre
+	   - Permet de remplacer l'état obtenu par l'état fourni par l'opération de renommage de façon sûre
+	   - /S = S'/ où
+	     - /(S1, _) = undo(Sinit, op_1)/
+	     - /(S2, _) = undo(Sinit, op_2)/
+	     - /S, _) = undo(S1, op2)/
+	     - /S', _) = undo(S2, op1)/
+	3. L'état final et les opérations regénérées après avoir /undo/ une séquence d'opérations puis les avoir /redo/ ne doivent pas dépendre de l'ordre de la séquence
+           - Permet de s'assurer que l'état final est le même pour chaque noeud et que les opérations communes aux noeuds sont regénérées de manière déterministe
+	   - /S = S'/ où
+	     - /(S_1, redoOp_1) = undo(S_init, op_1)/
+	     - /(S_2, redoOp_2') = undo(S_init, op_2)/
+	     - /S_before-rename, redoOp_2) = undo(S_1, op_2)/
+	     - /S_before-rename, redoOp_1') = undo(S_2, op_1)/
+	     - /view(S_before-rename) = view(S_rename)/
+	     - /(S_3, op_2') = redo(S_rename, redoOp_2)/
+	     - /(S_4, op_1') = redo(S_rename, redoOp_1')/
+	     - /(S, op1') = redo(S3, redoOp_1)/
+	     - /(S', op2') = redo(S4, redoOp_2')/
+      - Est-ce suffisant ?
+	- C'est pas sur /undo/ et /redo/ séparément que doivent porter les contraintes
+	- Mais sur leur combinaison
+  - Limites
+    - Résoudre plusieurs opérations de renommage concurrentes me paraît difficile
+    - Pour le moment, se contente d'éliminer la possibilité d'avoir des opérations de renommage concurrentes
+    - Dans le système décrit ici, on établit comme hypothèse qu'un seul noeud peut effectuer une opération de renommage (owner ? bot dédié ?)
+    - Single Point Of Failure
+    - Peut suggérer l'utilisation de rôles et d'un méchanisme de consensus pour permettre de décentraliser la responsabilité
+      - En dehors du scope pour le moment
   - Réflexions
     - La complexité est proportionnelle au nombre d'opérations concurrentes à l'opération de renommage
     - En fonction de la stratégie de génération des identifiants choisie, les identifiants des opérations concurrentes peuvent grossir par rapport à leur identifiants initiaux
