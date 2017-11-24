@@ -3701,6 +3701,9 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Problèmes
     - Si chaque noeud se contente uniquement de rejouer ses opérations, on peut perdre au cours du renommage des opérations
       - Potentiellement, un noeud peut ne jamais se reconnecter et donc jamais rejouer ses opérations
+      - L'opération de renommage pourrait aussi être interprétée par les utilisateurs comme plusieurs opérations de suppression, puisque des éléments vont disparaître momentanément
+      - Ce qui peut entraîner des réactions provoquant une duplication de l'intention
+	- Ré-insertion d'un mot qui a été "supprimé" au cours du renommage
     - Si chaque noeud rejoue les opérations de tous les utilisateurs, on risque de dupliquer l'intention
       - Si plusieurs noeuds ont observé la même opération concurrente à l'opération de renommage, ils vont chacun la ré-appliquer
   - Idée
@@ -3758,13 +3761,16 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Est-ce suffisant ?
 	- C'est pas sur /undo/ et /redo/ séparément que doivent porter les contraintes
 	- Mais sur leur combinaison
-  - Limites
+  - Points négatifs
+    - Besoin de conserver le log des opérations ou du moins une partie
+      - Afin de pouvoir undo les opérations en respectant l'ordre imposée par la couche livraison
+      - Peut retirer de façon sûre des opérations du log une fois qu'elles sont dans le contexte causal
     - Résoudre plusieurs opérations de renommage concurrentes me paraît difficile
-    - Pour le moment, se contente d'éliminer la possibilité d'avoir des opérations de renommage concurrentes
-    - Dans le système décrit ici, on établit comme hypothèse qu'un seul noeud peut effectuer une opération de renommage (owner ? bot dédié ?)
-    - Single Point Of Failure
-    - Peut suggérer l'utilisation de rôles et d'un méchanisme de consensus pour permettre de décentraliser la responsabilité
-      - En dehors du scope pour le moment
+      - Pour le moment, se contente d'éliminer la possibilité d'avoir des opérations de renommage concurrentes
+      - Dans le système décrit ici, on établit comme hypothèse qu'un seul noeud peut effectuer une opération de renommage (owner ? bot dédié ?)
+      - Single Point Of Failure
+      - Peut suggérer l'utilisation de rôles et d'un méchanisme de consensus pour permettre de décentraliser la responsabilité
+	- En dehors du scope pour le moment
   - Réflexions
     - La complexité est proportionnelle au nombre d'opérations concurrentes à l'opération de renommage
     - En fonction de la stratégie de génération des identifiants choisie, les identifiants des opérations concurrentes peuvent grossir par rapport à leur identifiants initiaux
