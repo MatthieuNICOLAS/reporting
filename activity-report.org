@@ -3779,15 +3779,71 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Opération de renommage consiste juste en un identifiant associé à une version du modèle
       - L'état du document est obtenu lors de la phase 2
       - Taille de l'opération de renommage proportionnel au nombre de noeuds
+- Meeting
+  - Study the past weeks consensus algorithms
+    - Paxos
+    - Raft
+  - Also took a look at Spanner, Google's Globally Distributed Database
+    - Distributed multiversion database
+    - Achieve lock-free distributed read transactions
+    - Thanks to a global wall-clock time
+  - Start writing down some ideas for the renaming problem
+    - One of them seems to be a good lead
+    - Will discuss about it with Gérald and Olivier to see if it is actually a good idea
 *** Planned
 **** DONE DISTRIBUTED SYSTEMS : Lire *Spanner: Google’s Globally Distributed Database*
 - Disponible ici : https://dl.acm.org/citation.cfm?id=2491245
-**** TODO PHD DAY : Préparer une présentation sur le sujet de thèse
+** Semaine du <2017-11-27 Mon> au <2017-12-01 Fri>
+*** Done
+- PHD DAY : Préparer une présentation sur le sujet de thèse
+  - Disponible ici : https://github.com/MatthieuNICOLAS/phd-day-2017/blob/master/presentation/presentation.pdf
+  - Réalisation d'une 1ère version
+  - Réunion avec Olivier et Gérald
+    - Ajouter logos LORIA et CNRS
+    - Slide 2
+      - Remplacer les utilisateurs par des noeuds
+      - Griser un noeud pour le faire apparaître comme déconnecté
+    - Entre slide 2 et 3
+      - Ajouter une slide avec un réseau plus complexe de noeuds, avec partitions et/ou noeuds déconnectés
+    - Slide 3
+      - Ajouter contrainte d'unicité
+      - Remplacer "..." par "Many others"
+    - Slide 4
+      - Retravailler le "research problem" sous l'angle de immutabilité/mutabilité
+      - Immutabilité nous a permis d'avoir des identifiants globaux permettant des opérations concurrentes tout en assurant la convergence
+      - Mais nous a donné des identifiants à taille non-bornée
+      - On voudrait pouvoir renommer les identifiants pour réduire leur taille
+      - Mais cela viendrait à réinsérer une notion de mutabilité dans les identifiants
+      - Est-ce une bonne idée ?
+    - Slide 5
+      - La supprimer
+- CRDT : Rédiger un rapport sur l'idée pour le renommage
+*** Planned
+**** DONE PHD DAY : Préparer une présentation sur le sujet de thèse
      SCHEDULED: <2017-12-07 Thu>
 - Dans le cadre du PhD Day, je dois effectuer une présentation de 5min
   - Emphasize on what is your research problem, who else are working on the same/similar problem, what is your specific approach, and what is/are your expected results
-**** TODO DISTRIBUTED SYSTEMS : Lire *Beyond TrueTime:  Using AugmentedTime for Improving Spanner*
-- Disponible ici : https://www.cse.buffalo.edu//~demirbas/publications/augmentedTime.pdf
+** Semaine du <2017-12-04 Mon> au <2017-12-08 Fri>
+*** Done
+- PHD DAY : Préparer une présentation sur le sujet de thèse
+  - Prise en compte des retours de Olivier et Gérald
+  - Répétition avec les autres doctorants de l'équipe
+  - Retours
+    - Les couleurs des schémas sont p-e un peu faibles et peuvent gêner la lecture (surtout pour les gens daltoniens)
+  - Modification des couleurs utilisées
+- CRDT : Rédiger un rapport sur l'idée pour le renommage
+  - Refonte de la partie sur les états, identifiants et /add/
+  - Complétion de la section /Discussion/
+  - Trouvé un contre-exemple pour l'algorithme proposé en 2.4
+    - Si /op2/ et /op3/ en concurrence et que /id2 < id3/
+    - Noeud B va obtenir l'état suivant avant la réception de l'opération renommage : /[(id1, elt1), (id2, elt2), (id3, elt3)]/
+    - Mais jouer l'opération de renommage va conduire à l'état /[(id'1, elt1), (id'3, elt3), (id'2, elt2)]/
+    - Puisqu'on va rejouer l'opération /addLocal(1, elt3)/
+    - On vient donc de perturber l'ordre initial des éléments
+  - Le mécanisme des /undo/ permettait de /transformer/ l'opération locale par rapport à l'état courant
+*** Planned
+**** DONE CRDT : Rédiger un rapport sur l'idée pour le renommage
+**** TODO ECSCW2017 : Ajouter le papier sur HAL
 **** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
 - *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
   #+BEGIN_QUOTE
