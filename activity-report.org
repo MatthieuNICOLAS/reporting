@@ -3841,9 +3841,48 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Puisqu'on va rejouer l'opération /addLocal(1, elt3)/
     - On vient donc de perturber l'ordre initial des éléments
   - Le mécanisme des /undo/ permettait de /transformer/ l'opération locale par rapport à l'état courant
+- ECSCW2017 : Ajouter le papier sur HAL
+  - François s'en est chargé
 *** Planned
+**** CANCELLED ECSCW2017 : Ajouter le papier sur HAL
 **** DONE CRDT : Rédiger un rapport sur l'idée pour le renommage
-**** TODO ECSCW2017 : Ajouter le papier sur HAL
+**** DONE CRDT : Ajouter le contre-exemple au rapport sur le renommage
+** Semaine du <2017-12-11 Mon> au <2017-12-15 Fri>
+*** Done
+- CRDT : Renommage
+  - Si on possède une opération /renameRemote(mapIds, causalContext)/, il est possible d'effectuer le renommage de la façon suivante
+    - Pour chaque opération concurrente /remoteOp/
+      - Si /id/ n'est pas présent dans /mapIds/
+	- Trouver son prédecesseur /prevId/ et son image /prevId'/ dans /mapIds/
+	- Générer /id'/ à partir de /prevId'/ (une simple concaténation de /prevId'/ et de /id'/ suffit)
+	- Ajouter /id -> id'/ dans /mapIds/
+	- Propager /remoteOp'/ (nécessaire ?)
+    - Pour chaque /(id, elt)/ de l'état
+      - Remplacer /id/ par /id'/ (un simple parcours de la structure suffit)
+  - Discussion
+    - Comment gérer les opérations concurrentes à l'opération de renommage lorsqu'on a déjà appliqué l'opération de renommage
+      - Soit on rejette les opérations concurrentes et on attend qu'un autre pair nous envoie la version modifiée de l'opération
+	- Si un pair nous l'envoie, il va probablement pouvoir nous envoyer sa transformée
+	- Mais rajoute du délai
+      - Soit on accepte l'opération et on la transforme nous-même
+	- Pour ça, besoin de récupérer la /mapIds/
+	  - Besoin de la stocker ou de la regénérer
+    - Quelles versions des opérations stocker dans le log ?
+      - Est-ce qu'on stocke les opérations initiales ?
+      - Ou les opérations transformées ?
+      - Ou un mix des 2 ?
+    - Peut réduire la quantité d'information contenue dans l'opération de renommage au prix de calcul supplémentaire
+      - À partir du contexte causal, un noeud peut regénérer /mapIds/
+	- En rejouant les opérations appartenant au contexte causal, on récupère l'état sur lequel a été appliqué l'opération de renommage
+	- En effectuant une opération de renommage local sur cet état, on obtient /mapIds/
+	- Ceci fonctionne tant que l'opération de renommage local est déterministe pour un état donné
+  - Limites
+    - Nécessité d'une livraison causale de l'opération de renommage
+    - Ne gère pas les renommages en concurrence
+      - Un noeud peut avoir un rôle particulier lui permettant de déclencher cette opération
+      - Ce rôle peut être attribué de manière fixe
+      - Ou un mécanisme d'élection de leader peut être utilisé pour déterminer qui possède ce rôle
+*** Planned
 **** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
 - *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
   #+BEGIN_QUOTE
