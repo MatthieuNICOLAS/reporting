@@ -3917,8 +3917,19 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 	    - Dès qu'on a, pour chaque utilisateur, une opération qui est de la nouvelle /epoch/ et qu'on a reçu toutes ses opérations précédentes
       - État du log
 	- En fonction de la gestion des opérations concurrentes
+  - Mise à jour du rapport
+    - Ajout de la partie sur l'optimisation du mécanisme
 *** Planned
 **** DONE CRDT : Mettre à jour rapport sur le mécanisme de renommage
+**** DONE CRDT : Ajouter la partie sur l'optimisation de la solution dans le rapport
+** Semaine du <2017-12-18 Mon> au <2017-12-22 Fri>
+*** Done
+- CRDT : Adaptation du mécanisme de renommage aux blockwise-CRDTs
+  - Ajout d'une section détaillant *Identifier* et *IdentifierInterval* dans les blockwise-CRDTs
+  - Ajout des algorithmes adaptés pour les blockwise-CRDTs
+  - Ajout des explications de chaque algorithme
+*** Planned
+**** DONE CRDT : Adaptation du mécanisme de renommage aux blockwise-CRDTs
 **** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
 - *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
   #+BEGIN_QUOTE
