@@ -3930,6 +3930,178 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Ajout des explications de chaque algorithme
 *** Planned
 **** DONE CRDT : Adaptation du mécanisme de renommage aux blockwise-CRDTs
+** Semaine du <2018-01-08 Mon> au <2018-01-12 Fri>
+*** Done
+- MUTE : Corriger l'assertion sur l'append vide
+  - Ajout d'un test /append-replayed-as-insert/ violant cette assertion
+  - Modification de /addBlockRec()/ pour ne plus tenter d'append un texte vide à un bloc
+  - Ajout d'un test /prepend-replayed-as-insert/ violant cette assertion
+  - Modification de /addBlockRec()/ pour ne plus tenter de prepend un texte vide à un bloc
+- MUTE : Corriger /createBetweenPosition()/
+  - Modification de la méthode de génération du /random/ pour que /random ∈ ]tuple1.random, tuple2.random[/
+  - Ajout d'un commentaire expliquant pourquoi /tuple2.random/ est exclue de l'interval
+- MUTE : Corriger l'export du log et de l'arbre d'un document
+  - Modification de *StorageService* pour ajouter /getDocBodyAsBlob()/, fonction permettant de récupérer le log d'un document
+  - Modification de *DevLabelComponent*
+    - Pour utiliser /getDocBodyAsBlob()/ pour récupérer le log du document courant
+    - Déclencher correctement le téléchargement du log ou de l'arbre
+- MUTE : Réflexion sur /replicaNumber/, /clock/ et identité de l'utilisateur
+  - On peut, grâce au mécanisme d'authentification, obtenir de façon déterministe un /replicaNumber/ pour une identité
+  - On pourrait donc partager ce /replicaNumber/ entre plusieurs machines
+  - Mais la /clock/ pose problème
+  - Celle-ci va évoluer en fonction de mes opérations
+  - Si je change d'appareil, je peux récupérer via le système d'authentification mon /replicaNumber/
+  - Mais je ne suis pas capable de récupérer la dernière valeur de ma /clock/ dans un environnement entièrement distribué
+    - Les collaborateurs connectés à ce moment n'ont pas forcément observés mes dernières opérations
+  - Pour assurer l'unicité des identifiants générés et pour assurer la disponibilité du système, *je ne peux pas conserver mon /replicaNumber/ d'une machine à l'autre*
+  - On peut par contre mettre en place et gérer une *Map* liant mon identité à la liste de mes /replicaNumbers/
+    - Cette *Map* devrait être répliquée chez chaque utilisateur et devrait être fusionnable avec celles des autres
+- Meeting
+  - Before holidays, present a first draft of a renaming mechanism to Gérald
+  - It seems to work
+  - Will now implement it to evaluate it
+  - So have been working on MUTE to prepare its prototyping
+  - Have branch corresponding to the refactoring of identifiers
+  - Was never merged
+    - Were not able to test it because of the eduroam issue
+  - Updated it
+  - Fixed parts of the code which triggered assertions
+  - Deployed it on dev
+  - Will organize a session to perform some user testing next week
+- Réplication et cohérence de données : Cours 1
+  - Reliability
+    - La durée qu'un système fonctionne sans tomber de panne
+  - Availability
+    - Probabilité que le système soit accessible à un moment donné
+  - Depandability
+    - Reliability * Availability
+  - Sequential Consistency
+    - À partir des observations de tous les sites, on peut construire un entrelacement des opérations qui
+      - Respecte l'ordre des opérations locales
+      - Respecte le résultat des opérations
+    - et qui serait exécuté par tous les sites
+    - Coûteuse à assurer
+      - Besoin de donner la priorité aux opérations d'écriture
+      - Les lectures sont mises en attente pendant que les écritures sont effectuées globalement
+      - Diminue la disponibilité du système
+  - Linearizability
+    - Modèle de cohérence reprenant Sequential Consistency, mais en plus strict
+    - Ajoute un timestamp aux opérations
+    - Les opérations doivent être ordonnées dans la séquence telles que les timestamps des opérations soit croissants
+  - Modèles de cohérence vs. protocoles de cohérence
+    - Les protocoles décrivent une implémentation d'un modèle de cohérence donné
+  - Remarques
+    - Slide 32 : faire apparaître qu'on a plus de dépendance/d'ordre entre /R(x)a/ et /W(x)b/ ?
+    - Slide 34 : les 2 processus ne peuvent pas aussi se tuer mutuellement avec la causalité ?
+*** Planned
+**** DONE MUTE : Corriger l'assertion sur l'append vide
+- L'assertion suivante déclenche dans un cas une erreur : https://github.com/coast-team/mute-structs/blob/rework-identifiers/src/ropesnodes.ts#L154
+- On essaie donc d'append un texte vide
+- Ce scénario arrive dans le cas suivant :
+  1. Un utilisateur A créé un bloc
+  2. Il append du texte à ce bloc
+  3. Il split le bloc à l'endroit du append
+  4. Un utilisateur B reçoit les opérations dans l'ordre 1, 3 puis 2
+- Modifier le code pour ne plus essayer d'ajouter un texte vide à un bloc
+**** DONE MUTE : Corriger /createBetweenPosition()/
+- On a récemment retravailler /createBetweenPosition()/ de façon à autoriser la valeur de /tuple2.random/ comme valeur de random pour le nouveau tuple
+- Cette modification entraîne la possibilité de générer un nouvel identifiant /newId/ à partir de /id1/ et /id2/ tel que /id1 < id2 < newId/
+  - Puisqu'on garantit que /newId.random <= id2.random/
+  - Mais potentiellement /newId.replicaNumber > id2.replicaNumber/ ou /newId.replicaNumber === id2.replicaNumber && newId.clock > id2.clock/
+- Corriger cette fonction
+**** DONE MUTE : Corriger l'export du log et de l'arbre d'un document
+- Les fonctionnalités d'export du log et de l'arbre d'un document ne fonctionnent plus
+- Vu qu'on souhaite tester la nouvelle version des identifiants, pouvoir récupérer les logs en cas de bugs est indispensable
+- Corriger cette
+** Semaine du <2018-01-15 Mon> au <2018-01-19 Fri>
+*** Done
+- MUTE : Mettre en place *Protractor* pour réaliser des tests E2E
+  - Le projet était déjà configuré pour utiliser *Protractor* pour réaliser des tests E2E
+  - Ajout de tests
+    - Stockage du document
+      - Créé un document
+      - Modifie le document
+      - Refresh la page
+      - Vérifie qu'on a bien récupéré le contenu du document
+    - Broadcast temps réel des opérations
+      - Créé un document avec un premier pair
+      - Ouvre le document avec un second pair
+      - Modifie le document avec le premier pair
+      - Vérifie que le second pair observe les modifications
+      - Modifie le document avec le second pair
+      - Vérifie que le premier pair observe les modifications
+  - Modification de la config pour démarrer le navigateur utilisé pour les tests en mode headless
+    - Voir les exemples de configuration
+      - http://www.protractortest.org/#/browser-setup#using-headless-chrome
+      - http://www.protractortest.org/#/browser-setup#using-headless-firefox
+  - Ajout de Travis comme système de CI
+    - Ajout du fichier /.travis.yml/ contenant la configuration requise pour exécuter ces tests
+    - Par défaut, si Travis détecte un fichier /yarn.lock/, il utilise *Yarn* comme gestionnaire de dépendances
+    - Dans notre cas, on avait un fichier /yarn.lock/ mais qui n'était pas utilisé et donc pas à jour
+    - Des hooks permettant de build le projet n'étaient pas non plus déclenchés par *Yarn*
+    - On obtenait l'erreur suivante en résultat
+      #+BEGIN_BLOCK
+        ERROR in ./node_modules/css-loader?{"sourceMap":false,"import":false}!./node_modules/postcss-loader/lib?{"ident":"postcss","sourceMap":false}!./node_modules/sass-loader/lib/loader.js?{"sourceMap":false,"precision":8,"includePaths":["/home/travis/build/coast-team/mute/src/assets"]}!./src/styles.scss
+        Module build failed: Error: Can't resolve '~normalize.css/normalize.css' in '/home/travis/build/coast-team/mute/src'
+          at onError (/home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/Resolver.js:61:15)
+          at loggingCallbackWrapper (/home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/createInnerCallback.js:31:19)
+          at runAfter (/home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/Resolver.js:158:4)
+          at innerCallback (/home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/Resolver.js:146:3)
+          at loggingCallbackWrapper (/home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/createInnerCallback.js:31:19)
+          at next (/home/travis/build/coast-team/mute/node_modules/tapable/lib/Tapable.js:252:11)
+          at /home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/UnsafeCachePlugin.js:40:4
+          at loggingCallbackWrapper (/home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/createInnerCallback.js:31:19)
+          at runAfter (/home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/Resolver.js:158:4)
+          at innerCallback (/home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/Resolver.js:146:3)
+          at loggingCallbackWrapper (/home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/createInnerCallback.js:31:19)
+          at next (/home/travis/build/coast-team/mute/node_modules/tapable/lib/Tapable.js:252:11)
+          at innerCallback (/home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/Resolver.js:144:11)
+          at loggingCallbackWrapper (/home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/createInnerCallback.js:31:19)
+          at next (/home/travis/build/coast-team/mute/node_modules/tapable/lib/Tapable.js:249:35)
+          at resolver.doResolve.createInnerCallback (/home/travis/build/coast-team/mute/node_modules/enhanced-resolve/lib/DescriptionFilePlugin.js:44:6)
+          @ ./src/styles.scss 4:14-191
+          @ multi ./src/styles.scss
+      #+END_BLOCK
+    - Suppression du fichier /yarn.lock/
+    - On arrivait toujours pas à exécuter les tests E2E
+      - On obtenait les erreurs suivantes
+	- /E/runner - Unable to start a WebDriver session./
+	- /E/launcher - Error: WebDriverError: unknown error: Chrome failed to start: crashed/
+    - Afin de mieux diagnostiquer ces erreurs, utilisation des images Docker de Travis pour effectuer des tests
+      - Les images Docker sont disponibles ici : https://docs.travis-ci.com/user/common-build-problems/#Troubleshooting-Locally-in-a-Docker-Image
+    - Réalisation de tests en local
+      - L'erreur était dûe à l'utilisation de Chrome au sein d'un conteneur
+      - En lançant Chrome, on obtient l'erreur suivante
+	- /Failed to move to new namespace: PID namespaces supported, Network namespace supported, but failed: errno = Operation not permitted/
+      - Cette erreur m'a permis de trouver la page suivante
+	- https://hub.docker.com/r/armbues/chrome-headless/
+      - Bien tenté d'utiliser le profil de sécurité indiqué, mais sans succès
+      - Ajout de l'option /--no-sandbox/ pour le moment
+    - Redéploiement des tests sur Travis
+    - Cette fois-ci, on démarre bien un navigateur et on le manipule pour effectuer les tests E2E
+    - Mais le résultat n'est pas déterministe
+      - Le ou les tests qui échouent ne sont pas les mêmes après plusieurs exécutions du même job
+    - Test avec Firefox au lieu de Chrome
+      - Le *GeckoDriver* n'a pas l'air de fonctionner avec la version de *Protractor* du projet
+	- Voir https://github.com/angular/protractor/issues/4253
+      - Possible de mettre à jour *Protractor*
+      - Mais on obtient une nouvelle erreur
+	- POST /session/ac0e051d-adc7-8247-b983-635cad11933d/keys did not match a known command
+      - Celle-ci semble lié à *WebDriver* et *Selenium*
+*** Planned
+**** DONE MUTE : Mettre en place *Protractor* pour réaliser des tests E2E
+- *Protractor* permet d'effectuer des tests E2E
+- On pourrait l'utiliser afin d'automatiser certains tests que nous faisons actuellement manuellement (connexion des pairs, broadcast des opérations, stockage du log)
+- Voir pour setup l'outil
+**** IN-PROGRESS MUTE : Organiser une session de test sur mute-structs@0.4.0
+- Afin de pouvoir implémenter le mécanisme de renommage sur de bonnes bases, il est nécessaire de tester la validité de cette branche
+**** TODO MUTE : Supprimer la boucle de rafraîchissement infinie de Angular
+- À l'heure actuelle, Angular rafraîchit de façon infinie l'interface, même si aucun évènement n'a lieu
+- *Protractor* permet d'attendre que le rafraîchissement s'interrompe avant de déclencher les instructions suivantes
+- Puisqu'il ne s'interrompt jamais, on ne peut pas utiliser cette méthode
+- On utilise donc des /sleep(duration)/ en attendant
+- Mais rien ne nous garantit que l'évènement a bien lieu avant la fin du /sleep()/
+- Afin de rendre le comportement de nos tests déterministes, il est nécessaire de supprimer ce cycle de rafraîchissement infini
 **** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
 - *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
   #+BEGIN_QUOTE
