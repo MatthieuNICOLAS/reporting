@@ -4094,21 +4094,45 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Ce test échoue sur la page /doc/
   - La boucle de rafraîchissement est donc dûe à un des *Components* ou *Services*
   - Voir si on peut mocker les composants pour essayer d'identifier plus précisement l'origine de cette boucle
+- MUTE : Organiser une session de test sur mute-structs@0.4.0
+  - Malgré quelques problèmes de connectivité, a quand même pu collaborer et récupérer des logs
+  - Des divergences ont encore eu lieu
+  - Dûes semblerait aux problèmes de causalité
+  - N'ayant pas détecter d'autres erreurs, a mergé le modèle
+- Réplication et cohérence de données : Cours 2
+  - Exemple de Not Strong Eventual Consistency
+    - Une fois toutes les opérations délivrées, une copie contacte un tier (autre copie ou arbitre) pour résoudre certains conflits
+  - Remarques
+    - Slide 14 : Une légende des schémas peut être utile
+    - Slide 15 : C(b) = 40.2 (et pas C(a))
+    - Slide 30 : On appelle ça un ordre lexicographique ?
+    - Slide 35 : Tu peux pas simplifier le schéma avec juste 2 sites ?
+- Meeting
+  - Crash test session
+    - Thanks again for your participation
+    - Was able to gather some test samples
+    - Did not find any other errors that the causality-related ones
+    - So was finally able to release the new model
+    - PLEASE EXPORT YOUR MUTE DOCUMENTS since the new model is not backward compatible
+  - Related to the causality issue
+    - Victorien proposed a simple way to add a lightweight causality tracking mechanism to MUTE
+    - Implemented it
+  - While i was still on MUTE
+    - Worked on adding E2E tests using Protractor (automatically open a browser and interact with MUTE and check that a feature is still working)
+    - Implement a few of them
+    - Tricky part was to run them on the CI tool Travis (weird behavior of browser in container)
+    - Unfortunately, tests are not deterministic
+    - No way currently to wait for asynchronous task to end before moving to the next one
+    - So wait using timeout
+    - Works great on dev environment, not so much on Travis
 *** Planned
 **** DONE MUTE : Mettre en place *Protractor* pour réaliser des tests E2E
 - *Protractor* permet d'effectuer des tests E2E
 - On pourrait l'utiliser afin d'automatiser certains tests que nous faisons actuellement manuellement (connexion des pairs, broadcast des opérations, stockage du log)
 - Voir pour setup l'outil
-**** IN-PROGRESS MUTE : Organiser une session de test sur mute-structs@0.4.0
+**** DONE MUTE : Organiser une session de test sur mute-structs@0.4.0
 - Afin de pouvoir implémenter le mécanisme de renommage sur de bonnes bases, il est nécessaire de tester la validité de cette branche
-**** IN-PROGRESS MUTE : Supprimer la boucle de rafraîchissement infinie de Angular
-- À l'heure actuelle, Angular rafraîchit de façon infinie l'interface, même si aucun évènement n'a lieu
-- *Protractor* permet d'attendre que le rafraîchissement s'interrompe avant de déclencher les instructions suivantes
-- Puisqu'il ne s'interrompt jamais, on ne peut pas utiliser cette méthode
-- On utilise donc des /sleep(duration)/ en attendant
-- Mais rien ne nous garantit que l'évènement a bien lieu avant la fin du /sleep()/
-- Afin de rendre le comportement de nos tests déterministes, il est nécessaire de supprimer ce cycle de rafraîchissement infini
-**** TODO MUTE : Enrichir *SyncService* pour assurer une livraison causale
+**** DONE MUTE : Enrichir *SyncService* pour assurer une livraison causale
 - Disclaimer: algo de Victorien
 - Algorithme
   - Ce mécanisme suppose qu'on a déjà une livraison FIFO
@@ -4122,6 +4146,30 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Délivre pas les messages de façon optimale
   - Puisque on va potentiellement faire attendre la livraison d'une opération qui n'a aucun lien avec l'opération de suppression
   - Mais au moins assure une livraison causale des suppressions
+** Semaine du <2018-01-22 Mon> au <2018-01-26 Fri>
+*** Done
+- MUTE : Implémenter le mécanisme de renommage
+  - Implémentation de /generateRenamingSequence()/
+  - Implémentation de /renameLocal()/
+  - Implémentation des tests correspondants
+    - Ajout de /generateStateA()/, /generateStateB()/ et de /generateStateC()/
+    - A correspond au scénario où 2 utilisateurs écrivent à tour de rôle
+    - B correspond au scénario où 1 utilisateur insère au sein de son dernier bloc de façon répétée
+    - C correspond au scénario où 2 utilisateurs écrivent à tour de rôle mais avec des suppressions
+    - Renvoie l'état du document, mais aussi la séquence de *DottedInterval* correspondante
+  - Implémentation de /recomputeMapBlocks()/
+- Réplication et cohérence de données : Cours 3
+  - Slide 57 : besoin d'un ordre causal nécessairement ? On parle pas plutôt d'un ordre partiel de livraison ? (Potentiellement FIFO donc)
+  - Slide 69 : pourquoi la version optimisé de LogootSplit ?
+*** Planned
+**** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
+**** IN-PROGRESS MUTE : Supprimer la boucle de rafraîchissement infinie de Angular
+- À l'heure actuelle, Angular rafraîchit de façon infinie l'interface, même si aucun évènement n'a lieu
+- *Protractor* permet d'attendre que le rafraîchissement s'interrompe avant de déclencher les instructions suivantes
+- Puisqu'il ne s'interrompt jamais, on ne peut pas utiliser cette méthode
+- On utilise donc des /sleep(duration)/ en attendant
+- Mais rien ne nous garantit que l'évènement a bien lieu avant la fin du /sleep()/
+- Afin de rendre le comportement de nos tests déterministes, il est nécessaire de supprimer ce cycle de rafraîchissement infini
 **** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
 - *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
   #+BEGIN_QUOTE
