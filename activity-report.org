@@ -4162,14 +4162,71 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Slide 57 : besoin d'un ordre causal nécessairement ? On parle pas plutôt d'un ordre partiel de livraison ? (Potentiellement FIFO donc)
   - Slide 69 : pourquoi la version optimisé de LogootSplit ?
 *** Planned
-**** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
-**** IN-PROGRESS MUTE : Supprimer la boucle de rafraîchissement infinie de Angular
+** Semaine du <2018-01-29 Mon> au <2018-02-02 Fri>
+*** Done
+- MUTE : Supprimer la boucle de rafraîchissement infinie de Angular
+  - Philippe a réussi à trouver et à patcher l'origine de la boucle
+- MUTE : Implémenter le mécanisme de renommage
+- MUTE : Intégration des tests E2E
+  - La méthode /waitForAngular()/ fonctionne donc désormais correctement
+  - Ré-écriture des tests E2E pour l'utiliser plutôt que /sleep()/
+  - Mais les tests ne sont toujours pas déterministes dans l'environnement Travis
+  - /waitForAngular()/ retourne avant que le stockage ait eu lieu
+  - Pour simplifier l'implémentation des tests liés au stockage, devrait émettre un évènement lorsqu'une nouvelle version du document est stocké
+  - En attendant, re-utilise /sleep()/
+  - Obtient des erreurs dont je ne comprends pas l'origine
+    #+BEGIN_SRC
+      mute App should broadcast updates to peers
+      Failed: unknown error: Cannot read property 'CodeMirror' of null
+    #+END_SRC
+  - Ceci intervient après /waitForAngular()/
+  - Cela signifierait que cette fonction retourne avant même que l'éditeur ne soit chargé
+  - Si finalement /waitForAngular()/ n'attend pas qu'Angular ait fini de render l'application, je ne sais pas quoi faire
+  - Laisse tomber personnellement les tests E2E pour le moment, perd trop de temps dessus
+- DISTRIBUTED SYSTEMS : Se documenter sur IPFS
+  - Whitepaper disponible à https://github.com/ipfs/papers/blob/master/ipfs-cap2pfs/ipfs-p2p-file-system.pdf
+  - InterPlanetary File System
+  - Un système de fichiers distribué
+  - Adresse des problèmes similaires à nos travaux
+    - Partition réseau
+    - Disparition du endpoint
+    - Censure
+  - Vise à remplacer HTTP par un protocole plus puissant
+  - Identifie dorénavant les données grâce à leur contenu
+  - Overview
+    - Une application web cherche à utiliser une ressource
+    - Un service de nommage IPNS permet d'obtenir à partir du nom human-readable de la ressource son identifiant
+    - L'identifiant de la ressource permet de récupérer son Merkle DAG
+    - Le Merkle DAG permet d'identifier la version de la ressource à récupérer
+    - La version de la ressource est échangée en utilisant BitTorrent
+    - Des DHTs sont utilisées pour déterminer les noeuds disposant de la ressource
+      - http://www.scs.stanford.edu/%7Edm/home/papers/kpos.pdf
+  - Une ressource est donc répliquée chez les noeuds qui sont intéressés par celle-ci
+  - Permet facilement d'assurer la disponibilité de sites statiques par exemple
+  - Mais encore du mal à imaginer le fonctionnement avec des données dynamiques
+  - Une discussion a justement eu lieu concernant ce type de données qui a conduit à une étude des CRDTs
+  - Ressources utiles
+    - Discussion initiale: https://github.com/ipfs/notes/issues/40
+    - Pourquoi utiliser des CRDTs avec IPFS: https://www.youtube.com/watch?v=2VOF-Z-nLnQ
+    - Construire un éditeur collaboratif reposant sur IPFS: https://www.youtube.com/watch?v=-kdx8rJd8rQ
+    - Éditeur collaboratif temps réel reposant sur IPFS: https://peerpad.net/
+    - Librairie de réseau P2P: https://libp2p.io/
+*** Planned
+**** CANCELLED MUTE : Intégration des tests E2E
+- Maintenant que la boucle Angular est supprimée, on peut reprendre les tests E2E pour les rendre déterministes
+**** DONE MUTE : Supprimer la boucle de rafraîchissement infinie de Angular
 - À l'heure actuelle, Angular rafraîchit de façon infinie l'interface, même si aucun évènement n'a lieu
 - *Protractor* permet d'attendre que le rafraîchissement s'interrompe avant de déclencher les instructions suivantes
 - Puisqu'il ne s'interrompt jamais, on ne peut pas utiliser cette méthode
 - On utilise donc des /sleep(duration)/ en attendant
 - Mais rien ne nous garantit que l'évènement a bien lieu avant la fin du /sleep()/
 - Afin de rendre le comportement de nos tests déterministes, il est nécessaire de supprimer ce cycle de rafraîchissement infini
+**** DONE DISTRIBUTED SYSTEMS : Se documenter sur IPFS
+- https://ipfs.io/
+**** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
+**** TODO DISTRIBUTED SYSTEMS : Se renseigner sur Dat
+- https://datproject.org/
+- https://datproject.org/paper
 **** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
 - *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
   #+BEGIN_QUOTE
