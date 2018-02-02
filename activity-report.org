@@ -4207,98 +4207,24 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Une discussion a justement eu lieu concernant ce type de données qui a conduit à une étude des CRDTs
   - Ressources utiles
     - Discussion initiale: https://github.com/ipfs/notes/issues/40
+    - Notes sur les CRDTs: https://github.com/ipfs/research-CRDT
     - Pourquoi utiliser des CRDTs avec IPFS: https://www.youtube.com/watch?v=2VOF-Z-nLnQ
     - Construire un éditeur collaboratif reposant sur IPFS: https://www.youtube.com/watch?v=-kdx8rJd8rQ
     - Éditeur collaboratif temps réel reposant sur IPFS: https://peerpad.net/
     - Librairie de réseau P2P: https://libp2p.io/
+- MUTE : Ajouter des tests pour *SyncService*
+  - Était déjà fait depuis quelques temps, mais n'avait pas marqué la tâche comme complétée
+- PLM
+  - Annulation des tâches liées à PLM qui traînaient depuis des années
 *** Planned
 **** CANCELLED MUTE : Intégration des tests E2E
 - Maintenant que la boucle Angular est supprimée, on peut reprendre les tests E2E pour les rendre déterministes
-**** DONE MUTE : Supprimer la boucle de rafraîchissement infinie de Angular
-- À l'heure actuelle, Angular rafraîchit de façon infinie l'interface, même si aucun évènement n'a lieu
-- *Protractor* permet d'attendre que le rafraîchissement s'interrompe avant de déclencher les instructions suivantes
-- Puisqu'il ne s'interrompt jamais, on ne peut pas utiliser cette méthode
-- On utilise donc des /sleep(duration)/ en attendant
-- Mais rien ne nous garantit que l'évènement a bien lieu avant la fin du /sleep()/
-- Afin de rendre le comportement de nos tests déterministes, il est nécessaire de supprimer ce cycle de rafraîchissement infini
-**** DONE DISTRIBUTED SYSTEMS : Se documenter sur IPFS
-- https://ipfs.io/
-**** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
-**** TODO DISTRIBUTED SYSTEMS : Se renseigner sur Dat
-- https://datproject.org/
-- https://datproject.org/paper
-**** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
-- *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
-  #+BEGIN_QUOTE
-  In many ways, a failure detector exactly encapsulates the synchrony requirements for consensus.
-  They showed that a particular failure detector Ω is the weakest failure detector for solving consensus.
-  The failure detector Ω essentially encapsulates a leader election service
-  #+END_QUOTE
-- Je ne comprends pas le lien entre /failure detector/ et /synchrony requirements for consensus/
-- Ce papier m'aidera p-e à comprendre
-**** TODO CRDT : Lire *Replicated Data Types: Specification, Verification, Optimality*
-**** TODO CRDT : Lire *CRDT notes*
-- Disponible ici: https://github.com/pfrazee/crdt_notes
-- Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
-**** TODO CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
-- Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
-**** TODO MUTE : Faire une liste des scénarios à tester d'une version à l'autre
-**** TODO MUTE : Rendre permanent l'identifiant et les clocks d'un utilisateur pour un document
-- Pour l'historique, il est important de conserver la liste des collaborateurs ayant collaboré sur un document
-- Pour faciliter l'implémentation de cette liste, il faut modifier le code pour réutiliser le même identifiant pour un même utilisateur au fil des sessions
-- À noter que les clocks aussi doivent être conservée pour prévenir tout bug
-  - Clock de /mute-structs/ pour éviter de générer un bloc avec le même identifiant
-  - Clock de /mute-core/ pour éviter de labeller des messages avec le même couple /<identifiant, clock>/
-**** TODO MUTE : Ajouter des tests pour *SyncService*
-- *SyncService* est un composant critique de MUTE
-- Écrire des tests pour *SyncService* permettrait:
-  - S'assurer de son bon fonctionnement
-  - Prévenir toute régression
-- Il n'est cependant pas facile à tester
-- Besoin de le refactorer ?
-**** TODO MUTE : Ajouter le /docId/ en tant que paramètre du constructeur de *DocService*
-- Cet attribut est actuellement initialisé via le flux /initSource/
-- Celui-ci émet l'identifiant du document actuel à son initialisation
-- Cependant, l'initialisation du document correspond à l'instantiation du *DocService*
-- Nous pouvons donc simplifier le code en ajoutant /docId/ en tant que paramètre du constructeur
-**** TODO MUTE : Étudier la suppression de *LogootSBlock*
-- L'utilisation de *LogootSBlock* semble limitée
-  - Conserve une référence vers un *IdentifierInterval*
-  - Cet *IdentifierInterval* ne peut que grossir
-  - Conserve le nombre d'éléments de cet *IdentifierInterval* qui existent encore
-  - Permet de déterminer si les éléments de cet *IdentifierInterval* nous appartiennent
-    - Pour voir si on peut append ou prepend
-- C'est ensuite une ou plusieurs instances de *RopesNodes* qui référencent un *LogootSBlock*
-- Les instances de *LogootSBlock* sont aussi référencées dans /mapBaseToBlock/
-  - Cette map nous permet de récupérer un bloc via sa base
-  - Elle est utilisée pour récupérer un bloc s'il existe, ou pour déterminer qu'il faut le créer
-- Serait-il possible de supprimer *LogootSBlock* ?
-  - L'objectif serait de simplifier la structure de données
-  - Il faudrait en contrepartie enrichir *RopesNodes* ou *LogootSRopes*
-  - Voir si ça permettrait effectivement de simplifier le code
-**** TODO MUTE : Fusionner blocs adjacents issus d'un split après la suppression
-- Lors d'un split, un bloc est coupé en deux et un nouveau bloc est inséré au milieu
-- Après la suppression du bloc inséré, on pourrait fusionner les deux parties du bloc initial pour le recréer
-- Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
-**** TODO MUTE : Ajouter la gestion du titre du document
-- Le titre du document peut être l'objet de modifications concurrentes
-- Il est donc nécessaire de s'assurer qu'il converge chez tous les utilisateurs
-- Utiliser *LogootSplit* pour gérer le titre semble un peu /overkill/
-- Un simple *LWW-Register* suffirait
-- Voir pour lier le document et son titre
-  - Le titre peut être amener à évoluer suite à des modifications du document
-  - Lier l'état du document et l'état du titre?
-**** TODO MUTE : Améliorer le pipe /slice/ d'Angular pour les *Strings*
-- Angular propose un pipe /slice/ permettant de limiter le nombre de caractères que nous souhaitons afficher d'une *String*
-- Cependant, rien n'indique dans le résultat si la chaîne de caractères a effectivement été tronquée ou non
-- Créer un pipe /sliceString/ ajoutant '...' au résultat si la chaîne a été coupée
-**** TODO CRDT : Lire *Kaleido*
-**** TODO PLM : Gérer les exercices n'ayant pas d'entité solution dans le langage de programmation par défaut
+**** CANCELLED PLM : Gérer les exercices n'ayant pas d'entité solution dans le langage de programmation par défaut
 - Actuellement, on considère que l'ensemble des exercices possèdent une entité solution en Java
 - Lors de leur instanciation à partir des sources, on essaie de calculer le(s) monde(s) objectif(s) à partir de cette entité solution
 - Ajouter un mécanisme de fallback vers un autre langage si l'entité solution Java n'est pas trouvée
 - Déclencher une erreur si aucune entité solution n'est trouvée
-**** TODO PLM : Ajouter des tests d'intégration pour vérifier la sérialisation JSON
+**** CANCELLED PLM : Ajouter des tests d'intégration pour vérifier la sérialisation JSON
 - Semblerait que la sérialisation JSON foire de temps en temps
   - Le JSON généré ne contient pas les opérations de la solution
 - Implémenter des tests d'intégration
@@ -4307,14 +4233,14 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Vérifier si l'instance obtenue possède des opérations solutions
   - Vérifier si les opérations solutions permettent bien d'atteindre l'état objectif ?
     - Je ne suis pas sûr qu'on puisse rejouer les opérations côté serveur actuellement
-**** TODO PLM : Corriger l'exercice Polygon360
+**** CANCELLED PLM : Corriger l'exercice Polygon360
 - L'exercice Polygon360 ne peut pas être résolu actuellement
 - Lorsqu'on soumet le code de la correction, on n'arrive pas à atteindre le monde objectif
   #+BEGIN_SRC
   Le monde 'Polygon360' diffère: x1 diffère. (trouvé Line (x263.445 y135.028 / x264.177 y149.000 / black) au lieu de Line (x263.968 y154.996 / x264.177 y149.000 / black) )
   #+END_SRC
 - L'erreur a été reportée ici : https://github.com/BuggleInc/webPLM/issues/130
-**** TODO PLM : Trouver l'origine du crash de webPLM du <2016-10-12 mer.>
+**** CANCELLED PLM : Trouver l'origine du crash de webPLM du <2016-10-12 mer.>
 - L'application a de nouveau eu un crash le <2016-10-12 mer.>, de 17:54 jusqu'à 18h:26
 - Il a fallu que je redémarre manuellement le container de webPLM
   - Pour une raison inconnue, il n'arrivait pas à redémarrer correctement
@@ -4359,6 +4285,89 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   2016-10-12 15:53:30 +0000 [DEBUG] from application in application-akka.actor.default-dispatcher-8689 - {"cmd":"stopExecution","args":{}}
   2016-10-12 16:27:11 +0000 [INFO] from application in application-akka.actor.default-dispatcher-2 - Execution Mode: TRIBUNAL
   #+END_SRC
+**** DONE MUTE : Supprimer la boucle de rafraîchissement infinie de Angular
+- À l'heure actuelle, Angular rafraîchit de façon infinie l'interface, même si aucun évènement n'a lieu
+- *Protractor* permet d'attendre que le rafraîchissement s'interrompe avant de déclencher les instructions suivantes
+- Puisqu'il ne s'interrompt jamais, on ne peut pas utiliser cette méthode
+- On utilise donc des /sleep(duration)/ en attendant
+- Mais rien ne nous garantit que l'évènement a bien lieu avant la fin du /sleep()/
+- Afin de rendre le comportement de nos tests déterministes, il est nécessaire de supprimer ce cycle de rafraîchissement infini
+**** DONE DISTRIBUTED SYSTEMS : Se documenter sur IPFS
+- https://ipfs.io/
+**** DONE MUTE : Ajouter des tests pour *SyncService*
+- *SyncService* est un composant critique de MUTE
+- Écrire des tests pour *SyncService* permettrait:
+  - S'assurer de son bon fonctionnement
+  - Prévenir toute régression
+- Il n'est cependant pas facile à tester
+- Besoin de le refactorer ?
+**** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
+**** TODO CRDT : Se renseigner sur replikativ
+- http://replikativ.io/
+**** TODO CRDT : Se renseigner sur OrbitDB
+- https://github.com/orbitdb/orbit-db
+**** TODO DISTRIBUTED SYSTEMS : Se renseigner sur Dat
+- https://datproject.org/
+- https://datproject.org/paper
+**** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
+- *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
+  #+BEGIN_QUOTE
+  In many ways, a failure detector exactly encapsulates the synchrony requirements for consensus.
+  They showed that a particular failure detector Ω is the weakest failure detector for solving consensus.
+  The failure detector Ω essentially encapsulates a leader election service
+  #+END_QUOTE
+- Je ne comprends pas le lien entre /failure detector/ et /synchrony requirements for consensus/
+- Ce papier m'aidera p-e à comprendre
+**** TODO CRDT : Lire *Replicated Data Types: Specification, Verification, Optimality*
+**** TODO CRDT : Lire *CRDT notes*
+- Disponible ici: https://github.com/pfrazee/crdt_notes
+- Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
+**** TODO CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
+- Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
+**** TODO MUTE : Faire une liste des scénarios à tester d'une version à l'autre
+**** TODO MUTE : Rendre permanent l'identifiant et les clocks d'un utilisateur pour un document
+- Pour l'historique, il est important de conserver la liste des collaborateurs ayant collaboré sur un document
+- Pour faciliter l'implémentation de cette liste, il faut modifier le code pour réutiliser le même identifiant pour un même utilisateur au fil des sessions
+- À noter que les clocks aussi doivent être conservée pour prévenir tout bug
+  - Clock de /mute-structs/ pour éviter de générer un bloc avec le même identifiant
+  - Clock de /mute-core/ pour éviter de labeller des messages avec le même couple /<identifiant, clock>/
+**** TODO MUTE : Ajouter le /docId/ en tant que paramètre du constructeur de *DocService*
+- Cet attribut est actuellement initialisé via le flux /initSource/
+- Celui-ci émet l'identifiant du document actuel à son initialisation
+- Cependant, l'initialisation du document correspond à l'instantiation du *DocService*
+- Nous pouvons donc simplifier le code en ajoutant /docId/ en tant que paramètre du constructeur
+**** TODO MUTE : Étudier la suppression de *LogootSBlock*
+- L'utilisation de *LogootSBlock* semble limitée
+  - Conserve une référence vers un *IdentifierInterval*
+  - Cet *IdentifierInterval* ne peut que grossir
+  - Conserve le nombre d'éléments de cet *IdentifierInterval* qui existent encore
+  - Permet de déterminer si les éléments de cet *IdentifierInterval* nous appartiennent
+    - Pour voir si on peut append ou prepend
+- C'est ensuite une ou plusieurs instances de *RopesNodes* qui référencent un *LogootSBlock*
+- Les instances de *LogootSBlock* sont aussi référencées dans /mapBaseToBlock/
+  - Cette map nous permet de récupérer un bloc via sa base
+  - Elle est utilisée pour récupérer un bloc s'il existe, ou pour déterminer qu'il faut le créer
+- Serait-il possible de supprimer *LogootSBlock* ?
+  - L'objectif serait de simplifier la structure de données
+  - Il faudrait en contrepartie enrichir *RopesNodes* ou *LogootSRopes*
+  - Voir si ça permettrait effectivement de simplifier le code
+**** TODO MUTE : Fusionner blocs adjacents issus d'un split après la suppression
+- Lors d'un split, un bloc est coupé en deux et un nouveau bloc est inséré au milieu
+- Après la suppression du bloc inséré, on pourrait fusionner les deux parties du bloc initial pour le recréer
+- Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
+**** TODO MUTE : Ajouter la gestion du titre du document
+- Le titre du document peut être l'objet de modifications concurrentes
+- Il est donc nécessaire de s'assurer qu'il converge chez tous les utilisateurs
+- Utiliser *LogootSplit* pour gérer le titre semble un peu /overkill/
+- Un simple *LWW-Register* suffirait
+- Voir pour lier le document et son titre
+  - Le titre peut être amener à évoluer suite à des modifications du document
+  - Lier l'état du document et l'état du titre?
+**** TODO MUTE : Améliorer le pipe /slice/ d'Angular pour les *Strings*
+- Angular propose un pipe /slice/ permettant de limiter le nombre de caractères que nous souhaitons afficher d'une *String*
+- Cependant, rien n'indique dans le résultat si la chaîne de caractères a effectivement été tronquée ou non
+- Créer un pipe /sliceString/ ajoutant '...' au résultat si la chaîne a été coupée
+**** TODO CRDT : Lire *Kaleido*
 * Glossaire
 - Eventual convergence property
   #+BEGIN_QUOTE
