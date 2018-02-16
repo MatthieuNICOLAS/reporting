@@ -4301,6 +4301,175 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Prévenir toute régression
 - Il n'est cependant pas facile à tester
 - Besoin de le refactorer ?
+** Semaine du <2018-02-05 Mon> au <2018-02-09 Fri>
+*** Done
+- MUTE : Implémenter le mécanisme de renommage
+  - Ajout de la fonction /completeRenamingMap()/
+    - Génère la map de renommage pour tous les noeuds du modèle
+      - Le pair ayant déclenché le renommage l'a effectué sur un état donné
+      - Mais je peux avoir d'autres noeuds dans mon modèle
+      - Il faut aussi renommer de façon déterministe ces noeuds
+    - Prend la map de renommage globale et la liste des insertions concurrentes en paramètre
+    - Extrait la liste des intervals d'identifiants de la map de renommage globale
+    - Pour chaque insertion concurrente
+      - Récupère l'identifiant précédent avec /findPrevious()/
+      - Renomme l'identifiant par rapport au précédent avec /renameIdentifier()/
+      - Génère l'interval d'identifiants correspondant au nouvel ident
+  - Ajout de la fonction /findPrevious()/
+    - Prend en paramètre un identifiant et une liste d'intervals d'identifiants
+    - Trouve l'identifiant dans la liste d'intervals qui précéde le noeud inséré
+    - Soit on insère un nouveau noeud entre 2 autres (on considère qu'il y a un bloc minimum)
+      - Dans ce cas, l'identifiant précédent est le dernier identifiant du noeud précédent
+    - Soit on insère un nouveau noeud en splittant un autre
+      - Dans ce cas, l'identifiant précédent est un préfixe de l'identifiant courant
+      - On peut le récupérer en tronquant l'identifiant courant
+    - Pas de garantie sur l'ordre des intervals dans la liste
+      - Peut pas interrompre la boucle de recherche si le noeud est inséré entre 2 autres
+      - Par contre, dans le cas d'un split, on peut interrompre la boucle de recherche de façon safe
+	- Un noeud ne peut pas être contenu dans 2 autres noeuds à la fois
+    - Renvoie l'identifiant précédent ainsi que l'interval le contenant
+- CRDT : Lire *A Study of CRDTs that do Computations*
+*** Planned
+**** DONE CRDT : Lire *A Study of CRDTs that do Computations*
+- Disponible ici : https://dl.acm.org/citation.cfm?id=2745948
+** Semaine du <2018-02-12 Mon> au <2018-02-16 Fri>
+*** Done
+- MUTE : Implémenter le mécanisme de renommage
+  - A trouvé une erreur dans l'algorithme de /renameRemote()/
+    - On regénère /renamingMap/ telle qu'elle a été générée par le site ayant déclenché le renommage à partir de l'état courant et des opérations de suppressions concurrentes
+    - On génère une nouvelle map /completedRenamingMap/ à partir de /renamingMap/ et des opérations d'insertion concurrentes
+    - On génère un nouvel état vide
+    - On parcourt chaque noeud de l'ancien état et pour chacun
+      1. On extrait l'interval d'identifiants du noeud
+      2. On récupère les éléments correspondants
+      3. On cherche dans /renamingMap/ le nouvel interval d'identifiants correspondants
+      4. On insère dans le nouvel état un nouveau noeud généré à partir de ces données
+    - Mais l'étape 2 peut échouer
+      - Si le noeud a été modifié en concurrence (append, preprend, split ou suppression partielle)
+      - Dans ce cas, l'interval d'identifiants du noeud ne correspond plus à celui d'enregistré dans /completedRenamingMap/
+      - Par exemple, on cherche à renommer un noeud correspondant à l'interval /a[0,6]/ alors que dans /completedRenamingMap/ on a les entrées /a[0,5]/ et /a[6,6]/
+	- Dû à une insertion en concurrence de /a6/
+      - En utilisant simplement /a[0,6]/ en clé, on n'obtiendra pas de résultats
+    - L'algo doit donc être corrigé
+    - Plusieurs possibilités
+      - [ ] Modifier la façon dont est générée /completedRenamingMap/
+	- "Appliquer" les opérations concurrentes sur /renamingMap/
+	- Permettrait d'obtenir une /completedRenamingMap/ qui colle exactement à notre état
+	- Cependant, ça impliquerait d'implémenter la logique de manipulation d'intervals dans *RenamingMap*
+	  - Insérer un nouveau bloc => Ajouter une entrée dans la map
+	  - Append/Prepend => Modifier une entrée dans la map
+	  - Split un bloc => Supprimer l'entrée correspondante et insérer les entrées correspondantes aux 2 morceaux du blocs résultant du split ainsi que le split
+	  - Supprimer un bloc => Supprimer l'entrée correspondante
+	  - Supprimer un morceau de bloc => Réduire la taille de l'interval d'une entrée
+	- Ceci serait lourd et error-prone à mon sens
+      - [ ] "Undo" les opérations concurrentes puis rejouer leur transformation
+	- L'algorithme consisterait à
+	  1. Revenir à l'état sur lequel a été effectué le renommage
+	  2. Appliquer l'opération de renommage
+	     - Permet de réutiliser le code de /renameLocal()/
+	  3. Appliquer les opérations concurrentes
+	     - Permet de réutiliser le code utilisé pour appliquer les opérations concurrentes à un renommage après qu'on ait appliqué le renommage
+	- Pour l'étape 1, il faut donc "undo" les opérations concurrentes qui ont été appliquées à la copie locale
+	  - "Undo" une insertion consiste simplement à supprimer l'interval inséré
+	  - "Undo" une suppression est plus problématique
+	    - Il s'agit d'insérer de nouveau l'interval supprimé, mais aussi son contenu
+	    - Dans notre cas, nous n'avons plus accès au contenu
+	    - Mais comme on va de toute façon re-supprimer l'interval en réappliquant l'opération ensuite, on peut se contenter d'insérer des caractères aléatoires
+        - Cette solution me paraît intéressante car elle permet de factoriser du code et reste simple
+	- Mais "undo" les opérations est une étape dont j'aimerai bien me passer
+      - [X] Générer un état correspondant mais avec des éléments factices et remplacer ses éléments par ceux de l'état original
+	- Au cours du renommage, on ne modifie que la structure de données (les blocs *RopesNodes*), pas ses éléments (/doc.str/)
+	- Mais les deux sont intraséquement liés par design, on ne peut pas modifier la structure sans modifier les éléments
+	  - Ce qui est pertinent d'un point de vue conceptuel
+	  - Mais qui devient gênant dans le cas présent
+	- Pour cela qu'on "undo" les opérations concurrentes dans la solution précédente, afin de revenir à un état où structure de données et éléments concordent
+	- On peut cependant éviter de "undo" les opérations en utilisant des éléments factices
+	- L'algorithme est le suivant
+	  1. Générer un état vide
+	  2. Appliquer une opération d'insertion du bloc résultant du renommage, avec des éléments factices
+	  3. Appliquer les opérations concurrentes
+	  4. Remplacer les éléments de la structure de données obtenue par ceux de l'ancien état
+	- Offre de meilleures performances que la stratégie "undo"
+	  - Au lieu d'appliquer /k/ opérations concurrentes nécessitant de parcourir la structure de données en /O(log(n))/
+	  - On a juste besoin de remplacer /newDoc.str/ par /doc.str/
+	  - Si l'implémentation évolue et qu'on répartit les éléments dans les blocs, on aura juste besoin de parcourir la structure de données complète en /O(n)/ pour remplacer les éléments
+	- Cette solution permet d'améliorer les performances de l'opération de renommage tout en restant simple
+- CRDT : Lire Legion
+  - Approche intéressante
+  - Plutôt que de construire un nouveau système entièrement distribué reposant sur des CRDTs, du P2P
+  - Ils prennent un système centralisé, Google Realtime API
+    - https://developers.google.com/google-apps/realtime/overview
+  - Et l'améliore en déléguant une partie de ses responsabilités aux utilisateurs
+  - Google Realtime API
+    - Propose de manipuler une structure de données répliquées
+    - Utilise un serveur centralisé
+    - Lorsqu'un utilisateur effectue une modification, l'applique à sa copie puis l'envoie au serveur
+    - Le serveur, en utilisant OT, transforme l'opération par rapport à sa copie et partage la modification aux autres participants
+  - Legion
+    - Override Google Realtime API
+    - Plutôt que de manipuler la structure de données initiale, manipule un CRDT
+    - Met en place et utilise un réseau P2P pour partager les modifications
+    - Un pair est élu leader et se charge de mettre à jour la copie du serveur
+      - À partir des changements effectués sur le CRDT depuis la dernière synchro, génère des opérations "standards" de Google Realtime API
+      - À partir des changements entre la copie du serveur et sa version précédente, génère des opérations correspondantes pour le CRDT
+    - Permet à des clients utilisant uniquement Google Realtime API de toujours participer à la collaboration
+  - Permet d'améliorer les performances du système
+    - Meilleure vitesse de propagation des changements
+      - Puisqu'ils sont partagés directement entre utilisateurs
+      - Plutôt que de passer par le serveur à chaque fois
+    - Meilleure disponibilité
+      - Si le serveur plante, les utilisateurs peuvent toujours collaborer
+  - Tout en limitant l'effort d'adoption
+    - Seulement 2 lignes de code à modifier semblerait pour utiliser Legion dans une application utilisant Google Realtime API à la base
+      - Import du script de Legion
+      - Utilisation du constructeur de Legion au lieu du constructeur de Google Realtime API
+    - Collaboration possible avec les "Legacy clients"
+  - Mais le serveur représente toujours un /Single Point Of Failure/
+    - Se charge d'authentifier les utilisateurs
+    - A la responsabilité des droits d'accès à la ressource
+    - Joue le rôle de /signaling/
+    - Conserve la clé de chiffrement symétrique des données au sein de la structure
+  - Il est donc nécessaire de faire confiance au serveur avec cette approche
+- CRDT : Lire *Consistency without concurrency control in large, dynamic systems*
+  - Se base sur *Treedoc*
+  - Problème adressé
+    - Dans *TreeDoc*, le TID d'un élément (son identifiant) représente un chemin dans l'arbre
+    - Au fur et à mesure que l'on insère des éléments dans l'arbre, sa hauteur augmente et donc la taille des identifiants
+    - Mais supprimer des éléments ne réduit pas la hauteur de l'arbre, notamment dans le cas où l'élément supprimé est un noeud intermédiaire
+  - Solution proposée
+    - L'idée est de rebalancer l'arbre afin d'éliminer les "trous" dans celui-ci
+    - La difficulté consiste à rebalancer l'arbre de façon uniforme sur toutes les copies
+    - Ainsi que de gérer les opérations concurrentes à un rebalancement
+    - Distingue 2 types de sites : les sites appartenant au /core/ et ceux appartenant à la /nebula/
+    - Les sites appartenant au /core/ sont en charge d'effectuer le rebalancing
+    - Permet de limiter le mécanisme lourd du rebalancing à un nombre restreint de sites stables grâce au /core/
+    - Tout en permettant une collaboration dynamique à grande échelle grâce à la /nebula/
+  - Rebalancing de l'arbre par les sites /core/
+    - Doivent se mettre d'accord sur quand/quel état déclencher un rebalancing
+    - Pour cela, utilisent un 2PC
+    - Si un site /core/ reçoit une opération concurrente durant le protocole de consensus, celui-ci échoue
+      - Priorité des opérations concurrentes
+    - Chaque rebalancing fait évoluer l'/epoch/ de l'arbre
+    - L'/epoch/ permet d'identifier le contexte dans lequel une opération a été générée
+    - Une fois qu'un rebalancing a été effectué, les sites de la /nebula/ doivent exécuter localement le rebalancing sur leur copie
+  - Renommage des opérations concurrentes au rebalancing par les sites /nebula/
+    - Identifie les noeuds qui ont été rebalancés
+    - Génère l'arbre balancé à partir de ces noeuds
+    - Attache les noeuds qui ont été ajoutés en concurrence à leur parent précédent
+    - Identifie le nouveau chemin menant au noeud concurrent
+  - Remarques
+    - Le rebalançing de l'arbre permet effectivement de garbage collecter la structure de données et de réduire la taille des identifiants utilisés
+    - Mais il nécessite dans ce système un consensus entre les sites du /core/ pour être effectué
+    - Voir si on arrive à faire sauter cette limitation et à proposer un mécanisme entièrement distribué
+*** Planned
+**** DONE CRDT : Lire Legion
+- Legion propose un système permettant de manipuler une variété de structures de données de manière décentralisée
+- Voir https://legion.di.fct.unl.pt/
+- Papier disponible ici : https://dl.acm.org/citation.cfm?id=3052673
+**** DONE CRDT : Lire *Consistency without concurrency control in large, dynamic systems*
+- Claudia m'a indiqué que le mécanisme de renommage lui rappelait ces travaux
+- Présentation disponible ici : https://www.cs.cornell.edu/projects/ladis2009/talks/shapiro-talk-ladis2009.pdf
+- Papier disponible là : https://www.cs.cornell.edu/projects/ladis2009/papers/letia-ladis2009.pdf
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** TODO CRDT : Se renseigner sur replikativ
 - http://replikativ.io/
