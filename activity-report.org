@@ -4461,6 +4461,9 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Le rebalançing de l'arbre permet effectivement de garbage collecter la structure de données et de réduire la taille des identifiants utilisés
     - Mais il nécessite dans ce système un consensus entre les sites du /core/ pour être effectué
     - Voir si on arrive à faire sauter cette limitation et à proposer un mécanisme entièrement distribué
+  - Questions
+    - Est-ce qu'adapter ce mécanisme à *LogootSplit* est une contribution suffisante ?
+    - Ou faut-il améliorer l'existant ?
 *** Planned
 **** DONE CRDT : Lire Legion
 - Legion propose un système permettant de manipuler une variété de structures de données de manière décentralisée
@@ -4470,7 +4473,115 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - Claudia m'a indiqué que le mécanisme de renommage lui rappelait ces travaux
 - Présentation disponible ici : https://www.cs.cornell.edu/projects/ladis2009/talks/shapiro-talk-ladis2009.pdf
 - Papier disponible là : https://www.cs.cornell.edu/projects/ladis2009/papers/letia-ladis2009.pdf
+** Semaine du <2018-02-19 Mon> au <2018-02-23 Fri>
+*** Done
+- MUTE : Implémenter le mécanisme de renommage
+  - Suite à la lecture de *Consistency without concurrency control in large, dynamic systems*, il est nécessaire de revoir les objectifs de cette implémentation
+  - La principale question est jusqu'où aller dans une 1ère étape ?
+    - Proposer une adaptation du mécanisme pour *LogootSplit* ?
+    - Proposer une amélioration du mécanisme en le rendant concurrence-safe ?
+  - Si on se limite à une adaptation du mécanisme pour *LogootSplit*
+    - Ne devrait-on pas implémenter un mécanisme d'élection de leader pour l'expérimentation ?
+      - Afin de proposer une évaluation la plus rigoureuse possible
+    - Rappel du FLP theorem: le consensus n'est pas atteignable dans un système avec réseau asynchrone et où les noeuds peuvent tomber en panne
+    - Il s'agit d'une hypothèse forte et qu'on va être incapable de reproduire en milieu expérimental
+  - On va plutôt réfléchir à comment rendre commutative l'opération de renommage avec elle-même
+  - Finalement, il s'agit d'un cas particulier de OT
+    - Ici, nous avons un système avec 3 opérations
+      - Insertion
+      - Suppression
+      - Renommage
+    - Seul l'opération de renommage modifie le contexte réellement
+    - Donc seules les opérations concurrentes à une opération de renommage doivent être transformées
+    - Transformer une opération de renommage /op1/ concurrente par rapport à une autre /op2/ consiste à
+      - Ne rien faire si /op2/ a la priorité sur /op1/
+      - Appliquer /op1/ sinon
+	- Recréer l'état obtenu après le renommage
+	- Rejouer, en les transformant, les opérations d'insertion et de suppression concurrentes
+	- Mapper le contenu de l'ancien état au nouveau
+    - Transformer une opération d'insertion ou de suppression /op1/ par rapport à une opération de renommage /op2/ dépend de son contexte de génération
+      - Si le contexte de génération de /op1/ est inférieur au contexte résultant de l'application de /op2/
+	- Alors il suffit de transformer l'opération comme décrit précédemment dans ce journal
+      - Sinon, cela signifie que le contexte de génération de /op1/ est concurrent au contexte résultant de l'application de /op2/
+	- Auquel cas, l'idée est d'utiliser des /backward/forward transformations/
+	- On recherche le contexte ancêtre à la fois de /op1/ et de /op2/
+	- On transforme en arrière /op1/ pour obtenir une opération équivalente /op1'/ applicable dans ce contexte ancêtre
+	- Puis on applique /op1'/ simplement en la considérant comme une opération concurrente à /op2/
+    - Là encore, on va utiliser la /renamingMap/ qui a servi à passer du contexte ancêtre au contexte de /op1/ pour la transformée arrière
+      - Juste qu'on va l'utiliser en sens inverse
+- IPFS : Lire *Paper review. IPFS: Content addressed, versioned, P2P file system*
+  - Argumente que le problème que IPFS adresse, la bande passante limitée, n'est pas un problème
+    - D'après lui, les CDNs existent pour résoudre le problème
+    - Sauf que les CDNs ne réduisent pas la bande passante consommée, ils la répartissent juste
+      - Plutôt que d'utiliser ma bande passante pour fournir une ressource, je vais utiliser celle des différents serveurs du CDN
+    - De plus, c'est le /host/ de la donnée qui a la charge d'utiliser sur un CDN pour répliquer la ressource
+      - Je peux tout à fait refuser d'utiliser un CDN pour fournir les ressources statiques de mon application
+    - Et c'est ensuite au CDN d'en assurer la disponiblité
+      - Donc finalement on déplace la complexité de mon application au CDN
+    - Avec IPFS, chaque consommateur d'une ressource peut en plus héberger et fournir cette donnée par la suite
+      - Ceci peut s'additionner à un CDN utilisé initialement pour fournir la ressource
+  - Donc considère que IPFS complique juste le système inutilement
+    - Effectivement, construire un système entièrement distribué peut s'avérer plus complexe que de construire son équivalent centralisé
+  - Argumente que des systèmes centralisés qui scalent et qui sont hautement disponibles existent
+    - Dropbox, Facebook
+    - Selon moi, il ne faut toutefois pas oublier la complexité de ces systèmes et leurs coûts de fonctionnement
+  - De mon point de vue, son analyse manque la cible
+    - Un des intérêts de IPFS est de changer le mode d'adressage des données
+      - On passe d'un adressage /host-based/ à un adressage /content-based/
+      - Ceci permet d'éviter le phénomène de centralisation de l'Internet
+      - On n'est alors plus dépendant d'un système tiers auquel on ne fait pas forcément confiance (privacy, disponbilité, ...) pour partager une donnée
+      - Et on économise effectivement de la bande passante avec ce nouveau mode d'adressage
+	- Pour partager une ressource dans un réseau local, il suffit qu'un seul des noeuds ait téléchargé la ressource
+    - La réplication des données proposée par IPFS permet aussi le fonctionnement en /offline/
+      - Puisque je possède la donnée, je n'ai pas besoin de passer par un service tiers pour y accéder
+    - IPFS vise aussi à proposer un système qui met à disposition toutes les mécanismes de scalabilité et de disponibilité qu'il mentionne
+      - Plutôt que chacun (ou du moins ceux qui ont les moyens) ne les réimplémente
+      - L'idée est de les mettre à disposition de tous tout en cachant leur complexité
+  - Une réponse d'un développeur de IPFS est disponible ici : https://news.ycombinator.com/item?id=16432502
+  - Référence une bonne vidéo explicative sur les Merkle Trees
+    - Disponible ici: https://www.youtube.com/watch?v=YIc6MNfv5iQ
+*** Planned
+**** DONE IPFS : Lire *Paper review. IPFS: Content addressed, versioned, P2P file system*
+- Un blogger a rédigé un post sur son analyse de IPFS
+- Peut être intéressant de lire son avis
+- Disponible ici : https://muratbuffalo.blogspot.fr/2018/02/paper-review-ipfs-content-addressed.html
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
+**** TODO MUTE : Implémenter un log CRDT-agnostic
+- Pour le besoin des expérimentations, nous avons besoin de traces d'utilisation
+- Cependant le log d'opérations que nous stockons actuellement dans MUTE n'est pas adapté
+  - Il n'offre qu'une linéarisation des opérations pour un utilisateur donné
+    - On ne conserve pas les informations de concurrence et de causalité
+  - On ne peut pas utiliser les opérations directement avec un CRDT
+    - Les opérations étant des opérations *LogootSplit*
+    - On peut s'en sortir en rejouant les opérations et en récupérant les opérations textes générées
+- On pourrait, afin de construire un corpus, générer un autre log contenant
+  - Les opérations textes de l'utilisateur
+    - Afin de pouvoir les rejouer en utilisant un autre modèle
+  - Avec pour chaque opération
+    - Le vecteur d'état représentant le contexte de génération de l'opération
+      - Afin de capturer les informations de causalité des opérations
+    - Potentiellement, l'état après opération
+      - Afin de vérifier la correction du modèle utilisé
+      - Mais dans ce cas, il ne faudrait jouer strictement que les opérations distantes faisant partie des dépendances de la prochaine opération locale
+- On pourrait ainsi rejouer fidèlement une collaboration à partir des logs de chaque participant
+  - Un noeud par participant
+  - Initialise un réseau P2P regroupant tous les noeuds
+  - Dans l'ordre causal de ses opérations locales
+    - Chaque noeud essaie de jouer sa prochaine opération
+      - Il peut la jouer uniquement s'il a reçu toutes ses dépendances causales
+      - Si le noeud ne possède pas toutes les dépendances de sa prochaine opération, il attend
+    - Une fois l'opération locale jouée, il partage avec les autres noeuds l'opération distante correspondante
+    - Potentiellement, vérifie après avoir appliqué chaque opération que l'état courant correspond à l'état enregistré
+  - Doit s'assurer que
+    - Le réseau P2P est correctement construit avant de donner le top départ aux noeuds
+    - Chaque opération distante est délivrée /at-least-once/ à chaque noeud
+- Reste à réfléchir à comment gérer la fin de la simulation
+  - Ce n'est pas parce qu'un noeud n'a plus opérations locales à jouer que la collaboration est finie
+    - D'autres noeuds peuvent avoir des opérations restantes de leur côté
+    - Par exemple, un noeud peut avoir jouer toutes ses opérations au bout de 5min sur les 50min de collaboration
+  - Faut-il spécifier un état final aux noeuds qu'ils doivent atteindre avant de quitter ?
+    - Grâce au vecteur d'état obtenu en aggrégeant le nombre d'opérations par noeud
+  - Ou finalement, chaque noeud peut quitter une fois son travail effectué ?
 **** TODO CRDT : Se renseigner sur replikativ
 - http://replikativ.io/
 **** TODO CRDT : Se renseigner sur OrbitDB
