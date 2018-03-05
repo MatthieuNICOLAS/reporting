@@ -4495,6 +4495,9 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Donc seules les opérations concurrentes à une opération de renommage doivent être transformées
     - Transformer une opération de renommage /op1/ concurrente par rapport à une autre /op2/ consiste à
       - Ne rien faire si /op2/ a la priorité sur /op1/
+	- L'opération de renommage n'a pas d'effet sur les éléments de la structure de données
+	- On peut donc considérer qu'aucune intention de l'utilisateur n'est associée à cette opération
+	- On peut donc ignorer ce type d'opération dans certains cas tout en continuant de respecter l'intention de l'utilisateur
       - Appliquer /op1/ sinon
 	- Recréer l'état obtenu après le renommage
 	- Rejouer, en les transformant, les opérations d'insertion et de suppression concurrentes
@@ -4504,11 +4507,11 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 	- Alors il suffit de transformer l'opération comme décrit précédemment dans ce journal
       - Sinon, cela signifie que le contexte de génération de /op1/ est concurrent au contexte résultant de l'application de /op2/
 	- Auquel cas, l'idée est d'utiliser des /backward/forward transformations/
-	- On recherche le contexte ancêtre à la fois de /op1/ et de /op2/
+	- On recherche le contexte ancêtre commun de /op1/ et de /op2/
 	- On transforme en arrière /op1/ pour obtenir une opération équivalente /op1'/ applicable dans ce contexte ancêtre
 	- Puis on applique /op1'/ simplement en la considérant comme une opération concurrente à /op2/
-    - Là encore, on va utiliser la /renamingMap/ qui a servi à passer du contexte ancêtre au contexte de /op1/ pour la transformée arrière
-      - Juste qu'on va l'utiliser en sens inverse
+	- Là encore, on va utiliser la /renamingMap/ qui a servi à passer du contexte ancêtre au contexte de /op1/ pour calculer la transformée arrière
+	  - Juste qu'on va l'utiliser en sens inverse
 - IPFS : Lire *Paper review. IPFS: Content addressed, versioned, P2P file system*
   - Argumente que le problème que IPFS adresse, la bande passante limitée, n'est pas un problème
     - D'après lui, les CDNs existent pour résoudre le problème
@@ -4545,7 +4548,21 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - Un blogger a rédigé un post sur son analyse de IPFS
 - Peut être intéressant de lire son avis
 - Disponible ici : https://muratbuffalo.blogspot.fr/2018/02/paper-review-ipfs-content-addressed.html
+** Semaine du <2018-03-05 Mon> au <2018-03-09 Fri>
+*** Done
+*** Planned
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
+**** TODO MUTE : Fix mécanisme de causalité
+- En effectuant des tests utilisateurs sur MUTE, on s'est aperçu que le mécanisme de causalité présente des problèmes
+- On constate le bug en rechargeant un document
+  - Au cours de l'initialisation du document à partir du log stocké, on n'arrive pas à rejouer toutes les opérations
+  - Certaines opérations sont bufferisées car on n'aurait pas toutes les dépendances pour les jouer
+  - On n'arrive donc pas à rejouer l'entièreté du log
+  - Une synchronisation avec un autre pair peut débloquer la situation
+  - Cependant, si ces opérations du log sont stockées dans cet ordre, cela veut dire qu'elles ont été délivrées dans cet ordre
+  - Voir d'où provient ce bug
+    - Est-ce qu'une opération n'est pas correctement loggée ?
+    - Ou est-ce qu'une opération n'est pas détectée comme délivrable alors qu'elle est en vérité ?
 **** TODO MUTE : Implémenter un log CRDT-agnostic
 - Pour le besoin des expérimentations, nous avons besoin de traces d'utilisation
 - Cependant le log d'opérations que nous stockons actuellement dans MUTE n'est pas adapté
