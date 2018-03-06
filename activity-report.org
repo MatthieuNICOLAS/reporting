@@ -4550,9 +4550,51 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 - Disponible ici : https://muratbuffalo.blogspot.fr/2018/02/paper-review-ipfs-content-addressed.html
 ** Semaine du <2018-03-05 Mon> au <2018-03-09 Fri>
 *** Done
+- MUTE : Fix mécanisme de causalité
+  - Le scénario permettant de générer ce bug est le suivant:
+    - 2 collaborateurs, A et B, rédigent un document (insertions multiples)
+    - Au bout d'un moment, A effectue une opération de suppression
+    - A poursuit ensuite avec quelques opérations d'insertion
+    - À ce moment, les 2 copies doivent converger
+    - A se déconnecte
+    - B recharge le document
+    - B va alors obtenir l'état du document correspondant à toutes ses opérations et toutes les opérations de A précédant l'opération de suppression
+  - Ce bug est dû à un problème de sérialisation/désérialisation
+    - Le champ /dependencies/ de *RichLogootSOperation* est perdu au cours de la sérialisation/désérialisation
+    - Dans le cas d'une opération *LogootSAdd*, cela ne pose pas de problème
+    - Dans le cas d'une opération *LogootSDel*, l'opération n'est plus valide
+  - L'opération désérialisée est ré-instanciée à 2 endroits du code
+    - Dans *SyncMessageService*, lorsqu'on reçoit l'opération d'un autre pair
+      - On regénère l'opération manuellement dans /deserializeRichLogootSOperation()/
+      - Mais on ne traite pas le cas où l'opération n'est pas valide dans ce code
+      - L'opération est donc délivrée correctement puis stockée
+    - Dans *SyncStorageService*, lorsqu'on regénère le document à partir du log
+      - Ici, on utilise /RichLogootSOperation.fromPlain()/ pour réinstancier l'opération
+      - /RichLogootSOperation.fromPlain()/ détecte que l'opération est non-valide et renvoie alors la valeur *null*
+      - *SyncStorageService* filtre les opérations *null* et ne délivre donc que les opérations valides
+  - Il est intéressant de noter que ce bug affecte uniquement les opérations de suppression des autres utilisateurs
+    - Les opérations d'insertion n'ont de toute façon pas de dépendances
+    - Nos opérations de suppression sont stockées directement et ne perdent pas leur champ /dependencies/ au cours de la sérialisation/désérialisation
+  - Ce bug serait donc similaire au cas où l'on ne stockerait pas les opérations de suppression générées par les autres utilisateurs
+    - On ne peut dès lors plus rejouer les opérations suivantes de ces utilisateurs (delivery FIFO)
+    - On ne peut potentiellement plus rejouer nos opérations si une d'entre elles est une opération de suppression dépendant d'une insertion distante bufferisée (delivery causal)
+  - L'origine de ce problème provient de cette ligne : https://github.com/coast-team/mute/blob/a1ef5a94ddf8fd1bd741040a63ba8eb62f28ab88/src/app/doc/editor/cursor/cursor.proto#L2
+    - Afin de réutiliser la configuration *Protobuf* écrite dans /mute-core/, on l'importe dans ce nouveau fichier
+    - Cependant, importer dans *Protobuf* se traduit par regénérer le code correspondant à la configuration du package et l'exporter en potentiellement écrasant un objet existant
+    - Ici, la configuration de /sync/ est plus récente que celle de /cursor/
+      - J'ai regénéré les fichiers *Protobuf* dans /mute-core/, mais pas ceux dans /mute/
+    - Ainsi, le code correspondant à la nouvelle configuration de /sync/ n'est pas pris en compte
+    - Car il est écrasé par son ancienne version qui a été générée au préalable et incluse dans le code correspondant à la configuration de /cursor/
+  - Plusieurs problèmes sont donc à corriger :
+    - [X] Utiliser /RichLogootSOperation.fromPlain()/ dans /deserializeRichLogootSOperation()/
+      - Permettrait de disposer d'un traitement uniforme des opérations, qu'elles soient reçues à l'instant d'un collaborateur ou qu'il s'agisse d'opérations provenant d'un log
+      - Modification de la fonction pour utiliser /RichLogootSOperation.fromPlain()/
+    - [X] Actualiser les fichiers *Protobuf* de /mute/
+    - [X] Inclure l'actualisation des fichiers *Protobuf* dans le processus de build de /mute-core/ et de /mute/
+      - Permettrait de s'assurer que les configurations *Protobuf* soient à jour
+      - Ajout de la commande /npm run proto/ dans la phase /prebuild/ de /mute/ et de /mute-core/
 *** Planned
-**** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
-**** TODO MUTE : Fix mécanisme de causalité
+**** DONE MUTE : Fix mécanisme de causalité
 - En effectuant des tests utilisateurs sur MUTE, on s'est aperçu que le mécanisme de causalité présente des problèmes
 - On constate le bug en rechargeant un document
   - Au cours de l'initialisation du document à partir du log stocké, on n'arrive pas à rejouer toutes les opérations
@@ -4563,6 +4605,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Voir d'où provient ce bug
     - Est-ce qu'une opération n'est pas correctement loggée ?
     - Ou est-ce qu'une opération n'est pas détectée comme délivrable alors qu'elle est en vérité ?
+**** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** TODO MUTE : Implémenter un log CRDT-agnostic
 - Pour le besoin des expérimentations, nous avons besoin de traces d'utilisation
 - Cependant le log d'opérations que nous stockons actuellement dans MUTE n'est pas adapté
