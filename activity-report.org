@@ -4593,6 +4593,69 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - [X] Inclure l'actualisation des fichiers *Protobuf* dans le processus de build de /mute-core/ et de /mute/
       - Permettrait de s'assurer que les configurations *Protobuf* soient à jour
       - Ajout de la commande /npm run proto/ dans la phase /prebuild/ de /mute/ et de /mute-core/
+- MUTE : Implémenter le mécanisme de renommage
+  - L'algorithme pour transformer les opérations de suppression par rapport à un renommage était incorrect
+    - Une opération de suppression peut supprimer des identifiants faisant parti du renommage
+    - Mais aussi des identifiants qui ont été insérés en concurrence à l'opération de renommage
+  - La marche à suivre dans ces 2 cas est différente
+  - Pour les identifiants faisant parti du renommage
+    - Pour déterminer quels identifiants sont concernés, il faut calculer l'intersection entre les identifiants supprimés et les identifiants renommés
+    - Il suffit ensuite de trouver l'image de l'intersection dans /renamingMap/
+  - Pour les identifiants insérés en concurrence
+    - Pour déterminer quels identifiants sont concernés, il faut calculer la différence entre les identifiants supprimés et l'intersection calculée précédemment
+    - Il faut ensuite calculer l'image de la différence dans le nouveau contexte
+  - Ajout des fonctions /intersection()/ et /difference()/ dans *IdentifierInterval*
+  - Modification de /findPredecessor()/ pour gérer le cas sans prédecesseur
+    - Auparavant, initialisait /predecessorId/ et /predecessorIdInterval/ avec un des éléments de /renamedIntervals/
+    - Mais potentiellement, aucun élément de /renamedIntervals/ n'est le prédécesseur de /id/
+    - Dans ce cas, on pouvait retourner un /predecessorId/ tel que /predecessorId > id/, ce qui est incorrect
+    - Dorénavant, /findPredecessor()/ retourne soit le couple /<predecessorId, predecessorIdInterval>/, soit /undefined/
+  - Modification de /renameIdentifierInterval()/ pour gérer le cas sans prédecesseur
+    - Puisque /findPredecessor()/ peut maintenant retourner la valeur /undefined/, il faut modifier /renameIdentifierInterval()/ en conséquence
+    - Initialise /newPredecessorId/ avec /Id[-1, 0, 0, 0]/
+      - Comme les éléments renommés commence à /Id[0, renamingReplicaNumber, renamingClock, 0]/, on est sûr que /newPredecessorId/ est plus petit que n'importe quel autre identifiant
+    - Puis écrase cette valeur si /findPredecessor()/ a retourné un résultat
+  - Étude d'une modification de /renameIdentifierInterval()/ pour limiter l'augmentation de la taille des splits effectués en concurrence d'un renommage
+    - Dans le scénario suivant :
+      #+CAPTION: Renommage d'un split concurrent
+      #+NAME: fig:concurrent-split-renaming.jpg
+      [[file:img/concurrent-split-renaming.jpg]]
+      - Un site A effectue le renommage suivant : /a[0..5] -> a'[0..5]/
+      - Un site B insére en concurrence du renommage l'identifiant /a1b0/
+      - Lorsqu'on joue l'insertion de /a1b0/ sur le site A, on la transforme par rapport au renommage
+      - On insère en finalité l'identifiant /a'1a1b0/
+      - Mais si on insérait l'identifiant /a'1b0/, l'ordre obtenu serait identique
+	#+CAPTION: Renommage optimisé d'un split concurrent
+        #+NAME: fig:concurrent-split-better-renaming.jpg
+        [[file:img/concurrent-split-better-renaming.jpg]]
+      - De plus, /a1/ peut être en pratique un identifiant de taille conséquente
+    - Le but est d'améliorer le mécanisme de renommage en omettant la particule qui a été renommé
+    - L'algorithme est le suivant
+      - Une fois qu'on a trouvé que /a1/ est le prédecesseur de /a1b0/
+      - On vérifie si /a1/ est un préfixe de /a1b0/
+      - Si c'est le cas
+	- On tronque /a1b0/ pour ne récupérer que le reste: /b0/
+      - On récupère l'image de /a1/ : /a'1/
+      - On concatène /a'1/ et /b0/ et on obtient ainsi /a'1b0/
+    - Mais un problème survient si le prédecesseur du split est aussi le dernier élément d'un interval renommé
+      #+CAPTION: Contre-exemple de l'optimisation du renommage d'un split concurrent
+      #+NAME: fig:counter-example-concurrent-split-better-renaming.jpg
+      [[file:img/counter-example-concurrent-split-better-renaming.jpg]]
+    - Il suffit juste de ne pas tronquer l'identifiant renommé dans ce cas
+    - Pour expliciter le cas problématique :
+    - Il ne faut pas que, suite à cette optimisation, on tombe dans un cas où l'on compare 2 tuples ayant une profondeur différente
+      - On appelle profondeur d'un tuple sa position dans l'identifiant d'origine
+      - On ne compare que des tuples de même profondeur
+      - Ici, il faut s'assurer que l'optimisation ne va pas aboutir dans certains scénarios à une comparaison incohérente
+      - C'est ce qu'il se passe notamment dans le contre-exemple
+- IAEM : Réunion de rencontre doctorants 1A et Directeur ED IAEM
+  - Comité de suivi de thèse
+    - Rôle
+      - Audition du doctorant conduisant la rédaction d'un rapport jugeant de la faisabilité de la thèse et donc de la capacité de réinscription du doctorant
+    - Le rapport du comité de suivi doit être déposé par le doctorant sur ADUM
+  - Formations
+    - Doctoriales
+      - Valide le quota de formations "professionnelles" à suivre
 *** Planned
 **** DONE MUTE : Fix mécanisme de causalité
 - En effectuant des tests utilisateurs sur MUTE, on s'est aperçu que le mécanisme de causalité présente des problèmes
@@ -4606,6 +4669,10 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Est-ce qu'une opération n'est pas correctement loggée ?
     - Ou est-ce qu'une opération n'est pas détectée comme délivrable alors qu'elle est en vérité ?
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
+**** TODO OT : Lire *OT FAQ*
+- Voir si les méthodes utilisées dans le mécanisme de renommage correspondent bien à des fonctions de transformations
+- Voir dans ce cas quelles sont les propriétés qu'elles doivent vérifiées, et comment prouver qu'elles les vérifient bien
+- Disponible ici : http://www3.ntu.edu.sg/home/czsun/projects/otfaq/#_Toc321146157
 **** TODO MUTE : Implémenter un log CRDT-agnostic
 - Pour le besoin des expérimentations, nous avons besoin de traces d'utilisation
 - Cependant le log d'opérations que nous stockons actuellement dans MUTE n'est pas adapté
