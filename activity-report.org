@@ -4668,6 +4668,77 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Voir d'où provient ce bug
     - Est-ce qu'une opération n'est pas correctement loggée ?
     - Ou est-ce qu'une opération n'est pas détectée comme délivrable alors qu'elle est en vérité ?
+** Semaine du <2018-03-12 Mon> au <2018-03-16 Fri>
+*** Done
+- MUTE : Implémenter le mécanisme de renommage
+  - Poursuite de l'étude de l'optimisation du renommage des splits concurrents
+    - Y-a-t il un moyen d'assurer qu'on ne tombe pas dans le scénario problématique ?
+    - Le raisonnement suivant suffit :
+      - Le problème se produit lorsqu'on compare deux identifiants /id'1/ et /id'2/ entre eux afin de déterminer leur ordre avec
+	- /id1/, identifiant généré au cours d'un split puis ensuite ré-écrit en /id'1/ de façon optimisé au cours du renommage
+	  - Sa taille est donc inchangé dans le pire cas, réduite sinon
+	- /id2/, identifiant généré au cours d'une insertion puis ensuite transformé en /id'2/ au cours du renommage
+	  - Sa taille est donc augmenté de 1
+      - Le simple fait qu'on ait pu effectuer l'optimisation implique que des identifiants /id3/ et /id4/ existent tels que /id3 < id1 < id4 < id2/
+      - On a donc :
+	- /id1/ étant un split, il se décompose en /id3 + x/ et se ré-écrit en /id'3 + x/
+	- /id'2 = id'4 + id2/
+      - Ainsi, /id'3 < id'1 < id'4 < id'2/
+    - On peut donc bel et bien optimiser le renommage d'un split si celui-ci n'a pas eu lieu à la fin d'un interval renommé
+  - Implémentation de l'optimisation du renommage des splits concurrents
+    - Ajout d'une méthode /reverseTruncate()/ dans *Identifier*
+    - Modification de /renameIdentifierInterval()/ pour tronquer la partie "renommée" dans split
+  - Réflexion sur l'exécution d'une opération distante de renommage
+    - Pour exécuter /renameRemote()/, j'ai besoin d'accéder à la liste des opérations concurrentes à l'opération de renommage
+    - Pour pouvoir accéder à ce log, 2 approches sont possibles
+      - *LogootSplit* maintient le log des opérations
+      - On délègue la responsabilité de fournir le log, et donc de maintenir ce dernier, au composant qui délivre l'opération de renommage
+    - Maintenir le log dans *LogootSplit*
+      - Si on maintient le log dans *LogootSplit*, on a finalement que déplacé le problème
+      - Auparavant on avait des identifiants qui grossissaient indéfiniment
+      - Maintenant on a des tombstones sous la forme du log
+      - Pour que la solution soit viable, il est nécessaire de garbage collecter les opérations
+    - Garbage collection d'opérations
+      - Dans *LogootSplit*, j'ai besoin de conserver une opération tant qu'un renommage en concurrence peut être généré
+      - Dans le cas où seulement un pair peut effectuer le renommage
+	- On peut garbage collecter une opération si la dernière opération de renommage dépend causalement sur celle-ci
+      - Dans le cas où chaque pair peut déclencher un renommage
+	- Je ne peux plus garbage collecter les opérations à moins de connaître avec certitude les membres du groupe
+	- Si je connais la liste des membres du groupe
+	  - Je peux garbage collecter une opération /op_i/ si je reçois de chaque membre une opération /op_k/ dépendant causalement d'une opération de renommage /op_j/ dominant /op_i/
+	    - Possible d'obtenir cette information grâce à l'/epoch/ d'une opération
+	- Si je ne connais pas les membres du groupe
+	  - Il est toujours possible qu'un membre du groupe ait été invité sans que je ne le sache
+	  - Il peut émettre des opérations concurrentes aux miennes et à celles des autres depuis un certain temps
+	  - Il est donc possible qu'il émette un renommage qui soit concurrent et prioritaire par rapport à un renommage qui ayant été accepté par tous les autres collaborateurs
+	- Scénario d'exemple :
+	  #+CAPTION: Garbage collection rendant impossible un renommage concurrent
+          #+NAME: fig:concurrent-renaming-incorrect-gc.jpg
+	  [[file:img/concurrent-renaming-incorrect-gc.jpg]]
+    - Déléguer la responsabilité
+      - Je me retrouve dans ce cas avec un problème d'interface
+      - La fonction /execute()/ de *LogootSOperation* prend en paramètre juste un *LogootSRopes* pour le moment
+	- Puisque *LogootSAdd* et *LogootSDel* contiennent toutes les informations nécessaires à leur exécution
+      - Dans le cas de *LogootSRename*, on se verrait contraint d'ajouter un paramètre supplémentaire, /log: LogootSOperation[]/
+      - Comment spécifier une interface compatible ?
+      - Possible de contourner le problème d'interface en incluant le log dans *LogootSRename* même
+	- Lorsqu'on génère l'opération, on laisse ce champ /undefined/
+	- Lorsqu'on reçoit une opération de renommage distante
+	  - On la désérialise
+	  - Puis on l'enrichit avec notre log d'opérations
+	- Ça ne me paraît pas clair
+	- Il faudrait ajouter des contraintes pour forcer l'enrichissement de l'opération avant de pouvoir l'appliquer
+      - Autre possibilité, ajouter des interfaces *Transformable* et *Applicable*
+	- Il existerait 2 classes pour l'opération de renommage
+	- L'opération locale de renommage générerait une opération distante qui implémenterait *Transformable*
+	- Cette opération serait partagée avec les autres collaborateurs
+	- Et c'est en utilisant sa fonction /transform(doc: LogootSRopes, concurrentOps: LogootSOperation[])/ que les collaborateurs obtiendraient une opération de renommage implémentant *Applicable*
+	  - Comment contraindre la pureté de la fonction /transform()/ ?
+	- Et c'est grâce à la fonction /applyTo(doc: LogootSRopes)/ de cette dernière qu'ils mettraient à jour leur copie du document
+	- Les opérations *LogootSAdd* et *LogootSDel* devraient aussi être refactorées de la sorte
+	- De cette manière, toute la logique des opérations et de leurs transformations est encapsulée dans /mute-structs/
+	- Et la seule responsabilité de /mute-core/ est de transformer les opérations avant de les délivrer
+*** Planned
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** TODO OT : Lire *OT FAQ*
 - Voir si les méthodes utilisées dans le mécanisme de renommage correspondent bien à des fonctions de transformations
