@@ -4699,7 +4699,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Maintenant on a des tombstones sous la forme du log
       - Pour que la solution soit viable, il est nécessaire de garbage collecter les opérations
     - Garbage collection d'opérations
-      - Dans *LogootSplit*, j'ai besoin de conserver une opération tant qu'un renommage en concurrence peut être généré
+      - Dans *LogootSplit*, j'ai besoin de conserver une opération tant qu'un renommage en concurrence peut être générée
       - Dans le cas où seulement un pair peut effectuer le renommage
 	- On peut garbage collecter une opération si la dernière opération de renommage dépend causalement sur celle-ci
       - Dans le cas où chaque pair peut déclencher un renommage
@@ -4726,7 +4726,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 	- Lorsqu'on reçoit une opération de renommage distante
 	  - On la désérialise
 	  - Puis on l'enrichit avec notre log d'opérations
-	- Ça ne me paraît pas clair
+	- Ça ne me paraît pas intuitif
 	- Il faudrait ajouter des contraintes pour forcer l'enrichissement de l'opération avant de pouvoir l'appliquer
       - Autre possibilité, ajouter des interfaces *Transformable* et *Applicable*
 	- Il existerait 2 classes pour l'opération de renommage
@@ -4736,10 +4736,34 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 	  - Comment contraindre la pureté de la fonction /transform()/ ?
 	- Et c'est grâce à la fonction /applyTo(doc: LogootSRopes)/ de cette dernière qu'ils mettraient à jour leur copie du document
 	- Les opérations *LogootSAdd* et *LogootSDel* devraient aussi être refactorées de la sorte
-	- De cette manière, toute la logique des opérations et de leurs transformations est encapsulée dans /mute-structs/
-	- Et la seule responsabilité de /mute-core/ est de transformer les opérations avant de les délivrer
+	- De cette manière, toute la logique des opérations et de leurs transformations serait encapsulée dans /mute-structs/
+	- Et la seule responsabilité de /mute-core/ serait de transformer les opérations avant de les délivrer
+      - Des interfaces supplémentaires, *Compressable* et *Decompressable*, permettent de représenter le mécanisme d'optimisation de l'opération de renommage
+	- Les opérations distantes implémenteraient l'interface *Compressable*
+	- Les compresser renverraient une opération équivalent *Decompressable*
+	- Ainsi, on les compresserait avant de les partager sur le réseau
+	- Les sites distants les décompresseraient avant de les transformer par rapport aux opérations concurrentes  puis de les appliquer sur leur état
+	- On peut généraliser ce comportement aux autres opérations *LogootSAdd* et *LogootSDel*
+	  - Pour *LogootSDel*, on peut par exemple ne conserver que la partie unique des identifiants supprimés
+	    - On gagne en bande passante mais on perd en calculs
+	  - Pour *LogootSAdd*, les méthodes /compress()/ et /decompress()/ peuvent se contenter de renvoyer l'opération telle quelle
+- Meeting
+  - Now that i have figure out and written down the transformation functions of insertions and deletions concurrent to a renaming
+  - Thinking about the correct way to implement it
+  - At first, the renaming mechanism did not require much additional metadata
+    - A log of operations
+  - So thought about putting everything needed in /mute-structs/
+  - But it was because only one node would be able to perform the renaming
+  - Now that we want every node to be able to perform the renaming, we have to deal with concurrent renamings
+  - It requires much more metadata
+  - And some of these metadata are in /mute-core/ currently
+  - So some reflexion to do a correct separation of concern
+  - And how these two projects will interact together
 *** Planned
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
+** Semaine du <2018-03-19 Mon> au <2018-03-23 Fri>
+*** Done
+*** Planned
 **** TODO OT : Lire *OT FAQ*
 - Voir si les méthodes utilisées dans le mécanisme de renommage correspondent bien à des fonctions de transformations
 - Voir dans ce cas quelles sont les propriétés qu'elles doivent vérifiées, et comment prouver qu'elles les vérifient bien
