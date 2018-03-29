@@ -4760,10 +4760,59 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - So some reflexion to do a correct separation of concern
   - And how these two projects will interact together
 *** Planned
-**** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 ** Semaine du <2018-03-19 Mon> au <2018-03-23 Fri>
 *** Done
+- Formation *Outils numérique pour la pédagogie*
+  - Classe inversée
+    - Au lieu de faire le cours en classe puis les exercices à la maison
+    - Fait le cours à la maison (par le biais de vidéos éducatives notamment) puis les exercices en classe
+    - Le rôle de l'enseignant devient donc d'aider chaque étudiant individuellement en fonction des difficultés qu'il rencontre
+  - Studio Professeur
+    - https://numerique.univ-lorraine.fr/audiovisuel/studio-professeur-pour-faire-evoluer-vos-formes-denseignement
+  - Camtasia
+    - Alternatives
+      - OBS (pour recording)
+      - OpenShot (pour montage)
+  - Arche
+    - Créer un cours
+      - Éviter les formats /activité unique/ et /informel/
+    - Ajout d'une ressource
+      - Dans *Apparence*, utiliser /Nouvelle fenêtre/ comme /Affichage/ pour forcer l'ouverture du document dans un nouvel onglet
+    - Gestion de groupes
+      - Depuis la page des participants > Roue dentée > Groupes
+      - /Créer des groupes automatiquements/ génère des groupes randoms
+      - On peut importer des groupes via un fichier csv
+	- Pas l'air de pouvoir ajouter les participants directement dans les groupes
+- Rédaction du /research statement/ pour Satis 2018
+  - Motivations
+    - Plus en plus d'utilisateurs
+    - Afin de supporter la charge et d'assurer une bonne qualité de service, les applications à large échelle doivent s'orienter vers les paradigmes décentralisé ou distribué
+    - Mais ces paradigmes entraînent des problèmes de cohérence et de disponibilité
+    - Comme indiqué dans le CAP Theorem, un système ne peut pas assurer les 2
+    - Il est donc nécessaire de faire un choix
+    - Choix de l'eventual consistency consiste à sacrifier temporairement la cohérence pour assurer la disponibilité
+    - Mais nécessite un mécanisme de résolution de conflits
+  - CRDT
+    - Structures de données
+    - Présentation de /State-based/ CRDTs
+    - Présentation de /Operations-based/ CRDTs
+  - Utilisation d'identifiants dans les CRDTs
+    - Contraintes portant sur les identifiants
+    - Ils grossissent en fonction du nombre de noeud mais aussi parfois en fonction du nombre d'éléments
+    - Problème d'identifiants ayant une taille non-bornée
+  - But du PhD
+    - Proposer des spécifications d'identifiants plus efficaces
+    - Proposer un mécanisme de renommage pour réduire la taille des identifiants
 *** Planned
+** Semaine du <2018-03-26 Mon> au <2018-03-30 Fri>
+*** Done
+- Rédaction du /research statement/ pour Satis 2018
+  - Prise en compte des retours de la part d'Olivier, Victorien et Gérald
+    - Développement de la section sur les identifiants
+    - Développement de la section sur les pistes du PhD
+*** Planned
+**** DONE Rédaction de la candidature pour Satis 2018
+**** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** TODO OT : Lire *OT FAQ*
 - Voir si les méthodes utilisées dans le mécanisme de renommage correspondent bien à des fonctions de transformations
 - Voir dans ce cas quelles sont les propriétés qu'elles doivent vérifiées, et comment prouver qu'elles les vérifient bien
