@@ -4812,6 +4812,182 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Développement de la section sur les pistes du PhD
 *** Planned
 **** DONE Rédaction de la candidature pour Satis 2018
+** Semaine du <2018-04-03 Tue> au <2018-04-06 Fri>
+*** Done
+- COO : TP1
+  - Environnement pour la génération de clé SSH
+    - Démarrer un conteneur Docker sous Ubuntu en mode interactif
+      - /docker run -it ubuntu:xenial/
+    - Mettre à jour les paquets
+      - /apt-get update/
+      - /apt-get upgrade/
+    - Installer git
+      - /apt-get install git/
+  - Commandes pour la démo de génération de clé SSH
+    - *docker run -it git:xenial /bin/bash*
+    - /ssh-keygen -t rsa/
+    - /cd/
+    - /ll/
+    - /cd .ssh/
+    - /ll/
+    - /cat id_rsa.pub/
+  - Slides d'introduction
+    - Me présenter
+      - Études
+	- DUT suivi de TELECOM
+      - Projets
+	- PLM
+	- MUTE
+      - Présent
+	- Doctorant en 1ère année
+    - Rappeler le sujet de ce cours
+      - Enseigner les bonnes pratiques à prendre en tant que développeur
+	- L'utilisation d'un logiciel de gestion de versions
+	- La réalisation de tests unitaires
+	- Passer par une phase de conception et de modélisation avant de coder
+    - Insister sur l'intérêt de git
+      - Fusion automatique des modifications
+      - Historique des versions du projet
+      - Faciliter la collaboration pour vous permettre de vous concentrer sur le développement
+    - Recommandations
+      - Faire des petits commits, quitte à en faire beaucoup
+      - Écrire des messages de commits simples et courts, mais complets
+- COO : TP2
+  - Slides
+    - Clé d'inscription au module arche : groupe_S2C
+    - Différences entre dossier courant, index et repo local
+- Meeting
+  - Result of my application to SATIS 2018 has been delayed until April 16
+  - Read Anna: A KVS for any scale
+    - Use CRDTs for values
+    - Use the Coordination-free Actors paradigm
+      - Each actor will handle requests for some keys
+      - According to the replication factor, several actors will share keys
+      - An actor share its value for a key with others so they can update their own value by merging both (since values are CRDTs)
+    - Implement several consistency models
+      - Causal order
+      - Read your writes
+    - Scale from a multicore machine to a geo-distributed deployment
+    - Able to outperform Redis and Cassandra
+      - Both in case of high contention of the updates and low contention
+    - No details about the error management
+      - If an actor fails after performing an update but before propagating its state to others, what happens ?
+    - Interesting observation
+      - "Most of the overhead goes to the network packet handling and message serialization and deserialization"
+      - Not to gossiping the states from actors to others and merging them
+      - Would be interesting to perform a profiling on MUTE to see how we fare
+*** Planned
+**** DONE CRDT : Lire Anna: A KVS for any scale
+- Anna est un key-value store où l'accent est mis sur la scalabilité
+- Anna fonctionne correctement sur une machine, mais l'application peut aussi être déployée de façon distribuée
+- Anna semble utiliser des CRDTs en son coeur
+- Étudier ça
+- Disponible ici : https://blog.acolyer.org/2018/03/27/anna-a-kvs-for-any-scale/
+** Semaine du <2018-04-09 Mon> au <2018-04-13 Fri>
+*** Done
+- COO : TP3
+  - Questions
+    - Les faire utiliser des attributs privés ?
+      - Et donc les faire tester en utilisant les getters ?
+    - Quels sont les 3 cas de tests attendus pour le constructeur avec paramètre ?
+      - pv > 0
+      - pv = 0
+      - pv < 0
+	- Dans ce cas, quoi tester ?
+	- En fonction de comment est définie /etreMort()/, on peut accepter un nombre négatif de points de vie
+    - Pareil pour /stockerNourriture()/
+      - On peut envisager utiliser /stockerNourriture()/ avec un nombre négatif pour diminuer les réserves de nourriture de l'animal
+    - À propos du poly, c'est quoi la classe *Addition* ?
+- MUTE : Implémenter le mécanisme de renommage
+- Thèse : Réunion de suivi
+  - Avancement
+    - Mécanisme de renommage
+      - On peut proposer un mécanisme de renommage pour /Operations-based CRDTs/ si on arrive à proposer
+	- Une opération de renommage commutative avec les opérations initiales du CRDT
+	- Des fonctions de transformation des autres opérations par rapport à l'opération de renommage qui
+	  - Conserve l'intention de l'utilisateur
+	  - Sont déterministes
+    - Implémentation en cours du mécanisme de renommage dans /mute-structs/
+      - Implémenté
+	- Génération d'une /renamingMap/
+	- Renommage local de l'état
+	- Génération d'une opération de renommage correspondante
+	- Mécanisme de compression de cette opération de renommage
+	- Mécanisme de décompression de cette opération de renommage
+      - L'implémentation m'a permis de me rendre compte qu'on retombe dans les transformées opérationnelles
+	- Pour appliquer une opération concurrente à un renommage, il est nécessaire de la transformer au préalable
+	- De la même façon, pour appliquer une opération de renommage distante sur un état sur lequel on a déjà appliqué des opérations concurrentes
+        - Permet de retrouver un cadre formel
+	  - Peut vérifier la correctness de fonctions de transformations à l'aide de TP1 et TP2
+      - Reste à implémenter
+	- La transformation de l'opération de renommage par rapport aux opérations concurrentes
+	  - Insertions
+	  - Suppressions
+	  - Renommages
+    - Lu /Consistency without concurrency control in large, dynamic systems/
+      - Propose un mécanisme de renommage pour le CRDT TreeDoc
+	- La taille des identifiants augmente avec le nombre d'insertions
+	- Mais la suppression d'éléments ne permet généralement pas de réduire la taille des futurs identifiants
+      - Basé sur une architecture 2-tiers
+	- Le /core/, un ensemble de noeuds stables et dans lesquels on a confiance
+	- La /nebula/, le reste des noeuds qui peuvent être volatiles
+      - La /nebula/ permet d'assurer une collaboration à grande échelle
+      - Tandis que le /core/ se charge d'effectuer un renommage à l'aide d'un algorithme de consensus 2PC
+      - Les noeuds de la /nebula/ ont un mécanisme de /catch-up/ pour mettre à jour leur structure suite à un renommage du /core/ et pour transformer leurs opérations concurrentes au renommage
+  - Problèmatiques soulevées
+    - Scope de la contribution
+      - Est-ce qu'une adaptation du mécanisme de renommage de *Treedoc* pour *LogootSplit* suffirait ?
+      - Ou faut-il aller plus loin ?
+	- Généralisation du mécanisme de renommage
+	- Suppression de la nécessité d'un consensus
+	  - Possible, il suffit juste de définir un ordre total sur les opérations de renommage et en faire gagner une lorsqu'il y a une concurrence
+	  - La difficulté porte alors les opérations qui dépendent causalement d'une opération de renommage qui "perd" face à une autre opération de renommage concurrente
+	    - Besoin de les transformer en arrière pour obtenir une opération équivalente partageant le même contexte que l'opération de renommage qui "gagne"
+    - Évaluation de la solution
+      - Simulation
+	- L'idée serait de rejouer des sessions de collaboration à l'aide de bots
+	  - Mesurer l'évolution des ressources consommées en
+	    - CPU
+	    - RAM
+	    - Bande passante
+	  - Vérifier la correctness du mécanisme
+	- Besoin de logs
+	  - Récupérer des logs
+	    - Mais où ?
+	    - On veut autoriser de la concurrence dans le log
+	      - Exclu Wikipédia
+	    - On veut pouvoir insérer des opérations de renommage dans le log et que les opérations suivantes dépendent causalement dessus
+	      - Exclu le log actuel de MUTE
+	    - Peut ajouter un mécanisme de collecte des traces d'utilisation dans MUTE
+	    - Mais besoin d'utilisateurs ensuite
+	  - Générer des logs
+	    - Bots qui écrivent aléatoirement
+	      - Criticable d'un point de vue réalisme des traces et du coup des performances
+	    - Étudier le comportement des utilisateurs dans des sessions d'édition collaborative pour générer des traces plausibles
+	      - Toujours criticable d'un point de vue réalisme
+	      - Time-consuming
+	      - Pas forcément l'angle que j'ai envie de donner à ma thèse
+        - Besoin d'un environnement de simulation
+	  - Doit pouvoir démarrer une simulation à partir d'un ensemble de logs
+	    - Un bot pour chaque utilisateur
+	    - Les bots doivent être orchestrés au démarrage pour l'initialisation de la simulation
+	    - Puis ensuite les bots agissent indépendemment à partir de leur log
+	      - Permettrait d'autoriser de la concurrence par moments
+	    - Puis de nouveau une orchestration finale pour récupérer les résultats
+	  - Voir les travaux de Vinh et Quentin pour les expériences sur MUTE
+      - Preuve
+	- Comme on retombe dans du OT, peut tenter de prouver que les fonctions de transformations
+	  - Conservent l'intention de l'utilisateur
+	  - Respectent TP1 et TP2
+	- Mais connaît peu le domaine des méthodes formelles
+	- Aurait besoin de me former là-dessus
+    - Déclenchement du renommage
+      - La fréquence de déclenchement ainsi que le nombre de renommage concurrents influencent les performances du mécanisme
+      - P-e intéressant d'essayer plusieurs stratégies pour déterminer laquelle est la plus performante
+      - Stratégie de renommage
+	- Quand le déclencher ?
+	- Qui le déclenche ?
+*** Planned
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** TODO OT : Lire *OT FAQ*
 - Voir si les méthodes utilisées dans le mécanisme de renommage correspondent bien à des fonctions de transformations
