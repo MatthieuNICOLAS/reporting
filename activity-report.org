@@ -5099,6 +5099,22 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Stratégie de renommage
 	- Quand le déclencher ?
 	- Qui le déclenche ?
+- Meeting
+  - Renaming mechanism
+    - Making progress
+    - Still having some trouble to build a system preventing me from making mistakes while keeping it simple
+    - Have to rework the class hierarchy
+  - CRDT-agnostic log mechanism
+    - Goal is to keep a log which would allow us to replay collaborative editing session without being tied to a conflict resolution mechanism
+      - Want to be able to replay the collaborative editing session with *LogootSplit*, or *LogootSplit with Renaming*, or *DottedLogootSplit* or even OT algorithms
+      - To perform benchmarks
+    - Worked on it with Victorien to determine the data required
+    - Realized that we won't be able to replay exactly a collaborative editing session as it was, to replicate it
+      - Since algorithms like *LogootSplit* are not determinist
+      - Even with the same algorithm, are not able to ensure the same result by replaying twice the same log
+      - Won't be able to use it to check the correctness of a conflict resolution mechanism
+    - Discussed with Le and Claudia to see if additional fields would be useful for their analysis
+    - Now have to think about the implementation
 *** Planned
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** IN-PROGRESS MUTE : Implémenter un log CRDT-agnostic
