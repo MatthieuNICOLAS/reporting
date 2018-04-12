@@ -4899,6 +4899,118 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - On peut envisager utiliser /stockerNourriture()/ avec un nombre négatif pour diminuer les réserves de nourriture de l'animal
     - À propos du poly, c'est quoi la classe *Addition* ?
 - MUTE : Implémenter le mécanisme de renommage
+  - Ajout des versions *Transformable* de *LogootSAdd* et de *LogootSDel*
+  - Modification de /add()/ et /remove()/ de *RenamableReplicableList* pour renvoyer des *TransformableLogootSOperations*
+  - Reste un problème de conception et de typage à résoudre
+    - *ReplicableList* prend en entrée (opérations distantes) renvoie (opérations locales) des *LogootSOperations*
+    - *RenamableReplicableList* prend en entrée (opérations distantes) des *ApplicableLogootSOperations* et renvoie (opérations locales) des *TransformableLogootSOperations*
+    - On veut
+      - Empêcher de fournir des *TransformableLogootSOperations* en entrée de *ReplicableList* et *RenamableReplicableList*
+	- Besoin de transformer l'opération avant de pouvoir l'appliquer
+      - Empêcher de fournir des *LogootSOperations* en entrée de *RenamableReplicableList*
+      - Empêcher de fournir des *ApplicableLogootSOperations* en entrée de *ReplicableList*
+- MUTE : Implémenter un log CRDT-agnostic
+  - Données potentielles
+    - Auteur
+    - Horloge logique
+    - Opération
+      - Type d'opération
+	- insert
+	- delete
+      - Offset
+      - Content
+	- Peut être obfusqué ?
+      - Length
+    - Contexte de génération
+      - Vecteur d'état
+    - Timestamp début de l'opération
+      - Quand l'utilisateur tape sur son clavier
+    - Timestamp fin de l'opération
+      - Quand la modification est intégrée au modèle
+  - Mock-up
+    #+BEGIN_SRC
+[
+    {
+        "author": 0,
+        "clock": 0,
+        "beginTimestamp": 1523531787342,
+        "endTimestamp": 1523531787350,
+        "operation": {
+            "type": "insertion",
+            "offset": 0,
+            "content": "Hellox",
+            "length": 6,
+        },
+        "context": {}
+    },
+    {
+        "author": 1,
+        "clock": 0,
+        "beginTimestamp": 1523531787343,
+        "endTimestamp": 1523531787348,
+        "operation": {
+            "type": "insertion",
+            "offset": 0,
+            "content": " world",
+            "length": 6
+        },
+        "context": {}
+    },
+    {
+        "author": 2,
+        "clock": 0,
+        "beginTimestamp": 1523531960875,
+        "endTimestamp": 1523531960900,
+        "operation": {
+            "type": "deletion",
+            "offset": 5,
+            "content": "x",
+            "length": 1
+        },
+        "context": {
+            "0": 0,
+            "1": 0
+        }
+    }
+]
+    #+END_SRC
+  - Problème
+    - Pour rendre ce log CRDT-agnostic, nous retirons les opérations distantes pour ne conserver que les opérations locales
+    - Le problème est que rejouer ces opérations locales ne nous garantit pas le même résultat, spécifiquement dans le cas d'insertions concurrentes
+    - Par exemple dans le mock-up précédent, les opérations <0,0> et <1,0> sont concurrentes
+    - On peut donc se retrouver avec les états suivants, en fonction des identifiants générés par *LogootSplit*
+      - Hellox_world
+      - _worldHellox
+    - Avec les informations disponibles dans le log à l'heure actuelle, nous avons pas de moyens d'enforcer un de ces états plutôt qu'un autre
+    - Rejouer l'opération locale suivante, qui dépend causalement de ces 2 opérations concurrentes, aura donc un résultat différent en fonction de l'état obtenu précédemment
+      - Potentiellement, nous ne respecterons pas l'intention de l'utilisateur
+    - Ce log ne permet donc pas de reproduire de façon déterministe le scénario d'une collaboration
+    - Pour cela, il faudra rajouter des informations supplémentaires
+      - identifiants générés/supprimés
+      - seed pour la factory des identifiants
+      - texte du document au moment de l'opération
+    - Mais ces informations sont spécifiques pour un algorithme donné
+      - Les algorithmes OT ne sauront pas utiliser les identifiants *LogootSplit* pour ordonner des opérations concurrentes
+	- Même *DottedLogootSplit* peut rencontrer des difficultés pour cela
+      - Ajouter une donnée telle que la seed de génération des identifiants ne garantirait pas que les algorithmes l'utiliseraient et obtiendraient les mêmes résultats
+    - On peut même se retrouver avec des scénarios qui ne sont pas reproductibles avec des algorithmes données
+      - Certains algorithmes OT ordonnent des insertions concurrentes au même offset à l'aide de l'identifiant de l'utilisateur
+      - Si les logs ont été générés avec *LogootSplit*, on peut avoir un bloc de l'utilisateur *A* qui se retrouve après un bloc de l'utilisateur *B* généré en concurrence
+  - Conclusion
+    - On peut difficilement utiliser ce type de log pour évaluer la correctness d'un algorithme donnée
+      - Il faudrait pour cela y ajouter des données spécifiques à cet algorithme
+    - Par contre, si on offusque le texte, on ne rencontre plus ces problématiques d'états ambigus
+    - Ce type de log est donc plus adapté pour du benchmarking seulement IMHO
+  - Discussion avec Chahrazed
+    - A effectué ses simulations multi-agent à l'aide de *JADE*
+      - Se charge de démarrer les agents, de les faire s'enregistrer auprès d'un service de discovery et de créer les connexions pair-à-pair
+      - Communications se font par le biais de message
+      - Disponible ici : http://jade.tilab.com/
+    - Pourrait potentiellement examiner des logs pour en extraire des comportements utilisateurs
+      - Voir avec elle les méthodes utilisées
+    - Commentaire intéressant : séparer les logs d'utilisateurs en plusieurs fichiers rendraient l'analyse plus complexe
+      - Voir pour tout centraliser dans un fichier unique par document
+    - À voir la quantité de données nécessaires
 - Thèse : Réunion de suivi
   - Avancement
     - Mécanisme de renommage
@@ -4989,11 +5101,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 	- Qui le déclenche ?
 *** Planned
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
-**** TODO OT : Lire *OT FAQ*
-- Voir si les méthodes utilisées dans le mécanisme de renommage correspondent bien à des fonctions de transformations
-- Voir dans ce cas quelles sont les propriétés qu'elles doivent vérifiées, et comment prouver qu'elles les vérifient bien
-- Disponible ici : http://www3.ntu.edu.sg/home/czsun/projects/otfaq/#_Toc321146157
-**** TODO MUTE : Implémenter un log CRDT-agnostic
+**** IN-PROGRESS MUTE : Implémenter un log CRDT-agnostic
 - Pour le besoin des expérimentations, nous avons besoin de traces d'utilisation
 - Cependant le log d'opérations que nous stockons actuellement dans MUTE n'est pas adapté
   - Il n'offre qu'une linéarisation des opérations pour un utilisateur donné
@@ -5029,6 +5137,20 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Faut-il spécifier un état final aux noeuds qu'ils doivent atteindre avant de quitter ?
     - Grâce au vecteur d'état obtenu en aggrégeant le nombre d'opérations par noeud
   - Ou finalement, chaque noeud peut quitter une fois son travail effectué ?
+**** TODO Méthode formelle : Se remettre à niveau en méthode formelle
+- D'après la discussion de Victorien avec Stefan Merz, ce dernier lui a conseillé
+  - De commencer par du model-checking (TLA+)
+  - Puis de passer sur un assistant de preuves (Isabelle/Coq)
+- Il faudrait donc je me forme sur ces sujets pour valider le mécanisme de renommage formellement
+- Ressources disponibles
+  - Page de Lamport sur TLA+
+    - http://lamport.azurewebsites.net/tla/tla.html
+  - Cours vidéo de Lamport sur TLA+
+    - http://lamport.azurewebsites.net/video/videos.html
+**** TODO OT : Lire *OT FAQ*
+- Voir si les méthodes utilisées dans le mécanisme de renommage correspondent bien à des fonctions de transformations
+- Voir dans ce cas quelles sont les propriétés qu'elles doivent vérifiées, et comment prouver qu'elles les vérifient bien
+- Disponible ici : http://www3.ntu.edu.sg/home/czsun/projects/otfaq/#_Toc321146157
 **** TODO CRDT : Se renseigner sur replikativ
 - http://replikativ.io/
 **** TODO CRDT : Se renseigner sur OrbitDB
