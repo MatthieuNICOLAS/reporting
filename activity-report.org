@@ -5138,7 +5138,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Grâce au vecteur d'état obtenu en aggrégeant le nombre d'opérations par noeud
   - Ou finalement, chaque noeud peut quitter une fois son travail effectué ?
 **** TODO Méthode formelle : Se remettre à niveau en méthode formelle
-- D'après la discussion de Victorien avec Stefan Merz, ce dernier lui a conseillé
+- D'après la discussion de Victorien avec Stephan Merz, ce dernier lui a conseillé
   - De commencer par du model-checking (TLA+)
   - Puis de passer sur un assistant de preuves (Isabelle/Coq)
 - Il faudrait donc je me forme sur ces sujets pour valider le mécanisme de renommage formellement
@@ -5147,6 +5147,8 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - http://lamport.azurewebsites.net/tla/tla.html
   - Cours vidéo de Lamport sur TLA+
     - http://lamport.azurewebsites.net/video/videos.html
+  - Un tuto que j'ai vu passé un jour sur HN
+    - https://learntla.com/introduction/
 **** TODO OT : Lire *OT FAQ*
 - Voir si les méthodes utilisées dans le mécanisme de renommage correspondent bien à des fonctions de transformations
 - Voir dans ce cas quelles sont les propriétés qu'elles doivent vérifiées, et comment prouver qu'elles les vérifient bien
