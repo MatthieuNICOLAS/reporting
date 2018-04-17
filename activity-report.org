@@ -5001,6 +5001,19 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Il faudrait pour cela y ajouter des données spécifiques à cet algorithme
     - Par contre, si on offusque le texte, on ne rencontre plus ces problématiques d'états ambigus
     - Ce type de log est donc plus adapté pour du benchmarking seulement IMHO
+  - Questions ouvertes
+    - Comment se comporterait le mécanisme de collecte des données ?
+      - Le flag autorisant la collecte devrait être pour le document
+      - Que faire dans les cas où
+        - On ne collectait pas les données du document et maintenant quelqu'un active le flag
+	  - On risque de ne pas collecter des opérations concurrentes à l'activation
+	- On collectait les données du document et maintenant quelqu'un désactive le flag
+	  - Potentiellement des opérations concurrentes à l'opération de désactivation du mécanisme de collecte vont être collectées
+	  - On peut accepter ces opérations
+	  - Ou on peut, avec un /stateVector/ tronquer le log à posteriori pour ne plus conserver ces opérations concurrentes
+	- Après une désactivation du mécanisme de collecte, celui-ci est de nouveau re-activé
+    - Que faire si une opération est manquante ?
+      - Peut-on compenser une ou des opérations manquantes ?
   - Discussion avec Chahrazed
     - A effectué ses simulations multi-agent à l'aide de *JADE*
       - Se charge de démarrer les agents, de les faire s'enregistrer auprès d'un service de discovery et de créer les connexions pair-à-pair
@@ -5013,6 +5026,17 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - À voir la quantité de données nécessaires
 - Thèse : Réunion de suivi
   - Avancement
+    - Intéressé
+      - Protocoles de consensus
+      - Utilisation des CRDTs
+	- Base de données distribuées
+	  - Dynamo
+	  - Anna
+	  - OrbitDB
+	- IPFS
+	  - Potentiellement besoin pour représenter les données dynamiques
+	- Langage de programmation
+	  - Lasp
     - Mécanisme de renommage
       - On peut proposer un mécanisme de renommage pour /Operations-based CRDTs/ si on arrive à proposer
 	- Une opération de renommage commutative avec les opérations initiales du CRDT
@@ -5049,8 +5073,13 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Problèmatiques soulevées
     - Scope de la contribution
       - Est-ce qu'une adaptation du mécanisme de renommage de *Treedoc* pour *LogootSplit* suffirait ?
+	- Oui ça suffit
       - Ou faut-il aller plus loin ?
 	- Généralisation du mécanisme de renommage
+	  - Voir par exemple Riak
+	  - Voir le type de CRDTs utilisés
+	  - Voir s'ils ont le problème des identifiants avec des contraintes qui grossissent
+	  - Voir si on peut adapter le mécanisme pour ça
 	- Suppression de la nécessité d'un consensus
 	  - Possible, il suffit juste de définir un ordre total sur les opérations de renommage et en faire gagner une lorsqu'il y a une concurrence
 	  - La difficulté porte alors les opérations qui dépendent causalement d'une opération de renommage qui "perd" face à une autre opération de renommage concurrente
@@ -5115,6 +5144,68 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Won't be able to use it to check the correctness of a conflict resolution mechanism
     - Discussed with Le and Claudia to see if additional fields would be useful for their analysis
     - Now have to think about the implementation
+*** Planned
+** Semaine du <2018-04-16 Mon> au <2018-04-20 Fri>
+*** Done
+- COO : TP5
+  - Questions
+    - Cours
+      - Slides 62-63 : slide dupliquée
+      - Slide 67 : mentionne un polycopié, lequel ?
+    - TD
+      - Est-ce que l'on leur fait écrire du code Java sur feuille ?
+	- Oui
+      - Qu'est-ce qu'on entend par /descriptif/ dans l'exo 4 ?
+	- À la 1ère lecture, j'ai cru qu'un /toString()/ suffisait
+	- En voyant la correction, j'ai l'impression que tu attends plus
+	- /toString()/ suffit
+      - L'emploi du temps est-il aussi à rendre ?
+	- Non
+- MUTE : Implémenter un log CRDT-agnostic
+  - Ajout de données supplémentaires
+    - Évènements
+      - Connexion
+      - Déconnexion
+      - Réception d'un évènement généré par un autre utilisateur
+    - Données
+      - Origine de l'évènement (local ou distant)
+      - Envoyeur
+      - Participants
+      - Voisins
+      - User-agent
+  - Décomposition du travail
+    - Établir les données du log
+      - Faire un 1er jet pour les évènements
+      - Documenter les différents champs
+      - Publier ça sur Github
+    - Mettre en place un log local
+      - Écouter les différents évènements dans MUTE
+      - Enregistrer leurs données dans une base de données locale
+    - Mettre en place un service de collecte centralisé
+      - Déployer un service permettant de centraliser les traces d'utilisations
+      - Réfléchir à l'intégration de ce service avec l'application
+	- Ajout d'une fonctionnalité permettant d'activer/désactiver le partage des traces pour le document
+	- Déterminer que faire lorsqu'un utilisateur
+	  - Désactive le partage
+	  - Active le partage
+    - Exploiter les traces
+      - Développement de scripts permettant
+	- D'extraire les données
+	- De les formater
+	- De filtrer des champs
+	- De combler les opérations manquantes si besoin et si possible
+- Thèse : Réunion de suivi
+  - Remarques
+    - Manque de clarté sur les identifiants qui grossissent
+      - Mal amené et mal justifié
+      - Mieux développer cette partie à l'avenir
+    - Motivations
+      - Manque de contexte
+      - Besoin d'étudier si c'est vraiment un problème
+      - Dans quelle mesure
+      - Dans quel cas
+    - Regarder Cassandra
+    - Mettre à jour le /research statement/ avec les fonctions de transformées
 *** Planned
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** IN-PROGRESS MUTE : Implémenter un log CRDT-agnostic
