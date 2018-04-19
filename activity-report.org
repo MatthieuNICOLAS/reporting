@@ -5206,6 +5206,20 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Dans quel cas
     - Regarder Cassandra
     - Mettre à jour le /research statement/ avec les fonctions de transformées
+- Séminaire autour de la reproductibilité en recherche informatique
+  - Un journal qui propose de publier des réplications d'articles
+    - Se base sur le fait que certains articles ne sont pas forcément réutilisables
+      - Code source non publié
+      - Données non disponibles
+      - Modèle pas clairement défini dans l'article
+    - Mais que les éditeurs ne sont pas forcément intéressés par rendre ces articles réutilisables
+  - Disponible à http://rescience.github.io
+  - Tourne autour des 5 R
+    - Re-runnable : Peut re-exécuter le programme
+    - Repeatable : Obtient le même résultat à chaque exécution
+    - Reproducible : Peut donner le programme à un autre pour qu'ils obtiennent les mêmes résultats
+    - Replicable : Peut recréer le modèle/le programme à partir de l'article
+    - Reusable : ?
 *** Planned
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** IN-PROGRESS MUTE : Implémenter un log CRDT-agnostic
