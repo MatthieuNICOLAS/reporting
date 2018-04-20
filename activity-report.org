@@ -5161,6 +5161,9 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 	- /toString()/ suffit
       - L'emploi du temps est-il aussi à rendre ?
 	- Non
+  - Remarques
+    - Beaucoup de mal à garder l'attention des étudiants après l'exo 2
+    - P-e revoir l'ordre des exercices
 - MUTE : Implémenter un log CRDT-agnostic
   - Ajout de données supplémentaires
     - Évènements
@@ -5220,6 +5223,19 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Reproducible : Peut donner le programme à un autre pour qu'ils obtiennent les mêmes résultats
     - Replicable : Peut recréer le modèle/le programme à partir de l'article
     - Reusable : ?
+- Meeting
+  - Application to SATIS 2018 summer school accepted
+  - Had a meeting with Gérald and Olivier
+    - Have to dig a little bit about the problem adressed
+    - Should look for real-case examples of the evergrowing size of metadata issue
+  - Log mechanism for collaborative editing
+    - Rework it according to feedbacks
+    - Put a mock-up and its documentation on a github repo
+    - Discussed with Cédric how to proceed for the implementation
+  - Start to read *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
+    - Since i need OT in my renaming mechanism, studying the field
+    - Highlight that the causality relationship is actually not sufficient to determine when to transform an operation and according to which ones
+    - Introduced the notion of context of generation of an operation to address this issue
 *** Planned
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** IN-PROGRESS MUTE : Implémenter un log CRDT-agnostic
