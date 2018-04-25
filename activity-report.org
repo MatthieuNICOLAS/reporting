@@ -5197,6 +5197,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 	- De les formater
 	- De filtrer des champs
 	- De combler les opérations manquantes si besoin et si possible
+  - C'est Cédric qui va se charger de réaliser l'implémentation du mécanisme
 - Thèse : Réunion de suivi
   - Remarques
     - Manque de clarté sur les identifiants qui grossissent
@@ -5237,8 +5238,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Highlight that the causality relationship is actually not sufficient to determine when to transform an operation and according to which ones
     - Introduced the notion of context of generation of an operation to address this issue
 *** Planned
-**** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
-**** IN-PROGRESS MUTE : Implémenter un log CRDT-agnostic
+**** DONE MUTE : Implémenter un log CRDT-agnostic
 - Pour le besoin des expérimentations, nous avons besoin de traces d'utilisation
 - Cependant le log d'opérations que nous stockons actuellement dans MUTE n'est pas adapté
   - Il n'offre qu'une linéarisation des opérations pour un utilisateur donné
@@ -5274,6 +5274,77 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
   - Faut-il spécifier un état final aux noeuds qu'ils doivent atteindre avant de quitter ?
     - Grâce au vecteur d'état obtenu en aggrégeant le nombre d'opérations par noeud
   - Ou finalement, chaque noeud peut quitter une fois son travail effectué ?
+** Semaine du <2018-04-23 Mon> au <2018-04-27 Fri>
+*** Done
+- OT : Lire *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
+  - Dans un système possèdant des opérations
+    - /Originales/ et /transformées/
+    - /Normales/ et /inverses/
+  - La relation de causalité n'est pas suffisante pour déterminer quand transformer une opération et par rapport à lesquelles
+    - La relation de causalité n'étant définie que pour les opérations originales normales
+    - Les opérations transformées ou inverses en sont dénuées
+    - Mais on peut avoir besoin de transformer une opération transformée ou inverse
+  - Introduit la notion de contexte de génération d'une opération pour corriger cela
+    - Toutes les opérations possèdent un contexte
+    - Une opération ne peut être appliquée sur un état que lorsque le contexte de l'état correspond au contexte de l'opération
+    - Une opération ne peut être transformée par rapport à une autre que lorsque leur contexte sont équivalents
+    - Le contexte ne comprend que les opérations originales
+  - Propose 6 conditions nécessaires pour l'écriture de fonctions de transformation correctes
+    - CC1: Une opération ne peut être transformée que sur un état incluant son contexte
+    - CC2: Une opération /O/ doit être transformée par rapport aux opérations inclues dans la différence /DS - C(O)/
+      - Où /DS/ est l'ensemble des opérations observées à un état donné
+    - CC3: Une opération ne peut être exécutée que sur un état équivalent à son contexte
+    - CC4: Une opération ne peut être transformée par rapport à une autre que si son contexte est inclus dans celui de cette dernière
+    - CC5: Une opération /Ox/ doit être transformée par rapport aux opérations inclues dans la différence /C(O) - C(Ox)/ avant d'être transformée par rapport à une opération /O/
+    - CC6: Une opération /Oa/ ne peut être transformée par rapport à une opération /Ob/ que si leur contexte sont équivalents
+  - Propose un /context vector/ pour représenter le contexte d'une opération
+    - Un /state vector/ n'inclut pas les opérations inverses
+    - Donc besoin d'un nouveau type de vecteur incluant ce type d'opérations
+    - Permet de représenter le contexte de génération d'une opération
+    - Et donc de déterminer par rapport à quelles opérations la transformer
+  - Utilise un /operation version group/ pour améliorer les performances du système
+    - Constate que les mêmes transformations d'une même opération originale sont calculées plusieurs fois au cours d'une session collaborative
+    - Ces transformées sont coûteuses à regénérer
+    - Propose de stocker les différentes versions d'une même opération afin de les réutiliser
+    - Mais ceci est coûteux en mémoire
+    - Propose des stratégies à adopter pour conserver uniquement les versions les plus utiles probablement
+  - Remarques
+    - Définir une fonction /Exclusion Transformation (ET)/ nécessite de respecter la /Reversibility Property (RP)/ entre IT et ET
+      - Est-ce vraiment nécessaire dans mon cas ?
+    - La condition CC3 semble trop contrainte pour mon système
+      - Cela dépend la notion de contexte d'une opération que l'on définit
+    - Si on considère que tous les types d'opérations utilisent la même notion de contexte
+      - CC3 impose un ordre sur l'exécution des opérations qui est trop contraint par rapport à nos possibilités
+	- Dans le cas où un site A génère une opération /o1/ puis une opération /o2/, tandis qu'en parallèle un site B génère une opération /o3/
+	  - Avec /o1/, /o2/ et /o3/ des opérations qui peuvent commuter telles que des insertions
+	- CC3 indique qu'on ne peut pas jouer l'opération /o2/ sur le site B directement, qu'il faut déjà avoir joué /o1/ pour cela
+	- Alors que pourtant, on peut bel et bien jouer /o2/ puis /o1/
+      - Dans ce cas, respecter CC3 assure que le système est correct, mais il ne s'agit pas de la condition optimale
+      - Il faudrait adapter CC3 pour notre système
+      - À partir de là, ne faudrait-il pas aussi retravailler les autres contraintes ?
+    - Sinon, on peut générer des contextes différents pour différents types d'opérations
+      - Pour les opérations d'insertions et de suppressions
+	- Puisqu'on ne transforme ce type d'opérations que par rapport aux opérations de renommages
+	- On ne pourrait répertorier dans le contexte que ces dernières
+      - Pour les opérations de renommage
+	- Celles-ci, on les transforme par rapport à toutes les autres opérations
+	- Là on a besoin du /state vector/
+      - La difficulté à résoudre dans ce cas est comment déterminer par rapport à quelles opérations transformer une opération ?
+	- Dans le papier, ils proposent la formule /DS - C(o)/
+	  - Où /DS/ est l'état courant du document, que l'on peut représenter dans notre cas avec un /state vector/
+	- Dans le cadre d'une opération de renommage, cette formule est valide
+	  - Puisqu'on transforme une opération de renommage par rapport à toutes les opérations concurrentes
+	- Mais cela ne correspondrait pas dans pas le cas d'une opération d'insertion ou de suppression
+	  - /DS - C(o)/ renverraient les opérations concurrentes, de renommage mais aussi d'insertion ou de suppression
+	  - Nous avons juste besoin des opérations de renommage
+	  - Il faudrait donc filtrer le résultat /DS - C(o)/ pour ne conserver que ces dernières
+    - Finalement, gérer des contextes différents par type d'opérations ne réduirait pas t-il l'aspect générique de l'approche OT ?
+      - À voir si on arrive à abstraire suffisamment pour retomber sur quelque chose de générique
+*** Planned
+**** DONE OT : Lire *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
+- Claudia m'a parlé de ce papier sur OT qui est l'état de l'art
+- Le lire pour se remettre à niveau sur ce domaine
+**** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** TODO Méthode formelle : Se remettre à niveau en méthode formelle
 - D'après la discussion de Victorien avec Stephan Merz, ce dernier lui a conseillé
   - De commencer par du model-checking (TLA+)
