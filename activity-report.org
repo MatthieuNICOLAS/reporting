@@ -5340,11 +5340,749 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 	  - Il faudrait donc filtrer le résultat /DS - C(o)/ pour ne conserver que ces dernières
     - Finalement, gérer des contextes différents par type d'opérations ne réduirait pas t-il l'aspect générique de l'approche OT ?
       - À voir si on arrive à abstraire suffisamment pour retomber sur quelque chose de générique
+- OT : Lire *OT FAQ*
+  - Context-based Conditions
+    - [[file:img/ot-context-based-conditions.png]]
+  - ET
+    - [[file:img/ot-et-pre-post-conditions.png]]
+    - [[file:img/ot-et-property-pre-cond.png]]
+  - Réflexions
+    - Semblerait qu'on puisse appliquer ET pour retirer des opérations dont une opération /o/ dépend causalement pour retirer ces opérations du contexte de /o/
+    - Pour respecter les /Context-based Conditions/, notamment CC3, on pourrait donc utiliser ET pour retirer des opérations du contexte des opérations d'insertion et de suppression
+      - On pourrait retirer du contexte toutes les opérations qui commutent avec l'opération générée
+      - Donc toutes les opérations d'insertion et de suppression depuis le dernier renommage
+      - Et pour des raisons de performances, on pourrait argumenter que ça revient à générer l'opération /o/ d'insertion ou de suppression avec /C(o) = C(r) ∪ r/ où /r/ est la dernière opération de renommage
+      - Ainsi, l'opération serait délivrable à partir du moment où le site distant a observé /r/
+      - Mais ça demanderait au site distant de transformer l'opération /o/ par rapport à toutes les opérations ayant eu lieu depuis la dernière opération de renommage
+	- Ce qui semble couteux
+      - Mais dans les faits, ces transformations ne modifient pas l'opération donc on peut calculer cette "transformée" aisément
 *** Planned
 **** DONE OT : Lire *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
 - Claudia m'a parlé de ce papier sur OT qui est l'état de l'art
 - Le lire pour se remettre à niveau sur ce domaine
+**** DONE OT : Lire *OT FAQ*
+- Voir si les méthodes utilisées dans le mécanisme de renommage correspondent bien à des fonctions de transformations
+- Voir dans ce cas quelles sont les propriétés qu'elles doivent vérifiées, et comment prouver qu'elles les vérifient bien
+- Disponible ici : http://www3.ntu.edu.sg/home/czsun/projects/otfaq/#_Toc321146157
+** Semaine du <2018-05-02 Wed> au <2018-05-04 Fri>
+*** Done
+- MUTE : Implémenter le mécanisme de renommage
+  - Discussion avec Gérald à propos de COT
+    - Il serait partant pour adapter les /Context-based Conditions/ à notre système plutôt que d'adapter le système aux /Context-basaed Conditions/
+    - Voir pour déterminer quelles sont les conditions à respecter et à retravailler
+*** Planned
+** Semaine du <2018-05-07 Mon> au <2018-05-11 Fri>
+*** Done
+- COO : TP7
+  - Groupe Vernevaut - Jacquot a fait le TP7 ensemble
+  - Mais Vernevautt était avec un autre pour le TP6
+- COO : TP8
+  - *Adapter*
+    - Le nom d'objet *Lumiere* est ambigü
+    - Les étudiants essaient de créer un lien avec *Lampe*
+    - Il serait préférable de trouver un autre appareil
+      - *Volet*
+      - *Cafetiere*
+      - *Climatisateur*
+  - *Thermostat*
+    - La fonction /toString()/ de *Thermostat* n'est pas redéfinie
+    - Difficile de se rendre compte de l'évolution de la température avec les informations à disposition
+    - Pas de /isAllume()/ aussi
+    - Pour le moment, se contente de renvoyer toujours /true/
+- Meeting
+  - Study further OT
+    - OT defines some constraints that a system has to comply with to ensure its correctness
+    - But some of them are too strong for my system
+      - For example, require causal delivery of all operations
+      - In my system, i do not have to deliver /insert/ in their causal order
+    - How to revamp these constraints to adapt them to my system ?
+  - Wrote the progress report
+- Progress report
+  - Ajouter les enseignements au rapport
+** Semaine du <2018-05-14 Mon> au <2018-05-18 Fri>
+*** Done
+- COO : TP9
+  - *Lampe* et *Lumiere*
+    - Maintenant il y a un lien entre *Lampe* et *Lumiere*
+  - *Hifi*
+    - On doit gérer le son dans *AdapterAppartHifi* ?
+  - Besoin de cast les objets dans les *Adapters*
+    - Je ne sais pas si c'est une bonne idée de les encourager à faire des casts
+    - Qu'est-ce qu'on essaie de montrer avec /appartement/ finalement ?
+      - Qu'une mauvaise conception implique une difficulté d'utilisation par la suite ?
+- COO : TP10
+  - Mémo PlantUML
+    - Erreur dans le diagramme de séquence, flèche pleine pour un message de retour
+  - Cours
+    - Est-ce que les acteurs extérieurs ont aussi une période d'activité ?
+*** Planned
+** Semaine du <2018-05-21 Mon> au <2018-05-25 Fri>
+*** Done
+** Semaine du <2018-05-28 Mon> au <2018-06-01 Fri>
+*** Done
+- COO : TP14
+  - Test diagramme de séquence
+    - Mémo diagramme de séquence autorisé
+    - Insister sur l'attribut /produits/
+      - Doit avoir une entité /produits/ dans le diagramme de séquence
+      - Doit avoir des appels vers cette liste
+      - Dans question 3 : on n'attend de vous que vous indiquez comment récupérer le 1er élément puis le 2nd élément (pas besoin de boucle)
+    - Tâche de corriger ça aujourd'hui de façon à ce que je puisse vous rendre ça demain pour avoir des dernières questions avant le DS
+  - Partiel jeudi de 8 à 10
+    - Droit
+      - Au mémo diagrammes de classe
+      - Au mémo diagrammes de séquence
+      - Feuille de pompes manuscrite, recto-verso
+  - Projet Zeldiablo
+    - Précédemment la semaine dernière, vous avez
+      - Décrit un 1er diagramme de classe basique
+      - Lister les fonctionnalités de l'appli
+      - Choisit et décrit plus précisement les fonctionnalités de la 1ère version
+	- Particulièrement en définissant des critères de validation
+    - Aujourd'hui
+      - Conception de ces fonctionnalités
+	- Diagramme(s) de séquence
+	- Mise à jour du diagramme de classe
+	- Répartition du travail à partir de ce dernier
+      - Code
+	- Mise en place des tests unitaires des fonctionnalités
+	- Écriture du code correspondant
+      - Objectif de fin séance
+	- Une 1ère version fonctionnelle de votre application
+    - Demain
+      - Met à disposition un moteur de jeu
+      - L'objectif sera de pluggé votre application dessus
+- COO : Test diagramme de séquence
+  - LISEZ L'ÉNONCÉ
+  - Soyez cohérent sur les noms de variables et les types, d'une question à l'autre
+    - Une fois, produits est une *List*
+    - La fois d'après, produits est un *Produit*
+  - La flèche de retour n'a que 3 significations possibles (ne correspond qu'à 3 morceaux de codes)
+    - Fin de la méthode (dans ce cas, aucune valeur attachée à la flèche)
+    - Return (dans ce cas, une variable ou une valeur attachée à la flèche)
+    - Une exception levée
+  - Dans le diagramme de séquence, nous avons une entité par instance
+    - Pour un livre, je vais avoir qu'une seule entité (et pas une entité /p: Produit/ et une entité /l: Livre/)
+- COO : Rappels examen
+  - Portera sur tout
+    - git
+    - JUnit
+    - Diagramme de classe
+    - Diagramme de séquence
+  - Droit
+    - À une feuille de pompe recto-verso manuscrite
+    - Aux mémos diagramme de classe, diagramme de séquence
+- ECSCW 2018 :
+  - Salles
+    - B013 - M2 et M3
+    - A006 - M1
+    - C005 - Workshop
+    - Posters and Demos - A008
+- Meeting
+  - Nothing interesting
+  - Worked on the program for ECSCW 2018
+  - Read a paper submitted to CSCW : *Real Differences between OT and CRDT for Co-Editors*
+    - Authors compare OT and CRDT to find the common ideas to better understand their differences
+    - Since i'm following a MOOC on scientific integrity currently, i can say that this paper does not fit the definition of integrity
+      - The comparison is not really fair (non-accurate complexity of algorithms, present false issues, invalid arguments)
+    - But at least it motivates my PhD topic
+  - Start to read a paper *Conflict-Aware Replicated Data Types*
+    - Propose to enhance CRDT with /guard conditions/ on operations
+    - Propose a system detecting non-commutative operations from these /guard conditions/ and setting up a consensus to handle these operations
+- MUTE : Divergence constatée sur les notes de la réunion
+  - On a un bloc de texte qui n'était pas placé au même endroit dans une copie
+  - Normalement, on a : received the first response from the journal Computer in Industry... major revision  in 2 months
+  - Chez la copie défectueuse, on a : received the first response from the journal Computer in Industry...n  in 2 months major revisio
+  - En examinant la structure de données, on observe qu'un bloc est positionné au mauvais endroit
+  - Voir à quelle moment cette incohérence apparaît
+    - Dès l'insertion ?
+    - Ou plus tard suite à un ré-équilibrage foireux ?
+*** Planned
+**** DONE ECSCW : Compléter le programme de la conférence
+- Version web disponible ici : http://ecscw2018.loria.fr/full-programme/
+- Lien vers la version papier : https://v2.overleaf.com/16274874bvcwsjtzswvj
+** Semaine du <2018-06-04 Mon> au <2018-06-08 Fri>
+*** Done
+- Lu *Data Laced with History: Causal Trees & Operational CRDTs*
+  - Disponible ici : http://archagon.net/blog/2018/03/24/data-laced-with-history/
+  - Propose
+  - Quelques liens intéressants
+    - À propos des différentes horloges logiques : https://queue.acm.org/detail.cfm?id=2917756
+    - À propos du fondement mathématique des CRDTS (/monotonic semilattice/) http://jtfmumm.com/blog/2015/11/17/crdt-primer-1-defanging-order-theory/
+    - Une autre approche de résolution de conflits, *Differential Synchronization* : https://neil.fraser.name/writing/sync/
+    - Causal Tree : http://www.ds.ewi.tudelft.nl/~victor/articles/ctre.pdf
+    - Replicated Object Notation : https://github.com/gritzko/ron
+    - Pure Operation-based Replicated Data Types : https://arxiv.org/pdf/1710.04469.pdf
+- MC : *Practice-based Computing as the Heart of CSCW Research*
+  - Considère qu'un résultat est fortement lié au contexte
+    - Que ça soit des études sociales
+    - Mais aussi des programmes/applications
+    - Mais un algo se veut générique
+    - Voir pour repenser cette approche
+  - Design Research : investigate activities of constructing artefacts which are implemented to achieve social ends
+  - Suggère de s'intéresser à comment l'appropriation d'un nouvel artefact change les habitudes/le quotidien de ses utilisateurs
+    - Contrairement à juste s'intéresser au caractère innovant de l'artefact comme actuellement
+  - Références à regarder
+    - Annotated protefolios (Bowers (2014), Gaver & Bowers (2012))
+  - Existe un gap entre le design et l'appropriation d'un artefact
+  - Design Case Studies
+    - Se décompose en 3 étapes
+      1. Étude des pratiques sociales d'un domaine
+      2. Conception d'un artefact en fonction des pratiques observées précédemment
+      3. Étude de l'appropriation de l'artefact
+- IUT : Rencontrer Nadia pour décider de mon service l'an prochain
+  - Mails envoyés
+  - Rencontre prévue le <2018-06-21 Thu> à 10:00
+  - Notes
+    - Volume horaire 64h max
+    - Si l'ensemble des modules n'atteint pas 64h, peut compenser avec des stages
+    - Part sur le module d'algo (32h du 3 septembre au 28 Octobre, 4h par semaine)
+    - Reste à
+      - Fiche de voeux
+      - La transmettre à Yolande
+    - Aura un suivi de stage à faire
+- SATIS : Faire l'ordre de mission et réserver les billets
+  - <2018-08-03 Fri>
+    - Train Nancy - CDG
+      - [ ] 05:55 (arrivée à 07:57)
+      - [ ] 06:55 (arrivée 09:09)
+      - [X] 09:25 (arrivée à 11:52)
+    - Avion CDG - Oslo
+      - [ ] 11:00 (arrivée 13:15)
+      - [X] 13:40 (arrivée 15:00)
+  - <2018-08-09 Thu>
+    - [ ] 08:09 (arrivée 09:50)
+    - [ ] 09:55 (arrivée 11:45)
+    - [X] 11:40 (arrivée 13:30)
+    - [ ] 14:05 (arrivée 15:55)
+    - [ ] 16:25 (arrivée 18:15)
+  - <2018-08-17 Fri>
+  - <2018-08-18 Sat>
+    - Tromso - Oslo - CDG
+      - [X] 08:30 (10:30) - 12:30 (14:55)
+    - Train CDG - Nancy
+      - [X] 17:43 (arrivée à 19:54)
+      - [ ] 18:55 (arrivée à 21:24)
+- COO : Corriger les copies du partiel
+  - Question 1
+    - Plusieurs associations de *ArmeEnchantee* à *Epee* et *Arc*
+    - *ArmeEnchantee* possèdent plusieurs instances de *Arme*
+    - *Epee* et *Arc* implémentent/héritent de *ArmeEnchantee*
+    - Ajoute /munition/ en attribut de *Arme*
+    - Oubli d'attributs
+    - Formalisme incorrect
+  - Question 2
+    - Absence de *Arc*
+    - Absence de *ArmeEnchantee*
+    - Absence de *Main*
+    - Diagramme de séquence incohérent avec le diagramme de classe proposé
+    - Formalisme incorrect
+  - Question 3
+    - Ne multiplie pas les dégâts de l'arme
+    - Fait un check avec /instanceOf/ pour déterminer le type de *Arme* afin de retirer une munition si besoin, alors qu'on appelle correctement ensuite /arme.utiliserArme()/
+    - Code incohérent avec le diagramme de séquence proposé
+    - Erreurs de syntaxe
+  - Question 4
+    - N'instancie pas de *Arc*
+    - N'instancie pas de *ArmeEnchantee*
+    - N'appelle pas /utiliserArme()/ sur la bonne instance
+    - Code incohérent avec le diagramme de classe proposé
+    - Erreurs de syntaxe
+- COO : Encadrer les projets
+  - Template
+    - Groupes
+      - *DIGNIEL, FARRUGIA, GIBIAT et SELY*
+      - *BALLAND, CADET, CHEVRIER, DIDRY, HUBLAU*
+      - *CORRIGEUX, GAND, KICHNER, RISSE*
+      - *KELLER, CUNIN, GHESQUIERE, GREBERT*
+      - *VERNEVAUT, MATUCHET, PALAUT, PALMIERI*
+      - *LIGEROT, MONTAUT, JEANDEL, ROBERT*
+    - Groupe /noms/
+      - État au début de l'itération
+	- Programme
+	- Conception
+      - Itération courante
+	- Liste des fonctionnalités
+	- Diagrammes de séquence
+	- Diagramme de classe
+	- Implémentation
+	- Tests unitaires
+      - Remarques
+  - Lundi matin
+    - Groupe *DIGNIEL, FARRUGIA, GIBIAT et SELY*
+      - État au début de l'itération
+	- Programme
+	  - Fonctionnel
+	  - Un personnage se déplace dans un labyrinthe
+	- Conception
+	  - Liste des fonctionnalités de la v1
+	    - Liste
+	  - Diagrammes de classe et de séquence manquants du repo
+      - Itération courante
+	- Liste des fonctionnalités
+	  - Pas encore établie
+	  - Mais souhaite ajouter la possibilité de récupérer des trésors, de tomber dans des pièges et de commencer les monstres
+	- Diagrammes de séquence
+	  - Pas fait
+	- Diagramme de classe
+	  - Pas fait
+	- Implémentation
+	  - Pas fait
+	- Tests unitaires
+	  - Pas fait
+      - Remarques
+	- Doivent mettre à jour leur repo pour ajouter les diagrammes de séquence et le diagramme de classe de l'itération 1
+	- Pas penser à demander l'exécution des tests
+	- Warning d'émis sur la fonctionnalité /labyrinthe procédural/
+    - Groupe *BALLAND, CADET, CHEVRIER, DIDRY, HUBLAU*
+      - État au début de l'itération
+	- Programme
+	  - Personnage se déplace dans le labyrinthe
+      - Itération courante
+	- Liste des fonctionnalités
+	  - Pas clairement définie
+      - Remarques
+	- Pas accès au repo
+	- Warning d'émis sur la fonctionnalité /labyrinthe procédural/
+    - Groupe *CORRIGEUX, GAND, KICHNER, RISSE*
+      - État au début de l'itération
+	- Pas de moteur de jeu en arrivant
+	- A été ajouté depuis
+	- Labyrinthe par défaut
+	- Personnage qui peut se déplacer mais pas testé
+      - Itération courante
+	- Liste des fonctionnalités
+	  - Pas clairement définie
+	    - Labyrinthe plus grand
+	    - Monstres immobiles
+	    - Cases piègées
+      - Remarques
+	- Pas accès au repo
+	- Warning émis sur le retard déjà pris sur l'itération 2
+	- Peut potentiellement fusionner l'itération 3 et 4 pour remettre le projet carré
+    - Groupe *KELLER, CUNIN, GHESQUIERE, GREBERT*
+      - État au début de l'itération
+	- Interface graphique
+	- Personnage qui peut se déplacer
+	- Présence de murs
+	- Bug si on appuie sur plusieurs touches
+	- Répartition du travail
+	  - Guillaume : Laby
+	  - Tom : IHM
+	  - Maxime et Thibaut : Personnage
+      - Itération courante
+	- Liste des fonctionnalités
+	  - Pas posée sur papier
+	    - Peut passer d'un laby à l'autre
+	    - Le personnage ne peut plus traverser les murs
+	    - Sérialisation/Désérialisation de labyrinthe
+      - Remarques
+	- Travaillent déjà sur des mécanismes d'optimisation
+	- Conseiller de plutôt se pencher sur des fonctionnalités tant que le besoin ne se fait pas particulièrement sentir
+    - Groupe *VERNEVAUT, MATUCHET, PALAUT, PALMIERI*
+      - État au début de l'itération
+	- V1 finie
+	- Mais moteur de jeu pas encore pluggé
+	- V1
+	  - Instancie un *Labyrinthe* avec *Personnage* qui peut se /deplacer()/
+	- Répartition du travail
+	  - Adrien
+	    - Labyrinthe + tests
+	  - Louis
+	    - Personnage
+      - Itération courante
+	- Liste des fonctionnalités
+	  - Ajout de monstres
+      - Remarques
+	- Comme ils étaient en retard sur l'itération 2, ils ont passé cette itération à plugger le moteur de jeu
+	- Dit de prendre leur temps pour finaliser cette itération afin de repartir sur des bases saines pour la prochaine itération
+	- Warning sur les fonctionnalités procédurales
+    - Groupe *LIGEROT, MONTAUT, JEANDEL, ROBERT*
+      - État au début de l'itération
+	- Programme
+	  - Construire le labyrinthe
+	  - Construire le joueur
+	  - Peut pas encore déplacer le joueur
+	  - Pas pluggé le moteur de jeu
+      - Itération courante
+	- Ont passé leur matinée à plugger le moteur de jeu
+	- Ont aussi travaillé sur la conception d'un nouveau labyrinthe plus complet
+      - Remarques
+	- Dit de prendre leur temps pour finaliser cette itération afin de repartir sur des bases saines pour la prochaine itération
+  - Lundi aprem
+    - Groupe *DIGNIEL, FARRUGIA, GIBIAT et SELY*
+      - État au début de l'itération
+	- En chantier
+	  - Difficultés pour agrandir le labyrinthe
+	  - Difficultés pour transformer la gestion des cases
+	  - En train de rattraper des diagrammes de séquences en retard
+	  - En train de rattraper le diagramme de classe
+	- Itération 3+4
+	  - Manque la liste des fonctionnalités sur le repo
+	  - N'ont pas fait les diagrammes de séquence, ont directement passé au code
+	- Remarques
+	  - Avertissement sur la présence des fichiers dans le repo
+    - Groupe *BALLAND, CADET, CHEVRIER, DIDRY, HUBLAU*
+      - État au début de l'itération
+	- Programme qui tourne
+	- Diagrammes de séquence présents
+	- Manque le diagramme de classe
+      - Itération 4
+	- Manque quelques fonctionnalités dans la liste
+	  - Ajout d'un type de monstre
+	  - Inventaire du personnage
+      - Remarques
+	- Pas de diagrammes de séquence, pas de diagramme de classe
+    - Groupe *CORRIGEUX, GAND, KICHNER, RISSE*
+      - État au début de l'itération
+	- Instanciation d'un labyrinthe à partir d'un fichier qui était buggé
+	- En retard sur les tests de cette itération
+      - Itération 4
+	- Manque la liste des fonctionnalités à ce stade
+	  - Déplacement aléatoire des monstres
+	  - Attaquer
+	  - Subir dégâts
+	- Les diagrammes de séquence sont présents par contre
+	  - Juste une coquille sur /déplacer()/ : le monstre accède au labyrinthe de manière indéfinie pour le moment
+      - Remarques
+	- Bien rattrapé l'itération de ce matin
+	- Continuer comme ça
+    - Groupe *KELLER, CUNIN, GHESQUIERE, GREBERT*
+      - État au début de l'itération
+	- Conception finie des différentes fonctionnalités
+	- L'implémentation des différents labyrinthes étaient toujours en cours
+	- Un peu de peaufinage réalisé avec des tests
+      - Itération courante
+	- Liste des fonctionnalités mais courte
+	- Quelques diagrammes de séquences, mais pas pour toutes les fonctionnalités
+      - Remarques
+	- Liste des fonctionnalités un peu courte : ajoutez une description et des critères de validation
+	- Arriver plus vite aux diagrammes de séquences de façon à ce que les réunions soient plus productives
+    - Groupe *VERNEVAUT, MATUCHET, PALAUT, PALMIERI*
+      - État au début de l'itération
+	- Fini de plugger le moteur graphique
+	- Définit une liste des fonctionnalités
+	- Réalisé les diagrammes de séquence correspondant
+	- L'implémentation était finie pour 14h
+	- Présence de tests unitaires
+      - Itération 4
+	- Mise en place d'une liste des fonctionnalités
+	- Seulement un diagramme de séquence sur /déplacerMonstre()/
+	  - Diagramme incomplet, manque l'interaction avec *Labyrinthe*
+      - Remarques
+	- Faire apparaître la répartition du travail sur la liste des fonctionnalités
+	- Ne pas gagner du temps sur les diagrammes de séquence, mais sur la liste des fonctionnalités plutôt
+    - Groupe *LIGEROT, MONTAUT, JEANDEL, ROBERT*
+      - État au début de l'itération
+	- Pas fini de plugger
+	- Représentation du labyrinthe qui était encore buggée (pb de coordonnées)
+	- Nouveau labyrinthe fini
+      - Itération courante
+	- Réalisation d'une liste des fonctionnalités
+	- Mais seulement 1 diagramme de séquence disponible
+	- Il s'agit du diagramme de séquence pour /Monstre.attaquer()/
+	  - Le diagramme de séquence n'est pas précis sur comment le monstre récupère le joueur
+      - Remarques
+	- La liste des fonctionnalités est trop précise et rentre trop dans les détails de l'implémentation
+	  - Retravailler pour décrire des fonctionnalités et non des classes
+	- Finaliser cette version aujourd'hui
+	- Avancer plus rapidement sur la liste des fonctionnalités et les diagrammes de séquence au cours des itérations suivantes
+  - Mardi matin
+    - Groupe *DIGNIEL, FARRUGIA, GIBIAT et SELY*
+      - État début itération
+	- Comme itération 2
+	- Manque les documents de conception de l'itération 3
+      - Itération courante
+	- Liste des fonctionnalités présente mais incomplète (description, critères de validation, responsable)
+	- Documents de conception manquants
+	- Application fonctionnelle
+      - Remarques
+	- Liste des fonctionnalités incompletes
+	- Aucun documents de conception disponibles au cours de la réunion
+    - Groupe *BALLAND, CADET, CHEVRIER, DIDRY, HUBLAU*
+      - Itération précédente
+      - Itération courante
+	- Liste des fonctionnalités
+	- Diagrammes manquants
+      - Remarques
+	- Faire apparaître les responsables des fonctionnalités
+	- Diagrammes manquants ou insuffisants
+	- Voir s'ils arrivent à compléter l'itération pour cet aprem
+    - Groupe *CORRIGEUX, GAND, KICHNER, RISSE*
+      - Itération précédente
+	- Application fonctionnelle
+	- Documents de conception présents
+	- Tag v4 présent
+      - Itération courante
+	- Liste des fonctionnalités présentes
+	- Diagrammes de séquences réalisés
+      - Remarques
+	- Faire apparaître critères de validation et responsable de fonctionnalités dans la liste
+    - Groupe *KELLER, CUNIN, GHESQUIERE, GREBERT*
+      - État au début de l'itération
+	- Documents de conception présents
+	- Tag v4 présent
+	- Programme exécutable et fonctionnel
+	- Test échouent
+      - Itération courante
+	- Liste de fonctionnalités prête
+	- Diagrammes de séquences réalisés sur papier
+	  - Quelques remarques sur la responsabilité de *ZeldiabloJeu* qui fait beaucoup trop de choses
+	  - Déléguer une partie de ses responsabilités à *Labyrinthe* et *Carte* notamment pour récupérer un *Monstre*, un *Objet*
+    - Groupe *VERNEVAUT, MATUCHET, PALAUT, PALMIERI*
+      - Début d'itération
+	- Documents de conception présents
+	- Tag v4 présent
+	- Projet fonctionnel
+      - Itération courante
+	- Liste de fonctionnalités prête
+	- Diagrammes de séquence réalisés
+      - Remarques
+	- Diagramme de séquence sur /changerMonde()/ incomplet
+    - Groupe *LIGEROT, MONTAUT, JEANDEL, ROBERT*
+      - État au début de l'itération
+	- Projet fonctionnel avec interface graphique
+      - Itération courante
+	- Réalisation d'une liste des fonctionnalités
+	- Diagrammes de séquence réalisés
+      - Remarques
+	- Travailler
+  - Mardi aprem
+    - Groupe *DIGNIEL, FARRUGIA, GIBIAT et SELY*
+      - Itération précédente
+	- Ont retravaillé la liste des fonctionnalités
+	- Ont ajouté des diagrammes de séquence
+      - Itération courante
+	- Liste des fonctionnalités présentes
+	- Diagramme de séquence présent que pour une d'entre elles
+	- Pas encore eu le temps de faire le diagramme de seq d'une autre
+	- La flemme de faire le diagramme de séquence de /monstre.seDeplace()/
+      - Remarques
+	- Gestion des *Entites* et des *Bonus* semble très similaire
+	  - Voir s'ils fusionnent ces concepts
+    - Groupe *BALLAND, CADET, CHEVRIER, DIDRY, HUBLAU*
+      - Itération précédente
+	- Ajout des diagrammes manquants lors de l'itération précédente
+	- Retours effectués, pas forcément appréciés
+      - Itération courante
+	- Liste des fonctionnalités présentes
+	- Pas des diagrammes de séquence pour l'ensemble des fonctionnalités
+    - Groupe *CORRIGEUX, GAND, KICHNER, RISSE*
+      - Itération précédente
+	- Application fonctionnelle
+	- Pris du retard sur l'implémentation des items
+      - Itération courante
+	- Liste des fonctionnalités présente
+	- Diagrammes de séquences réalisés
+	- Un diagramme de séquence sur l'instanciation et le comportement de *GenerateurSprite* serait cool
+    - Groupe *KELLER, CUNIN, GHESQUIERE, GREBERT*
+      - État au début de l'itération
+	- Pris du retard sur l'implémentation des boutons déclencheurs
+	- Mais le reste des fonctionnalités de l'itération précédente a été implémenté
+      - Itération courante
+	- Liste des fonctionnalités présente mais incomplète
+	- Diagramme de séquence pour /attaquer()/
+    - Groupe *VERNEVAUT, MATUCHET, PALAUT, PALMIERI*
+      - Début d'itération
+	- Un test unitaire n'était pas encore implémenté
+      - Itération courante
+	- Liste des fonctionnalités présente et correcte
+	- Diagrammes de séquence présents, quelques retours à faire
+      - Remarque
+	- Adrien a fini rapidement sa fonctionnalité, voir pour en ajouter une autre
+    - Groupe *LIGEROT, MONTAUT, JEANDEL, ROBERT*
+      - Itération précédente
+	- Fonctionnalités implémentées
+	- Manque les tests
+      - Itération courante
+	- La liste des fonctionnalités est présente
+	- Les diagrammes de séquence absents
+      - Remarques
+	- Possible de faire des diagrammes de séquence sur *Sprite*, *Sound*, fin de partie
+  - Mercredi matin
+    - Groupe *DIGNIEL, FARRUGIA, GIBIAT et SELY*
+      - Itération précédente
+	- Pas pu implémenter la gestion des portes/clefs
+	- Fonctionnelle, testée
+      - Itération courante
+	- Liste des fonctionnalités présentes
+	- Diagrammes de séquences absents
+      - Remarques
+	- Ajouter les tags manquants
+	- Ajouter responsables fonctionnalités
+	- Warning sur les différentes fonctionnalités qu'ils veulent implémenter au cours de cette itération
+	  - J'ai l'impression qu'ils sont trop gourmands
+	  - Insisté sur le fait qu'on préfère avoir un projet peaufiné et documenté qu'un projet instable et/ou des documents de conception manquants
+    - Groupe *BALLAND, CADET, CHEVRIER, DIDRY, HUBLAU*
+      - Itération précédente
+	- Fonctionnalités implémentées, testées
+	- Fenêtre inventaire un peu bugué
+      - Itération courante
+	- Liste des fonctionnalités établie
+	- Peu de documents de conception
+      - Remarques
+	- Manque les diagrammes de séquence les plus intéressants
+	- Prendre le temps de peaufiner le projet
+	  - Ajout des diagrammes manquants
+	  - Ajout des tests
+	  - Ajout de la JavaDoc
+	- Pas hésiter à sabrer une fonctionnalité si celle-ci n'est pas finie à temps
+    - Groupe *CORRIGEUX, GAND, KICHNER, RISSE*
+      - Itération précédente
+	- Fonctionnalités implémentées, application fonctionnelle
+	- Mise à jour des diagrammes de séquence par rapport aux retours
+      - Itération courante
+	- Ajout d'1 fonctionnalité : attaque directionnelle
+	- Peaufiner l'interface graphique de votre application
+	- Retravailler les diagrammes de séquence
+      - Remarques
+	- Ajouter les diagrammes de classe manquants
+	- Documenter l'application
+    - Groupe *KELLER, CUNIN, GHESQUIERE, GREBERT*
+      - Itération précédente
+	- Tout était implémenté et testé
+      - Itération courante
+	- Ajout documents de conception (séquences, classes)
+	- Ajout JavaDoc
+	- Correction de bugs
+	- Préparation de la soutenance
+    - Groupe *LIGEROT, MONTAUT, JEANDEL, ROBERT*
+      - Itération précédente
+	- Fonctionnelle (sauf *Donjon*)
+	- Pas encore testée
+	- Documents de conception manquants
+      - Itération courante
+	- Préparation de la soutenance
+	- Nettoyage du code
+	- Essaye de corriger la fonctionnalité /donjon/
+	- Ajoute les diagrammes de séquence manquants
+      - Remarques
+	- Tags manquants
+	- Ajouter les diagrammes de classe manquants
+	- Warning sur *Donjon*
+	  - Ne pas hésiter à supprimer ce début de fonctionnalité s'il pose trop de problèmes
+  - Mercredi aprem
+    - Groupe *VERNEVAUT, MATUCHET, PALAUT, PALMIERI*
+      - B
+    - Groupe *KELLER, CUNIN, GHESQUIERE, GREBERT*
+      - B+
+    - Groupe *DIGNIEL, FARRUGIA, GIBIAT et SELY*
+      - C+
+    - Groupe *LIGEROT, MONTAUT, JEANDEL, ROBERT*
+      -
+    - Groupe *CORRIGEUX, GAND, KICHNER, RISSE*
+    - Groupe *BALLAND, CADET, CHEVRIER, DIDRY, HUBLAU*
+*** Planned
+**** DONE PhD : Finir le module d'intégrité scientifique
+**** DONE PhD : Évaluer les formations suivies
+**** DONE IUT : Rencontrer Nadia pour décider de mon service l'an prochain
+**** DONE COO : Corriger les copies du partiel
+**** DONE COO : Transmettre les notes des tests sur les diagrammes de classe et les diagrammes de classe
+**** DONE COO : Encadrer les projets
+**** DONE SATIS : Faire l'ordre de mission et réserver les billets
+- Départ pour Oslo : <2018-08-03 Fri>
+- Départ pour Tromso : <2018-08-09 Thu>
+- Départ pour SATIS : <2018-08-14 Tue>
+- Retour : <2018-08-18 Sat>
+- Ordre de Mission : https://gfd.inria.fr/portail/Portail.jsp
+- Ordre de Mission Sans Frais :
+- Oreli : https://neo.mykds.com/home?instance=inria
+** Semaine du <2018-07-02 Mon> au <2018-07-06 Fri>
+*** Done
+- IUT : Cours prog web client
+  - Alternance
+    - Y a des alternants dans les groupes
+    - Il n'est possible de donner du travail aux alternants alors qu'ils sont en entreprises les semaines suivantes
+    - La pause de 3 semaines début novembre est une période en entreprise
+    - Peut pas donner un projet pour les vacances de la Toussaint
+  - Groupes
+    - LP1 (horizons variés)
+    - LP2 (anciens DUT info)
+      - Ont déjà du JS en DUT
+      - Connaissent déjà les bases du langage et de la manipulation de DOM
+  - Prog web/client
+    - <2018-10-01 Mon> au <2018-11-30 Fri>
+    - Compétences enseignées
+      - LP1
+	- Bases de JS
+	- Manipulation de DOM
+	- jQuery
+	- Ajax?
+      - LP2
+	- DOM
+	- jQuery
+	- Héritage
+	  - Prototype
+	  - Classe
+	- Fonctionnel
+	  - Map
+	  - Reduce
+        - Modules
+	- Webpack
+	- TypeScript
+	- Tests unitaires
+	  - Ava : https://github.com/avajs/ava
+	- Tests end-to-end
+	  - Cypress : https://www.cypress.io/
+  - App web/cient
+    - <2018-12-01 Sat> au <2019-03-31 Sun>
+    - Contenu
+      - Démarre par une application panier en jQuery
+      - Puis refait l'application en ViewJS
+      - Projet : clone de Slack
+    - Compétences enseignées
+      - Appels asynchrones
+      - Dev une web app avec un framework
+      - Ergonomie
+    - Pré-requis
+      - Bases du langage
+      - Connaissance en manipulation de DOM
+      - Connaissance de jQuery
+- PhD : Réunion suivi
+  - Programmée le <2018-07-06 Fri> à 10:00
+- CRDT : Regarder *RedisConf18: CRDTs and Redis—From Sequential to Concurrent Executions*
+  - La vidéo présente les différents CRDTs implémentés et disponibles dans *Redis*
+    - Mais ne parle pas de comment ces CRDTs sont ensuites utilisés
+  - Remarque intéressante sur la latence
+    - La latence existe et existera toujours, ainsi que les différences en fonction des distances
+      - Déjà assez proche des limites théoriques
+      - La latence ne pourra qu'augmenter avec l'expansion de l'espèce humaine (ex communication Terre-Mars)
+    - Présente les différents temps de latence en fonction des mécanismes de réplication utilisés
+      - Avec λ pour les latences locales (jusqu'à 50ms) et Λ pour les latences inter-continentales (entre 100 et 300ms)
+      - Consensus/Paxos : [Λ, 2Λ]
+      - Primary-backyp : [λ, Λ]
+      - Multi-master : λ
+  - Présente une implémentation d'une séquence répliquée dans une des dernières slides
+    - Mais ne parle pas de quelle implémentation il s'agit
+  - D'après les ressources consultées, les CRDTs sont utilisés dans le cadre des /Conflict-free Replicated Databases (CRDB)/
+  - L'idée est de proposer une base de données géo-répliquée, utilisant des CRDTs à la place des types de données traditionnels
+    - Adopte le modèle de réplication /Multi-master/
+    - Permet d'assurer la disponibilité des données et leur convergence
+    - Tout en évitant un consensus qui serait coûteux dans ce type d'application répliquée à travers le monde
+  - Aucune information n'est disponible concernant l'algorithme utilisé pour implémenter la séquence répliquée
+    - Mais cette séquence ne semble proposer que les opérations d'ajout en tête ou d'ajout en queue d'éléments
+    - Les cas d'utilisation semble être spécifiques, comme récupérer les évènements les plus récents ou mettre en place des queues
+  - On a donc aucune information sur les potentielles limites de cette implémentation d'un point de vue performance
+  - Ressources
+    - Whitepaper Redis CRDTs
+      - https://redislabs.com/docs/active-active-whitepaper/
+    - Geo-Distributed Active-Active Redis Applications with Conflict-free Replicated Databases (CRDB)
+      - https://redislabs.com/redis-enterprise-documentation/concepts-architecture/intercluster-replication/
+    - Developing Applications with Geo-replicated CRDBs on Redis Enterprise Software (RS)
+      - https://redislabs.com/redis-enterprise-documentation/developing/crdbs/
+    - Developing with Lists in a CRDB
+      - https://redislabs.com/redis-enterprise-documentation/developing/crdbs/developing-lists-crdb/
+    - Webinars
+      - https://redislabs.com/resources/webinars/past/?post_id=34753
+      - https://redislabs.com/resources/webinars/past/?post_id=34762
+*** Planned
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
+**** TODO MUTE : Identifier l'origine de la divergence de la réunion du <2018-06-01 Fri>
+- Un bloc de texte s'est retrouvé inséré au mauvais endroit pour une copie des notes prises au cours de cette réunion
+- En identifiant la structure obtenue, on s'est rendu compte que ce bloc n'aurait pas dû être placé à cet endroit étant donné son identifiant
+- Enquêter pour identifier l'origine de ce mauvais positionnement
+  - Est-ce lié à l'algorithme de comparaison des identifiants ?
+  - Ou est-ce lié à l'algorithme d'insertion au sein de l'arbre ?
 **** TODO Méthode formelle : Se remettre à niveau en méthode formelle
 - D'après la discussion de Victorien avec Stephan Merz, ce dernier lui a conseillé
   - De commencer par du model-checking (TLA+)
@@ -5357,10 +6095,6 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - http://lamport.azurewebsites.net/video/videos.html
   - Un tuto que j'ai vu passé un jour sur HN
     - https://learntla.com/introduction/
-**** TODO OT : Lire *OT FAQ*
-- Voir si les méthodes utilisées dans le mécanisme de renommage correspondent bien à des fonctions de transformations
-- Voir dans ce cas quelles sont les propriétés qu'elles doivent vérifiées, et comment prouver qu'elles les vérifient bien
-- Disponible ici : http://www3.ntu.edu.sg/home/czsun/projects/otfaq/#_Toc321146157
 **** TODO CRDT : Se renseigner sur replikativ
 - http://replikativ.io/
 **** TODO CRDT : Se renseigner sur OrbitDB
