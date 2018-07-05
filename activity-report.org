@@ -5418,6 +5418,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 *** Planned
 ** Semaine du <2018-05-21 Mon> au <2018-05-25 Fri>
 *** Done
+*** Planned
 ** Semaine du <2018-05-28 Mon> au <2018-06-01 Fri>
 *** Done
 - COO : TP14
@@ -6040,6 +6041,57 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
       - Connaissance de jQuery
 - PhD : Réunion suivi
   - Programmée le <2018-07-06 Fri> à 10:00
+  - Préparation de la réunion
+    - Mécanisme de log
+      - Déterminé avec Le et Victorien les évènements et les données associées à logger
+      - Travaillé avec Cédric pour la mise en place du système de log
+	- Chaque navigateur log les informations en local
+	- Puis envoie les logs à un serveur de collecte
+      - Reste à mettre en place le mécanisme de groupe permettant d'activer/désactiver la publication des logs
+    - Mécanisme de renommage
+      - Motivations
+	- Littérature
+	  - Pas trouvé d'article justifiant que le phénomène des identifiants qui grossissent est un problème
+	    - LSEQ par exemple se contente de dire que s'en est un
+	  - À part l'article soumis à IEEE qui mentionne des expériences ayant montré une dégradation de l'expérience utilisateur en utilisant /teletype/
+	  - Mais ne sait pas la crédibilité qu'on peut donner à ces propros
+	    - Vu qu'il se contente de mentionner les expériences sans décrire le protocole expérimental ni publier les résultats obtenus
+	- Renseigné sur Redis
+	  - Redis propose des CRDTs dans le cadre de ses CRDBs
+	  - Plusieurs types dont *String* et *List*
+	  - Mais utilise un LWW pour *String*
+	  - Et ne mentionne pas l'algorithme implémenté pour *List*
+	    - Mais avec des méthodes limitées (ajout en tête, ajout en queue)
+        - Renseigné sur Akka.DistributedData
+	  - /Distributed key-value store/ construit sur Akka
+	  - Propose des CRDTs
+	  - Pas de *List*
+	  - Mentionne l'utilisation de tombstones et d'un mécanisme de /pruning/
+        - *Soulève l'interrogation sur le problème posé*
+	  - Est-ce que les types proposés le sont car ils suffisent aux utilisateurs ?
+	  - Ou est-ce que les systèmes se brident car les algorithmes proposés souffrent actuellement de problème de performance ?
+        - Piste avec xRay
+	  - Éditeur de code expérimental développé par l'équipe d'Atom
+	  - Souhaitent intégrer des fonctionnalités d'édition collaborative
+	  - Utilisaient leurs travaux sur /teletype/ qui implémente *RGASplit*
+	  - Mais ont l'air de transitionner sur des identifiants denses
+	  - Étudient des pistes d'optimisation de l'espace mémoire consommé par ces identifiants denses
+	    - Notamment LSEQ
+      - OT
+	- Lu *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
+	- Meilleure vision des contraintes et propriétés de cette approche
+	- Le problème est maintenant de faire matcher mon mécanisme à cette approche
+	  - Pour ce faire, soit je modifie le fonctionnement pour respecter les contraintes
+	  - Soit je prouve que certaines contraintes peuvent être allégées
+	  - Quelques difficultés à faire ça de façon simple
+	- *Est-ce que ça ne vaudrait pas mieux de rattacher à OT que pour la partie validation ?*
+      - Travaillé sur la gestion des opérations de renommage en concurrence
+	- On peut réussir à gérer des opérations de renommage concurrentes facilement en décidant que l'une l'emporte sur l'autre
+	- 2 approches pour cela
+	  - Soit lorsqu'on transforme une opération de renommage par rapport à l'autre, celle-ci est transformé en /No Op/
+	  - Soit les opérations de renommage forment un /State-based CRDT/ et transformer une opération de renommage par rapport à l'autre consiste à les fusionner
+      - Pas avancé sur l'implémentation
+    -
 - CRDT : Regarder *RedisConf18: CRDTs and Redis—From Sequential to Concurrent Executions*
   - La vidéo présente les différents CRDTs implémentés et disponibles dans *Redis*
     - Mais ne parle pas de comment ces CRDTs sont ensuites utilisés
