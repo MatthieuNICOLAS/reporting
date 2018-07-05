@@ -6063,7 +6063,14 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Mais cette séquence ne semble proposer que les opérations d'ajout en tête ou d'ajout en queue d'éléments
     - Les cas d'utilisation semble être spécifiques, comme récupérer les évènements les plus récents ou mettre en place des queues
   - On a donc aucune information sur les potentielles limites de cette implémentation d'un point de vue performance
+  - La vidéo *Building Geo-distributed Applications with Redis CRDBs* offre quelques informations supplémentaires
+    - /CRDBs/ ne sont pas disponibles dans la version open-source
+      - Se base effectivement sur les fonctionnalités de géo-réplication offertes dans la version entreprise
+    - Propose un type *String* mais il s'agit du seul /CRDT/ qui se base alors sur /LWW/
   - Ressources
+    - Active-Active Redis Enterprise
+      - https://redislabs.com/landing/active-active/
+      - https://www.youtube.com/watch?v=WHcvc0I24wA
     - Whitepaper Redis CRDTs
       - https://redislabs.com/docs/active-active-whitepaper/
     - Geo-Distributed Active-Active Redis Applications with Conflict-free Replicated Databases (CRDB)
@@ -6075,7 +6082,26 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - Webinars
       - https://redislabs.com/resources/webinars/past/?post_id=34753
       - https://redislabs.com/resources/webinars/past/?post_id=34762
+- CRDT : Se renseigner sur les CRDTs présents dans *Akka*
+  - *Akka* propose un module *Akka.Cluster*
+  - Ce module permet de connecter un ensemble d'instances d'application *Akka* via un réseau P2P
+  - Le but est de permettre le développement de systèmes décentralisés
+  - En se basant sur *Akka.Cluster*, *Akka* propose *Akka.DistributedData* permettant de mettre en place un /distributed key-value store/
+  - Les types de données utilisées par *Akka.DistributedData* sont des CRDTs
+  - Ces CRDTs sont différentes implémentations de *Counter*, *Flag*, *Map*, *Register*, *Set*
+    - http://getakka.net/articles/clustering/distributed-data.html#available-replicated-data-types
+    - https://github.com/akka/akka/tree/master/akka-distributed-data/src/main/scala/akka/cluster/ddata
+  - Absence de CRDTs pour gérer les séquences
+  - Semblerait en outre que les CRDTs implémentés utilisent des tombstones
+    - http://getakka.net/articles/clustering/distributed-data.html#tombstones
+  - Mais un mécanisme de /pruning/ permet d'en supprimer une partie
+    - À voir comment ce mécanisme détermine quelles données supprimer (stabilité causale de la suppression ?)
 *** Planned
+**** DONE CRDT : Regarder *RedisConf18: CRDTs and Redis—From Sequential to Concurrent Executions*
+- https://www.youtube.com/watch?v=ZoMIzBM0nf4
+**** DONE CRDT : Se renseigner sur les CRDTs présents dans *Akka*
+- Semblerait que *Akka* utilise des CRDTs
+- Se renseigner sur le sujet
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** TODO MUTE : Identifier l'origine de la divergence de la réunion du <2018-06-01 Fri>
 - Un bloc de texte s'est retrouvé inséré au mauvais endroit pour une copie des notes prises au cours de cette réunion
