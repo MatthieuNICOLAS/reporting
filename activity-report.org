@@ -6053,7 +6053,7 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 	- Littérature
 	  - Pas trouvé d'article justifiant que le phénomène des identifiants qui grossissent est un problème
 	    - LSEQ par exemple se contente de dire que s'en est un
-	  - À part l'article soumis à IEEE qui mentionne des expériences ayant montré une dégradation de l'expérience utilisateur en utilisant /teletype/
+	  - À part l'article soumis à CSCW qui mentionne des expériences ayant montré une dégradation de l'expérience utilisateur en utilisant /teletype/
 	  - Mais ne sait pas la crédibilité qu'on peut donner à ces propros
 	    - Vu qu'il se contente de mentionner les expériences sans décrire le protocole expérimental ni publier les résultats obtenus
 	- Renseigné sur Redis
@@ -6089,9 +6089,32 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
 	- On peut réussir à gérer des opérations de renommage concurrentes facilement en décidant que l'une l'emporte sur l'autre
 	- 2 approches pour cela
 	  - Soit lorsqu'on transforme une opération de renommage par rapport à l'autre, celle-ci est transformé en /No Op/
+	    - /IT(op1, op2) = op1'/ et /IT(op2, op1) = NoOp/
 	  - Soit les opérations de renommage forment un /State-based CRDT/ et transformer une opération de renommage par rapport à l'autre consiste à les fusionner
+	    - /IT(op1, op2) = IT(op2, op1) = op1'/
+	    - Est-ce que ça permet de simplifier la preuve de correction du mécanisme ?
       - Pas avancé sur l'implémentation
-    -
+    - Notes
+      - Principalement regardé motivations pour les séquences
+	- Mais qu'en conclusion on ne trouve pas d'autres cas d'utilisation que nos scénarios traditionnels d'édition collaborative
+	- Voir si on peut se pencher sur d'autres CRDTs
+      - OT
+	- Pas forcément besoin d'appliquer tel quel
+	- OT donne la forme générique que je dois respecter
+      - Mécanisme de renommage CRDT
+	- Finalement simplifie énormément le système de le voir comme un CRDT qui représente les epochs et qui est capable de faire passer les opérations d'une epoch à l'autre
+	- Reste à l'écrire et à montrer sa correction
+	- D'un point de vue défauts, peut argumenter que cette structure
+	  - n'est pas nécessaire tout le temps donc peut être stocké dans une BDD
+	  - peut être pruner au fur et à mesure que la causale stability avance
+    - Suite
+      - Implémentation du mécanisme d'arborescence des époques et de transformation des opérations
+	- Test de ce dernier
+	- Preuve
+      - Mise en place de simulation
+	- Déjà se comparer à LogootSplit sans mécanisme
+	- Voir si on peut facilement plugger /teletype/ pour se comparer à RGASplit
+      - Réfléchir à l'après
 - CRDT : Regarder *RedisConf18: CRDTs and Redis—From Sequential to Concurrent Executions*
   - La vidéo présente les différents CRDTs implémentés et disponibles dans *Redis*
     - Mais ne parle pas de comment ces CRDTs sont ensuites utilisés
@@ -6148,12 +6171,259 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - http://getakka.net/articles/clustering/distributed-data.html#tombstones
   - Mais un mécanisme de /pruning/ permet d'en supprimer une partie
     - À voir comment ce mécanisme détermine quelles données supprimer (stabilité causale de la suppression ?)
+- Meeting
+  - Had a meeting with Olivier et Gérald this morning
+  - So had to prepare for it
+  - One of the main feedback from the last one was about the motivation of the problem i'm adressing
+    - Yeah, identifiers are growing but is it really a problem ?
+  - So i worked on this topic
+    - Read LSEQ, a paper proposing a new strategy to allocate identifiers to prevent from growing too fast
+      - But no justification
+    - Took a look at xRay
+      - Experimental code editor by Atom team
+      - Want to implement collaborative editing features
 *** Planned
 **** DONE CRDT : Regarder *RedisConf18: CRDTs and Redis—From Sequential to Concurrent Executions*
 - https://www.youtube.com/watch?v=ZoMIzBM0nf4
 **** DONE CRDT : Se renseigner sur les CRDTs présents dans *Akka*
 - Semblerait que *Akka* utilise des CRDTs
 - Se renseigner sur le sujet
+** Semaine du <2018-07-09 Mon> au <2018-07-13 Fri>
+*** Done
+- PhD : Retour réunion suivi avec Olivier
+  - Olivier m'a fait des retours concernant notre réunion de suivi, notamment à propos des motivations
+  - Trouve que la motivation est encore floue et ne s'appuie pas assez sur des scénarios de l'industrie
+  - Pense pourtant qu'il y a matière à avec Redis, Cassandra et autres
+- PhD : Motiver le problème adressé
+  - Envoi d'un mail à Baquero à propos de l'utilisation des /Sequence CRDTs/ dans /Redis CRDB/
+  - Ce dernier ayant rejoint le /Redis Labs' Technical Advisory Board/, il me paraît bien placé pour répondre à mes différentes questions à ce sujet
+    - https://redislabs.com/press/crdt-expert-carlos-baquero-joins-redis-labs-technical-advisory-board/
+- CRDT : Se renseigner sur ElmSEQ
+  - Propose de représenter le texte en utilisant une liste de positions
+  - Un caractère peut être attribué à une position pour indiquer son emplacement dans le texte
+  - Mais plusieurs caractères peuvent être assignés en concurrence à une même position
+  - À ce moment, l'utilisateur se voit afficher le conflit et doit le résoudre
+  - Les opérations ont l'air d'être prévues pour une séquence /element-wise/
+    - Il faudrait donc résoudre les conflits élément par élément
+    - À voir à l'usage si c'est fonctionnel et pratique
+  - Permettrait p-e de gagner sur la taille des identifiants sur plusieurs niveaux en ne conservant que le /siteId/ et le /seq/ de l'auteur
+*** Planned
+**** DONE CRDT : Se renseigner sur ElmSEQ
+- Présentation disponible ici : https://brightdb.com/elmeurope18/#frame3897
+** Semaine du <2018-07-16 Mon> au <2018-07-20 Fri>
+*** Done
+- Algo :
+  - Base de l'algorithmie
+    - Instructions
+    - Conditions
+    - Itérations
+    - Structures
+    - Tableaux
+  - But : convaincre de réfléchir à l'algo avant de programmer
+  - Cours en pseudo-code
+    - Les langages de programmation sont abordés dans les modules suivants
+  - Entremêle cours et exercices
+    - Dès que possible faire les exercices histoire de ne pas perdre leur attention
+  - Insiste sur les règles
+    - Bon formalisme
+    - Bon choix du nombre de variables
+  - Pas de documents pour les DS
+    - Leur indiquer de bien revoir le cours et de finir les exercices si besoin d'une séance à l'autre
+  - 2 DS
+    - <2018-09-28 Fri> : 45min (1/3 de la note)
+      - Portera sur les 4 1ers chapitres
+      - Au bout de 4 semaines de cours
+      - Devrait être corrigé en 1 semaine
+    - <2018-10-26 Fri> : 1h15 (2/3 de la note)
+*** Planned
+** Semaine du <2018-08-15 Wed> au <2018-08-17 Fri>
+*** Done
+- SATIS 2018
+  - Session 1. Distributed Computing – External Simplicity, Internal Complexity
+    - *Dag Johansen*
+    - Systèmes distribués imposent des problèmes de
+      - Security
+      - Consistency
+      - Complexity
+      - Fault-tolerance
+    - Un trade-off entre fault-tolerance et performance est nécessaire
+    - Cherche de nouveau cas d'utilisation pour les systèmes distribués
+    - Se penche sur le monde du sport et spécifiquement sur celui du foot
+    - Beaucoup de staff théorique dans les clubs behind the scene (PhD en physique, médecine, info)
+    - Développe un système pour mesurer précisement la charge physique d'un entraînement sur un athlète (voir si un athlète est dans la forme physique pour un entraînement et si l'entraînement se déroule correctement)
+      - Scalable, non-invasif, high availability, real-time
+    - A utilisé des émetteurs radios pour suivre la position, la vitesse et l'accélération des athlètes en temps réel (meilleure précision que des GPS)
+    - Dorénavant travaille sur du processing vidéo pour obtenir ces données
+      - Le système mettait initialement 1s pour processer une image
+      - Incompatible avec du temps réel
+      - Essaie de distribuer la charge de travail pour améliorer le pipeline
+      - Un noeud dans le stade capture la vidéo en local et effectue des traitements sur l'image
+      - Avant de déléguer les calculs au cloud (AWS, Azure)
+      - Arrive à atteindre le temps réel dans ces conditions
+    - Travaille maintenant sur utiliser des technologies similaire pour effectuer du 360-panorama streaming video
+    - Remarques
+      - Capable d'atteindre le temps réel en déléguant le processing sur le cloud
+      - En fonction de la connexion et de la latence avec le cloud, peut impacter les performances
+      - Peut voir pour déployer des centres de calcul aux edges
+  - Session 2. If You’re Not Writing a Program, Don’t Use a Programming Language.
+    - *Leslie Lamport*
+    - Fait la distinction entre algorithme et programme
+      - Algorithme est le coeur du "programme"
+      - Le "programme" contient des informations supplémentaires (types, assertions, exceptions)
+    - Décrit algorithmes avec un ensemble de comportements (suite d'états)
+    - Décrit un ensemble de comportements avec un prédicat sur l'état intial /InitE/ et un /next-state predicate NextE/ sur chaque étape /(si, si+1)/
+    - /Safety property/ asserts what is allowed to happen
+    - /Liveness property/ asserts what must eventually happen
+    - Safety and liveness can be precisely defined and /any property = safety ^ liveness/
+    - Un algorithme maintient tout au long de ses étapes un /inductive invariant/
+      - Exemple du GCD : /GCD(M, N) = GCD(x, y)/
+    - Encourage fortement à décrire mathématiquement son algorithme avec un outil tel que TLA+ pour vérifier sa correction
+  - Session 3. Lamport’s Turing Award talk
+    - *Leslie Lamport*
+    - The Beginning of Concurrent System : Dijkstra paper circa 1970 about mutual exclusion
+    - Need for rigorous proof in concurrent systems
+    - Two arrows system
+      - -> (solid arrow) : Happen-before relation
+      - --> (dotted arrow): ?
+      - Properties
+	- A -> B -> C => A -> C
+	- A !-> A
+	- A -> B => A --> B
+      - Temporal Logic is to reason about Liveness
+      - Pseudo-code is obsolete, should use PlusCal instead
+  - Session 4. Consistency vs Performance 1
+    - *Lorenzo Alvisi*
+    - Parle du trade-off entre Simplicité du système et Performance dans le cadre des bases de données distribuées
+    - Associe ACID à la Simplicité
+    - ANSI SQL 92
+      - Feu vert signifie qu'on peut effectuer cette opération
+    - /Dirty Reads/ signifie qu'on peut lire une valeur au cours d'une transaction concurrente avant que la transaction concurrente n'ait COMMIT ou ABORT
+    - /Fuzzy Reads/ signifie qu'au cours d'une même transaction, pour une même clé, on lit différentes valeurs
+    - /Phantom Menace : Non-repeatable predicate-based reads/ : pareil que /Fuzzy Reads/, mais on ne lit pas une valeur mais un ensemble de valeurs respectant un prédicat
+    - "ANSI isolation levels should be intended to proscribe phenoma, not anomalies"
+    - /Dirty Write/ signifie que des write concurrents peuvent être entrelacés (T1 modifie X, T2 modifie X puis Y et T1 modifie Y)
+    - Présente une approche pour caractériser la seriability d'un ensemble de transactions à l'aide d'états
+  - Session 5. Consistency vs Performance 2
+    - *Lorenzo Alvisi*
+    - Performance vs Complexity
+    - Propose d'autoriser plus d'entrelacements des transactions (en découpant des transactions) afin d'améliorer les performances, au coût d'une augmentation de la complexité
+    - Argumente que seules certaines transactions introduisent des problèmes de performance
+    - Suggère donc de découper sélectivement ces transactions uniquement afin d'améliorer les performances tout en introduisant un minimum de complexité dans le système
+    - Parle de SALT Isolation
+    - Distingue les transactions ACID et BASE
+    - Seules les BASE peuvent être décomposées et entrelacées entre elles
+    - Tandis qu'une transaction ACID ne peut pas l'être et ne peut avoir lieu qu'avant ou après une transaction BASE concurrente
+    - La difficulté porte maintenant sur BASE-ifying les transactions lourdes
+    - A présenté un autre SGBD pour améliorer les performances sans augmenter la complexité (pas besoin de modifier le code et de BASE-ifier les transactions comme avec SALT): Callas
+  - Session 6. Fail-Stop Replication 1
+    - *Robbert van Renesse*
+    - Replication is drived by motivation in fault tolerance and scalability
+    - Highly influential RFC : P.R. Johnson and R.H. Thomas. Maintenance of duplicate databases. RFC 677, Jan. 1975
+      - Utilise la règle du LWW en utilisant des local timestamps pour annoter les modifications, utilisant le siteId pour résoudre les conflits
+    - System/Threats Model
+      - Peut faire des hypothèses sur
+	- Les communications
+	  - Fair Links
+	    - Un message est éventuellement délivré après un nombre infini de tentatives
+	  - Perfect Checksums
+	    - Un message correct reçu a bien été envoyé par un autre site
+	- Timing (Synchrone/Asynchrone)
+	  - No bounds on timing
+	    - Message latency
+	    - Speed at which clocks increase
+	    - The difference between clocks
+	- Défaillance
+	  - Byzantine > Crash > Fail-Stop
+	    - Crash: Sites sont honnêtes mais peuvent crasher à un moment donné
+	    - Fail-Stop: Dans cette sous-catégorie des Crashs, le mécanisme de détection des défaillances est fiable
+	  - Nombre de sites requis pour tolérer /f/ défaillances
+	    - Byzantine : 3f + 1
+	    - Crash: 2f + 1
+	    - Fail-Stop: f + 1
+	  - Dans le cadre d'un datacenter, le modèle /Fail-Stop/ est réaliste
+      - System Model dans le cadre des travaux présentés : Fail-Stop, Asynchrone, FIFO Communication
+    - Protocole
+      - Deux noeuds, la /head/ et la /tail/
+      - Lors d'une update, le client contacte la /head/ qui ajoute l'entrée à son log, puis transmet l'update à la /tail/. La /tail/ ajoute l'entrée à son log à son tour puis répond au client
+	- L'update peut être joué ensuite de façon asynchrone, mais doit être joué avant la prochaine query
+      - Lors d'une query, le client contacte la /tail/ qui effectue la query et retourne le résultat
+      - Le log de la /tail/ correspond à l'historique stable
+      - Si un crash se produit, le site restant devient à la fois la /head/ et la /tail/
+      - Peut ajouter un noeud au système après une panne histoire de revenir à 2 noeuds
+      - Un mécanisme de catch-up permet au nouveau noeud de récupérer l'état et de prendre le rôle de /head/
+	- Le nouveau noeud peut crasher au cours du mécanisme de catch-up sans que la pose (trop) de problèmes
+      - Une fois que le mécanisme de catch-up a fini, on retombe sur le système initial avec 2 noeuds
+  - Session 7. Fail-Stop Replication 2
+    - *Robbert van Renesse*
+    - Pour généraliser à plus de 2 noeuds : Chain Replication
+    - Le problème dans ce scénario concerne la /Failure Recovery/
+      - Les noeuds restants ont besoin de se coordonner puisque
+	- Ils n'ont pas forcément détecter les défaillances dans le même ordre
+	- Plusieurs noeuds peuvent essayer de joindre en concurrence
+      - Ajoute des opérations spéciales pour la reconfiguration
+	- /addReplica (replicaId)/
+	  - Permet à un site de rejoindre et de devenir la /head/
+	- /removeReplica (replicaId)/
+	- /resumeAsHead (replicaId)/
+      - La configuration peut donc être déterminée à partir de ces opérations dans le log lorsqu'elles sont stables (dans le log de la /tail/)
+    - Remarque
+      - La latence peut être élevée puisqu'une update doit parcourir toute la chaîne afin d'arriver à la /tail/ et être joué pour pouvoir être observé par les /queries/
+    - Questions
+      - Pourquoi la lecture ne se fait que la /tail/ et non pas de façon aléatoire entre la /head/ et la /tail/ ?
+	- Car potentiellement certaines updates vues par la /head/ ne sont pas stables et peuvent mener à des résultats étranges si la /head/ vient à crasher
+      - Lorsqu'on ajoute des noeuds, est-ce que seul le groupe de /tails/ augmente ou pouvons-nous avoir plusieurs /heads/ ?
+	- Les deux : le 1er noeud joue le rôle de /head/, le dernier celui de /tail/ et ceux du milieu à la fois /head/ et /tail/
+  - Session 8. Byzantine Consensus to Blockchains 1
+    - *Christian Cachin*
+  - Session 11. Security from Tags 1
+    - *Fred Schneider*
+    - Propose d'enforcer la sécurité et les safety properties d'un système non pas sur les opérations mais sur les valeurs
+    - Approche existe depuis 1975
+    - Pourquoi cette méthode d'enforcer la sécurité en attachant des tags sur les valeurs est sous-utilisée actuellement ?
+    - Enforcement: Access Control
+      - Utilise l'identité de l'utilisateur pour déterminer si iel a accès aux /containers/ ou aux /contents/
+      - /Content-based Access Control/ semble préférable au /Container-based Access Control/ (E2E Access Control, moins error-prone)
+    - Quel tag donner aux valeurs retournées par /op(x1, ..., xn)/ ?
+      - Peut dépendre sur les tags associés à /x1, ..., xn/, la sémantique de /op/, les valeurs de /x1, ..., xn/
+      - Prior work: Le résultat doit au moins être aussi confidentiel que l'union des tags associés aux valeurs
+    - Mais cela est incompatible avec certaines applications
+      - Vote électronique : chaque vote est secret, mais le résultat doit être public
+      - Chiffrement : la valeur est secrète, mais la valeur chiffrée peut être public
+    - Il est donc nécessaire d'associer à chaque opération une fonction permettant d'obtenir le tag du résultat
+      - Fonctionnel, mais demande donc de définir une fonction pour chaque opération, ce qui peut s'avérer lourd
+    - Peut définir une fonction universelle permettant d'obtenir un nouveau tag à partir de valeurs
+      - Difficile d'établir une telle fonction
+    - Ou peut enrichir les tags pour qu'ils définissent les contraintes sur les valeurs, mais aussi les contraintes sur les valeurs dérivées à partir d'opérations
+      - Déplace donc la responsabilité non plus sur le développeur des opérations, mais sur le concepteur des tags
+      - Semble être la solution la plus pratique
+    - Tags forment alors un /join semi-lattice/
+  - Session 13. Keidar: Reliable Distributed Storage 1
+    - *Idit Keidar*
+*** Planned
+**** CANCELLED SATIS : Faire un poster
+     DEADLINE: <2018-08-02 Thu>
+- Peut proposer un poster pour SATIS
+- Établir le plan
+- Le faire valider par Gérald et Olivier
+- Rédiger le poster
+** Semaine du <2018-08-21 Tue> au <2018-08-24 Fri>
+*** Done
+- PhD : Motiver le problème adressé
+  - Voir pour relancer M. Baquero
+- MUTE : Implémenter le mécanisme de renommage
+  - Pour faire le point, on a implémenté actuellement la version suivante
+    - Un des pairs effectue un /renameLocal()/ et partage l'opération
+    - Les autres pairs, en reçevant l'opération de renommage, applique le renommage sur leur copie
+    - L'application d'opérations de renommage concurrentes n'est pas gérée
+  - Ce qu'il reste à faire
+    - [ ] À la réception d'une opération, déterminer le "chemin" entre les /epochs/ de l'opération et de l'état courant
+    - [ ] Appliquer les transformations dans l'ordre
+    - [ ] Écrire les tests correspondants
+*** Planned
+**** IN-PROGRESS PhD : Motiver le problème adressé
+- Contacter les gens de Redis pour discuter des implémentations proposés pour les types *String* et *List*
+- Contacter les gens de xRay pour discuter du CRDT implémenté
+- Creuser du côté de Postgres
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** TODO MUTE : Identifier l'origine de la divergence de la réunion du <2018-06-01 Fri>
 - Un bloc de texte s'est retrouvé inséré au mauvais endroit pour une copie des notes prises au cours de cette réunion
