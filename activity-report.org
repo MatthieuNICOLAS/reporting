@@ -6419,19 +6419,76 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - [ ] À la réception d'une opération, déterminer le "chemin" entre les /epochs/ de l'opération et de l'état courant
     - [ ] Appliquer les transformations dans l'ordre
     - [ ] Écrire les tests correspondants
+- Méthode formelle : Se remettre à niveau en méthode formelle
+  - A lu https://learntla.com/
+  - Exemple de code
+    #+BEGIN_SRC
+---- MODULE Transfer ----
+EXTENDS Naturals, TLC // Imports de packages
+
+(* --algorithm transfer  // Le programme est écrit en PlusCal, qui est ensuite transpilé en TLA+
+variables alice_account = 10, bob_account = 10, money \in 1..20, // Définitions de variables, variables pouvant itérer sur un ensemble
+  account_total = alice_account + bob_account;
+
+begin
+Transfer:
+  if alice_account >= money then
+  A: alice_account := alice_account - money;  // Définition d'une transaction
+  bob_account := bob_account + money; \* Both now part of A
+end if;
+C: assert alice_account >= 0;
+
+end algorithm *)
+
+
+// Le code TLA+ généré est placé ici
+
+
+MoneyNotNegative == money >= 0  // Définitions d'invariants du système
+MoneyInvariant == alice_account + bob_account = account_total
+====
+  #+END_SRC
+  - Représentation du modèle
+    - Plusieurs instances d'un process
+    - Chaque instance possède un état composé de
+      - Un /siteId/
+      - Une /clock/
+      - Une séquence /list/ de tuples <id, elements>
+      - Un vecteur d'état correspondant /stateVector/
+      - Une liste des opérations distantes en attente /remoteOps/ (?)
+    - À chaque étape, un site peut effectuer
+      - Une insertion locale
+      - Une suppression locale
+      - Une opération distante
+  - Invariants
+    - Convergence : avoir des vecteurs d'états équivalents implique d'avoir des états équivalents
+    - Espace dense : je peux toujours générer un nouvel identifiant entre 2 autres
+    - /rename/ ne modifie pas l'ordre : une séquence est toujours triée après que chacun de ses éléments ait été /rename/
+    - /reverseRename/ ne modifie pas l'ordre : une séquence est toujours triée après que chacun de ses éléments ait été /reverseRename/
+  - Questions
+    - Comment modéliser un /message passing system/ en TLA+ ?
+      - La livraison des messages aux process doit respecter un certain ordre
+	- FIFO
+	- Suppression d'un élément après son insertion
+      - Mais en dehors de ces contraintes, chaque process peut observer les messages dans un ordre différent
+      - Comment les instances communiquent entre-elles ?
+    - [X] Est-ce que le caractère non-borné des états et des identifiants posent problème pour la modélisation ?
+      - Si l'on met aucune limite à la taille de la séquence ou à celle des éléments, est-ce que ça pose problème à TLC ?
+      - Si l'on met une limite, est-ce que l'on ne va pas provoquer des erreurs liées à cette dernière ?
+	- À voir comment on définit les invariants et comment on instaure cette limite
+	- Mais par exemple, empêcher d'effectuer une insertion locale grâce à un /await/ ne va pas à l'encontre de l'invariant *je peux toujours insérer un nouvel élément entre 2 autres*
+    - [X] Est-ce qu'on peut limiter le nombre de pas ?
+      - Genre 50 actions puis le système s'arrête
+      - Oui, dans les /Advanced Options/ du modèle, on peut indiquer la longueur maximale de la trace
+    - Est-ce que je dois spécifier et vérifier les invariants de *LogootSplit* ou seulement ceux du mécanisme de renommage ?
+      - Par exemple celui concernant l'espace dense ne concerne que *LogootSplit*
 *** Planned
 **** IN-PROGRESS PhD : Motiver le problème adressé
 - Contacter les gens de Redis pour discuter des implémentations proposés pour les types *String* et *List*
 - Contacter les gens de xRay pour discuter du CRDT implémenté
 - Creuser du côté de Postgres
 **** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
-**** TODO MUTE : Identifier l'origine de la divergence de la réunion du <2018-06-01 Fri>
-- Un bloc de texte s'est retrouvé inséré au mauvais endroit pour une copie des notes prises au cours de cette réunion
-- En identifiant la structure obtenue, on s'est rendu compte que ce bloc n'aurait pas dû être placé à cet endroit étant donné son identifiant
-- Enquêter pour identifier l'origine de ce mauvais positionnement
-  - Est-ce lié à l'algorithme de comparaison des identifiants ?
-  - Ou est-ce lié à l'algorithme d'insertion au sein de l'arbre ?
-**** TODO Méthode formelle : Se remettre à niveau en méthode formelle
+**** IN-PROGRESS Méthode formelle : Se remettre à niveau en méthode formelle
 - D'après la discussion de Victorien avec Stephan Merz, ce dernier lui a conseillé
   - De commencer par du model-checking (TLA+)
   - Puis de passer sur un assistant de preuves (Isabelle/Coq)
@@ -6443,6 +6500,12 @@ $ curl http://localhost:8728/bonita/API/bpm/caseVariable/14001/movieId
     - http://lamport.azurewebsites.net/video/videos.html
   - Un tuto que j'ai vu passé un jour sur HN
     - https://learntla.com/introduction/
+**** TODO MUTE : Identifier l'origine de la divergence de la réunion du <2018-06-01 Fri>
+- Un bloc de texte s'est retrouvé inséré au mauvais endroit pour une copie des notes prises au cours de cette réunion
+- En identifiant la structure obtenue, on s'est rendu compte que ce bloc n'aurait pas dû être placé à cet endroit étant donné son identifiant
+- Enquêter pour identifier l'origine de ce mauvais positionnement
+  - Est-ce lié à l'algorithme de comparaison des identifiants ?
+  - Ou est-ce lié à l'algorithme d'insertion au sein de l'arbre ?
 **** TODO CRDT : Se renseigner sur replikativ
 - http://replikativ.io/
 **** TODO CRDT : Se renseigner sur OrbitDB
