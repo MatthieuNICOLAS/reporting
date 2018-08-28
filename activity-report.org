@@ -6482,6 +6482,41 @@ MoneyInvariant == alice_account + bob_account = account_total
       - Oui, dans les /Advanced Options/ du modèle, on peut indiquer la longueur maximale de la trace
     - Est-ce que je dois spécifier et vérifier les invariants de *LogootSplit* ou seulement ceux du mécanisme de renommage ?
       - Par exemple celui concernant l'espace dense ne concerne que *LogootSplit*
+  - Réunion avec Stephan Merz prévue le <2018-09-04 Tue 10:00>
+  - Stephan m'a recommandé de lire *The TLA+ Hyperbook* (http://lamport.azurewebsites.net/tla/hyperbook.html) pour poursuivre mon apprentissage de TLA+
+*** Planned
+** Semaine du <2018-08-27 Mon> au <2018-08-31 Fri>
+*** Done
+- VTSA 2018 : Distributed Synthesis
+  - Synthesis : construit un programme qui correspond à une/des propriétés
+  - /Closed synthesis/ : pas d'environnement
+  - /Open synthesis/ : le système est /réactif/, il évolue /contre/ l'environnement
+  - Cas d'utilisation de /open synthesis/
+    - Doit développer un module appartenant à un large système
+    - Peut considérer le reste du système comme l'environnement
+    - Le module doit se comporter correctement dans tous les scénarios d'interactions possible
+  - /Model-checking linear-time properties (LTL, MSO) requires automata @ logic over infinite words/
+- MUTE : Implémenter le mécanisme de renommage
+  - Détection d'un problème avec la fonction /reverseRenameId()/ dans le cas suivant
+    - On a inséré un identifiant /id/ en concurrence au renommage tel que /newFirstId < id < firstId/
+      - Exemple avec /newFirstId = <1, -1, 1, 0>, id = <1, 1, 1, 0>, firstId = <1, 1, 1, 1>/
+    - /id' = <1, -1, 1, -1><1, 1, 1, 0>/
+    - Dans ce scénario, on a
+      - /reverseRenameId(renameId(id)) /= id/
+      - /<1, -1, 1, -1><1, 1, 1, 0> /= <1, 1, 1, 0>/
+    - Ajout du test unitaire correspondant
+    - Ré-écriture de ce cas
+      - Considère qu'on ne peut avoir /closestPredecessorOfNewFirstId < id' < newFirstId/ seulement si /newFirstId < firstId/
+      - /id'/ est donc forcément de la forme /closestPredecessorOfNewFirstId + tail/
+      - Différents cas
+	1. Si /random(tail) === random(firstId)/, renvoie /tail/
+	   - Permet de couvrir l'ensemble des identifiants ayant pour position /random(firstId)/ jusqu'à /closestPredecessorOfFirstId/ (compris)
+	   - Tout en préservant l'ordre existant entre ces identifiants
+	2. Si /closestPredecessorOfFirstId < tail/, renvoie /closestPredecessorOfFirstId + tail/
+	   - Permet de conserver l'ordre /closestPredecessorOfFirstId < tail/
+	3. Renvoie /id/
+	   - Dans ce cas, /id < closestPredecessorOfFirstId/
+      - On a donc bien /ids3 < ids1 < closestPredecessorOfFirstId < ids2 < firstId/
 *** Planned
 **** IN-PROGRESS PhD : Motiver le problème adressé
 - Contacter les gens de Redis pour discuter des implémentations proposés pour les types *String* et *List*
