@@ -6455,15 +6455,34 @@ MoneyInvariant == alice_account + bob_account = account_total
       - Une /clock/
       - Une séquence /list/ de tuples <id, elements>
       - Un vecteur d'état correspondant /stateVector/
+      - Une /epoch/ courante
+      - Une arborescence des /epoches/
       - Une liste des opérations distantes en attente /remoteOps/ (?)
     - À chaque étape, un site peut effectuer
       - Une insertion locale
+	- Trouve la position correspondante dans la séquence
+	- Génère un identifiant correspondant
+	- Insère le tuple <id, elt> dans la séquence
       - Une suppression locale
+	- Trouve la position correspondante dans la séquence
+	- Récupère les identifiants correspondants
+	- Supprime les tuples concernés de la séquence
+      - Un renommage local
+	- Répertorie les identifiants présents dans l'état actuel
+	- Génère un nouvel interval d'identifiants
+	- Crée une nouvelle séquence
+	- Insère l'interval d'identifiants avec les éléments dans la nouvelle séquence
+	- Remplace la séquence actuelle par la nouvelle
+	- Incrémente l'epoch courante
       - Une opération distante
+	- Insertion distante
+	- Suppression distante
+	- Renommage distant
   - Invariants
     - Convergence : avoir des vecteurs d'états équivalents implique d'avoir des états équivalents
     - Espace dense : je peux toujours générer un nouvel identifiant entre 2 autres
     - /rename/ ne modifie pas l'ordre : une séquence est toujours triée après que chacun de ses éléments ait été /rename/
+      - Une séquence est triée si pour chaque élément, tous les éléments précédents ont un identifiant plus petit
     - /reverseRename/ ne modifie pas l'ordre : une séquence est toujours triée après que chacun de ses éléments ait été /reverseRename/
   - Questions
     - Comment modéliser un /message passing system/ en TLA+ ?
@@ -6517,6 +6536,191 @@ MoneyInvariant == alice_account + bob_account = account_total
 	3. Renvoie /id/
 	   - Dans ce cas, /id < closestPredecessorOfFirstId/
       - On a donc bien /ids3 < ids1 < closestPredecessorOfFirstId < ids2 < firstId/
+- Algo : Préparer les slides pour la section /Instructions et Types Élementaires/
+  - Durée estimée à 4h
+  - Correspond aux pages 3 à 8 du poly de cours enseignant
+  - Correspond à la page 2 du poly d'exercices enseignant
+  - Plan
+    - Se présenter
+    - Présenter les règles
+      - Appel obligatoire tous les cours
+      - 5min de retard toléré
+      - Encourage à travailler en binôme dans le cadre des exercices
+    - Demander qui a déjà programmé
+    - Présenter le module
+      - Organisation
+	- Volume horaire de 30h de début septembre à fin octobre
+	- Enseignement intégré (CM + TD fusionnés en 1 seule séance)
+	- 2 partiels pour l'évaluation (1/3 et 2/3 de la note)
+      - Objectifs
+	- Notion d'algorithme
+	- Concevoir un algorithme
+	- Dérouler un algorithme
+	- Constituer une culture algorithmique
+      - Lien avec le module de programmation
+	- Dans le module d'algorithmie, on va réfléchir et concevoir des algorithmes
+	- Que vous allez implémenter et faire exécuter par la machine dans le module de programmation
+    - Notion d'algorithme
+      - Définition: /Suite d'instructions à suivre pour réaliser une tâche/
+      - Algorithmes dans la vie de tous les jours
+	- Certains sont apparents : GIF d'un JV
+	- D'autres sont plus subtils : Capture des résultats Google ou d'une timeline Twitter
+	- Mais on peut rencontrer des algorithmes en dehors de l'informatique : Recette des crêpes
+      - Algorithme /= Programme
+	- Un algorithme correspond à la manière d'effectuer une tâche
+	- Un programme est une traduction, une adaptation d'un algorithme pour qu'il soit compris par l'ordinateur
+	- On parle d'/implémentation/
+	- On peut avoir différentes implémentations d'un même algorithme
+	  - Différents langages de programmation
+	  - Différentes façons d'implémenter un algorithme pour un même langage de programmation
+    - Exemple d'algorithme
+- Méthode formelle : Se remettre à niveau en méthode formelle
+  - Construction du graphe des états
+    1. We start by setting G to the set of all possible initial states of behaviors, which we find by computing all possible assignments of values to variables that make the initial predicate true.
+    2. For every state s in G
+       1. We compute as follows all possible states t such that s → t can be a step in a behavior.
+       2. We substitute the values assigned to variables by s for the unprimed variables in the next-state action
+       3. Compute all possible assignments of values to the primed variables that make the next-state action true.
+    3. For every state t found in step 2
+       1. We add t to G if it is not already in G
+       2. We draw an edge from s to t.
+    4. We repeat steps 2 and 3 until no new states or edges can be added to G.
+  - Lors de la vérification d'un modèle avec TLC, dans la partie statistiques
+    - /Diameter/ The number of states in the longest path of G in which no state appears twice.
+    - /States Found/ The total number of (not necessarily distinct) states it examined in step 1 or as successor states t in step 2.
+    - /Distinct States/ The number of states that form the set of nodes of G.
+    - /Queue Size/ The number of states s in G for which step 2 has not yet been performed.
+  - LET ... IN ... permet de déclarer des variables temporaires
+  - L'équivalent en *PlusCal* est /with (...) { ... }/
+  - Questions
+    - À quoi correspond une ligne dans les statistiques de TLC ?
+    - Pourquoi /Queue Size/ serait différent de 0 dans le cas d'une spécification correcte ?
+    - Déjà exécuter TLC en mode distribué ?
+      - De quel manière ? Ad-hoc ou Cloud ?
+      - Des retours à faire ?
+*** Planned
+** Semaine du <2018-09-03 Mon> au <2018-09-07 Fri>
+*** Done
+- Méthode formelle : Se remettre à niveau en méthode formelle
+  - Récap questions
+    - À quoi correspond une ligne dans les statistiques de TLC ?
+    - Pourquoi /Queue Size/ serait différent de 0 dans le cas d'une spécification correcte ?
+    - Est-ce que le caractère non-borné des états et des identifiants posent problème pour la modélisation ? Comment s'en sortir ?
+    - Comment modéliser un /message passing system/ en TLA+ ?
+    - Déjà exécuter TLC en mode distribué ?
+    - Utiliser des invariants ou des asserts ?
+  - Réunion
+    - Model Checker != preuve
+    - Permet de trouver des contres-exemples
+    - Dois tout borner
+      - Peut utiliser /Advanced Options > State Constraints/
+    - Utiliser TLC le plus possible pour détecter les cas problématiques
+    - Avant de se pencher sur une preuve si besoin
+    - Possibilité d'être mis en lien avec quelqu'un qui a fait tourné TLC sur Grid5000
+    - Possibilité d'implémenter l'ordre aléatoire des messages avec des ensembles
+    - Statistics sert surtout à détecter une incohérence au niveau du système
+      - Si j'ai pas trouvé d'erreurs mais que je n'ai pas exploré beaucoup d'états, y a p-e un problème sur Next
+    - Ne pas trop jouer avec les TLC Options, plutôt définir des contraintes sur mes valeurs possibles du système
+    - Simulation mode permet de demander à TLC d'essayer un chemin aléatoire (seulement un)
+  - Poursuite de la lecture de l'hyperbook
+    - Je ne comprends pas comment vérifier la terminaison d'un algo avec TLA+
+    - Méthode à suivre
+      - Avec /I/ un invariant de notre système et /Next/ l'action permettant de passer d'un état donné au suivant
+      - Définit une /integer-valued state function W/ pour laquelle
+	1. /I => (W ∈ Nat) ∨ (pc = "Done")/ pour tout état atteignable non-final
+	2. /I ∧ Next => (W > W') ∨ (pc = "Done")/
+    - Messages d'erreurs obtenus
+      - The property L2 is not correctly defined.
+      - The property Next is not correctly defined.
+    - Définition de /weak fairness/
+      - La /weak fairness/, notée /WF_var(A)/, stipule que pour une action arbitraire /A/ nous avons les 2 conditions suivantes
+	1. The behavior does not end in a state s_n in which A is enabled.
+	   - Le système ne s'arrête pas tant qu'il peut progresser
+	   - Prévient le système de s'arrêter inopinément
+	2. If the behavior is infinite, then there is no n such that the infinite behavior s_n -> s_n+1 -> ··· has no A steps but A is enabled in all of its states.
+	   - Si le comportement est infini, il n'existe pas chaîne infinie d'états n'ayant pas effectué d'action /A/ alors que l'action /A/ est disponible pour chaque état
+	   - Force le système à alterner entre l'ensemble des actions possibles
+    - Définition de /strong fairness/
+      - La /strong fairness/, notée /SF_var(A)/, remplace la condition 2. de la /weak fairness/ par la suivante
+	- If the behavior is infinite, then there is no n such that the infinite behavior s_n -> s_n+1 -> ··· has no A steps but A is enabled in infinitely many of its states.
+      - La différence se place sur l'action /A/ qui ne doit plus être disponible pour chaque état de la chaîne infinie mais /juste/ pour un nombre infini d'états
+*** Planned
+** Semaine du <2018-09-10 Mon> au <2018-09-14 Fri>
+*** Done
+- Méthode formelle : Se remettre à niveau en méthode formelle
+  - Poursuite de la lecture de l'hyperbook
+    - /Refinement mapping/
+      #+BEGIN_QUOTE
+A refinement mapping from a specification H to a specification A is an assignment of an expression v to each variable v of A, where v is defined in terms of the variables of H .
+This refinement mapping defines, for each state s of H, the state s of A that assigns to each variable v of A the value of v in state s.
+If σ is the behaviors 1 →s2 → ... of H, we define the behavior σ of A to be s1 → s2 → ... .
+We say that H implements A under this refinement mapping iff, for each behavior σ satisfying the behavior specification of H , the behavior σ satisfies the behavior specification of A.
+      #+END_QUOTE
+- Réunion suivi
+  - A contacté Baquero
+    - Pas de réponse pour le moment
+    - Vais voir pour faire un mail de relance
+  - Faudrait que je rejette un oeil à xray
+    - Voir comment le projet a évolué
+  - Réinscription
+    - Voir convention individuelle de formation
+  - Remarques
+    - Motivations
+      - Recontacter Redis
+    - Arborescence, choix de l'epoch gagnante
+      - Voir si on peut réfléchir à un mécanisme plus intelligent que l'ordre lexicographique pour limiter le nombre d'/undo/
+      - Voir comment ils ont fait dans les /blockchains/
+    - Correction des fonctions de ré-écritures
+      - Voir ce que Gérald a formalisé dans sa thèse et la façon dont c'est fait
+      - Se renseigner sur les /theorem provers/
+      - Mettre au clair les propriétés que l'on veut que les fonctions de ré-écritures respectent
+    - Gain
+      - Voir pour continuer sur la piste des simulations
+      - Voir si on peut estimer le gain de façon analytique à l'aide de probabilités
+    - Middleware
+      - Voir pour contacter et obtenir un use case de Redis au plus tôt
+      - Voir pour écrire une proposition pour le doctoral symposium de la conf
+- PhD : Motiver le problème adressé
+  - Redis
+    - A envoyé un mail de relance à Baquero
+    - Eu une réponse
+      - Il a forwardé le mail à l'équipe technique de Redis
+      - Mais Redis CRDB est un produit commercial, il faut s'attendre à ne pas avoir de réponse
+    - Gérald a trouvé les slides suivantes
+      - https://www.slideshare.net/RedisLabs/redisconf18-activeactive-geodistributed-apps-with-redis-crdts-conflict-free-replicated-datatypes
+    - Leurs CRDTs utilisent des tombstones
+    - Voir quels sont les mécanismes de garbage collection existants pour ce type de CRDT, leurs propriétés et leurs performances
+  - IPFS
+    - Suis retombé sur cette issue, *CRDT: Garbage Collection* : https://github.com/ipfs/dynamic-data-and-capabilities/issues/2
+    - Étudier la discussion pour y trouver des points d'intérêts
+- Biblio
+  - Je suis retombé sur la page du projet *Lightkone* : https://www.lightkone.eu/index.php/publications/
+  - Les travaux suivants ont l'air intéressants
+    - *Aggregation Protocols in Light of Reliable Communication* : https://arxiv.org/pdf/1801.07005.pdf
+    - *Borrowing an Identity for a Distributed Counter* : https://wiki.lightkone.eu/pmwiki/uploads/Main/borrow-counter.pdf
+      - Slides : https://wiki.lightkone.eu/pmwiki/uploads/Main/borrow-counter-slides.pdf
+*** Planned
+** Semaine du <2018-09-17 Mon> au <2018-09-21 Fri>
+*** Done
+- PhD : Motiver le problème adressé
+  - XRay
+    - L'issue mentionnant la taille des identifiants comme problème n'a pas évoluée : https://github.com/atom/xray/issues/24
+- MUTE : Implémenter le mécanisme de renommage
+  - En présentant le mécanisme de renommage à Wei Hai, j'ai identifié un cas problèmatique
+  - Si on doit annuler un renommage et que nous avons /id1/ et /id2/ de telle façon que
+    - /id1/ dépendant causalement du renommage et /newLastId < id1 < lastId/
+    - /id2/ inséré de façon concurrente au renommage et /id2 = lastId + tail/ avec /tail < id1/
+  - Après avoir annulé le renommage, on va avoir
+    - /id1' = lastId + id1/
+    - /id2' = id2/
+  - On a donc /id2' < id1'/ au lieu de /id1' < id2'/
+  - Pour corriger ce scénario, il faut revoir comment on génère /id1'/
+    - Une solution est d'introduire un nouveau tuple /min/
+    - Et générer /id1'/ tel que /id1' = lastId + min + id1/
+    - Et exclure /min/ de l'algorithme de génération des identifiants
+    - Ceci permet d'empêcher les utilisateurs de générer des identifiants en utilisant cette valeur
+    - Ainsi, tout identifiant /id2/ généré par une action utilisateur tel que /lastId < id2/ respectera la condition suivante
+      - /id1' < id2/
 *** Planned
 **** IN-PROGRESS PhD : Motiver le problème adressé
 - Contacter les gens de Redis pour discuter des implémentations proposés pour les types *String* et *List*
