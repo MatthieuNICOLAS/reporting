@@ -6944,13 +6944,70 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Affirme que seule la valeur retournée aurait pu être décidée dans les epochs précédentes
     - Je ne comprends pas pourquoi la réponse reçue ne pourrait pas être une valeur différente que la valeur choisie à l'epoch précédente
       - À voir le quorum requis pour cette optimisation
+- DISTRIBUTED SYSTEMS : Regarder *Is there anybody out there?*
+  - Key issues for building clusters
+    - *Discovery*: who's there ?
+    - *Fault Detection*: who's is in trouble ?
+    - *Load Balancing*: who can take up work ?
+  - *Group Membership* permet d'adresser l'ensemble de ces problèmes
+  - Pour implémenter *Group Membership*, a besoin de 3 composants
+    - *Failure Detection*: détecter qu'un noeud est en panne
+    - *Dissemination*: transmettre l'information aux autres noeuds du système
+    - *Consensus*: se mettre d'accord sur l'état du système malgré des informations potentiellement contraires
+  - *Failure Detection*
+    - 2 propriétés clés sont définies pour un tel composant
+      - *Completeness*
+	- crash-failure of any group member is detected by all non-faulty members
+      - *Accuracy*
+	- no non-faulty group member is declared as failed by any other non-faulty group member
+	- no-false positives in short
+    - D'autres propriétés sont néanmoins désirées pour un système réel
+      - Vitesse
+      - Consommation en bande passante
+    - Il est /impossible/ pour un *Failure Detector Algorithm* de respecter à la fois la *Completeness* et l'*Accuracy* si le réseau est *asynchrone* et *non-fiable*
+    - Les algorithmes doivent donc effectuer un compromis entre ces deux propriétés
+      - *Strong - Weak Completeness*: *All / Some* non-faulty members detect a crash
+      - *Strong - Weak Accuracy*: There are *No / Some* false-positives
+      - Généralement les applications privilégient une *Strong Completeness* et se retrouvent donc avec une *Weak Accuracy*
+    - Stratégies de détection
+      - *Heartbeat*: "Je suis en vie"
+      - *Ping*: "Es-tu en vie ? - Oui"
+    - Présente ensuite un *Failure Detector Algorithm* intéressant: *Phi Adaptive Accrual Failure Detector*
+      - A été rendu populaire par Cassandra
+      - Introduit la notion de /accrual failure detection/
+      - La valeur φ représente la suspicion qu'un noeud ait un problème plutôt qu'être un simple booléen
+      - Peut donc ajuster le comportement du système par rapport à cette valeur
+      - Par exemple
+	- φ(w) > 8 ⇒ On n'arrête de donner de nouvelles tâches à ce noeud
+	- φ(w) > 10 ⇒ On redistribue les tâches actuellement en cours du noeud aux autres
+	- φ(w) > 12 ⇒ On retire le noeud du système
+      - Par contre, la valeur de φ augmente rapidement jusqu'à atteindre ~12 mais la valeur augmente bien plus lentement ensuite
+    - Présente ensuite un nouveau *Failure Detector Algorithm* et son évolution: *SWIM Failure Detector* et *Lifeguard Failure Detector*
+      - *Scalable Membership Protocol*
+      - Comme avec *Phi*, les noeuds sont tout d'abord suspectés avant d'être notés comme étant en panne
+      - Détecte les pannes en pingant de façon aléatoire les autres noeuds
+      - Si un noeud ne répond pas, demande à d'autres noeuds d'essayer de le ping et de communiquer le résultat
+      - *Lifeguard* améliore *SWIM* en diminuant le nombre de faux-positifs
+  - *Dissemination*
+    - Repose sur des algorithmes de gossiping
+    - Présente quelques optimisations possibles
+      - Contacte en priorité les noeuds qui n'ont pas été contacté depuis longtemps
+      - Accélère la fréquence de gossiping si beaucoup de noeuds n'ont pas observé le dernier gossip
+  - *Consensus*
+    - Parle de /State Machine Replication/, de /CRDTs/ et de /Protocols/
+    - Mentionne aussi le consensus par *Convention*
+    - Son exemple concerne l'élection de leader
+    - Réplique la liste des membres du groupe sur chaque noeud
+    - À partir de là, considère que le leader est le noeud de la liste qui respecte une certaine contrainte
+      - Identifiant le plus "petit"
+    - Pas besoin de communication supplémentaire pour ce type de consensus
 *** Planned
 **** DONE DISTRIBUTED SYSTEMS : Regarder *Liberating Distributed Consensus*
 - Lien : https://www.reactivesummit.org/2018/schedule/liberating-distributed-consensus
+**** DONE DISTRIBUTED SYSTEMS : Regarder *Is there anybody out there?*
+- Lien : https://www.reactivesummit.org/2018/schedule/is-there-anybody-out-there
 **** TODO DISTRIBUTED SYSTEMS : Regarder *Distributed Transactions are dead, long live distributed transactions!*
 - Lien : https://www.reactivesummit.org/2018/schedule/distributed-transactions-are-dead-long-live-distributed-transactions
-**** TODO DISTRIBUTED SYSTEMS : Regarder *Is there anybody out there?*
-- Lien : https://www.reactivesummit.org/2018/schedule/is-there-anybody-out-there
 **** TODO DISTRIBUTED SYSTEMS : Regarder *7 Reasons why your microservices should use Event Sourcing & CQRS*
 - Lien : https://www.reactivesummit.org/2018/schedule/7-reasons-why-your-microservices-should-use-event-sourcing--cqrs
 **** TODO DISTRIBUTED SYSTEMS : Surveiller l'apparition des vidéos des talks de *Code Mesh 2018*
