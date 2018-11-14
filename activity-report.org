@@ -6706,7 +6706,7 @@ We say that H implements A under this refinement mapping iff, for each behavior 
   - XRay
     - L'issue mentionnant la taille des identifiants comme problème n'a pas évoluée : https://github.com/atom/xray/issues/24
 - MUTE : Implémenter le mécanisme de renommage
-  - En présentant le mécanisme de renommage à Wei Hai, j'ai identifié un cas problèmatique
+  - En présentant le mécanisme de renommage à Weihai, j'ai identifié un cas problèmatique
   - Si on doit annuler un renommage et que nous avons /id1/ et /id2/ de telle façon que
     - /id1/ dépendant causalement du renommage et /newLastId < id1 < lastId/
     - /id2/ inséré de façon concurrente au renommage et /id2 = lastId + tail/ avec /tail < id1/
@@ -6721,12 +6721,257 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Ceci permet d'empêcher les utilisateurs de générer des identifiants en utilisant cette valeur
     - Ainsi, tout identifiant /id2/ généré par une action utilisateur tel que /lastId < id2/ respectera la condition suivante
       - /id1' < id2/
+- Enseignement : Réunion pédagogique LP CIASIE
+  - 28 étudiants pour le groupe avec lequel j'interviens
+  - Pas mal d'étudiants venant de DUT, mais d'autres IUT
+  - Potentiellement des lacunes et des inégalités de niveaux à gérer
+  - Voir avec Gilles pour se mettre d'accord sur le nombre de notes pour le module de programmation web sur le client
+    - Faut voir pour l'intitulé des notes et leurs coefficients
+    - Une note de contrôle continu (un TP noté ?), une note de projet ?
+  - Participation de la matière dans le cadre de l'atelier 2
+  - Opportunité d'encadrer des alternants (compte pour 5h par contre)
+- PhD : Se réinscrire auprès de l'école doctorale IAEM
+  - Complétion et mise en ligne de la convention individuelle de formation de cette année
+  - Envoi de l'email à Vanessa BINET pour obtenir un lien pour compléter la réinscription
+  - Complétion de l'inscription
+  - Reste à récupérer les certificats de scolarité
 *** Planned
+** Semaine du <2018-09-24 Mon> au <2018-09-28 Fri>
+*** Done
+- PhD : Se réinscrire auprès de l'école doctorale IAEM
+  - J'ai récupéré les certificats de scolarité
+  - Envoi du certificat de scolarité à l'IUT
+- PhD : Compléter et envoyer l'autorisation de cumul à l'IUT
+  - Il faut bien que la composante signe l'autorisation de cumul préalablement pour que l'école doctorale accepte de signer l'autorisation de cumul
+  - Renvoi de l'autorisation de cumul à l'IUT pour signature
+- IUT : Se concerter avec Gilles pour déterminer le nombre de notes dans le module de prog web client
+  - Envoi d'un mail à Gilles avec une proposition de 2 notes
+    - Note de contrôle continu
+      - Peut être obtenue différement en fonction des groupes
+      - À l'aide d'un ou plusieurs TPs notés, de tests écrits
+    - Note de projet
+*** Planned
+**** DONE PhD : Se réinscrire auprès de l'école doctorale IAEM
+** Semaine du <2018-10-01 Mon> au <2018-10-05 Fri>
+*** Done
+- IUT : Préparer le cours de prog web
+  - Planning des séances
+    - <2018-10-02 Tue>
+      - Cours
+	- Bases du langage
+	- Bases des objets
+      - Exos
+	- Spécification du langage
+    - <2018-10-09 Tue>
+      - Cours
+	- Closures, IIFE, Namespace, Module
+	- Prototype
+	- Classe
+      - Exos
+	- Bases des objets
+	- Closure
+	- Prototype
+	- Classe
+    - <2018-10-16 Tue>
+      - Cours
+	- Les évènements
+	- Le DOM
+	- jQuery
+      - Exos
+	- TP Noté ?
+	  - Application jQuery respectant le pattern Module et devant forcer l'usage de classes ?
+    - <2018-10-23 Tue>
+      - Cours
+	- Node
+	- Modules (CommonJS -> ESM)
+	- Webpack
+      - Exos
+	- TBD
+    - <2018-11-20 Tue>
+      - Cours
+	- TBD
+      - Exos
+	- Projet
+    - <2018-11-27 Tue>
+      - Cours
+	- TBD
+      - Exos
+	- TBD
+      - Soutenance projets
+  - Notions restantes à aborder
+    - Code asynchrone
+    - Typescript
+    - Progressive Web App
+  - Séance du <2018-10-02 Tue>
+    - Exos
+      - Spécification du langage
+	- [X] Ajouter des tests liés à la déclarations de variables
+	  - /let/
+	  - /const/
+	- [X] Ajouter des tests liés au parcours de tableaux
+	  - Simple boucle /for/
+	  - Boucle /for ... in/
+	  - Méthode /forEach()/
+	- Ajouter des tests avancés
+	  - [X] /filter()/
+	  - [X] /map()/
+	  - [ ] /reduce()/
+    - Notes
+      - Certains tests échouent de façon aléatoire avec la dernière version de Jasmine si l'ordre aléatoire d'exécution des tests est activé
+	- Notamment ceux ayant trait au /scope global/
+      - Le test qui montre comment on capture une exception est incorrect
+      - Le test sur l'exécution d'une RegExp échoue pour une raison inconnue
+- IUT : Correction du partiel d'algo
+  - Question 1
+    - Ajout d'un paramètre inutile à la fonction
+    - coef en tant que paramètre /InOut/ au lieu de juste le retourner
+    - Utilise /lire()/ pour obtenir la valeur des paramètres
+    - Plusieurs /retourne/
+    - Pas de sortie (pas de /retourne/, pas de paramètre modifiable)
+    - Des /ecrire(...)/ au lieu de /retourne/
+    - Au lieu de juste calculer le /coef/, multiplie le /score/ passé en paramètre par le /coef/ et retourne le résultat
+  - Question 2
+    - Lit le nom, prénom ou temps à chaque itération imbriquée et non globalement
+    - Ne conserve pas et n'affiche pas les informations liées au meilleur résultat
+    - Ne remet pas à 0 le score final d'un participant à chaque itération
+    - Ne boucle pas pour lire les différentes notes
+  - Divers
+    - Pour affecter la valeur 1 à une variable, utilise /toto <- lire(1)/
+    - Noms de variables pas clairs
+    - Évalue l'expression booléenne /v <= d <= q/
+    - Utilise && ou || au lieu de /et/ et /ou/
+    - Utilisation du signe = au lieu de <-
+    - Soin de la copie
+- IUT : Se concerter avec Gilles pour déterminer le nombre de notes dans le module de prog web client
+  - Mail envoyé à Amine
+- PhD : Compléter et envoyer l'autorisation de cumul à l'IUT
+  - Autorisation de cumul signée par l'IUT
+  - Je l'ai transféré à Sabrine Ferry pour signature de l'école doctorale et du président de l'université
+- MUTE : Corriger l'inversion du renommage dans le scénario
+  - Définition de nouvelles valeurs, *INT32_BOTTOM_USER* et *INT32_TOP_USER* de façon à réserver *INT32_BOTTOM* et *INT32_TOP* pour le mécanisme de renommage
+  - Modification de /createBetweenPosition()/ pour utiliser les valeurs *USER* à la place des valeurs systèmes
+  - Modification de /reverseRenamingId()/ pour gérer le cas problématique
+*** Planned
+**** DONE IUT : Se concerter avec Gilles pour déterminer le nombre de notes dans le module de prog web client
+**** DONE MUTE : Corriger l'inversion du renommage dans le scénario
+** Semaine du <2018-10-08 Mon> au <2018-10-12 Fri>
+*** Done
+- IUT : Préparer le cours de prog web de <2018-10-09 Tue>
+  - Cours
+    - Refaire un rappel sur les objets
+    - Les fonctions
+    - Les arguments des fonctions
+    - /this/ dans les fonctions
+    - Closures, IIFE, Namespace, Module
+  - Exercices
+    - Égalités, fonctions et closures
+  - Mettre en place une /GitHub Classroom/
+    - Disponible ici : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/assignments/lp-ciasie-prog-web-td2
+    - Pour chaque étudiant, une copie du repo d'origine est réalisée
+    - Mais le repo d'origine n'est pas par défaut dans les repos distants de leur copie
+    - Il faut donc ajouter "à la main" le repo pour qu'ils puissent récupérer les modifications suivantes
+    - Veiller à mettre à disposition les URLs et les commandes nécessaires à l'ajout du repo distant et la récupération des derniers commits
+- MUTE : Réflexion sur la simulation
+  - Si on évalue le mécanisme de renommage en déployant un ensemble de bots
+  - Ça veut dire qu'on déploie plusieurs instances de /node/ qui vont collaborer ensemble
+  - Car le bot tourne sous /node/, il n'a pas accès à /WebRTC/
+  - Vérifier si les bots vont créer des connexions /WebSocket/ entre eux
+  - Ou s'ils vont tous communiquer via le /TURN Server/
+    - Auquel cas le /TURN Server/ peut s'avérer incarner le /bottleneck/ de notre simulation
+  - Ne faudrait-il pas remplacer la couche réseau dans le cadre de l'expérience ?
+*** Planned
+** Semaine du <2018-10-15 Mon> au <2018-10-19 Fri>
+*** Done
+- MUTE : Implémenter le mécanisme de renommage
+  - Ajout d'une méthode /getEpochPath()/ pour récupérer le chemin complet d'une /epoch/
+  - Ajout d'une méthode /getPathBetweenEpochs()/ pour récupérer la liste des /epochs/ à traverser (à annuler ou à appliquer) pour passer d'une /epoch/ à une autre
+  - Modification de /renameRemote()/ pour
+    - Récupère le chemin entre l'ancienne /epoch/ et la nouvelle
+    - Récupère la liste des identifiants actuellement présents dans la structure de données
+    - Applique les inversions de renommage puis les renommages successifs sur la liste des identifiants
+    - Remplace l'état par ce nouvel état renommé
+*** Planned
+**** DONE MUTE : Implémenter le mécanisme de renommage
+** Semaine du <2018-11-12 Mon> au <2018-11-16 Fri>
+*** Done
+- DISTRIBUTED SYSTEMS : Regarder *Liberating Distributed Consensus*
+  - Modèle du système
+    - Réseau asynchrone, non-fiable
+    - Noeuds non-byzantins
+    - Aucune mention du groupe, s'il est statique ou dynamique
+  - Propose une généralisation de l'algorithme de consensus
+  - Dans le cadre d'un consensus, les clients vont proposer leurs valeurs aux différents serveurs au cours d'epoch successives jusqu'à atteindre une décision
+  - Une fois une valeur choisie par un serveur pour une epoch donnée, celle-ci est immutable
+  - Les valeurs choisies sont conservées par les serveurs dans une table des états
+  - Les clients conservent eux une table globale des états des serveurs d'après les informations qu'ils collectent au fur et à mesure
+  - Ceci va permettre aux clients de prendre des décisions de manière informé et d'accélérer le mécanisme de consensus dans certains cas de figures
+  - Définit des règles pour s'assurer qu'on aboutit à une décision
+  - *Epoch Allocation Rule*
+    - Exclusive value
+      - Peut limiter le nombre de valeurs différentes proposées par epoch à 1
+      - Par exemple en attribuant le droit d'écrire à un seul client par epoch via un round robin
+    - Non-exclusive values
+      - Dans le cas contraire où on autorise plusieurs valeurs différentes à être proposées en concurrence par les différents clients
+      - Il est nécessaire que les quorums d'une epoch s'entrecroisent pour qu'une décision soit validée de manière sûre
+  - *Client Write Rule*
+    - Afin d'éviter qu'on obtienne des valeurs différentes pour une décision d'une epoch à l'autre, on ajoute des contraintes sur les valeurs proposées par les clients
+    - Avant de proposer une valeur /v/ à une epoch /e/, un client doit s'assurer que
+      - Aucune décision n'a été atteinte de l'epoch 0 à l'epoch /e-1/
+	- Auquel cas le client est libre de soumettre n'importe quelle valeur
+      - Toute décision qui a été de l'epoch 0 à l'epoch /e-1/ a pour valeur /v/
+  - Propose ensuite de relâcher certains requirements notamment de Paxos pour atteindre une décision de manière plus efficace
+  - *Value Selection*
+    - Relâche la contrainte sur la valeur proposée par un client en phase 2
+    - Dans Paxos, le client doit proposer la valeur associée à la plus grande epoch retournée par un serveur au cours de la phase 1
+    - Ici, un client a pour obligation de proposer une valeur retournée par un des serveurs si cette valeur peut avoir été choisie par un quorum d'après les informations de la table des états
+  - Finalement, propose des compromis/variantes d'algo de consens pour obtenir de meilleures performances dans des cas donnés
+  - Une variante intéressante est le *binary consensus*
+    - L'idée est d'associer exclusivement des valeurs aux epochs
+      - Les clients doivent alors attendre une epoch donnée pour pouvoir proposer une valeur spécifique
+    - Comme l'epoch 0 n'a pas d'epoch précédente, on peut optimiser le consensus en skippant la phase 1 de préparation
+      - Aucune valeur n'a pu être encore choisi, donc on peut directement proposer une valeur
+    - En associant une valeur commune/prioritaire de notre système à cette epoch, le consensus peut être effectuer plus rapidement (1 RTT)
+      - Exemple de valeur pour l'epoch 0 : COMMIT une transaction
+    - Pour les epochs suivantes, on peut retomber sur du Basic Paxos
+  - Remarques
+    - Terminaison de l'algo: quand est-ce que le mécanisme s'arrête ?
+    - Comment la /configuration table/ est-elle établie et communiquée aux noeuds ?
+    - Est-ce que la /configuration table/ peut être modifiée en cours d'exécution ?
+  - *Slide 65*: Pas compris pourquoi l'optimisation donnée peut être effectuée
+    - Si j'ai bien compris, explique que dans Paxos on attend une majorité de réponses des serveurs à la phase 1 pour déterminer la valeur /v/ à proposer à la phase 2
+    - Ici, explique qu'on est pas obligé d'attendre autant de réponses
+    - À partir du moment où une réponse comporte une valeur /v/ telle que /v ≠ nil/, peut proposer /v/
+    - Affirme que seule la valeur retournée aurait pu être décidée dans les epochs précédentes
+    - Je ne comprends pas pourquoi la réponse reçue ne pourrait pas être une valeur différente que la valeur choisie à l'epoch précédente
+      - À voir le quorum requis pour cette optimisation
+*** Planned
+**** DONE DISTRIBUTED SYSTEMS : Regarder *Liberating Distributed Consensus*
+- Lien : https://www.reactivesummit.org/2018/schedule/liberating-distributed-consensus
+**** TODO DISTRIBUTED SYSTEMS : Regarder *Distributed Transactions are dead, long live distributed transactions!*
+- Lien : https://www.reactivesummit.org/2018/schedule/distributed-transactions-are-dead-long-live-distributed-transactions
+**** TODO DISTRIBUTED SYSTEMS : Regarder *Is there anybody out there?*
+- Lien : https://www.reactivesummit.org/2018/schedule/is-there-anybody-out-there
+**** TODO DISTRIBUTED SYSTEMS : Regarder *7 Reasons why your microservices should use Event Sourcing & CQRS*
+- Lien : https://www.reactivesummit.org/2018/schedule/7-reasons-why-your-microservices-should-use-event-sourcing--cqrs
+**** TODO DISTRIBUTED SYSTEMS : Surveiller l'apparition des vidéos des talks de *Code Mesh 2018*
+- Plusieurs talks ont l'air intéressant
+- Lien YT : https://www.youtube.com/channel/UC47eUBNO8KBH_V8AfowOWOw
+- Lien Twitter : https://twitter.com/CodeBEAMio
+**** IN-PROGRESS PhD : Compléter et envoyer l'autorisation de cumul à l'IUT
+**** TODO Middleware 2018 : Faire un poster présentant le mécanisme de renommage
+**** TODO PhD : Faire valider les formations scientifiques suivies
+**** TODO MUTE : Exploser le test "renameId() retains order between ids"
+- Ce test évalue de nombreux cas différents
+- Lorsqu'il échoue, le message d'erreur n'indique pas exactement le cas qui échoue
+- Exploser ce test en plusieurs, chacun testant un scénario précis, aidera à détecter les erreurs et les potentiels scénarios manquants
+**** TODO MUTE : Exploser le test "reverseRenameId() retains order between ids"
+- Ce test évalue de nombreux cas différents
+- Lorsqu'il échoue, le message d'erreur n'indique pas exactement le cas qui échoue
+- Exploser ce test en plusieurs, chacun testant un scénario précis, aidera à détecter les erreurs et les potentiels scénarios manquants
 **** IN-PROGRESS PhD : Motiver le problème adressé
 - Contacter les gens de Redis pour discuter des implémentations proposés pour les types *String* et *List*
 - Contacter les gens de xRay pour discuter du CRDT implémenté
 - Creuser du côté de Postgres
-**** IN-PROGRESS MUTE : Implémenter le mécanisme de renommage
 **** IN-PROGRESS Méthode formelle : Se remettre à niveau en méthode formelle
 - D'après la discussion de Victorien avec Stephan Merz, ce dernier lui a conseillé
   - De commencer par du model-checking (TLA+)
@@ -6739,6 +6984,9 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - http://lamport.azurewebsites.net/video/videos.html
   - Un tuto que j'ai vu passé un jour sur HN
     - https://learntla.com/introduction/
+**** TODO DISTRIBUTED DATABASES : Lire *NewSQL database systems are failing to guarantee consistency, and I blame Spanner*
+- Disponible ici : https://dbmsmusings.blogspot.com/2018/09/newsql-database-systems-are-failing-to.html
+- Semblerait que des CTO des bases de données mentionnées dans l'article ont répondu dans les commentaires, ce qui a donné lieu à des conversations intéressantes à priori
 **** TODO MUTE : Identifier l'origine de la divergence de la réunion du <2018-06-01 Fri>
 - Un bloc de texte s'est retrouvé inséré au mauvais endroit pour une copie des notes prises au cours de cette réunion
 - En identifiant la structure obtenue, on s'est rendu compte que ce bloc n'aurait pas dû être placé à cet endroit étant donné son identifiant
