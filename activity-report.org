@@ -7001,11 +7001,113 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - À partir de là, considère que le leader est le noeud de la liste qui respecte une certaine contrainte
       - Identifiant le plus "petit"
     - Pas besoin de communication supplémentaire pour ce type de consensus
+- PhD : Lire les updates de *xray* depuis celle du <2018-07-10 Tue> incluse
+  - <2018-07-10 Tue>
+    - Le focus du projet a changé de *xray* à *Eon*
+    - *Eon* est un système de gestion de version distribué basé sur des CRDTs
+    - La collaboration se ferait en temps réel en propageant les modifications effectués par un noeud aux autres
+    - Propose pour le moment un CRDT pour représenter le système de fichiers et gérer ses modifications
+  - <2018-07-16 Mon>
+    - Porte principalement sur la gestion d'un type de conflit : les cycles
+    - Un cycle se produit lorsqu'un noeud déplace un dossier *a/* dans un dossier *b/* tandis qu'en concurrence un autre noeud déplace le dossier *b/* dans *a/*
+    - En appliquant ces deux opérations successivement, on détache les dossiers *a/* et *b/* de l'arborescence du système de fichier et on créé une boucle entre *a/* et *b/*
+    - Afin d'éviter ce genre de situation, il est nécessaire d'empêcher la génération de cycle
+    - Propose 2 approches pour résoudre ce problème
+    - *Undo: Ordonner totalement les opérations et en annuler une*
+      - Lorsque deux opérations en conflit sont détectées, l'une prend la précédence sur l'autre
+      - Les opérations suivantes sont ré-évaluées en fonction de l'état résultant de la résolution du conflit
+      - Met de côté cette solution pour les raisons suivantes
+      - Des cycles pourraient être résolus pour que finalement une autre opération concurrente que ce n'était pas nécessaire
+	- Pas sûr de comprendre le cas de figure mentionné ici
+	- Est-ce que l'autre opération concurrente serait un autre déplacement générant un autre cycle mais ayant une plus forte priorité?
+	- Ou s'agit-il d'opérations genre suppression d'un des deux répertoires?
+      - La résolution de conflits même ferait apparaître des dossiers de manière non-intuitive pour les utilisateurs, notamment si la résolution du conflit est longue à calculer
+	- Ceci pourrait rendre confus les utilisateurs
+	- Dans le cas du renommage, comme il s'agit d'une opération interne, on n'a pas ce genre de problèmes
+    - *Fixup: Génère une opération de réparation*
+      - Lorsqu'un déplacement génère un cycle, identifie les opérations qui ont participé à la création de ce cycle
+      - Génère une opération qui annule l'effet d'une d'entre elles (celle ayant l'horloge la plus élevée)
+      - Propage cette opération de *réparation* aux autres noeuds
+      - Peut entraîner la génération d'opérations de réparation *redondantes* ou même portant sur des déplacements différents formant le même cycle
+      - Implique un état entre l'opération générant le cycle et celle de réparation *incohérent*
+    - Dans leur cas, ils ont privilégié la 2nde approche pour des raisons d'usabilité
+  - <2018-07-23 Mon>
+    - Implémentation de la *Fixup strategy* pour les cycles
+      - Lors de la détection d'un cycle, génère une opération de réparation annulant le dernier déplacement qui a généré le cycle
+      - Potentiellement cette opération mène à un état où un cycle existe toujours
+      - Continue de générer des opérations de réparation jusqu'à ne plus avoir de cycles
+    - Implémentation de la *Fixup strategy* pour les renommages
+      - Ils se sont rendus compte qu'on pouvait avoir un conflit sur le nom des répertoires
+      - À ce moment, compare les deux opérations ayant généré les répertoires en conflit
+      - Une des opérations prend précédence sur l'autre et le répertoire généré conserve le nom
+      - Génère une opération de renommage ajoutant un ~ au nom de l'autre répertoire
+      - Potentiellement ce renommage génère un nouveau conflit
+      - Continue de générer des opérations de renommage jusqu'à ne plus avoir de conflits
+    - Synchronisation avec le système de fichiers
+      - Instancie une structure de données représentant l'état du système de fichiers à l'initialisation
+      - Lorsque des opérations distantes arrivent, les applique au système de fichiers
+      - Mais potentiellement, une modification locale peut avoir en concurrence modifié l'état du système de fichiers mais n'étant pas encore reflété dans le modèle
+      - Et il n'est semblerait pas possible d'effectuer des opérations sur le système de fichiers de façon atomique
+      - On peut donc vérifier avant d'appliquer l'opération distante si l'état du système de fichiers correspond à l'état du modèle
+      - Mais une modification locale, potentiellement conflictuelle, pourra toujours se glisser entre la vérification et l'exécution de l'opération distante
+      - Accepte cette possibilité d'erreur car juge son risque extrêmement faible
+  - <2018-07-31 Tue>
+    - Application des opérations par batch
+      - En effectuant des tests, ils se sont rendus compte qu'appliquer une par une les opérations peut poser des problèmes
+      - Notamment dans le cas où on détecte un changement en local correspondant à plusieurs opérations
+      - Prend pour exemple deux dossiers avec le même, mais avec un niveau dans l'arborescence différent, dont on échange les positions
+	- En résolvant les modifications une par une, on va se retrouver à mettre les deux dossiers au même endroit
+	- Une opération de réparation sera donc générée pour résoudre le conflit de nom
+	- Puis on va finir l'échange en déplaçant le second dossier
+	- On aura donc bien échanger la position des deux dossiers
+	- Mais au passage on en aura renommé un
+      - Ils ont donc modifié leur modèle pour appliquer les opérations par batch, et seulement après voir s'il y a besoin de générer des opérations de réparation
+      - Leur système converge dorénavant
+	- Test où 5 différents noeuds appliquent 20 opérations aléatoires
+	- Test répété 1 million de fois
+    - Modification du système de fichier par batch
+      - De la même façon, on ne peut pas mettre à jour l'état du système de fichier au fur et à mesure que l'on applique les opérations sur le CRDT
+      - En effet, de par l'approche choisie, on peut se retrouver avec un état du modèle qui est inconsistent
+	- Présence de cycles par exemple
+      - Reproduire cette état sur le système de fichiers génèrerait des erreurs
+      - Il est donc nécessaire d'appliquer toutes les opérations nécessaires pour que le CRDT soit dans un état cohérent avant de générer et d'appliquer les opérations locales correspondantes aux modifications
+      - Pour que l'exécution des opérations locales se déroulent correctement, se base sur l'intuition suivante
+	- Les insertions et déplacements doivent être exécutés en premiers, en s'occupant des opérations les plus proches de la racine en priorité
+	- Les suppressions sont quant à elles traitées en dernières
+    - Synchronisation avec le système de fichiers
+      - Comme dit précédemment, le modèle qu'on manipule peut en fait représenter une version antérieure de l'état actuel du système de fichier
+      - Pour adresser ce problème, créé une copie du modèle avant d'appliquer un batch d'opérations distantes: /old_tree/
+      - Une fois les opérations distantes appliquées au modèle, essaie d'appliquer les opérations locales correspondantes sur le système de fichier
+      - Utilise /old_tree/ pour déterminer l'emplacement de chacun des fichiers manipulé par les opérations distantes
+      - Si une incohérence est détectée, interrompt le mécanisme pour mettre à jour le modèle de /old_tree/
+      - Pour chaque mise à jour du modèle, les opérations correspondantes sont appliqués sur l'arbre courant
+      - Reprend ensuite l'application des opérations sur le système de fichier
+  - <2018-08-21 Tue>
+    - Synchronisation avec le système de fichiers
+      - La synchroniation s'est avérée être plus difficile que prévue
+      - Notamment à cause du fait que le système de fichier peut être mis à jour au cours même du scan
+      - Mais ont réussi à faire converger leur CRDT
+    - Ajout du support des fichiers textes et de leur structure
+      - Jusque là, le CRDT ne pouvait que gérer des dossiers
+      - Travaille sur l'ajout de la gestion de fichiers
+	- Devrait s'avérer proche de ce qu'ils ont déjà fait pour les dossiers
+	- Les fichiers étant des dossiers simplifiés
+      - Reste le problème de la synchronisation du contenu des fichiers présents dans l'arborescence
+      - Travaille sur l'architecture du logiciel, notamment la partie *Composition*
+  - <2018-08-28 Tue>
+    - Ajout du support des fichiers
+    - CRDT pour le contenu des fichiers
+      - Maintenant il faut répliquer le contenu des fichiers
+      - Pour cela, ils reprennent leur module *buffer*, qui a l'air d'être leur CRDT pour représenter un document
 *** Planned
 **** DONE DISTRIBUTED SYSTEMS : Regarder *Liberating Distributed Consensus*
 - Lien : https://www.reactivesummit.org/2018/schedule/liberating-distributed-consensus
 **** DONE DISTRIBUTED SYSTEMS : Regarder *Is there anybody out there?*
 - Lien : https://www.reactivesummit.org/2018/schedule/is-there-anybody-out-there
+**** IN-PROGRESS PhD : Lire les updates de xray depuis celle du <2018-07-10 Tue> incluse
+- Leur projet de Git enrichi avec des fonctionnalités d'édition collaborative temps réel à l'aide de CRDTs à l'air d'avoir bien avancé
+- Voir le travail réalisé
+- Les bulletins d'information sont disponibles ici : https://github.com/atom/xray/tree/master/docs/updates
 **** TODO DISTRIBUTED SYSTEMS : Regarder *Distributed Transactions are dead, long live distributed transactions!*
 - Lien : https://www.reactivesummit.org/2018/schedule/distributed-transactions-are-dead-long-live-distributed-transactions
 **** TODO DISTRIBUTED SYSTEMS : Regarder *7 Reasons why your microservices should use Event Sourcing & CQRS*
