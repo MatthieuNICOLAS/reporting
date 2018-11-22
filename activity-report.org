@@ -7172,6 +7172,18 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Leur projet de Git enrichi avec des fonctionnalités d'édition collaborative temps réel à l'aide de CRDTs à l'air d'avoir bien avancé
 - Voir le travail réalisé
 - Les bulletins d'information sont disponibles ici : https://github.com/atom/xray/tree/master/docs/updates
+**** CANCELLED MUTE : Ajouter la gestion du titre du document
+- Le titre du document peut être l'objet de modifications concurrentes
+- Il est donc nécessaire de s'assurer qu'il converge chez tous les utilisateurs
+- Utiliser *LogootSplit* pour gérer le titre semble un peu /overkill/
+- Un simple *LWW-Register* suffirait
+- Voir pour lier le document et son titre
+  - Le titre peut être amener à évoluer suite à des modifications du document
+  - Lier l'état du document et l'état du titre?
+**** CANCELLED MUTE : Améliorer le pipe /slice/ d'Angular pour les *Strings*
+- Angular propose un pipe /slice/ permettant de limiter le nombre de caractères que nous souhaitons afficher d'une *String*
+- Cependant, rien n'indique dans le résultat si la chaîne de caractères a effectivement été tronquée ou non
+- Créer un pipe /sliceString/ ajoutant '...' au résultat si la chaîne a été coupée
 **** TODO DISTRIBUTED SYSTEMS : Regarder *Distributed Transactions are dead, long live distributed transactions!*
 - Lien : https://www.reactivesummit.org/2018/schedule/distributed-transactions-are-dead-long-live-distributed-transactions
 **** TODO DISTRIBUTED SYSTEMS : Regarder *7 Reasons why your microservices should use Event Sourcing & CQRS*
@@ -7269,18 +7281,6 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Lors d'un split, un bloc est coupé en deux et un nouveau bloc est inséré au milieu
 - Après la suppression du bloc inséré, on pourrait fusionner les deux parties du bloc initial pour le recréer
 - Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
-**** TODO MUTE : Ajouter la gestion du titre du document
-- Le titre du document peut être l'objet de modifications concurrentes
-- Il est donc nécessaire de s'assurer qu'il converge chez tous les utilisateurs
-- Utiliser *LogootSplit* pour gérer le titre semble un peu /overkill/
-- Un simple *LWW-Register* suffirait
-- Voir pour lier le document et son titre
-  - Le titre peut être amener à évoluer suite à des modifications du document
-  - Lier l'état du document et l'état du titre?
-**** TODO MUTE : Améliorer le pipe /slice/ d'Angular pour les *Strings*
-- Angular propose un pipe /slice/ permettant de limiter le nombre de caractères que nous souhaitons afficher d'une *String*
-- Cependant, rien n'indique dans le résultat si la chaîne de caractères a effectivement été tronquée ou non
-- Créer un pipe /sliceString/ ajoutant '...' au résultat si la chaîne a été coupée
 **** TODO CRDT : Lire *Kaleido*
 * Glossaire
 - Eventual convergence property
