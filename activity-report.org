@@ -7104,7 +7104,71 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Lien : https://www.reactivesummit.org/2018/schedule/liberating-distributed-consensus
 **** DONE DISTRIBUTED SYSTEMS : Regarder *Is there anybody out there?*
 - Lien : https://www.reactivesummit.org/2018/schedule/is-there-anybody-out-there
-**** IN-PROGRESS PhD : Lire les updates de xray depuis celle du <2018-07-10 Tue> incluse
+** Semaine du <2018-11-19 Mon> au <2018-11-23 Fri>
+*** Done
+- PhD : Lire les updates de xray depuis celle du <2018-07-10 Tue> incluse
+  - <2018-09-14 Fri>
+    - Intégration avec Git
+      - Constate qu'un CRDT pour la gestion de versions n'offrirait pas assez d'avantages par rapport à Git, notamment pour les collaborations asynchrones, pour inciter au changement
+      - Constate qu'il faudrait probablement pouvoir interagir avec Git de toute manière
+      - Décide donc de changer l'orientation du projet
+      - Propose de construire un CRDT pour la collaboration en temps entre les commits
+      - Permet de réduire la taille des métadonnées à conserver et l'empreinte du CRDT sur le système
+	- Puisqu'on peut reposer sur Git dans une certaine mesure
+	- Uniquement besoin de conserver les opérations correspondantes aux modifications depuis le dernier commit
+	- A l'air de reset l'état du CRDT à chaque commit
+    - Undo
+      - Rencontre avec un problème avec l'undo
+      - Jusqu'à maintenant, maintenait la liste des opérations et associait un compteur pour chacune d'entre elles
+      - Undo une opération consistait à incrémenter son compteur
+      - Si son compteur était pair, elle était undo, sinon elle était prise en compte
+      - Avait un mécanisme pour gérer les undos/redos concurrents
+      - Dorénavant le CRDT est reset après un commit
+      - Un undo en concurrence d'un commit pose donc quelques problèmes pour être appliqué, l'opération initiale ayant été perdue lors du commit
+      - Propose de maintenir 2 CRDTs pour chaque fichier
+	- Le 1er correspond à l'historique complet du fichier
+	  - Ça a l'air d'être un DAG des opérations distantes
+	- Le 2nd correspond à son historique depuis le dernier commit
+      - Lorsqu'un undo est reçu, il est déjà appliqué au CRDT représentant l'historique complet
+      - Ceci génère une opération distante qui correspond à l'effet du undo
+      - Cette opération distante est ensuite appliquée au second CRDT et transmise aux autres sites
+    - Remarques
+      - Voir plus en détail comment ils gèrent les opérations concurrentes à un commit
+      - Même, voir comment ils gèrent deux commits concurrents
+      - Comment ça se passe si je pull un commit qui comprend certaines opérations que j'ai déjà observé grâce au CRDT ?
+	- Duplication d'intention ?
+      - De plus, un commit peut potentiellement contenir qu'une partie d'une opération observé via le CRDT
+	- On copie/colle plusieurs lignes de codes mais on ne commit dans un 1er temps uniquement les premières lignes
+  - <2018-10-02 Tue>
+    - Release d'une 1ère version de Memo
+      - Pour le moment, le système de fichiers est virtuel pour des raisons de simplicité
+      - Aucune interaction avec un système de fichiers externe
+    - Work Tree
+      - *Work Tree* est le CRDT représentant l'état du système de fichiers
+      - Assume qu'un *Work Tree* est généré sur l'état qui correspond au dernier commit
+      - Assume que l'application se charge d'instancier un nouveau *Work Tree* à chaque commit, reset ou checkout
+    - Epochs
+      - Décompose l'évolution du *Work Tree* en epochs
+      - Chaque epoch correspond à un commit
+      - Les opérations sont liées à une epoch et correspondent aux modifications non-committées
+      - Une seule epoch active à un moment donné chez un noeud
+      - Les epochs possèdent un identifiant composé d'une horloge de Lamport
+      - Lorsqu'un site effectue un commit (ou un reset), génère une nouvelle epoch et la broadcast aux autres sites
+      - Lorsque des epochs concurrentes sont générées, privilégient arbitrairement l'epoch ayant la plus grande horloge de Lamport
+    - Livraison causale des epochs
+      - Attache un version vector aux epochs pour indiquer les opérations qui ont été committées
+      - Suppose que dans la majorité des cas, un site va recevoir un commit ayant été effectué sur son epoch courante
+      - Auquel cas, l'état du commit est inclus dans son état courante
+	- Implique une livraison causale des opérations (du moins celle de commit)
+      - On peut donc récupérer une partie des opérations actuelles et les conserver pour le CRDT de l'epoch nouvelle créée
+      - Mais des commits peuvent être construits sur d'autres epochs que l'actuelle
+      - Semble pas clair pour le moment comment ils comptent gérer cela
+    - Remarques
+      - S'ils utilisent un mécanisme d'epochs similaire au mien avec une décision arbitraire
+      - Ils doivent rencontrer le même problème de la gestion des opérations générées sur une epoch "perdante"
+      - Voir comment ils gèrent ces opérations
+*** Planned
+**** DONE PhD : Lire les updates de xray depuis celle du <2018-07-10 Tue> incluse
 - Leur projet de Git enrichi avec des fonctionnalités d'édition collaborative temps réel à l'aide de CRDTs à l'air d'avoir bien avancé
 - Voir le travail réalisé
 - Les bulletins d'information sont disponibles ici : https://github.com/atom/xray/tree/master/docs/updates
