@@ -7279,6 +7279,9 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Permet ainsi d'obtenir de meilleures perfs sur certaines opérations sensibles
     - Mais augmente aussi le coût de certaines opérations qui nécessitent dorénavant une interaction edge/cloud
     - A pour but d'automatiser cette classification et ce déploiement hybride
+    - A utilisé Locust (https://locust.io/) pour simuler le comportement de l'utilisateur dans leur expérience
+    - La configuration utilisée est disponible ici https://github.com/gtato/sharelatex-loadgenerator
+    - D'après notre discussion, les pairs écrivent de manière aléatoire dans le document
   - *QueCC: A Queue-oriented, Control-free Concurrency Architecture* (Thamir M. Qadah, Mohammad Sadoghi)
     - https://dl.acm.org/citation.cfm?id=3274810
     - Se place dans le cadre de la gestion de transactions par batch dans une base de données hautement parallèle (nombreux cores, mémoire partagée)
@@ -7298,6 +7301,24 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Implémenté, obtient de meilleurs résultats (throughput) que l'existant
   - *SPADE: Tuning scale-out OLTP on modern RDMA clusters* (G. Chatzopoulos, A. Dragojevic, R. Guerraoui)
     - https://dl.acm.org/citation.cfm?id=3274815
+  - *Speculative Read-write Locks* (S. Issa, P. Romano, T. Lopes)
+    - https://dl.acm.org/citation.cfm?id=3274825
+    - Le but est d'améliorer les performances en écriture et lecture dans les systèmes utilisant du /Hardware Transactional Memory (HTM)/
+    - /HTM/ permet d'offrir le mécanisme de transaction au niveau de l'accès à la mémoire par différents threads
+    - Les transactions sont potentiellement aborted/restarted si une transaction concurrente a été commit et provoque un conflit
+    - Même si ça permet d'améliorer les performances d'applications hautement parallèle par rapport à des mécanismes de synchronisation logiciels, il y a toujours moyen de faire mieux
+    - Propose d'effectuer les lectures seules en dehors du mécanisme de transaction proposé par /HTM/
+      - Ceci est rendu possible sans briser l'isolation des lectures grâce à 2 propriétés de /HTM/
+      - Les écritures effectuées dans le cadre d'une transaction ne sont externalisées qu'après avoir été /commit/
+	- Prévenant ainsi tout /dirty read/
+      - /HTM/ détecte les conflits entre les accès mémoire transactionnels et non-transactionnels et annule la transaction courante le cas échéant
+	- Prévenant ainsi tout /stale read/
+    - Pour éviter d'/abort/ fréquemment les écritures, met en place plusieurs mécanismes de synchronisation
+      - Les /writers/ vérifient qu'il n'y a pas de /readers/ actifs avant de /commit/ leur transaction
+      - Les /readers/  vérifient qu'il n'y a pas de /writers/ actifs avant d'effectuer leur lecture
+	- Le cas échéant, ils attendent que les /writers/ aient finis pour effectuer leur lecture
+	- Par contre, une fois que tous les /writers/ ont fini, tous les /readers/ en attente peuvent effectuer leur lecture en concurrence
+      - Les /writers/ prédisent le temps d'exécution des lectures en cours pour pouvoir exécuter leur transaction en amont et /commit/ juste après que les lectures soient finies
   - *SpecRPC: A General Framework for Performing Speculative Remote Procedure Calls* (X. Yan, A. Pie Joa, B. Wong, B. Cassell, T. Szepesi, M. Naouach, D. Lam)
     - https://dl.acm.org/citation.cfm?id=3274829
     - Dans le cadre des systèmes composés de plusieurs services
