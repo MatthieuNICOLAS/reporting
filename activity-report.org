@@ -7167,6 +7167,20 @@ We say that H implements A under this refinement mapping iff, for each behavior 
       - S'ils utilisent un mécanisme d'epochs similaire au mien avec une décision arbitraire
       - Ils doivent rencontrer le même problème de la gestion des opérations générées sur une epoch "perdante"
       - Voir comment ils gèrent ces opérations
+- Meeting
+  - Reading about Memo
+    - New project from the GitHub team working on teletype
+    - Original idea was to propose a Version Control System based on CRDTs to allow real-time collaboration
+    - Built on top of Git
+    - Epoch-based system
+    - Each commit corresponds to a new epoch
+    - CRDT keep track of changes between two epochs
+    - Need to deal with concurrent epochs and thus operations build on concurrent epochs
+  - Refactoring of Mute
+    - Want to deploy a version of Mute not using LogootSplit but RenamableLogootSplit or DottedLogootSplit
+    - Unfortunately, have some code deeply tied to LogootSplit currently (the object which represents the text document, the anti-entropy mechanism)
+    - Need to refactor these components to make them more generic
+    - Work on the conception of this refactoring with Victorien and Cedric
 *** Planned
 **** DONE PhD : Lire les updates de xray depuis celle du <2018-07-10 Tue> incluse
 - Leur projet de Git enrichi avec des fonctionnalités d'édition collaborative temps réel à l'aide de CRDTs à l'air d'avoir bien avancé
@@ -7184,6 +7198,178 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Angular propose un pipe /slice/ permettant de limiter le nombre de caractères que nous souhaitons afficher d'une *String*
 - Cependant, rien n'indique dans le résultat si la chaîne de caractères a effectivement été tronquée ou non
 - Créer un pipe /sliceString/ ajoutant '...' au résultat si la chaîne a été coupée
+** Semaine du <2018-11-26 Mon> au <2018-11-30 Fri>
+*** Done
+*** Planned
+**** DONE Middleware 2018 : Préparer la présentation pour le Doctoral Symposium
+- 10min allouées pour ma présentation (questions incluses)
+- Prévois 8min de pres, 2min de questions
+** Semaine du <2018-12-03 Mon> au <2018-12-07 Fri>
+*** Done
+- Formation
+  - Outil de quizz : https://socrative.com
+  - Mur de post-it : https://padlet.com/
+  - Slideshare pour trouver des supports de cours réutilisables
+  - 3 types d'évaluations
+    - Diagnostic : Quizz pour déterminer le niveau initial
+    - Formative : Quizz pour apprendre de ses erreurs
+    - Sommative : Interro finale
+*** Planned
+**** DONE Middleware 2018 : Préparer la *One-Minute Madness*
+     DEADLINE: <2018-12-07 Fri>
+- Dans le cadre du Doctoral Symposium, doit faire la pub de ma présentation en 1min avec 1 slide
+**** DONE Middleware 2018 : Faire un poster présentant le mécanisme de renommage
+** Semaine du <2018-12-10 Mon> au <2018-12-14 Fri>
+*** Done
+- Doctoral Symposium
+  - Towards an optimized PhD experience
+  - Cloudiator
+    - Unified multi-cloud, cross-cloud orchestration
+  - Feedback
+    - On a l'impression que ce que l'on gagne en espace pour la séquence va être bouffé par ailleurs pour les maps de renommage
+      - Maps de renommage seulement nécessaire pour gérer les opérations concurrentes à un renommage, peut les stocker sur le disque au bout d'un moment
+      - Stockage est plus cheap que la mémoire
+    - À quelle point le document grossit ? À quelle point est-ce un problème ?
+      - Nous faudrait des traces pour pouvoir répondre à cette question
+- Bird of feather
+  - System model
+    - Low latency environment, in single data center
+    - Crash Fault Tolerant
+  - How to accelerate consensus using hardware
+    - Utilise du hardware spécifique pour mettre en place un réseau low-latency et reliable entre différents noeuds
+      - NICS, RDMA
+    - Peut utiliser des techniques de routage particulière pour ordonner les messages de façon à ce que l'application soit toujours dans son /best-case scenario/
+  - Se pose la question sur comment du /specific hardware/ peut être utilisé pour améliorer les performances dans différents scénarios
+  - What about Geo-Distribution?
+    - Majorité du temps d'attente est dû à la latence entre sites, ça peut difficilement être amélioré avec du matériel dédié
+    - Par contre, du matériel dédié permettrait p-e d'offrir des garanties sur l'état du système, l'ordre des messages qui permettraient d'optimiser l'algorithme
+  - Throughput (TPUT) vs Latency
+    - La majorité des travaux avec de l'accélération matériel souhaitent effectuer un grand nombre de consensus par seconde (1M rounds/s) tout en gardant la latence basse (μs)
+      - Applications concernées : KVS, Multi-Tenancy
+    - Batcher les opérations logiques permet de réduire le nombre de rounds nécessaires tout en conservant la latence basse
+  - BFT
+    - Dans le cas d'une base de données distribuée dans un système BFT
+    - Reçoit un batch de transaction de la part du leader
+    - Doit décoder le message
+    - Puis doit vérifier l'authenticité des transactions du batch
+    - La vérification de l'authenticité des transactions peut être parallélisé
+      - Peu de choses à gagner là-dessus
+    - Par contre, sur la partie réseau, pourrait utiliser de l'accélération matérielle pour chiffrer/déchiffrer les données
+- Réflexions pour le renommage
+  - Pourrait adapter la stratégie de renommage selon les informations que l'on a
+  - Si on détecte beaucoup de concurrence ou une partition, délaie le renommage ou durcit les conditions de déclenchement
+- Recap Middleware
+  - *METRIC: A Middleware for Entry Transactional Database Clustering at the Edge* (E. Saurez, B. Balasubramanian, R. Schlichting, B. Tschaen, Z. Huang, S. Puzhavakath Narayanan, U. Ramachandran)
+    - https://dl.acm.org/citation.cfm?id=3286686
+    - Propose une base de données composée
+      - De noeuds à l'edge pour réduire la latence des clients
+      - De noeuds globaux pour gérer la synchro entre les noeuds à l'edge
+    - Pose un trade-off entre la disponibilité des noeuds à un edge donné et la disponibilité des dernières données d'un point de vue globale
+    - Fonctionne sur un système d'ownership
+      - Un client revendique l'ownership de plusieurs clés
+      - Il est ensuite capable d'effectuer des transactions efficaces sur ces dernières grâce aux noeuds à l'edge
+      - Par contre, revendiquer l'ownership requiert une communication entre les différents noeuds pour s'assurer qu'il n'y a pas 2 owners
+    - On-going work
+  - *ShareLatex on the Edge: Evaluation of the Hybrid Core/Edge Deployment of a Microservices-based Application* (G. Tato, M. Bertier, E. Rivière, C. Tedeschi)
+    - https://hal.inria.fr/hal-01942807
+    - Le but est de prendre une application construite à l'aide de micro-services et d'essayer de répartir ces services entre le cloud et l'edge
+    - Prend *ShareLatex* comme cas d'usage
+    - Classifie les micro-services en fonction de différentes catégories (stateless, splittable, critique, temps réel, fréquent...)
+    - À partir de cette classification, détermine une répartition entre le cloud et l'edge
+    - Permet ainsi d'obtenir de meilleures perfs sur certaines opérations sensibles
+    - Mais augmente aussi le coût de certaines opérations qui nécessitent dorénavant une interaction edge/cloud
+    - A pour but d'automatiser cette classification et ce déploiement hybride
+  - *QueCC: A Queue-oriented, Control-free Concurrency Architecture* (Thamir M. Qadah, Mohammad Sadoghi)
+    - https://dl.acm.org/citation.cfm?id=3274810
+    - Se place dans le cadre de la gestion de transactions par batch dans une base de données hautement parallèle (nombreux cores, mémoire partagée)
+    - Cherche à réduire le coût de synchronisation entre threads
+      - Dû des conflits entre transactions concurrentes
+    - L'idée est de séparer la gestion des transactions en 2 phases
+      1. Phase de planification
+      2. Phase d'exécution
+    - La phase de planification est la plus importante
+      - Elle détermine les conflits entre transactions
+      - Elle les résout en ordonnant les transactions de façon déterministe
+      - Les transactions sont placées dans des queues
+	- Queues parallèles si pas de conflits
+	- Queues de différentes priorités sinon
+    - Les queues sont ensuite affectées à des threads
+    - Chaque thread peut alors exécuter chaque transaction "sans se poser de questions"
+    - Implémenté, obtient de meilleurs résultats (throughput) que l'existant
+  - *SPADE: Tuning scale-out OLTP on modern RDMA clusters* (G. Chatzopoulos, A. Dragojevic, R. Guerraoui)
+    - https://dl.acm.org/citation.cfm?id=3274815
+  - *SpecRPC: A General Framework for Performing Speculative Remote Procedure Calls* (X. Yan, A. Pie Joa, B. Wong, B. Cassell, T. Szepesi, M. Naouach, D. Lam)
+    - https://dl.acm.org/citation.cfm?id=3274829
+    - Dans le cadre des systèmes composés de plusieurs services
+    - Il est souvent nécessaire d'enchaîner plusieurs requêtes séquentiellement
+      - La réponse à la 1ère requête sert d'entrée pour la 2nd et ainsi de suite
+    - De ce fait, pour former la réponse globale, on accumule les latences nécessaires de chacune de ces requêtes
+    - Dans ce papier, les auteurs proposent d'utiliser un outil de prédiction pour prédire les différents résultats successifs
+    - Ceci permet
+      - D'effectuer les différentes requêtes en parallèle
+      - De préparer la réponse pour l'utilisateur
+    - Si l'ensemble des prédictions s'est avéré correct, on peut répondre bien plus rapidement qu'avec l'approche standard
+    - Si une prédiction s'est avérée incorrecte, on peut tout simplement reprendre le fil d'exécution standard
+    - Ce mécanisme a pour défaut d'augmenter la charge reposant sur les différents services en fonction de la précision du mécanisme de prédiction
+      - Potentiellement, on va effectuer des requêtes donc les résultats seront inutiles car la prédiction des paramètres était fausse
+    - Le mécanisme de prédiction ne fait pas partie du scope de définition
+      - Reste à déterminer le coût d'utilisation d'un tel mécanisme
+*** Planned
+** Semaine du <2018-12-17 Mon> au <2018-12-21 Fri>
+*** Done
+- Réflexions sur la fusion de traces d'utilisation
+  - Obtenir des traces d'utilisation réelles est difficile
+  - Par contre, on possède plusieurs traces d'utilisation sur des courtes sessions d'édition collaborative
+  - On peut essayer de les combiner afin de générer des exemples de document à grande échelle
+  - Plusieurs pistes possibles
+  - Combiner séquentiellement, spatialement et temporellement, des traces de plusieurs documents de façon *statique*
+    - À partir des traces de deux documents, /doc1/ et /doc2/, on peut générer un nouveau document /doc1+2/ assez simplement
+    - Il suffit d'obtenir la /length/ et le /context/ de l'état final de /doc1/
+    - Puis de décaler les traces de /doc2/ en ajoutant /length/ à la position de ses opérations et /context/ au contexte de génération de ses opérations
+    - Suffit ensuite de concaténer les logs de /doc1/ et de /doc2'/
+    - Peut facilement étendre ce mécanisme de combinaison à /n/ documents en utilisant /doc1+2/ comme de nouvelles traces à utiliser
+    - Jouer sur l'/offset/ utilisé pour décaler les opérations permet de jouer sur la position de la section
+    - Jouer sur le /context/ utilisé pour décaler les opérations permet de jouer sur la causalité de la section
+    - Permet d'effectuer plusieurs types de combinaison et de permutation d'un même ensemble de traces
+  - Par contre, combiner différentes traces pour les jouer de façon concurrente est un peu plus tricky
+    - Pose soit des problèmes de synchronisation, soit des problèmes de cohérence
+    - Décompose le groupe en /n/ sous-groupes, chacun jouant une trace
+    - Si un membre du sous-groupe 1 reçoit une opération du sous-groupe 2, il ne peut pas la délivrer
+      - Cela provoquerait un décalage dans le doc qui briserait l'intention des opérations locales restantes
+    - Pour prévenir cela, il faudrait donc partitionner les sous-groupes le temps que chacun exécute sa trace
+      - Soit de façon logique, en ne délivrant pas les opérations concernées
+      - Soit de façon physique en isolant effectivement les différents sous-groupes
+  - Pourrait résoudre ce problème de cohérence à l'aide d'un décalage *dynamique*
+    - Peut au fur et à mesure qu'un noeud reçoit des opérations provenant d'autres sous-groupes calculer un nouvel /offset/ et /context/ à ajouter aux prochaines opérations locales
+    - Implique un overhead lors de l'exécution, autant d'un point de vue computationnel que d'un point de vue RAM, ce que je cherche à éviter
+  - Mais quel serait l'intérêt de combiner des traces pour qu'elles s'exécutent de manière concurrente tout en ne partitionnant pas le système ?
+    - Est-ce que ça aurait un effet sur la taille des identifiants ?
+      - Si les modifications ne se font pas à la même position, il n'y a pas de raison
+    - Est-ce qu'on a envie d'entrelacer deux traces ?
+      - Ça peut fournir des nouvelles traces plus "intéressantes" puisque les modifications seraient plus localisées dans une section du document
+      - Mais on ne tiendrait plus compte de la cohérence du résultat dans ce cas là
+  - Effets de la combinaison des traces sur l'overhead observé
+    - Si on se contente de linéariser, spatialement et temporellement, les traces dans une seule et unique trace
+      - J'aurai tendance à dire que l'overhead résultant correspondra à la somme des overheads de chaque trace
+    - En fait, jouer sur le /context/ de décalage des opérations ne va pas influer sur leur overhead
+      - Si j'ai deux traces /doc1/ et /doc2/ et que je veux obtenir le résultat /doc1 + doc2/
+      - Jouer /doc1/ puis /doc2/ ou /doc2/ puis /doc1/ devrait me mener à des réprésentations équivalentes
+    - C'est si on fait se chevaucher différentes traces à l'aide de l'/offset/ que l'on va augmenter l'overhead
+  - Après discussion avec Victorien, il y a moyen de générer un document à partir de plusieurs traces en ajoutant de la concurrence tout en conservant la cohérence
+    - Se fait en 2 étapes
+    - Génère au préalable un log composé de plusieurs traces avec une partie concurrente
+    - Définit une position de référence à partir de laquelle les opérations de la partie concurrente vont être relativement exécutées
+    - Fait rejouer ce log par des bots
+    - Lorsque les bots rentrent dans la partie concurrente, ils utilisent la position de référence pour calculer l'index des opérations locales à effectuer
+    - Ceci permet de générer une nouvelle trace d'exécution ensuite réutilisable par l'outil de simulation standard
+*** Planned
+**** TODO COLLABORATIVE EDITING : Lire *Specification and Complexity of Collaborative Text Editing*
+- Disponible ici : https://dl.acm.org/citation.cfm?id=2933090 (H. Attiya, S. Burckhardt, A. Gotsman, A. Morrison, H. Yang , M. Zawirski)
+- Spécifie le comportement d'une liste répliquée
+- Précise que pour assurer ce comportement, les protocoles doivent ajouter un overhead au moins linéaire au nombre d'éléments
+- Indique qu'un protocole existant s'approche de cette limite
+- Vérifiez le système modèle du protocole en question et à quelle spécification de la liste répliquée il correspond
+- À partir de là, voir si je me place dans le même contexte
 **** TODO DISTRIBUTED SYSTEMS : Regarder *Distributed Transactions are dead, long live distributed transactions!*
 - Lien : https://www.reactivesummit.org/2018/schedule/distributed-transactions-are-dead-long-live-distributed-transactions
 **** TODO DISTRIBUTED SYSTEMS : Regarder *7 Reasons why your microservices should use Event Sourcing & CQRS*
@@ -7193,7 +7379,6 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Lien YT : https://www.youtube.com/channel/UC47eUBNO8KBH_V8AfowOWOw
 - Lien Twitter : https://twitter.com/CodeBEAMio
 **** IN-PROGRESS PhD : Compléter et envoyer l'autorisation de cumul à l'IUT
-**** TODO Middleware 2018 : Faire un poster présentant le mécanisme de renommage
 **** TODO PhD : Faire valider les formations scientifiques suivies
 **** TODO MUTE : Exploser le test "renameId() retains order between ids"
 - Ce test évalue de nombreux cas différents
