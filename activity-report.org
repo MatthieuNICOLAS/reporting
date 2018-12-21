@@ -7383,6 +7383,73 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Fait rejouer ce log par des bots
     - Lorsque les bots rentrent dans la partie concurrente, ils utilisent la position de référence pour calculer l'index des opérations locales à effectuer
     - Ceci permet de générer une nouvelle trace d'exécution ensuite réutilisable par l'outil de simulation standard
+- CRDT : *CRDTs in Production*
+  - https://www.infoq.com/presentations/crdt-production
+  - Système géo-répliqué
+  - Auparavant, utilisé des locks pour gérer la concurrence
+  - Mais avec le passage à un système géo-répliqué, la latence entre les noeuds impactent négativement les performances
+  - Afin d'offrir de meilleures performances, décide de relâcher la cohérence pour la disponibilité
+  - Liste plusieurs approches pour maintenir la cohérence dans un système /eventually consistent/
+  - *Affinity Based Approaches*
+    - Consiste à définir une affinité entre un utilisateur et un noeud de façon à ce que l'utilisateur n'interagisse qu'avec ce dernier
+    - Permet de facilement assurer /Read Your Writes/
+    - Par exemple, lie à son commencement la session d'un utilisateur à un noeud
+    - Ou en routant les requêtes d'une zone géographique sur un noeud
+    - Cette approche fonctionne correctement si les données modifiées par un utilisateur lui sont propres
+      - Son profil par exemple
+    - Mais rencontre des conflits si plusieurs utilisateurs modifient les mêmes données depuis des noeuds différents
+    - Nécessite aussi des mécanismes pour recouvrir des pannes
+  - *Coordinator Based Approaches*
+    - Ajoute au système un coordinateur en charge de gérer les conflits entre les différents noeuds
+    - Pas nécessaire qu'il prenne part à chaque modification
+    - Est jugé très complexe comme approche
+      - Notamment pour supporter les pannes et /recoveries/ dans des états intermédaires
+  - *Consensus Based Approaches*
+    - Explique l'approche du consensus marche très bien, mais qu'elle était difficilement applicable dans leur contexte
+    - Décompose l'application en plusieurs couches
+      - Business Logic (Type of documents, business rules)
+      - Domain Platform (Entity objects, DAO)
+      - Service Infrastructure (Service discovery, routing & balancing)
+      - Domain Data (Data model, records)
+      - Data Infrastructure (Deployment configuration, namespaces & schemas, replication params)
+    - Chacune de ses couches est gérée par une équipe dédiée
+    - En tant que dev, a généralement la responsabilité des couches suivantes
+      - Business Logic
+      - Domain Platform
+      - Domain Data
+    - Les autres couches sont fournies tels des services par les autres équipes
+    - Pour implémenter un algorithme de consensus, indique que les couches concernées sont les suivantes
+      - Domain Platform
+      - Service Infrastructure
+      - Data Infrastructure
+    - Nécessite donc d'interférer avec les autres équipes, celles-ci ayant déjà leurs préoccupations respectives
+  - *CRDTs*
+    - Connaît les /CRDTs/ via Riak, Akka et Jepsen
+    - Utilise un /State-based CRDT/
+    - Semble avoir implémenté un /Multi-Value Register/
+  - Aborde ensuite les problèmes rencontrés
+  - *Siblings Explosion*
+    - Appelle /Siblings/ des valeurs concurrentes
+    - Doit conserver ces différentes valeurs pour potentiellement résoudre l'incertitude par la suite
+    - Cet ensemble de valeurs peut grossir indéfiniment en fonction du scénario
+    - Définit une stratégie tronquant l'ensemble si sa taille commence à impacter négativement les performances
+    - Très arbitraire comme solution
+  - *Wait, Siblings?*
+    - Souhaite initialement possèder une seule valeur
+    - Mais à cause de modifications concurrentes, peut se retrouver avec plusieurs /siblings/
+    - Comment gérer cette situation ?
+    - Peut demander à l'utilisateur de résoudre le conflit manuellement
+    - Ceci peut s'avérer perturbant et/ou rébarbatif pour l'utilisateur
+    - Peut masquer ce phénomène à l'utilisateur en prenant la décision pour lui
+    - Quelle décision prendre dans ce cas de figure dépend de l'application concernée et est +/- arbitraire
+    - Ici, ajoute une couche intermédiaire entre l'application et le /MV-Register/
+    - Ce composant intermédiaire définit une stratégie déterministe pour choisir quelle valeur retourner à l'application si le /MV-Register/ retourne plusieurs /siblings/
+  - Remarques
+    - Ne présente pas leur cas concret, leur type, qu'il a fallu transformer en CRDT
+    - D'un côté, s'ils ont fait un /MV-Register/, c'est pas non plus super important
+    - Mais potentiellement ça ramène au sujet de la composition de CRDTs
+    - La composition permettrait de définir une granularité plus fine des modifications
+    - Permettrait ainsi de définir des stratégies différentes de résolution du cas des /siblings/
 *** Planned
 **** TODO COLLABORATIVE EDITING : Lire *Specification and Complexity of Collaborative Text Editing*
 - Disponible ici : https://dl.acm.org/citation.cfm?id=2933090 (H. Attiya, S. Burckhardt, A. Gotsman, A. Morrison, H. Yang , M. Zawirski)
