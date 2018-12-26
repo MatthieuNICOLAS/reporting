@@ -7451,6 +7451,41 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - La composition permettrait de définir une granularité plus fine des modifications
     - Permettrait ainsi de définir des stratégies différentes de résolution du cas des /siblings/
 *** Planned
+** Semaine du <2018-12-24 Mon> au <2018-12-28 Fri>
+*** Done
+- CRDT : Regarder *CRDTs: From sequential to concurrent executions*
+  - *Principle of permutation equivalence*
+    - Si des opérations, dans le cadre d'une séquence, sont commutatives
+    - Alors on doit obtenir le même résultat, dans le cadre d'un système distribué où elles sont sont concurrentes
+  - *Principle of sequential semantics*
+    - L'exécution concurrente d'opérations doit respecter la même sémantique que leur exécution séquentielle
+    - Permet aussi d'assurer la correction d'une exécution séquentielle distribuée
+  - Cas d'usage : /Registers in Redis CRDB/
+    - Implémente des /MV-Registers/ dans Redis
+    - Peut donc se retrouver avec plusieurs valeurs suite à l'exécution d'opérations concurrentes
+    - Mais les utilisateurs sont déjà habitués à l'API de Redis
+    - Proposer plusieurs valeurs en réponse à une requête qui renvoyait habituellement une valeur peut être déroutant pour l'utilisateur
+    - A donc décidé de trancher pour l'utilisateur
+    - Conserve des informations de causalité ainsi qu'un timestamp pour chaque opération
+    - Lors d'une lecture, utilise le timestamp pour départager les valeurs et n'en retourner qu'une, si plusieurs sont actuellement contenues dans le registre
+    - Quel est l'intérêt d'un /MV-Register/ dans ce cas là par rapport à un /LWW-Register/ ?
+      - Peut-être lié au point qu'il aborde plus tard dans la présentation concernant le fait de retarder le choix de la sémantique du type de données jusqu'à la requête
+  - *Equivalence to a sequential execution?*
+    - Les exécutions concurrentes ne peuvent pas toujours être ramenées à des exécutions séquentielles équivalents
+    - Prend l'exemple du /Add-Wins Sets/
+    - On ne peut donc pas toujours /seulement/ raisonner sur la sémantique séquentielle d'un type de données
+    - Il faut prendre des décisions pour ces scénarios
+  - *Choice of semantics*
+    - Peut retarder le choix de la sémantique du type de données (/Add-Wins, Remove-Wins, .../) jusqu'à la requête
+    - Mais ceci implique un coût pour conserver assez de meta-données pour assurer n'importe quelle sémantique à n'importe quel moment
+  - Indique qu'un /Operation-based CRDT/ nécessite un mécanisme de membership
+    - Je ne vois pas la nécessité
+    - À moins que ça ne soit pour obtenir un /global unique ID/
+    - Par contre nécessaire pour le mécanisme de /garbage collection/
+*** Planned
+**** DONE CRDT : Regarder *CRDTs: From sequential to concurrent executions*
+- Talk présenté par Carlos Baquero à Code Mesh LDN 2018
+- https://www.youtube.com/watch?v=hw4agjz4240
 **** TODO COLLABORATIVE EDITING : Lire *Specification and Complexity of Collaborative Text Editing*
 - Disponible ici : https://dl.acm.org/citation.cfm?id=2933090 (H. Attiya, S. Burckhardt, A. Gotsman, A. Morrison, H. Yang , M. Zawirski)
 - Spécifie le comportement d'une liste répliquée
