@@ -7482,10 +7482,79 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Je ne vois pas la nécessité
     - À moins que ça ne soit pour obtenir un /global unique ID/
     - Par contre nécessaire pour le mécanisme de /garbage collection/
+- DISTRIBUTED SYSTEMS : Regarder *Towards language support for distributed systems*
+  - Explique qu'il y a 3 grandes zones d'intérêt dans le domaine à l'heure actuelle
+  - *Consistency & Programming Models*
+    - Parle de /programming models/ qui offrent des garanties de cohérence
+    - Généralement, assume qu'on possède la /strong consistency/
+    - Mais parfois, de la /weak consistency/ est suffisante
+    - Peut-on permettre aux développeurs de définir le comportement attendu via leurs outils de programmation ?
+    - Présente *Lasp*, le langage de programmation proposant des /CRDTs/ comme types de données
+    - Présente *Spry* (Christopher Meiklejohn)
+      - Cite *On the Design of Distributed  Programming Models* de ce dernier
+	- https://arxiv.org/pdf/1701.07615.pdf
+	- /the morning paper/ lui a consacré un article
+	  - https://blog.acolyer.org/2017/08/17/on-the-design-of-distributed-programming-models/
+      - Autant *Lasp* et les /CRDTs/ se focalisent sur le côté /AP/ du /CAP Theorem/
+      - Autant *Spry* propose de faire évoluer le trade-off au cours de l'exécution
+	#+BEGIN_QUOTE
+	Spry is a programming model for building applications that want to tradeoff availability and consistency at varying points in application code to support application requirements
+	#+END_QUOTE
+      - *Spry* permet de définir des contraintes et des limites sur la /staleness/ et /freshness/ des données via des annotations
+    - Présente *Correctables*
+      - Introduit dans le papier *Incremental Consistency Guarantees for Replicated Objects* (Rachid Guerraoui, Matej Pavlovic, Dragos-Adrian Seredinschi)
+	- https://www.usenix.org/system/files/conference/osdi16/osdi16-guerraoui.pdf
+      - Permet à l'utilisateur de faire varier les contraintes de cohérence au fur et à mesure de l'exécution
+      - Peut vouloir de la /weak consistency/ jusqu'à un point puis passer en /strong consistency/ ensuite par exemple
+      - Fournit à l'utilisateur différentes APIs en fonction des contraintes à assurer
+    - Présente *MixT*
+      - Introduit dans le papier *MixT: A Language for Mixing Consistency in Geodistributed Transactions* (Matthew Milano, Andrew C. Myers)
+	- https://www.cs.cornell.edu/andru/papers/mixt/mixt.pdf
+      - Un langage de programmation permettant d'associer différents modèles de cohérence avec des /remote storages sites/
+      - Permet d'effectuer des transactions sur un ensemble de données, potentiellement présentes sur des /remote storages sites/ différents et donc ayant différent modèles de cohérence
+      - Vérifie à la compilation que ces différents modèles de cohérence sont mixés correctement et avertit l'utilisateur si une erreur peut survenir
+  - *Session Types*
+    - Correspond à des types pour des protocoles de communication
+    - Si le type d'un programme est vérifié, alors cela garantit qu'il suit le protocole de communication souhaité
+    - Permet donc de vérifier statiquement la correction de l'implémentation d'un protocole de communication
+    - Plusieurs variantes existent
+      - *Binary & Multiparty*
+	- Protocoles de communication entre deux noeuds
+	- Puis étendu aux protocoles de communication impliquant plus que 2 noeuds
+      - *Static & Dynamic*
+	- Étend certains langages de programmation avec un système de typage statique pour ajouter ces vérifications
+	- Mais se fait aussi pour d'autres langages
+    - Recommande comme introduction *Session types in programming languages---a collection of implementations.* (Simon Fowler)
+      - http://simonjf.com/2016/05/28/session-type-implementations.html
+    - Présente un formalisme pour décrire un protocole de communication
+    - Un type est ensuite généré et peut être utilisé pour permettre la vérification de la correction de l'implémentation
+  - *Static Analysis & Verification*
+    - Pas abordé dans le cadre de ce talk
+  - Présente *Whip*
+    - Introduit dans *Whip: Higher-Order Contracts for Modern Services* (Lucas Waye, Stephen Chong, Christos Dimoulas)
+      - https://people.seas.harvard.edu/~chong/pubs/icfp17-whip.pdf
+    - Définit des /runtime/ contrats que les services doivent respecter pour assurer leur compatibilité
+    - Contraintes du système
+      - Doit fonctionner dans le cadre d'un déploiement partiel
+      - Ne pas modifier les communications
+      - Être /language agnostic/
+      - Être compatible avec du /loose coupling/ entre services
+      - Être compatible avec des /wire protocols/
+	- Cite *Thrift* en exemple
+  - Présente *Statically ensuring that functions on replicated data are monotone* (Kevin Clancy)
+    - Travail en cours d'un de ses étudiants
+    - Permettrait de vérifier la validité d'un /CRDT/ ?
 *** Planned
 **** DONE CRDT : Regarder *CRDTs: From sequential to concurrent executions*
 - Talk présenté par Carlos Baquero à Code Mesh LDN 2018
 - https://www.youtube.com/watch?v=hw4agjz4240
+**** DONE DISTRIBUTED SYSTEMS : Regarder *Towards language support for distributed systems*
+- Talk présenté par Heather Miller à Code Mesh LDN 2018
+- https://www.youtube.com/watch?v=-SyvnfBeWJk
+**** TODO DISTRIBUTED SYSTEMS : Lire *Incremental Consistency Guarantees for Replicated Objects*
+- Par Rachid Guerraoui, Matej Pavlovic, Dragos-Adrian Seredinschi
+- Introduit la notion de *Correctables*, des objets répliqués dont les garanties de cohérence évoluent au cours de l'exécution
+- https://www.usenix.org/system/files/conference/osdi16/osdi16-guerraoui.pdf
 **** TODO COLLABORATIVE EDITING : Lire *Specification and Complexity of Collaborative Text Editing*
 - Disponible ici : https://dl.acm.org/citation.cfm?id=2933090 (H. Attiya, S. Burckhardt, A. Gotsman, A. Morrison, H. Yang , M. Zawirski)
 - Spécifie le comportement d'une liste répliquée
