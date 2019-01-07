@@ -7551,6 +7551,54 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 **** DONE DISTRIBUTED SYSTEMS : Regarder *Towards language support for distributed systems*
 - Talk présenté par Heather Miller à Code Mesh LDN 2018
 - https://www.youtube.com/watch?v=-SyvnfBeWJk
+** Semaine du <2019-01-07 Mon> au <2019-01-11 Fri>
+*** Done
+- DISTRIBUTED SYSTEMS : Regarder *Designing Distributed Systems with TLA+*
+  - Propose la définition suivante d'un système distribué
+    - Multiple agents
+    - Global properties
+    - Localized information
+    - Partial failure
+  - *State space*
+    - La représentation de l'ensemble des états qu'un système distribué peut atteindre
+  - *Behavior*
+    - Une chaîne d'états forme un *Behavior*
+    - Peut être entre deux états intermédiaires, pas forcément entre l'état initial et un état final
+  - Nombre maximum d'états
+    - Avec /n/ le nombre d'agents et /m/ le nombre d'étapes des agents
+    - On a, au max, /(m*n)(m*n)! / m!^n/ états possibles
+    - À titre d'exemple, si on a 2 agents avec 4 étapes chacun, on se retrouve avec environ 550 états au max
+    - Par contre, on peut avoir des états qui sont factorisables
+  - *Number of states grows fast*
+  - *Number of behavior grows very very fast*
+  - *Safety properties*
+    - Habituellement vérifiée sur chaque état
+  - *Systems may have invalid behaviors and states*
+    - Certains états peuvent violer des /safety properties/
+    - Mais même si tous les états du système vérifient les /safety properties/
+    - On peut avoir des /behaviors/ qui représentent une exécution incorrecte
+  - *Over a long enough time, a system will do everything*
+  - *Invariants*
+    - *State Invariants*
+      - "At least one server is online"
+    - *Action Invariants*
+      - "We do not remove servers if below capacity"
+    - *Behavior Invariants*
+      - "Eventually we have enough server"
+  - Références
+    - Cite plusieurs pistes pour apprendre à spécifier des systèmes et TLA+
+    - *Pratical TLA+* (Hillel Wayne)
+      - Pour débutants
+      - Pas mal d'exemples pratiques
+    - *Specifying Systems* (Leslie Lamport)
+      - Niveau intermédiaire
+      - Couvre aussi des aspects théoriques pour bien assimiler la rigeur de la preuve
+*** Planned
+**** DONE DISTRIBUTED SYSTEMS : Regarder *Designing Distributed Systems with TLA+*
+- Talk présenté par Hillel Wayne à Code Mesh LDN 2018
+- https://www.youtube.com/watch?v=tfnldxWlOhM
+**** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
+- Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
 **** TODO DISTRIBUTED SYSTEMS : Lire *Incremental Consistency Guarantees for Replicated Objects*
 - Par Rachid Guerraoui, Matej Pavlovic, Dragos-Adrian Seredinschi
 - Introduit la notion de *Correctables*, des objets répliqués dont les garanties de cohérence évoluent au cours de l'exécution
