@@ -7593,6 +7593,35 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - *Specifying Systems* (Leslie Lamport)
       - Niveau intermédiaire
       - Couvre aussi des aspects théoriques pour bien assimiler la rigeur de la preuve
+- Réflexion sur les propriétés du mécanisme de renommage que l'on souhaite vérifier
+  - On dispose d'un ensemble ordonné correctement formé d'identifiants /Ids/
+    - Pas de duplication d'un dot
+  - À partir d'un sous-ensemble de /Ids/, /IdsToRename/ (l'état local), on génère une fonction /rename/ et une fonction /reverseRename/
+  - En appliquant /rename/ sur chaque élément de /Ids/, on obtient un second ensemble /RenamedIds/
+  - Pour la fonction /rename/
+  - On cherche à vérifier
+    - *Unicité des identifiants*
+      - Pour tout identifiant /id/ appartenant à /Ids/, /rename(id)/ n'apparaît qu'une fois dans /RenamedIds/
+      - Plus précisément, le dot de /rename(id)/ doit être unique
+    - *Préservation de l'ordre*
+      - Pour tout /id1, id2/ appartenant à /Ids/ tels que /id1 < id2/
+      - On doit avoir /rename(id1) < rename(id2)/
+  - Ceci suffit pour assurer le bon fonctionnement de /rename/
+  - Un système prévenant l'exécution en concurrence de plusieurs renommages peut se contenter de ces propriétés
+  - Pour pouvoir résoudre le cas de renommages en concurrence, d'autres propriétés sont nécessaires
+  - On se place dans le cas où on fixe un ordre total sur les opérations de renommage
+  - Grâce à cet ordre, on résout de manière déterministe le cas d'opérations de renommage concurrentes en donnant à l'une la priorité sur l'autre
+  - Pour la fonction d'inversion de renommage /reverseRename/
+    - Alors pas exactement une fonction d'inversion de renommage puisque on peut utiliser /reverseRename/ sur des identifiants n'étant pas issu de l'application de /rename/ sur un identifiant de /Ids/
+  - On cherche à vérifier
+    - *Inversibilité pour les identifiants appartenant à Ids*
+      - Pour tout identifiant /id/ appartenant à /Ids/, on doit avoir /reverseRename(rename(id)) = id/
+    - *Préservation de l'ordre*
+      - Pour tout /id1, id2/ appartenant à /RenamedIds/ tels que /id1 < id2/
+      - On doit avoir /reverseRename(id1) < reverseRename(id2)/
+  - Le fait de toujours se déplacer vers l'epoch la plus à gauche (ou la plus à droite) de l'arbre des epochs permet de se passer de la propriété
+    - *reverseRename réciproque de rename*
+      - Permettrait d'avoir /rename(reverseRename(id) = id/
 - DISTRIBUTED SYSTEMS : Regarder *AntidoteDB: a planet scale, highly available, transactional database*
   - Présente un bug intéressant de Discord lié à Cassandra
     - Certains messages avaient pour auteur *NULL*
