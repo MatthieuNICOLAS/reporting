@@ -7593,10 +7593,98 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - *Specifying Systems* (Leslie Lamport)
       - Niveau intermédiaire
       - Couvre aussi des aspects théoriques pour bien assimiler la rigeur de la preuve
+- DISTRIBUTED SYSTEMS : Regarder *AntidoteDB: a planet scale, highly available, transactional database*
+  - Présente un bug intéressant de Discord lié à Cassandra
+    - Certains messages avaient pour auteur *NULL*
+    - Ce bug se produisait lorsqu'un utilisateur éditait un message alors qu'en concurrence un autre supprimait le même message
+    - Dans Cassandra
+      - L'update d'une entrée consiste à appliquer une logique de LWW pour chaque colonne de l'entrée
+      - La suppression d'une entrée conserve une tombstone, se contente donc de passer chaque colonne de l'entrée à *NULL*
+    - Ainsi, la suppression passait tous les champs du message à *NULL*
+    - Puis l'update réassignait une valeur aux champs concernés (contenu notamment) mais pas à tous
+  - Présente l'évolution des base de données distribuées
+    - Au début, AP-Oriented
+      - Cite Cassandra, Riak et DynamoDB en exemples
+      - Habituellement proposent de manipuler une map clé-valeur
+      - Ne supportent généralement pas les transactions
+      - Possèdent des sémantiques "flexibles"
+      - Besoin de se plonger dans les méandres de la base de données pour comprendre son comportement
+    - Puis a évolué vers CP-Oriented
+      - Cite Spanner, Cosmos DB
+      - Supportent les transactions et SQL
+      - Assure /strong consistency/ et un ordre total des opérations
+      - Mais au prix d'une plus grande latence
+  - Indique qu'il y a un juste milieu entre ces 2 orientations
+  - Présente AntidoteDB
+    - Base de données distribuée offrant un compromis entre AP-Oriented et CP-Oriented
+    - Propose un modèle de cohérence /Transactional Causal+ Consistency/
+    - Utilise des transactions pour grouper les mises à jour ensemble
+    - Utilise des Operation-Based CRDTs comme types
+    - Propose différents types de données
+      - Counter
+      - Set (Grow-Only, 2-Phase, Add-Wins, Remove-Wins)
+      - Sequence
+      - Map, JSON
+      - Register (LWW, MV)
+      - Flags
+      - Graph (directed, monotone DAG)
+    - Semble inclure de la composition de /CRDTs/ avec le type *JSON*
+  - Propose un outil pour vérifier les /safety properties/ de /CRDTs/ : *Repliss*
+    - Ont publié 2 papiers utilisant/sur cet outil
+      - *Formal Specification and Verification of CRDTs* (P. Zeller, A. Bieniusa, A. Poetzsch-Heffter)
+	- Publié à FORTE 2014
+      - *Verifying properties of weakly consisten programs with Repliss* (P. Zeller, A. Bieniusa, A. Poetzsch-Heffter)
+	- En cours de soumission
+    - Permet de la vérification automatique et manuelle avec *Why3*
+  - Propose *Just-Right Consistency*
+    - Indique que toutes les opérations de notre système n'ont pas les mêmes contraintes de cohérence
+    - Que choisir un seul modèle de cohérence serait préjudiciable
+      - Soit autoriserait des anomalies
+      - Soit serait trop strict et coûteux
+    - Propose d'utiliser un modèle de cohérence différent en fonction des invariants de chaque opération
+  - Illustre ce principe avec quelques exemples
+    - *Causal Order*
+      - Peut facilement garantir une /causal delivery/ avec un système AP
+    - *Joint updates*
+      - Peut facilement grouper des mises à jour en transaction atomique dans un système AP
+    - *Limited resources*
+      - Doit par contre instaurer une synchronisation entre noeuds pour éviter d'utiliser plusieurs la même ressource en concurrence dans un système où les ressources sont limitées
+	- Exemple des tickets
+      - La synchronisation peut par exemple être nécessaire qu'à partir d'un certain palier de ressources restantes
+  - Présente un mécanisme d'*Access Control for Highly Available Datastore*
+    - Définit le comportement que doit proposer ce mécanisme
+      - Restrict operations of a system based on a set of rules
+      - Rules should be dynamically adaptable (e.g. new employees, new roles)
+      - System component Access Monitor enforces rules
+      - Operations not adhering to the rules must not be executed
+    - Définit la sémantique souhaité d'un système de contrôle d'accès
+      - Revoking the right of subject /s/ to execute operation /op/ on /o/ means that /op/ may not be executed by /s/ on /o/ until the right is granted again
+    - Cite leur publication sur le sujet
+      - *Access Control for Weakly Consistent Replicated Information Systems* (M. Weber, A. Bieniusa, A. Poetzsch-Heffter)
+      - Publié dans STM 2016
+    - Couple les /access control policies/ avec les données
+      - Stockées dans le même store
+      - Partage la même couche de livraison
+      - Dépendances causales entre les modifications des /access control polices/ et de la structure de données
+  - Présente finalement l'écosystème d'Antidote
+    - Propose un /CRDT Visualizer/
+      - À voir à quoi ça ressemble, comment ça s'utilise et si on peut l'étendre?
+    - Propose des outils de vérifications
+      - *Repliss*
+      - *CISE / CEC*
+    - Propose un benchmarker
+      - À voir qu'est-ce qu'il benchmark et comment ça fonctionne
+  - Notes
+    - Étudier le type *JSON* proposé
+    - Quelle différence entre *Flag* et *Register* ?
+    - Étudier *Repliss*
 *** Planned
 **** DONE DISTRIBUTED SYSTEMS : Regarder *Designing Distributed Systems with TLA+*
 - Talk présenté par Hillel Wayne à Code Mesh LDN 2018
 - https://www.youtube.com/watch?v=tfnldxWlOhM
+**** DONE DISTRIBUTED SYSTEMS : Regarder *AntidoteDB: a planet scale, highly available, transactional database*
+- Talk présenté par Annette Bieniusa à Code BEAM Lite Munich 2018
+- https://www.youtube.com/watch?v=ol1D9X2_nJc
 **** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
 - Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
 **** TODO DISTRIBUTED SYSTEMS : Lire *Incremental Consistency Guarantees for Replicated Objects*
