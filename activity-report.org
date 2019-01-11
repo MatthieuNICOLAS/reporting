@@ -7707,6 +7707,54 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Étudier le type *JSON* proposé
     - Quelle différence entre *Flag* et *Register* ?
     - Étudier *Repliss*
+- Réunion suivi thèse
+  - Retours de /Middleware/
+    - "Tu rajoutes des metadonnées pour réduire l'overhead, est-ce qu'on s'y retrouve ?"
+      - On peut garbage collecter ces métadonnées additionnelles du renommage ou ne serait-ce que les sortir de la mémoire
+    - "L'overhead augmente, mais il n'y a pas de changement d'ordre de grandeur"
+      - À voir l'effet sur une plus longue session de collaboration
+      - Mais l'augmentation de la taille des métadonnées influent aussi sur la taille des messages du réseau
+      - On peut aussi pruner du log toutes les opérations dont dépend causalement la dernière opération de renommage stable pour réduire le coût de synchroniser un nouveau pair
+    - "Coûteux de transformer les opérations d'une epoch à l'autre"
+      - Parallèlisable et pipelinable, si ça peut servir à qqch
+    - "Besoin de stabilité pour garbage collecter les nouvelles méta-données"
+      - Pas énormément plus couteux que ce que l'on peut avoir actuellement
+      - Mais requiert un mécanisme de membership
+      - À moins de juste stocker sur le disque quand tous ceux que je connais ont observé le renommage
+    - "Y a eu une preuve qu'une liste répliquée nécessite un overhead en meta-donnée minimal et que RGA est proche de celle-ci"
+      - Cette preuve semble porté que sur certaines spéficifications de listes répliquées
+      - À voir si le fait d'aggréger les éléments en bloc nous fait sortir de ces spécifications
+  - Discussion
+    - Preuve du mécanisme
+      - Prouver la correction du mécanisme, c'est bien
+      - Mais potentiellement la partie "preuve" du papier va consister en 1 paragraphe
+      - Il faut donc limiter le périmètre de ce que l'on veut prouver pour ne pas perdre trop de temps dessus
+    - Garbage collection
+      - Pour garbage collecter définitivement les métadonnées d'une epoch, il faut qu'une opération de renommage suivante soit stable
+      - Pour déterminer la stabilité d'une opération, un mécanisme de membership est nécessaire
+      - Un tel mécanisme est cependant couteux
+      - On a donc un choix à faire entre conserver indéfinitivement les données ou mettre en place un mécanisme pour permettre cette garbage collection
+      - Peut proposer différents trade-offs à partir de différentes hypothèses ou contraintes
+	- Peut stocker sur le disque les métadonnées à partir du moment que les membres que je connais ont observé le renommage
+	- Peut supprimer les métadonnées à partir d'un moment sur les noeuds participant à la collaboration mais introduire un noeud spécial qui lui les conserve
+    - Perspectives du mécanisme de renommage
+      - À priori, tenter de généraliser l'approche à d'autres CRDTs serait limité
+	- Peu de CRDTs ont les mêmes contraintes sur leurs métadonnées et donc n'ont pas un overhead qui croît de la même manière
+	- Un tel mécanisme permettrait toutefois de définir des états comme "checkpoints" et permettrait de réinitialiser les métadonnées
+	- Mais seul le framework de l'approche est généralisable IMO
+      - Il existe plusieurs pistes d'améliorations du mécanisme
+	- Fonctions de renommage plus performantes
+	- Façon de déterminer le renommage gagnant ou de résoudre les renommages concurrents
+      - C'est des pistes intéressantes mais qui reviennent à perséverer sur une contribution qui est déjà de niche
+      - Dans le cadre de la thèse, ce n'est pas le plus conseillé
+  - Plan
+    - Rédiger le papier sur la contribution du mécanisme de renommage
+      - Choisir la conf visée
+	- Permettra de fixer une deadline
+	- Mais aussi de fixer le nombre de pages et le public auquel on s'adresse
+      - Permettra de mettre en lumière les différentes pièces manquantes actuellement
+    - Travailler sur la preuve des /safety properties/ des fonctions de renommage
+    - Travailler sur l'évaluation du mécanisme
 - DISTRIBUTED SYSTEMS : Regarder *7 Reasons why your microservices should use Event Sourcing & CQRS*
   - Le but est de construire un système basé sur des microservices
     - Independently deployable
