@@ -7707,6 +7707,79 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Étudier le type *JSON* proposé
     - Quelle différence entre *Flag* et *Register* ?
     - Étudier *Repliss*
+- DISTRIBUTED SYSTEMS : Regarder *7 Reasons why your microservices should use Event Sourcing & CQRS*
+  - Le but est de construire un système basé sur des microservices
+    - Independently deployable
+    - Owns its schema
+    - API only access to data
+  - *What is Event Sourcing & CQRS*
+    - Command Query Responsibility Segregation (CQRS)
+    - Propose de décomposer son système en 2 parties
+      - Command, qui correspond aux écritures
+      - Query, qui correspond aux lectures
+    - Une Command génère une sortie, généralement un Event, qui va ensuite être utilisé en tant qu'entrée pour alimenter le modèle ou les modèles de données utilisés pour les Query
+    - Chacune des parties va être responsable de son bon fonctionnement efficace
+    - Comme les Commands et Query sont découplées, cela permet à chacun d'adopter un modèle de donnée spécifique à ses besoins
+      - Potentiellement, on peut utiliser plusieurs services pour les Queries
+	- Chacun ayant son propre modèle de données
+	- Afin de gérer des requêtes différentes de la manière la plus optimisée possible
+      - Mais avec tous les services générant et mettant à jour leur base de données à partir des évènements générés par la partie Command
+  - *Smooth transition from DDD & Event Storming to implementation*
+    - Domain Driven Design (DDD)
+      - Le but est de décomposer une application large et complexe en différents services ayant chacun leur domaine d'expertise et responsabilité
+    - Event Storming
+      - Le but est de répertorier les différents évènements pouvant se produire dans le système
+      - Puis de les regrouper par domaine
+    - Coupler ces deux procédés permet d'obtenir
+      - Les différentes Commands de notre système et les Events correspondants
+      - Les Microservices concernés
+    - Indique qu'il est assez naturel de transitionner de cette spécification vers une implémentation si on architecture notre application sur de l'Event Sourcing et CQRS
+  - *Reduce service coupling*
+    - Traditionnellement, les services communiquent entre via le biais de requêtes HTTP
+      - Que ça soit pour les Queries
+      - Ou pour les Commands
+    - Si le service appelé plante durant la requête, le service appelant se retrouve bloqué
+    - La difficulté consiste à recouvrir de ce type crash
+      - Dans le cadre d'une Query, il suffit juste de la refaire
+      - Mais dans le cadre d'une Command, il y a plusieurs scénarios possibles
+	- La Command peut avoir été perdue à cause du réseau à l'aller
+	- Ou le service exécutant la Command peut avoir planté avant de l'exécuter
+	- Ou après l'avoir exécuté mais avant d'avoir répondu
+	- Ou la réponse peut avoir été perdue à cause du réseau
+	- Ou le service appelant peut avoir planté avant de délivrer la réponse
+      - Il faut déterminer le cas concerné et être capable de réparer l'état du système
+    - L'Event Sourcing permet de transitionner d'un modèle basé sur des pushs synchrones à un modèle basé sur des pulls asynchrones
+    - Dans le cadre de Queries, les services peuvent répondre à partir des évènements des autres services dont ils ont connaissance
+    - Dans le cadre de Commands
+      - J'ai un doute sur comment ça se passe
+      - Le service "appelant" génère un évènement
+      - Le service "appelé" consomme l'évènement et génère un autre évènement en réponse
+      - Le service "appelant" consomme la réponse
+  - *Break the read versus write performance bottleneck*
+    - Habituellement, on designe notre modèle de données de manière à mettre en place un compromis entre les performances des lectures et celles des écritures
+    - Comme on découple la partie Commands, qui génère les écritures, de la partie Queries, qui génère les lectures
+    - On peut optimiser le modèle de données de chaque composant pour sa responsabilité
+  - *Elevate the concurrency barrier*
+    - Comme on a découplé les écritures des lectures
+    - Bien plus simple de juste scaler les lecteurs pour supporter le nombre de Queries
+  - *Simplify and harden messaging*
+    - Raisonner sur les évènements permet de raisonner à nouveau sur les garanties que l'on doit offrir sur la diffusion de chacun d'entre eux
+    - at-most-once : /maybe-once/
+    - at-least-once : /once-or-more/
+    - exactly-once : /essentially-once/
+    - Propose différentes solutions pour implémenter ces garanties de delivery en fonction du modèle utilisé (push ou pull)
+  - *Eliminate service coupling*
+    - Chaque service peut, au fur et à mesure qu'il observe les évènements des autres, se créer une vue locale de l'état du système
+    - Cette vue lui permet de fonctionner de manière indépendante, sans avoir à dépendre de la disponibilité d'autres services
+    - Les interactions entre services sont seulement nécessaires pour faire évoluer l'état en fonction des évènements du reste du système
+  - *Graduate from the IT Nursery*
+    - Exploser le système en microservices découplés permet à chacun d'entre eux d'évoluer de façon indépendante
+    - Ceci permet de réduire le nombre des personnes concernées dans la prise de décision pour un microservice
+    - Et donc limite la coordination requise
+    - Ce qui permet d'évoluer plus rapidement et fréquemment
+  - Remarque
+    - Construire un système en se basant sur un mécanisme de pull asynchrone implique d'autoriser les composants à diverger temporairement
+    - Ceci n'est pas compatible avec toutes les applications, Commands ou Queries
 *** Planned
 **** DONE DISTRIBUTED SYSTEMS : Regarder *Designing Distributed Systems with TLA+*
 - Talk présenté par Hillel Wayne à Code Mesh LDN 2018
@@ -7714,6 +7787,12 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 **** DONE DISTRIBUTED SYSTEMS : Regarder *AntidoteDB: a planet scale, highly available, transactional database*
 - Talk présenté par Annette Bieniusa à Code BEAM Lite Munich 2018
 - https://www.youtube.com/watch?v=ol1D9X2_nJc
+**** DONE DISTRIBUTED SYSTEMS : Regarder *7 Reasons why your microservices should use Event Sourcing & CQRS*
+- Lien : https://www.reactivesummit.org/2018/schedule/7-reasons-why-your-microservices-should-use-event-sourcing--cqrs
+**** DONE DISTRIBUTED SYSTEMS : Surveiller l'apparition des vidéos des talks de *Code Mesh 2018*
+- Plusieurs talks ont l'air intéressant
+- Lien YT : https://www.youtube.com/channel/UC47eUBNO8KBH_V8AfowOWOw
+- Lien Twitter : https://twitter.com/CodeBEAMio
 **** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
 - Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
 **** TODO DISTRIBUTED SYSTEMS : Lire *Incremental Consistency Guarantees for Replicated Objects*
@@ -7729,12 +7808,6 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - À partir de là, voir si je me place dans le même contexte
 **** TODO DISTRIBUTED SYSTEMS : Regarder *Distributed Transactions are dead, long live distributed transactions!*
 - Lien : https://www.reactivesummit.org/2018/schedule/distributed-transactions-are-dead-long-live-distributed-transactions
-**** TODO DISTRIBUTED SYSTEMS : Regarder *7 Reasons why your microservices should use Event Sourcing & CQRS*
-- Lien : https://www.reactivesummit.org/2018/schedule/7-reasons-why-your-microservices-should-use-event-sourcing--cqrs
-**** TODO DISTRIBUTED SYSTEMS : Surveiller l'apparition des vidéos des talks de *Code Mesh 2018*
-- Plusieurs talks ont l'air intéressant
-- Lien YT : https://www.youtube.com/channel/UC47eUBNO8KBH_V8AfowOWOw
-- Lien Twitter : https://twitter.com/CodeBEAMio
 **** IN-PROGRESS PhD : Compléter et envoyer l'autorisation de cumul à l'IUT
 **** TODO PhD : Faire valider les formations scientifiques suivies
 **** TODO MUTE : Exploser le test "renameId() retains order between ids"
