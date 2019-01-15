@@ -7841,6 +7841,126 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Plusieurs talks ont l'air intéressant
 - Lien YT : https://www.youtube.com/channel/UC47eUBNO8KBH_V8AfowOWOw
 - Lien Twitter : https://twitter.com/CodeBEAMio
+** Semaine du <2019-01-14 Mon> au <2019-01-18 Fri>
+*** Done
+- CRDT : Lire *Extending Eventually Consistent Cloud Databases for Enforcing Numeric Invariants*
+  - Répartit la différence la valeur actuelle du compteur et la limite entre les différents noeuds
+  - Ne se base pas sur un système centralisé et des communications synchrones
+  - Mais uniquement sur des infos locales et des communications asynchrones
+  - Évite les cas où le système centralisé est indisponible et empêche le système de progresser
+    - Il est précisé dans le /system model/ que les processus peuvent crash de manière définitive
+    - Quid du cas où un noeud avec des autorisations restantes rencontre une panne définitive ?
+    - Peut-on récupérer ses autorisations ?
+    - Peut-on gérer des opérations concurrentes du noeud (car finalement il a réussi à recover) du mécanisme de redistribution de ses autorisations ?
+  - L'API permet de spécifier si l'on souhaite exécuter une opération seulement en local ou en global
+    - Dans les 2 cas, essaie déjà d'exécuter l'op en local
+    - Si le noeud n'a pas l'autorisation d'exécuter l'opération demandée
+      - Si l'op était strictement locale, elle échoue et indique de ré-essayer en global
+      - En mode global, tente de contacter d'autres noeuds pour exécuter l'opération de façon safe
+    - Indique qu'en mode global, renvoie une erreur si le compteur s'avère avoir atteint sa limite
+      - Que se passe-t-il si je suis isolé du reste du groupe ?
+	- Dans le cas d'une partition réseau par exemple
+      - Renvoie /retry/ dans ce cas ?
+  - Doit préserver l'invariant à tout moment, que ce soit localement et globalement
+    - Nécessité de respecter la condition suivante
+    - /lower bound <= initial value + Σ inc - Σ dec <= upper bound/
+  - Considère la diff entre la valeur du compteur et son invariant comme un nombre de droits d'exécution d'opérations
+    - Si un compteur démarre à /n = 40/ et possède comme invariant /n >= 10/
+    - Cela résulte en 30 droits de décrémenter /n/ (40 - 10)
+    - Incrémenter /n/, dans cet exemple, crée des droits supplémentaires
+    - Ces droits peuvent être répartis entre replicas
+    - Si un replica possède assez de droits, il peut exécuter une op sans coordination sans crainte de violer l'invariant globalement
+    - Si pas assez de droits, l'opération échoue ou nécessite une synchronisation avec un autre replica pour obtenir des droits supplémentaires
+  - État se décompose en 3 parties
+    - /K/, la valeur initiale du compteur
+    - /R/, une matrice /n * n/ où /n/ est le nb de replicas
+      - /R[i][i]/ correspond au nombre de droits générés par le replica /i/
+	- Ici, cela correspond au nombre d'/inc/ effectués
+      - /R[i][j]/ correspond au nombre de droits transférés par le replica /i/ au replica /j/
+    - /U/, un vecteur de dimension /n/
+      - /U[i]/ correspond au nombre de droits consommés par le replica /i/
+	- Ici, cela correspond au nombre de /dec/ executés par /i/
+  - Les opérations sur le compteur sont définies en utilisant ces 3 composants
+    [[file:img/bounded-counter-pseudo-code.png]]
+  - Peut modifier la sémantique du *Bounded Counter* en inversant le sens de /increment/ et de /decrement/
+    - Possible alors de définir un compteur tel que /v ≤ K/
+    - Pour ça, modifie la sémantique pour que ça soit les droits d'utiliser /increment/ qui soient limités et représentés dans /R/
+  - Peut alors combiner les 2 logiques pour créer un *Bounded Counter* avec une borne minimale et maximale
+    - Il faut alors modifier les 2 /R/ et 2 /U/ de manière synchronisée (par le biais de transaction)
+  - Propose 2 implémentations en se basant sur *Riak* comme /data store/
+    - Client-Based Middleware
+    - Server-Based Middleware
+  - Client-Based Middleware
+    - Chaque /Data Center (DC)/ est un replica
+    - L'état du *Bounded Counter* est stocké en tant que boîte noire dans *Riak*
+    - La MàJ se décompose en 3 étapes
+      - Lit la valeur actuelle du compteur
+      - Exécute l'opération
+      - Soumet la nouvelle valeur au /DC/
+    - Marqué comme /strongly consistent/
+      - Pas de concurrence autorisée sur un *Bounded Counter* dans un /DC/
+      - Si des opérations concurrentes sont générées, seule la 1ère est acceptée
+      - Les autres écritures sont rejetées
+    - Seul cas où des opérations concurrentes peuvent apparaître est lorsqu'on synchronise des /DCs/
+      - Les versions concurrentes du compteur seront alors fusionnées à la prochaine MàJ par un client
+    - Souffre de la disponibilité de la ressource critique, la BDD
+      - Augmenter le nombre de clients n'augmente pas le /throughput/, juste le nombre d'écritures rejetées
+  - Server-Based Middleware
+    - Corrige ce problème en déplaçant la logique du *Bounded Counter* sur un serveur qui
+      - Est chargé d'exécuter toutes les opérations pour un compteur dans un /DC/
+	- Il y a donc sérialisation des opérations
+      - Puis de sauvegarder la nouvelle version du *Bounded Counter* dans *Riak*
+    - Les clients sont redirigés vers le serveur gérant le *Bounded Counter* concerné à l'aide d'une /DHT/
+    - Implémente des optimisations tels que un mécanisme de cache de l'état du compteur et de batch des opérations pour accroître les performances
+  - Transferts de droits
+    - Met en place un mécanisme pour transférer des droits d'un noeud à l'autre
+    - Peut être utilisé en tâche de fond pour rebalancer les droits disponibles sur l'ensemble des noeuds
+    - Ou ponctuellement pour permettre d'effectuer une opération
+    - Principe
+      - Le replica /i/ arrive sous un certain seuil d'autorisations restantes
+      - Il utilise sa vue locale pour déterminer quel autre replica /j/ possède le plus d'autorisations
+      - Il envoie une requête à ce dernier afin de demander que celui-ci lui transfère une quantité de droits
+      - À la réception d'un tel message, le noeud /j/ vérifie s'il peut satisfaire la requête
+      - Si oui, il effectue une opération locale pour mettre à jour le nombre de droits qu'il a transféré à /i/
+	- Correspond à incrémenter /R[j][i]/
+      - En fonction du mode de requête choisi par /i/, /sync/ ou /async/, /j/ répond directement à /i/ ou laisse le processus de synchronisation s'en charger
+    - Il s'agit donc d'un mécanisme asynchrone par son design
+  - Remarques
+    - L'implémentation Client-Based Middleware me semble apporter que peu de valeur
+    - Une approche entièrement distribuée aurait été plus pertinent IMHO
+    - L'évaluation me semble injuste sur certains points
+      - L'implémentation Server-Based Middleware profite d'optimisations supplémentaires que sont le mécanisme de caching et de batching d'opérations
+    - Récupération des droits d'un noeud ayant subit une panne définitive
+      - D'après le /system model/, les noeuds peuvent subir une panne définitive
+      - L'article indique qu'il est possible de récupérer les droits de ce type de noeuds
+      - Mais aucune proposition n'étaye ces propos
+      - Ne serait-ce, s'agit-il d'un processus manuel ou automatique ?
+  - Adaptation de l'approche à d'autres CRDTs
+    - Y aurait-il d'autres CRDTs qui bénéficieraient de cette possibilité que les noeuds possèdent et puissent se transmettre le droit d'effectuer certaines opérations ?
+    - Il ne faudrait pas que cela soit pour des fonctionnalités critiques, puisque dans ce cas il faudrait supporter la récupération des droits d'un noeud crashé définitivement
+    - Un mécanisme d'attribution d'identifiants pour les différents noeuds dans un système distribué reposant sur un mécanisme d'invitation
+      - Le noeud initial possèderait l'ensemble des identifiants possibles
+      - À l'invitation d'un nouveau noeud, il attribuerait un identifiant au nouveau noeud et lui confierait la moitié de l'ensemble des identifiants restants
+      - Avec ce design, un noeud peut se retrouver dans l'incapacité d'inviter un nouveau noeud, faute d'identifiants
+      - Un tel mécanisme permettrait de récupérer d'autres identifiants à allouer d'un autre noeud
+      - Dans ce cas, nécessiterait un mécanisme pour gérer les pannes définitives
+    - Dans tous les CRDTs utilisant des dots, pourrait être utilisé pour effectuer une opération en le nom d'un autre noeud
+      - Quelle utilité ?
+      - Dans /LogootSplit/, permettrait d'append/prepend à un bloc plutôt que d'en créer un nouveau
+  - Mais là où leur solution est élégante, c'est que la représentation des droits est la base même du CRDT
+    - On n'a pas d'un côté le compteur, de l'autre les droits d'effectuer les opérations
+    - Mais on a une structure unique permettant de représenter les deux à la fois, selon comment on la lit
+  - Essayer d'incorporer ce mécanisme à un autre CRDT ressemblerait plus à du hack qu'autre chose
+  - Il faudrait plutôt reconcevoir les CRDTs concernés avec ce mécanisme en tête
+*** Planned
+**** DONE CRDT : Lire *Extending Eventually Consistent Cloud Databases for Enforcing Numeric Invariants*
+- Disponible ici : https://arxiv.org/abs/1503.09052
+- Par Valter Balegas, Diogo Serra, Sérgio Duarte, Carla Ferreira, Rodrigo Rodrigues, Nuno Preguiça, Marc Shapiro, Mahsa Najafzadeh
+- Publié dans /2015 IEEE 34th Symposium on Reliable Distributed Systems (SRDS)/
+- Propose de limiter les opérations que peut effectuer un noeud sans coordination afin de respecter des invariants globaux
+- Certains opérations peuvent alors échouer si le noeud a déjà atteint la limite qui lui est imposée
+- Un mécanisme permet à un noeud de confier une partie de ses droits à un autre
+- Une synchronisation entre les 2 noeuds est alors requise
 **** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
 - Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
 **** TODO DISTRIBUTED SYSTEMS : Lire *Incremental Consistency Guarantees for Replicated Objects*
