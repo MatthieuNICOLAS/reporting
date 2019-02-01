@@ -7952,6 +7952,46 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Mais on a une structure unique permettant de représenter les deux à la fois, selon comment on la lit
   - Essayer d'incorporer ce mécanisme à un autre CRDT ressemblerait plus à du hack qu'autre chose
   - Il faudrait plutôt reconcevoir les CRDTs concernés avec ce mécanisme en tête
+- Netflux : Implémenter un scénario où 2 bots se connectent, sans aucun browser dans la collaboration
+  - Correspond au scénario qu'on souhaite mettre en place dans le cadre des simulations
+    - Ça nous paraît effectivement plus simple de mettre de côté toute la partie interaction avec le navigateur
+    - Permet de se concentrer sur la manipulation de la structure de données
+  - Aucun test de *Netflux* cependant implémente un tel scénario
+  - Certains tests par contre font se connecter un bot puis un client à une session de collaboration
+  - Ré-utilise ce code pour écrire un test où un bot se connecte puis un second
+- Répétition défense de thèse de Guillaume
+  - Général
+    - Police du texte de la barre du bas trop petite ?
+  - Slide 3
+    - Mettre en couleur les zones de sous-capacité et sur-capacité ?
+  - Slide 8
+    - Ajouter une image pour illustrer qu'on peut regrouper les différents tenants sur une seule machine ?
+  - Slide 8 à 10
+    - Redondant ?
+  - Slide 13
+    - Chargée
+    - Faire apparaître les problèmes dans une autre couleur ?
+  - Slide 16
+    - Mettre "Hypothesis" au pluriel ?
+  - Slide 24
+    - Faire apparaître les chiffres importants d'une manière ?
+  - Slide 36
+    - Ajouter du texte pour les équations comme un titre ?
+    - Ce que tu fais slide 41
+  - Slide 37
+    - Tu donnes les conclusions de l'analyse des résultats à l'oral
+    - Les highlighter avec du texte ne serait-il pas utile ?
+  - Questions
+    - Slide 26
+      - Tu parlais de migration à chaud
+      - Finalement tu stoppes sur la machine initiale
+      - Transfert les données
+      - Et redémarre le tenant sur la machine destination
+      - Quelle différence avec de la migration à froid ?
+    - Slide 46
+      - Donc finalement, on migre plus des tenants mais des machines finalement ?
+      - Tu parles du coût
+      - Quid de la qualité de service ?
 *** Planned
 **** DONE CRDT : Lire *Extending Eventually Consistent Cloud Databases for Enforcing Numeric Invariants*
 - Disponible ici : https://arxiv.org/abs/1503.09052
@@ -7961,36 +8001,206 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Certains opérations peuvent alors échouer si le noeud a déjà atteint la limite qui lui est imposée
 - Un mécanisme permet à un noeud de confier une partie de ses droits à un autre
 - Une synchronisation entre les 2 noeuds est alors requise
-**** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
+** Semaine du <2019-01-21 Mon> au <2019-01-25 Fri>
+*** Done
+- Meeting
+  - Read *Extending Eventually Consistent Cloud Databases for Enforcing Numeric Invariants*
+    - https://arxiv.org/abs/1503.09052
+    - Propose a Counter CRDT which ensures to preserve some global numeric invariants
+      - Like always positive or always less than 42
+    - According to the invariant, it limits the number of times a replica can perform an update
+      - For example, for an always positive counter, i can not decrement more than i increased
+    - The state allows to keep track of the value of the counter but also of the number of rights of each replica
+      - Very smart
+    - Add a mechanism to ask another replica to transfer some of its rights to us
+    - Issues
+      - The state is a matrix of dimension /n x n/, with /n/ being the number of replicas
+	- Should not scale so well with the number of replicas
+      - Claim that they can retrieve rights from replicas which failed definitively
+	- But do not describe the way to do it
+      - Very specific, would be kind of hacky to add it to other data structures
+    - Try to see if we could somehow adapt such ideas to other distributed data structures
+      - Like FileSystem, without success
+  - Struggling with JS for the integration of the renaming mechanism in /mute-core/
+*** Planned
+** Semaine du <2019-01-28 Mon> au <2019-02-01 Fri>
+- AMQP/JMS message brokers
+  - *Advanced Message Queuing Protocol (AMQP)*
+  - *Java Message Service (JMS)*
+  - Aussi appelés /message queues/
+  - Permet de connecter des producteurs et des consommateurs
+  - Centralise les données dans le /message broker/
+  - Permet au système de tolérer du churn des côté des clients (producteurs et consommateurs)
+  - Mais déplace le problème de tolérance aux pannes au niveau du /message broker/
+  - Notamment, certains /message brokers/ ne conserve les messages à transmettre qu'en RAM
+    - Une interruption suite à une panne entraînera donc la perte des messages courants
+    - Le système doit pouvoir supporter ce scénario
+  - Introduit de l'asynchronicité au sein du système
+    - Le producteur se contente de délivrer le message au /message broker/ et d'obtenir son ACK
+    - Mais rien ne borne le temps requis pour qu'un consommateur traite ce message
+      - Généralement court (<1s)
+      - Mais en cas de surcharge ou de panne, peut prendre bien plus longtemps
+  - Ne conserve pas les messages
+    - Généralement, dès qu'un message a été traité par un consommateur, il est supprimé de la /message queue/
+    - Les /message queues/ supposent donc qu'elles ont généralement un nombre "limité" de messages
+    - Si, pour une raison donnée, cette hypothèse n'est plus vérifiée
+      - Plus de consommateurs de disponibles par exemple
+    - Les performances des /message queues/ se dégradent
+      - Besoin de stocker les messages sur le disque
+      - Ceci impacte les performances globales du /message broker/
+  - Offre des moyens pour ne suivre qu'un sous-ensemble des messages
+    - Permet aux consommateurs de ne traiter qu'uniquement les messages qui les intéressent
+  - Notifie les consommateurs concernés lorsqu'un nouveau message est disponible
+  - Permet la mise en place de différents patterns de messaging
+    - *Load balancing*
+      - Plusieurs consommateurs peuvent s'abonner à un même ensemble de messages et effectuer le même traitement
+      - Lorsqu'un message arrive, seul un d'entre eux va s'occuper de le traiter
+	- Le consommateur peut être désigné à l'aide d'un système de /round robin/
+	- Ou tout simplement un des consommateurs /idle/ à ce moment peut s'en charger
+      - Permet d'améliorer les performances lorsque le traitement d'un message est lourd
+      - Requirements
+	- Le traitement des messages doit être commutatif
+	  - Des messages vont être traités en parallèle en fonction du nombre de consommateur
+	  - Mais aussi, des messages peuvent être réordonnés
+	    - Si un noeud crash alors qu'il était en train de traiter un message
+	    - Ce dernier sera retransmis à un autre consommateur par la suite
+	    - Cet autre consommateur aura potentiellement traité entre-temps des messages dépendant causalement de ce message
+	  #+BEGIN_CAPTION
+	  [[file:img/ddia-message-queue-reordering.png]]
+	  #+END_CAPTION
+    - *Fan-out*
+      - Plusieurs consommateurs peuvent s'abonner à un même ensemble de messages mais effectuer des traitements différents
+      - Lorsqu'un message arrive, tous les consommateurs vont le traiter
+      - Mais ils vont générer chacun leur sortie
+      - Permet d'effectuer plusieurs tâches de manière totalement découplée
+    #+BEGIN_CAPTION
+    [[file:img/ddia-message-queue-messaging-patterns.png]]
+    #+END_CAPTION
+    - Ces deux patterns peuvent être combinés pour profiter des avantages de chacun
+  - Permet de configurer la nécessité d'un ACK
+    - Si le système ne peut tolérer la perte d'un message, un mécanisme de ACK est nécessaire
+      - Un message pourrait délivrer à un consommateur
+      - Mais ce dernier pourrait crash avant même de ne l'avoir traité
+    - Afin d'éviter ce scénario, peut exiger des consommateurs qu'ils ACKent explicitement le traitement d'un message
+    - Si le /message broker/ ne reçoit pas de ACK d'un consommateur pour un message, il peut le redélivrer à un autre au bout d'un certain temps
+    - Mais ceci mène à un scénario où l'on peut traiter plusieurs fois le même message
+      - Un consommateur en charge d'un message peut le traiter mais planter juste avant d'émettre le ACK
+	- Ou le ACK peut être perdu par le réseau
+      - Dans ce cas, le message est redélivré à un autre consommateur et traité de nouveau
+    - Il faut donc
+      - Soit tolérer la perte de messages si on n'active pas le mécanisme de ACK
+      - Soit assurer l'idempotence du traitement des messages si on l'active
+- Log-based message brokers
+  - L'idée est de proposer une approche hybride entre une base de données et un AMQP/JSM /message broker/
+  - Le principal point sur lequel repose cette fusion est la durabilité des données
+    - Dans une /message queue/, les messages sont effacés dès lors qu'ils ont été délivrés
+    - Dans une base de données, toutes les données sont conservées jusqu'à une suppression explicite
+    - Cette seconde approche ouvre des possibilités, notamment sur la création de /derived data/
+      - Un nouveau client peut être démarré à tout moment
+      - Il est alors capable d'interroger la base de données et de voir les écritures passées
+      - Ceci lui permet de générer son état initial
+    - En comparaison, démarrer un client dans un système reposant sur une /message queue/
+      - Il va juste pouvoir suivre les nouveaux messages
+      - Mais il ne pourra pas initialiser son état à partir des précédents, puisqu'ils auront été supprimés
+  - Une approche hybride permet de bénéficier des avantages de stocker durablement les messages tout en profitant du système de notifications rapides des /message brokers/
+  - Le /message broker/ conserve un log, une séquence /append-only/
+  - Les messages générés par les producteurs sont ajoutés à ce log
+  - Les consommateurs lisent le log et traitent son contenu de manière séquentielle
+  - Si un consommateur atteint la fin courante du log, il attend une notification d'un nouveau message pour reprendre la lecture
+  - Un log peut être partitionné afin d'accroître les performances
+    - Permet de répartir le log sur plusieurs machines et donc de ne plus être limité par les performances d'une seule et unique machine
+  - Pour chaque partition
+    - Chaque message se voit assigné un /sequence number/ monotonique
+    - Les messages étant ordonnés séquentiellement
+  - Par contre, on n'a aucune relation d'ordre entre les messages de partitions différentes
+  - Log-based message brokers et patterns de messagings
+    - /fan-out messaging/
+      - L'approche log-based supporte par défaut ce pattern
+      - Il suffit que plusieurs consommateurs s'abonnent à un topic pour le mettre en place
+      - Comme aucun message n'est supprimé du /message broker/, chaque consommateur pourra lire et traiter chaque message à son rythme
+    - /load balancing/
+      - Ce pattern devient par contre plus complexe à mettre en place
+      - Si plusieurs consommateurs s'abonnent au même topic, ils vont tous traiter chaque message au lieu de se les répartir
+      - Il faut donc diviser le topic en partitions et répartir les partitions entre les noeuds
+      - Il faut remarquer que dans ce cas on perd l'ordre total sur les messages
+  - Inconvénients
+    - Le nombre de noeuds se répartissant la charge travail peut n'être au plus qu'égal au nombre de partitions
+      - Puisqu'affecter plusieurs noeuds à une même partition ne fait que de dupliquer le travail effectué
+    - Mais partitionner un topic pour augmenter le parallèlisme peut s'avérer gênant pour d'autres consommateurs
+      - Certains peuvent ne pas souffrir de problèmes de performances et surtout nécessiter l'ordre total existant avec la partition actuelle
+    - Si un message s'avère long à traiter, il délaie le traitement de l'intégralité du reste de la partition car les messages sont traités séquentiellement
+  - Stratégies pour le load balancing
+    - Une stratégie est proposée dans *Designing Data-Intensive Applications*
+      - Elle consiste à abonner plusieurs consommateurs au même topic
+      - Tout en ajoutant une logique sur les messages à traiter dans ces derniers
+	- Par exemple, un consommateur ne traite que les messages pairs tandis que l'autre ne traite que les impairs
+      - Ceci permet d'accroître le parallèlisme sur le traitement des messages
+      - Tout en ne modifiant pas la partition existante
+      - Mais on perd l'ordre total sur les messages
+      - Comment augmenter ou diminuer dynamiquement le nombre de consommateurs dans ce scénario ?
+    - Finalement, Kleppmann recommande de multiplier les partitions
+      - De la même manière, comment fait-on varier le nombre de partitions dynamiquement dans des /log-based message brokers/ ?
+    - Une autre façon de faire serait d'ajouter un niveau d'indirection
+      - Le consommateur, au lieu de traiter directement le message, va les insérer dans un nouveau log
+      - Ce log étant spécifique à ce sous-système, il peut être partitionné en fonction de ses besoins
+      - Cela correspond à augmenter le nombre de partitions, mais cette fois-ci en aval
+      - Cette approche a le mérite de ne pas modifier la partition initiale et donc de ne pas générer de conflits avec les autres consommateurs
+      - Mais elle ajoute une indirection et donc une latence supplémentaire
+  - /Consumer offsets/
+    - De par la nature séquentielle du log, il est simple de déterminer quels messages a traité un consommateur et lesquels il n'a pas encore observé
+    - Il suffit pour le consommateur de conserver l'offset du dernier message lu
+    - Cet offset est transmis au /message broker/ de façon à ne pas tout rejouer en cas de panne du consommateur
+    - Mais cet offset, côté /message broker/, peut être inexact
+      - Un consommateur peut avoir récupéré et traité un message
+      - Mais avoir crash avant d'avoir pu envoyer la mise à jour de l'offset au /message broker/
+    - Dans ce cas, redémarrer un consommateur et lui faire reprendre le travail à partir de cet offset va entraîner le re-traitement de certains messages
+    - Il faut donc que le système soit en mesure de supporter ce cas de figure
+- Choisir entre les types de /message brokers/
+  - Le choix entre ces deux systèmes de messages est motivé d'après les critères suivantes
+    #+BEGIN_QUOTE
+    In situations where messages may be expensive to process and you want to parallelize processing
+    on message-by-message basis, and where message ordering is not so important, the JMS/AMQP style
+    of message broker is preferable. On the other hand, in situations with high message throughput,
+    where each message is fast to process and where message ordering is important, the log-based
+    approach works very well.
+    #+END_QUOTE
+  - J'ai toutefois l'impression que le facteur motivant est le fait de conserver ou non les messages
+    - Peut être utile pour démarrer une nouvelle /derivated data view/ du système ou pour débugger
+  - L'autre aspect important IMO est l'élasticité du système
+    - J'ai l'impression que les /log-based message brokers/ permettent un passage à l'échelle mais planifié
+      - Il faut en amont de l'exécution déterminer comment on va partitionner les différents messages de façon à pouvoir tenir la charge
+    - Alors que les /AMQP/JMS message brokers/ m'ont l'air plus flexibles et permettent de s'adapter à la charge courante en démarrant de nouveaux consommateurs
+* Backlog
+** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
 - Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
-**** TODO DISTRIBUTED SYSTEMS : Lire *Incremental Consistency Guarantees for Replicated Objects*
+** TODO DISTRIBUTED SYSTEMS : Lire *Incremental Consistency Guarantees for Replicated Objects*
 - Par Rachid Guerraoui, Matej Pavlovic, Dragos-Adrian Seredinschi
 - Introduit la notion de *Correctables*, des objets répliqués dont les garanties de cohérence évoluent au cours de l'exécution
 - https://www.usenix.org/system/files/conference/osdi16/osdi16-guerraoui.pdf
-**** TODO COLLABORATIVE EDITING : Lire *Specification and Complexity of Collaborative Text Editing*
+** TODO COLLABORATIVE EDITING : Lire *Specification and Complexity of Collaborative Text Editing*
 - Disponible ici : https://dl.acm.org/citation.cfm?id=2933090 (H. Attiya, S. Burckhardt, A. Gotsman, A. Morrison, H. Yang , M. Zawirski)
 - Spécifie le comportement d'une liste répliquée
 - Précise que pour assurer ce comportement, les protocoles doivent ajouter un overhead au moins linéaire au nombre d'éléments
 - Indique qu'un protocole existant s'approche de cette limite
 - Vérifiez le système modèle du protocole en question et à quelle spécification de la liste répliquée il correspond
 - À partir de là, voir si je me place dans le même contexte
-**** TODO DISTRIBUTED SYSTEMS : Regarder *Distributed Transactions are dead, long live distributed transactions!*
+** TODO DISTRIBUTED SYSTEMS : Regarder *Distributed Transactions are dead, long live distributed transactions!*
 - Lien : https://www.reactivesummit.org/2018/schedule/distributed-transactions-are-dead-long-live-distributed-transactions
-**** IN-PROGRESS PhD : Compléter et envoyer l'autorisation de cumul à l'IUT
-**** TODO PhD : Faire valider les formations scientifiques suivies
-**** TODO MUTE : Exploser le test "renameId() retains order between ids"
+** IN-PROGRESS PhD : Compléter et envoyer l'autorisation de cumul à l'IUT
+** TODO PhD : Faire valider les formations scientifiques suivies
+** TODO MUTE : Exploser le test "renameId() retains order between ids"
 - Ce test évalue de nombreux cas différents
 - Lorsqu'il échoue, le message d'erreur n'indique pas exactement le cas qui échoue
 - Exploser ce test en plusieurs, chacun testant un scénario précis, aidera à détecter les erreurs et les potentiels scénarios manquants
-**** TODO MUTE : Exploser le test "reverseRenameId() retains order between ids"
+** TODO MUTE : Exploser le test "reverseRenameId() retains order between ids"
 - Ce test évalue de nombreux cas différents
 - Lorsqu'il échoue, le message d'erreur n'indique pas exactement le cas qui échoue
 - Exploser ce test en plusieurs, chacun testant un scénario précis, aidera à détecter les erreurs et les potentiels scénarios manquants
-**** IN-PROGRESS PhD : Motiver le problème adressé
+** IN-PROGRESS PhD : Motiver le problème adressé
 - Contacter les gens de Redis pour discuter des implémentations proposés pour les types *String* et *List*
 - Contacter les gens de xRay pour discuter du CRDT implémenté
 - Creuser du côté de Postgres
-**** IN-PROGRESS Méthode formelle : Se remettre à niveau en méthode formelle
+** IN-PROGRESS Méthode formelle : Se remettre à niveau en méthode formelle
 - D'après la discussion de Victorien avec Stephan Merz, ce dernier lui a conseillé
   - De commencer par du model-checking (TLA+)
   - Puis de passer sur un assistant de preuves (Isabelle/Coq)
@@ -8002,23 +8212,23 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - http://lamport.azurewebsites.net/video/videos.html
   - Un tuto que j'ai vu passé un jour sur HN
     - https://learntla.com/introduction/
-**** TODO DISTRIBUTED DATABASES : Lire *NewSQL database systems are failing to guarantee consistency, and I blame Spanner*
+** TODO DISTRIBUTED DATABASES : Lire *NewSQL database systems are failing to guarantee consistency, and I blame Spanner*
 - Disponible ici : https://dbmsmusings.blogspot.com/2018/09/newsql-database-systems-are-failing-to.html
 - Semblerait que des CTO des bases de données mentionnées dans l'article ont répondu dans les commentaires, ce qui a donné lieu à des conversations intéressantes à priori
-**** TODO MUTE : Identifier l'origine de la divergence de la réunion du <2018-06-01 Fri>
+** TODO MUTE : Identifier l'origine de la divergence de la réunion du <2018-06-01 Fri>
 - Un bloc de texte s'est retrouvé inséré au mauvais endroit pour une copie des notes prises au cours de cette réunion
 - En identifiant la structure obtenue, on s'est rendu compte que ce bloc n'aurait pas dû être placé à cet endroit étant donné son identifiant
 - Enquêter pour identifier l'origine de ce mauvais positionnement
   - Est-ce lié à l'algorithme de comparaison des identifiants ?
   - Ou est-ce lié à l'algorithme d'insertion au sein de l'arbre ?
-**** TODO CRDT : Se renseigner sur replikativ
+** TODO CRDT : Se renseigner sur replikativ
 - http://replikativ.io/
-**** TODO CRDT : Se renseigner sur OrbitDB
+** TODO CRDT : Se renseigner sur OrbitDB
 - https://github.com/orbitdb/orbit-db
-**** TODO DISTRIBUTED SYSTEMS : Se renseigner sur Dat
+** TODO DISTRIBUTED SYSTEMS : Se renseigner sur Dat
 - https://datproject.org/
 - https://datproject.org/paper
-**** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
+** TODO CONSENSUS : Lire *The weakest failure detector for solving consensus*
 - *Perspectives on the CAP Theorem* ([[perspective-cap-theorem]]) cite ce papier de la manière suivante
   #+BEGIN_QUOTE
   In many ways, a failure detector exactly encapsulates the synchrony requirements for consensus.
@@ -8027,25 +8237,25 @@ We say that H implements A under this refinement mapping iff, for each behavior 
   #+END_QUOTE
 - Je ne comprends pas le lien entre /failure detector/ et /synchrony requirements for consensus/
 - Ce papier m'aidera p-e à comprendre
-**** TODO CRDT : Lire *Replicated Data Types: Specification, Verification, Optimality*
-**** TODO CRDT : Lire *CRDT notes*
+** TODO CRDT : Lire *Replicated Data Types: Specification, Verification, Optimality*
+** TODO CRDT : Lire *CRDT notes*
 - Disponible ici: https://github.com/pfrazee/crdt_notes
 - Regroupe des notes de lectures sur plusieurs articles concernant les CRDT
-**** TODO CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
+** TODO CRDT : Lire *A Conflict-Free Replicated JSON Datatype*
 - Disponible ici: https://arxiv.org/pdf/1608.03960.pdf
-**** TODO MUTE : Faire une liste des scénarios à tester d'une version à l'autre
-**** TODO MUTE : Rendre permanent l'identifiant et les clocks d'un utilisateur pour un document
+** TODO MUTE : Faire une liste des scénarios à tester d'une version à l'autre
+** TODO MUTE : Rendre permanent l'identifiant et les clocks d'un utilisateur pour un document
 - Pour l'historique, il est important de conserver la liste des collaborateurs ayant collaboré sur un document
 - Pour faciliter l'implémentation de cette liste, il faut modifier le code pour réutiliser le même identifiant pour un même utilisateur au fil des sessions
 - À noter que les clocks aussi doivent être conservée pour prévenir tout bug
   - Clock de /mute-structs/ pour éviter de générer un bloc avec le même identifiant
   - Clock de /mute-core/ pour éviter de labeller des messages avec le même couple /<identifiant, clock>/
-**** TODO MUTE : Ajouter le /docId/ en tant que paramètre du constructeur de *DocService*
+** TODO MUTE : Ajouter le /docId/ en tant que paramètre du constructeur de *DocService*
 - Cet attribut est actuellement initialisé via le flux /initSource/
 - Celui-ci émet l'identifiant du document actuel à son initialisation
 - Cependant, l'initialisation du document correspond à l'instantiation du *DocService*
 - Nous pouvons donc simplifier le code en ajoutant /docId/ en tant que paramètre du constructeur
-**** TODO MUTE : Étudier la suppression de *LogootSBlock*
+** TODO MUTE : Étudier la suppression de *LogootSBlock*
 - L'utilisation de *LogootSBlock* semble limitée
   - Conserve une référence vers un *IdentifierInterval*
   - Cet *IdentifierInterval* ne peut que grossir
@@ -8060,11 +8270,11 @@ We say that H implements A under this refinement mapping iff, for each behavior 
   - L'objectif serait de simplifier la structure de données
   - Il faudrait en contrepartie enrichir *RopesNodes* ou *LogootSRopes*
   - Voir si ça permettrait effectivement de simplifier le code
-**** TODO MUTE : Fusionner blocs adjacents issus d'un split après la suppression
+** TODO MUTE : Fusionner blocs adjacents issus d'un split après la suppression
 - Lors d'un split, un bloc est coupé en deux et un nouveau bloc est inséré au milieu
 - Après la suppression du bloc inséré, on pourrait fusionner les deux parties du bloc initial pour le recréer
 - Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
-**** TODO CRDT : Lire *Kaleido*
+** TODO CRDT : Lire *Kaleido*
 * Glossaire
 - Eventual convergence property
   #+BEGIN_QUOTE
@@ -8110,3 +8320,7 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     There are many different ways in which a system can be unreliable. There may be partitions,
     crash failures, message loss, malicious attacks (or Byzantine failures), etc. -- Perspectives on the CAP Theorem
     #+END_QUOTE
+- Effectively-once
+  #+BEGIN_QUOTE
+  Viktor Klang: "I'm coining the phrase 'effectively-once' for message processing with at-least once + idempotent operations", twitter.com, October 20, 2016
+  #+END_QUOTE
