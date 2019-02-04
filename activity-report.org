@@ -8233,6 +8233,30 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Par exemple, une réservation peut être décomposée en 2
       - Une tentative de réservation
       - Une confirmation de réservation
+  - Avantages des évènements immutables
+    - Permet d'auditer le système
+      - La liste des évènements permet de retracer pas-à-pas l'évolution du système
+      - On peut donc auditer le log pour trouver l'origine d'un dysfonctionnement
+      - Cette tâche peut être rendue plus complexe dans un système avec une simple base de données mutables puisque des informations peuvent avoir été supprimées
+    - Simplifie la /recovery/
+      - Puisque tous les évènements sont toujours présents, peut tout à fait rejouer les évènements pour regénérer l'état
+      - Alors qu'avec une base de données mutables, si un code incorrect a été exécuté, on peut avoir perdu des données
+      - Et à moins d'avoir un backup sous la main, on ne peut plus les récupérer
+    - Permet de capturer plus d'informations que l'état du système courant
+      - Par exemple, un utilisateur peut ajouter un item à son panier puis le retirer avant de valider sa commande
+      - Dans un système avec une base de données mutable, on perd cette information
+      - Alors que d'un point de vue analytics, elle peut être intéressante à conserver
+  - Dériver de multiples vues d'un /event log/
+    - Peut lire le même /event log/ pour générer plusieurs vues du système
+    - Permet de faciliter l'évolution de l'application au fil du temps
+      - Ajouter une nouvelle feature peut correspondre à déployer un nouveau service qui lit le log pour établir un état et répondre à des requêtes
+      - Modifier le schéma d'un service peut être fait en déployant une nouvelle version en parallèle de l'ancienne
+	- Une fois que la nouvelle a rattrapée son retard, on peut arrêter l'ancienne version
+	- Ce procédé peut s'avérer plus simple à mettre en place que de mettre en place un mécanisme de migration
+    - Permet de découpler l'écriture de la lecture des données
+      - Permet donc d'optimiser les vues pour répondre aux requêtes spécifiquement
+  - L'inconvénient de cette approche (ainsi que de /CDC/) est d'ajouter de l'asynchrone entre la génération d'un évènement et l'application de ses effets dans les vues
+    - Les problèmes habituelles /eventual consistency/ s'applique donc
 * Backlog
 ** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
 - Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
