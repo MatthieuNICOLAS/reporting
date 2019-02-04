@@ -8165,11 +8165,74 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     approach works very well.
     #+END_QUOTE
   - J'ai toutefois l'impression que le facteur motivant est le fait de conserver ou non les messages
-    - Peut être utile pour démarrer une nouvelle /derivated data view/ du système ou pour débugger
+    - Peut être utile pour démarrer un nouveau /derivated data system/ ou pour débugger
   - L'autre aspect important IMO est l'élasticité du système
     - J'ai l'impression que les /log-based message brokers/ permettent un passage à l'échelle mais planifié
       - Il faut en amont de l'exécution déterminer comment on va partitionner les différents messages de façon à pouvoir tenir la charge
     - Alors que les /AMQP/JMS message brokers/ m'ont l'air plus flexibles et permettent de s'adapter à la charge courante en démarrant de nouveaux consommateurs
+- Change Data Capture (CDC)
+  - Consiste à ce qu'une base de données streame les modifications qui sont effectuées sur son contenu
+  - Ce stream peut être rendu persistant sous la forme d'un log
+  - Permet de créer un système à base
+    - d'une base de données /leader/
+    - de /derivated data systems/
+  #+BEGIN_CAPTION
+  [[file:img/ddia-change-data-capture.png]]
+  #+END_CAPTION
+  - Permet d'éviter les problèmes de cohérence que l'on pourrait rencontrer si on effectuait des écritures parallèles sur les bases de données des différents sous-systèmes
+    #+BEGIN_CAPTION
+    [[file:img/ddia-dual-writes-inconsistency.png]]
+    #+END_CAPTION
+  - Tout en ne nécessitant pas l'implémentation d'un mécanisme de transaction distribuée
+  - Mais introduit les problèmes relatifs au /replication lag/ et à l'/eventual consistency/
+    - Certaines opérations ne seront effectives sur les /derivated data systems/ qu'après un certain délai
+  - Propose un mécanisme pour tronquer le log
+    - Conserver tous les changements n'est pas faisable
+    - Ainsi que tous les rejouer
+    - Génère une snapshot correspondant à l'état de la base de données en un point du log
+    - Supprime les entrées précédentes du log
+  - Propose aussi un mécanisme de compaction du log alternatif à l'approche via snapshot
+    - En associant une clé primaire à chaque entrée modifiée
+    - On peut reconstruire l'état courant de la base de données en ne rejouant que la dernière entrée concernant chaque clé
+    - On peut donc supprimer au fur et à mesure les entrées concernant une clé donnée
+** Semaine du <2019-02-04 Mon> au <2019-02-08 Fri>
+- Event Sourcing
+  - Comparaison avec /Change Data Capture/
+    - Dans /Change Data Capture/, on utilise une base de données mutable
+    - Le log des changements correspond aux effets des requêtes sur la base de données
+    - L'application utilisant la base de données peut ne pas savoir que du /CDC/ est utilisé
+    - Dans /Event Sourcing/, on construit la logique de l'application autour d'un log d'évènements immutables
+    - Plutôt que de retenir les effets, ici on stocke les causes (les évènements)
+    - Exemple
+      - Avec /CDC/, on peut conserver qu'à un moment "on a supprimé une entrée de la table des inscriptions" et qu'"on a ajouté une entrée dans la table des retours des étudiants"
+      - Avec /Event Sourcing/, on peut plutôt conserver "un étudiant a annulé son inscription"
+  - Le log des évènements gardent représente donc l'historique des modifications
+  - Afin de recréer l'état, il est nécessaire de reprendre l'intégralité du log et de le rejouer
+  - Log compaction
+    - Avec /CDC/, nous pouvions compacter le log en ne conservant que la dernière modification pour chaque clé primaire
+    - Avec /Event Sourcing/, comme les évènements conservés sont de "haut niveau", on peut difficilement inférer leur résultat sur l'état à 1ère vue
+    - Les évènements n'écrasent pas les précédents
+    - On ne peut donc pas appliquer le même mécanisme de /log compaction/
+  - Snapshot
+    - D'un point de vue applicatif, afin d'éviter de reparcourir l'intégralité du log pour regénérer l'état
+    - Les applications utilisent généralement un mécanisme de snapshots pour sauvegarder l'état de l'application en 1 point du log
+    - Mais ce mécanisme est utilisé en complément du log que l'on souhaite conserver entièrement, afin d'accélerer l'instanciation d'une réplique de l'application
+  - Différences entre /commands/ et /events/
+    - Une requête d'un utilisateur est originellement une commande
+    - À ce stade, elle peut toujours échouer, pour des raisons d'intégrité par exemple
+    - L'application doit déjà valider la commande puis ensuite l'exécuter
+    - Une fois que la commande est exécutée, elle devient un évènement
+    - Un évènement est un fait durable et immutable
+    - Même si le client change ensuite d'avis et annule sa commande par la suite
+    - L'évènement précédent restera toujours valide
+    - Juste, un nouvel évènement indiquera l'annulation
+  - Validation d'une /command/
+    - Une commande doit donc être validée avant d'être appliquée et de générer un évènement
+    - La validation peut se faire via une synchronisation entre noeuds
+    - Si l'on souhaite/a besoin de faire une validation asynchrone, un évènement peut être splitté en plusieurs
+    - Par exemple, une réservation peut être décomposée en 2
+      - Une tentative de réservation
+      - Une confirmation de réservation
 * Backlog
 ** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
 - Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
