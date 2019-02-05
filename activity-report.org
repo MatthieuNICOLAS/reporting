@@ -8257,6 +8257,75 @@ We say that H implements A under this refinement mapping iff, for each behavior 
       - Permet donc d'optimiser les vues pour répondre aux requêtes spécifiquement
   - L'inconvénient de cette approche (ainsi que de /CDC/) est d'ajouter de l'asynchrone entre la génération d'un évènement et l'application de ses effets dans les vues
     - Les problèmes habituelles /eventual consistency/ s'applique donc
+- Remplacer le *BotStorage* par un /log-based message broker/
+  - Sujet de stage ?
+  - L'idée est de mettre en place un /log-based message broker/
+  - Les pairs lui enverraient les opérations distantes qu'ils génèrent
+  - Et ils s'abonneraient à ce même topic pour recevoir les opérations distantes des autres pairs
+  - Les opérations seraient donc reçues potentiellement à la fois du /webGroup/ et du /message broker/
+  - Mais le *SyncService* permet de filtrer ces opérations dupliquées
+  - Présente plusieurs avantages
+    - Permet de communiquer à travers les partitions provoquées par webRTC
+      - À partir du moment où des noeuds arrivent à communiquer avec le /message broker/
+      - Ils peuvent se communiquer leurs opérations via ce dernier
+      - Le /message broker/ jouerait alors le rôle de TURN
+    - Permet initialement à un nouveau pair de récupérer l'ensemble des opérations à sa connexion
+    - Permet de retirer toute logique applicative
+      - Le /message broker/ n'a pas à connaître la logique de l'application
+      - Il lui suffit de stocker les messages
+      - Il n'a pas à appliquer les opérations et construire une vue
+      - C'est les autres pairs qui se chargeront de traiter les messages en les recevant
+    - Permet de ne plus dépendre de la version des clients
+      - À partir du moment que les clients envoient des messages
+      - C'est leur responsabilité de pouvoir les décoder
+      - Le /message broker/ est donc /version agnostic/
+    - Permet de n'avoir aucune connaissance des messages
+      - Vu qu'on n'a pas besoin de jouer les opérations
+      - Pourrait les recevoir chiffrés
+      - Par contre, chiffrer les messages lève quelques problèmes d'utilisabilité
+    - Permet de jouer la carte de la transparence
+      - Si le /message broker/ possède une interface
+      - On pourrait montrer directement aux utilisateurs ce que l'on possède du document
+    - Permet de logger durablement les évènements
+      - Pourrait nous être utile à des fins de débuggage
+    - Permet de réduire la reponsabilité du *BotStorage*
+      - Le *BotStorage* n'aurait plus besoin de remplir le rôle de TURN de back-up
+      - Peut se concentrer sur "juste" être un pair
+    - Permet de réduire la surface de développement
+      - Pourrait complètement remplacer le *BotStorage*
+      - Ce qui nous permettrait de concentrer nos efforts de développement sur d'autres aspects
+      - Pourrait aussi remplacer le *LogCollector*
+	- Finalement, on a réimplémenté un /log-based message broker/ à l'époque
+  - Présente néanmoins aussi des inconvénients
+    - Ces inconvénients sont liés au protocole de chiffrement utilisé
+    - En fonction des garantis fournies par ce dernier, peut entraver l'utilisabilité
+    - Par exemple, dans le cas du /group key agreement/
+      - Un noeud ne pourrait déchiffrer que les opérations envoyées lorsqu'il était dans le groupe
+      - À partir du moment où il se déconnecte, la clé change
+      - Il n'est pas en mesure de lire les messages précédents et suivants
+      - La seule utilité du /message broker/ dans ce cas est de potentiellement communiquer à travers une partition webRTC
+      - Il devient nécessaire de se connecter à un autre noeud pour se synchroniser
+  - Étapes
+    - État de l'art
+      - Quels /log-based message brokers/ existent ?
+      - Quelles sont leurs spécificités ?
+      - Lequel utiliser ?
+    - Prototype
+      - Concevoir une application basique à part
+      - Potentielles idées
+	- Chat
+    - Intégration dans MUTE basique
+      - Un topic d'opérations distantes est créé par document
+      - Les noeuds en sont à la fois producteurs et consommateurs
+      - Ils y ajoutent leurs opérations distantes
+      - Et récupèrent les opérations du log et les appliquent
+      - Il n'y a pas de chiffrement
+      - Un utilisateur peut choisir d'utiliser le /message broker/ ou pas pour un document
+    - Intégration dans MUTE avec chiffrement
+      - Cette fois-ci, les opérations sont chiffrées avant d'être envoyées au log
+      - Si on part sur le /group key agreement/, ajout d'un topic pour permettre l'établissement de la clé de groupe à travers les partitions webRTC
+    - Remplacement du *LogCollector* par le /log-based message broker/
+      - Modifie *MUTE* pour envoyer les logs non plus au *LogCollector* mais au /message broker/
 * Backlog
 ** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
 - Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
