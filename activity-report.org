@@ -8134,10 +8134,13 @@ We say that H implements A under this refinement mapping iff, for each behavior 
       - Elle consiste à abonner plusieurs consommateurs au même topic
       - Tout en ajoutant une logique sur les messages à traiter dans ces derniers
 	- Par exemple, un consommateur ne traite que les messages pairs tandis que l'autre ne traite que les impairs
+	- Mais comment on fait pour gérer ça dynamiquement ?
+	- Notamment, comment on fait pour faire varier le nombre de consommateurs en live ?
       - Ceci permet d'accroître le parallèlisme sur le traitement des messages
       - Tout en ne modifiant pas la partition existante
       - Mais on perd l'ordre total sur les messages
       - Comment augmenter ou diminuer dynamiquement le nombre de consommateurs dans ce scénario ?
+      - Et comment gérer les pannes d'un des consommateurs dans ce type de système ?
     - Finalement, Kleppmann recommande de multiplier les partitions
       - De la même manière, comment fait-on varier le nombre de partitions dynamiquement dans des /log-based message brokers/ ?
     - Une autre façon de faire serait d'ajouter un niveau d'indirection
@@ -8257,7 +8260,7 @@ We say that H implements A under this refinement mapping iff, for each behavior 
       - Permet donc d'optimiser les vues pour répondre aux requêtes spécifiquement
   - L'inconvénient de cette approche (ainsi que de /CDC/) est d'ajouter de l'asynchrone entre la génération d'un évènement et l'application de ses effets dans les vues
     - Les problèmes habituelles /eventual consistency/ s'applique donc
-- Remplacer le *BotStorage* par un /log-based message broker/
+- <<stage-log-based-message-broker>> Remplacer le *BotStorage* par un /log-based message broker/
   - Sujet de stage ?
   - L'idée est de mettre en place un /log-based message broker/
   - Les pairs lui enverraient les opérations distantes qu'ils génèrent
@@ -8302,7 +8305,7 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Par exemple, dans le cas du /group key agreement/
       - Un noeud ne pourrait déchiffrer que les opérations envoyées lorsqu'il était dans le groupe
       - À partir du moment où il se déconnecte, la clé change
-      - Il n'est pas en mesure de lire les messages précédents et suivants
+      - Il n'est donc pas en mesure de lire les messages précédents et suivants
       - La seule utilité du /message broker/ dans ce cas est de potentiellement communiquer à travers une partition webRTC
       - Il devient nécessaire de se connecter à un autre noeud pour se synchroniser
   - Étapes
@@ -8329,6 +8332,9 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 * Backlog
 ** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
 - Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
+** TODO Stage : Écrire le sujet de stage pour l'intégration d'un /log-based message broker/ dans *MUTE*
+- Rédiger le sujet de stage basé sur cette proposition: [[stage-log-based-message-broker]]
+- Vise un.e étudiant.e de TN, 2A IL
 ** TODO DISTRIBUTED SYSTEMS : Lire *Incremental Consistency Guarantees for Replicated Objects*
 - Par Rachid Guerraoui, Matej Pavlovic, Dragos-Adrian Seredinschi
 - Introduit la notion de *Correctables*, des objets répliqués dont les garanties de cohérence évoluent au cours de l'exécution
