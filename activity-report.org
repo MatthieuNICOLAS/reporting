@@ -8329,6 +8329,70 @@ We say that H implements A under this refinement mapping iff, for each behavior 
       - Si on part sur le /group key agreement/, ajout d'un topic pour permettre l'établissement de la clé de groupe à travers les partitions webRTC
     - Remplacement du *LogCollector* par le /log-based message broker/
       - Modifie *MUTE* pour envoyer les logs non plus au *LogCollector* mais au /message broker/
+- Réflexions sur le mécanisme de renommage
+  - Un mécanisme de consensus est nécessaire
+    - Dans /Core & Nebula/, il est nécessaire pour déclencher le renommage
+    - Dans mon cas, il est nécessaire pour GC les métadonnées
+      - C'est même plus fort que cela, il faut l'unanimité dans mon cas
+      - L'opération doit être stable
+  - La différence par rapport à /Core & Nebula/ est la position du protocole lourd dans le mécanisme
+    - Dans /Core & Nebula/, il se trouve sur le chemin critique
+    - Dans mon cas, la stabilité est déplacée hors du chemin critique
+  - On profite déjà des effets du renommage pendant la récupération des informations de stabilité
+    - Réduction de la bande passante et des computations
+  - Peu importe les droits attribués pour effectuer un renommage, on demandera toujours la stabilité pour pouvoir GC
+    - On peut arriver dans un état où l'on ne peut plus recevoit d'opérations de renommage concurrentes
+    - Mais où un noeud peut toujours générer une opération concurrente qu'il faudra transformée
+  - Il faut donc chercher une autre piste d'amélioration
+  - Un axe d'amélioration possible est la stratégie pour définir l'opération de renommage prioritaire entre plusieurs concurrentes
+  - Actuellement, il suffit qu'un seul noeud isolé génère une opération de renommage prioritaire pour potentiellement faire inverser un grand nombre de renommage au reste du groupe
+  - Une stratégie limitant le nombre de migration d'/epochs/ d'un point de vue global du système améliorerait les performances du mécanisme
+  - Pour prendre la décision, peut reposer sur différents types de données
+    - Les données fixes
+    - Les données dynamiques
+  - Les données fixes
+    - Nb d'éléments renommés
+    - Nb d'opérations observées
+    - Nb de noeuds ayant observés l'/epoch/ parente
+    - Nb de destinataires
+  - Les données dynamiques
+    - Nb d'opérations dépendantes
+    - Nb d'éléments courant
+    - Nb de noeuds convertis
+  - Les données fixes permettent d'assurer la convergence de façon assez triviale
+    - On considère que les données fixes sont incluses dans l'opération de renommage
+    - Lorsque les noeuds comparent leur /epoch/ courante avec l'/epoch/ d'une nouvelle opération de renommage, ils utilisent donc les mêmes valeurs
+    - Ils prendront donc tous la même décision
+  - Mais cette approche ne permet pas de capturer les changements depuis la dernière opération de renommage
+  - La décision peut donc être prise sur des données /outdated/
+  - Les données dynamiques permettent de palier à ce cas de figure
+  - Mais il devient bien plus difficile de montrer que le système converge
+    - Des noeuds peuvent prendre des décisions différentes en fonction de leur vue locale
+    - Comment garantir que le processus de décision termine à terme ?
+  - Ces différentes données permettent de définir une fonction /poids()/ pour une /epoch/
+  - En se basant sur cette fonction /poids()/, peut définir une stratégie pour choisir laquelle de 2 /epochs/ concurrentes choisir
+  - Là encore, 2 types de stratégies possibles
+    - Comparaison par palier
+    - Comparaison par branche
+  - Comparaison par palier
+    - Prévient le yo-yo entre plusieurs branches
+    - Les fonctions de transformations doivent offrir moins de garanties
+      - Juste préserver l'ordre et /reverseRename(rename(id)) = id/
+    - Un noeud isolé peut déclencher une inversion de plusieurs renommages chez le reste des noeuds
+  - Comparaison par branche
+    - Plus de confiance dans ma branche au fur et à mesure
+    - Peut me retrouver à faire yo-yo entre plusieurs branches
+      - Notamment si on a plusieurs assez équilibrés qui travaillent en concurrence et qui se resynchronisent brièvement par intermittence
+    - Les fonctions de transformation sont plus complexes à écrire
+      - Elles doivent respecter plus de propriétés
+      - Notamment, on doit avoir /rename(reverseRename(id)) = id/
+  - Point intéressant, on n'a pas besoin d'être à la même /epoch/ pour converger
+    - Des noeuds peuvent être sur des /epochs/ différentes
+    - Tant que chaque noeud sait comment traduire les opérations de l'autre
+    - Ils sont capables de les appliquer sur leur état local
+    - C'est juste qu'il sera nécessaire de transformer chacune de ces opérations
+      - Ce qui sera probablement pas terrible pour les performances
+  - L'indécision sur l'/epoch/ n'influence donc pas la /liveness/ du système
 * Backlog
 ** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
 - Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
