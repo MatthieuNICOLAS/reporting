@@ -8393,6 +8393,90 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - C'est juste qu'il sera nécessaire de transformer chacune de ces opérations
       - Ce qui sera probablement pas terrible pour les performances
   - L'indécision sur l'/epoch/ n'influence donc pas la /liveness/ du système
+** Semaine du <2019-02-19 Tue> au <2019-02-22 Fri>
+- Réflexions sur l'impact de la stratégie utilisée pour déterminer la priorité entre plusieurs /epochs/ sur le mécanisme de /garbage collection/ des /epochs/
+  - Je parlais précédemment de deux stratégies différentes pour déterminer laquelle de 2 /epochs/ concurrentes choisir
+    - Comparaison par palier
+    - Comparaison par branche
+  - Contrairement à ce que je pensais, ces 2 stratégies différentes partagent le même mécanisme de /garbage collection/ des /epochs/
+  - Part du constat qu'on ne peut pas GC une opération de renommage dès que celle-ci est stable
+    - Par exemple si j'ai 2 opérations de renommage concurrentes, /e1A/ et /e1B/
+    - Avec /e1B/ prioritaire par rapport à /e1A/
+    - Lorsque /e1A/ devient causalement stable, on ne peut pas la GC
+    - En effet, que /e1A/ soit stable n'assure en rien que tous les noeuds ont observé /e1B/ et transitionné vers cette /epoch/
+    - Ils peuvent donc toujours générer des opérations sur l'/epoch/ /e1A/
+    - On a donc besoin de conserver les règles de ré-écritures des identifiants de /e1A/ pour être capable de traduire l'effet de ces opérations vers /e1B/
+  - Pose donc la question de quand peut-on GC les /epochs/ ?
+    - Si on reprend l'exemple courant mais que cette fois-ci, c'est l'/epoch/ /e1B/ qui devient stable
+      - La stabilité de /e1B/ offre bien plus de garanties
+      - Elle indique plus aucun noeud n'est ou ne sera sur l'epoch /e1A/
+      - En effet, tous les noeuds ont observé /e1B/
+      - S'ils étaient sur /e1A/, ils ont dû transitionné sur /e1B/ en conséquence
+      - S'ils n'avaient pas encore observé /e1A/, ils l'ignoreront lorsqu'ils la recevront
+      - Plus aucune opération reposant directement sur l'/epoch/ /e1A/ ne peut encore être reçue ou même émise
+      - Pour le moment on considère qu'il n'y a pas eu d'opérations de renommage concurrentes à /e1B/
+      - À ce moment là, on peut GC /e1A/
+      - En effet, on a déjà reçu et transformé toutes les opérations basé sur /e1A/
+      - Si maintenant on considère qu'il y a une opération de renommage concurrente à /e1A/ et /e1B/, /e1C/ telle qu'elle est prioritaire par rapport à /e1B/
+      - On peut toujours GC /e1A/
+      - Donc à partir du moment qu'une /epoch/ prioritaire devient stable, on peut GC les /epochs/ plus petites
+    - Si on reprend l'exemple courant, avec /e1B/ qui devient stable, mais qu'on a en plus /e2A/ qui dépend de /e1A/ et /e2B/ qui dépend de /e1B/
+      - On considère la stratégie de priorité par branche
+      - Et qu'on a /e1A/ < /e1B/ < /e2A/ < /e2B/
+      - On ne peut de nouveau plus GC /e1A/ quand /e1B/ devient stable
+      - Des noeuds peuvent être sur l'/epoch/ /e2A/
+      - On a donc encore besoin des règles de ré-écritures de /e1A/ pour transformer ces opérations vers /e2B/
+      - La stabilité d'une /epoch/ prioritaire ne suffit donc pas pour GC une /epoch/
+      - Il faut aussi que l'/epoch/ à GC soit une feuille
+  - On peut GC une /epoch/ quand elle est une feuille et qu'une /epoch/ prioritaire est devenue stable
+  - Pour GC les /epochs/ de façon efficace, il est donc nécessaire de faire évoluer la structure de données *EpochStore*
+    - Conserver la liste des feuilles courantes
+      - Permet de facilement accéder aux /epochs/ potentiellement GC -able
+      - Principe
+	- Quand on ajoute une /epoch/ à l'*EpochStore*
+	- Supprimer l'/epoch/ parente de la liste des feuilles
+	- Ajouter l'/epoch/ à la liste des feuilles
+    - Compter le nombre d'/epochs/ filles de chaque /epoch/
+      - On ne peut GC une /epoch/ que si elle est une feuille
+      - Permet de facilement identifier qu'une /epoch/ est une feuille si son compteur est à 0
+      - Principe
+	- Quand on ajoute une /epoch/ à l'*EpochStore*
+	- Initialise son compteur à 0
+	- Incrémente le compteur de l'/epoch/ parente de 1
+  - Algorithme de GC
+    - Lorsqu'une /epoch/ devient stable
+    - S'il s'agit de l'/epoch/ courante
+      - Peut vider l'*EpochStore* dans son intégralité
+    - Sinon
+      - Calcule la priorité /p/ de l'/epoch/ devenue stable
+      - Pour toutes les feuilles, tente de la GC
+	- Si la priorité de la feuille est inférieure à /p/
+	  1. Récupère l'/epoch/ parente
+	  2. Supprime l'/epoch/
+	  3. Retire l'/epoch/ de la liste des feuilles
+	  4. Diminue de 1 le compteur d'/epochs/ filles de la parente
+	  5. Si le nombre d'/epochs/ fille de la parente vaut 0
+	     - On suit les mêmes étapes pour GC l'/epoch/ parente
+	     - Peut juste skip la 3.
+      - Si toutes les feuilles restantes sont des descendantes de l'/epoch/ devenue stable
+	- La GC ainsi que ses ancêtres
+  - Cet algorithme de GC peut encore être raffiné
+    - On a pas nécessairement besoin d'attendre qu'une /epoch/ devienne stable
+    - On a juste besoin de tracker la priorité de l'/epoch/ courante de chaque noeud
+    - Si on a l'information que tous les noeuds sont sur une /epoch/ avec une priorité plus forte qu'une feuille existante
+      - Même s'il s'agit d'/epochs/ différentes et qu'ils n'ont pas connaissance d'/epochs/ concurrentes
+    - On peut GC cette feuille
+    - Aucun noeud ne peut encore générer une opération dépendant de cette feuille
+  - Il s'agit donc de trouver la priorité minimum globale
+    - Pour chaque noeud
+      - Récupèrer la dernière opération observée de ce noeud à partir du log
+      - Récupérer l'/epoch/ de génération de cette opération
+      - Calculer sa priorité
+    - Récupérer la priorité minimum
+  - On peut donc lancer un mécanisme de GC de temps en temps
+    - À partir du log, calcule la priorité minimum globale
+    - Tente de GC les feuilles en utilisant cette priorité
+  - Pose toujours le problème qu'un seul noeud peut bloquer le système de GC en n'émettant pas de nouvelles opérations
 * Backlog
 ** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
 - Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
@@ -8502,51 +8586,53 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
 ** TODO CRDT : Lire *Kaleido*
 * Glossaire
-- Eventual convergence property
+- <<<Eventual convergence>>> property
   #+BEGIN_QUOTE
   Copies of shared objects are identical at all sites if updates cease and all generated updates are propagated to all sites.
   #+END_QUOTE
-- Precedence property
+- <<<Precedence>>> property
   #+BEGIN_QUOTE
   If one update /Oa/ causally precedes another update /Ob/, then,
   at each site, the execution of /Oa/ happens before the execution of /Ob/.
   #+END_QUOTE
-- Intention-preservation
+- <<<Intention-preservation>>>
   #+BEGIN_QUOTE
   For any update /O/, the effect of executing /O/ at all sites is the same as the intention of /O/ when executed at the site that originated it,
   and the effect of executing /O/ does not change the effect of non concurrent operations.
   #+END_QUOTE
 - Mathematics operations properties
-  - Associativity
+  - <<<Associativity>>>
     #+BEGIN_QUOTE
     Associativity means that you can apply a function in any order:
       =f(a,f(b,c)) = f(f(a,b),c)=
     #+END_QUOTE
-  - Commutativity
+  - <<<Commutativity>>>
     #+BEGIN_QUOTE
     Commutativity means that a function's arguments are order-insensitive:
       =f(a,b) = f(b,a))=
     #+END_QUOTE
-  - Idempotence
+  - <<<Idempotence>>>
     #+BEGIN_QUOTE
     Idempotence means you can call a function on the same input any number of times and get the same result:
       =f(f(x))=f(x) (e.g., max(42, max(42, 42)) = 42))=
     #+END_QUOTE
 - Systems properties
-  - Safety
+  - <<<Safety>>>
     #+BEGIN_QUOTE
     Informally, an algorithm is safe if nothing bad ever happens. -- Perspectives on the CAP Theorem
     #+END_QUOTE
-  - Liveness
+  - <<<Liveness>>>
     #+BEGIN_QUOTE
     By contrast, an algorithm is live if eventually something good happens. -- Perspectives on the CAP Theorem
     #+END_QUOTE
-  - Unreliable
+  - <<<Unreliable>>>
     #+BEGIN_QUOTE
     There are many different ways in which a system can be unreliable. There may be partitions,
     crash failures, message loss, malicious attacks (or Byzantine failures), etc. -- Perspectives on the CAP Theorem
     #+END_QUOTE
-- Effectively-once
+- <<<Effectively-once>>>
   #+BEGIN_QUOTE
   Viktor Klang: "I'm coining the phrase 'effectively-once' for message processing with at-least once + idempotent operations", twitter.com, October 20, 2016
   #+END_QUOTE
+- <<<GC>>>
+  - Garbage Collection
