@@ -8477,6 +8477,38 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - À partir du log, calcule la priorité minimum globale
     - Tente de GC les feuilles en utilisant cette priorité
   - Pose toujours le problème qu'un seul noeud peut bloquer le système de GC en n'émettant pas de nouvelles opérations
+- Différences induites par un changement de stratégie utilisée pour déterminer la priorité entre plusieurs /epochs/
+  - La représentation de la priorité
+    - Peut s'agir d'une valeur
+      - Dans le cas d'un poids calculé à partir de plusieurs informations contenues dans l'opération
+    - Peut s'agir d'une liste de valeurs
+      - Dans le cas de l'ordre total défini à priori sur les /epochs/ par exemple
+  - La fonction de comparaison entre priorités
+    - Une simple comparaison <
+      - Dans le cas où les priorités sont représentées par des valeurs
+    - Un ordre lexicographique
+      - Dans le cas où les priorités sont représentées par une liste de valeurs
+  - Les garanties que doivent fournir les fonctions de renommage /renameId()/ et /reverseRenameId()/
+    - De base, ces 2 fonctions doivent préserver l'ordre entre identifiants
+      - Pour /id1/ et /id2/ tels que /id1 < id2/
+      - On doit avoir
+	- /renameId(id1) < renameId(id2/
+	- /reverseRenameId(id1) < reverseRenameId(id2)/
+    - Les opérations de renommage concurrentes doivent être commutatives
+    - Donc pour deux opérations de renommage /op/ et /op'/, on doit avoir /op · op' === op' · op/
+    - Ceci peut facilement être garanti si on utilise la priorité pour
+      - Annuler l'effet du renommage perdant si on l'a appliqué auparavant
+      - Décider d'ignorer le renommage perdant si on le reçoit par la suite
+    - On doit avoir /reverseRenameId(renameId(id)) = id/
+      - Permet de garantir que dans le cas d'opérations de renommage concurrentes
+      - Pour tous les identifiants de l'/epoch/ ancêtre commune
+      - On arrivera à récupérer l'identifiant initial
+    - Cette propriété est suffisante si la représentation de la priorité utilisée prévient les allers-retours entre /epochs/
+    - Si ce n'est pas le cas
+    - On doit avoir /renameId(reverseRenameId(id)) = id/
+      - Permet de garantir que dans le cas d'opérations de renommage concurrentes
+      - Pour tous les identifiants dépendant d'une opération de renommage autrefois perdante, dorénavant sur la branche gagnante
+      - On arrivera à récupérer l'identifiant initial
 * Backlog
 ** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
 - Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
