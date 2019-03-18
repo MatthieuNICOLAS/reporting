@@ -8744,6 +8744,26 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Pourrait essayer de forker Iodide et d'utiliser /mute-core/ pour fournir des fonctionnalités d'édition collaborative
   - Pourrait se faire dans le cadre d'un stage
   - Peut ensuite continuer sur l'intégration de mécanisme d'awareness dans l'outil si ça passe bien
+*** DONE PhD : Réflexion sur un système de serveurs de signaling distribués
+- À l'heure actuelle, on a un point unique de défaillance qui est le serveur de signaling
+- Ça serait intéressant de résoudre ce problème
+- Actuellement dans sa version centralisée
+  - Permet à un noeud de contacter un membre du réseau et de lui communiquer une offre
+  - Permet au noeud contacté de répondre par l'intermédiaire du signaling server
+- Pourrait proposer un système composé de plusieurs serveurs de signaling
+  - Chaque signaling server maintient une vue des connexions de chaque autre noeud
+  - Chaque signaling server maintient une liste de ses connexions
+  - Transmet les /insert/ et /remove/ locaux aux autres noeuds
+    - Comme on utiliserait des /WebSockets/ entre les serveurs, aurait la garantie de l'ordre des messages par serveur
+    - Pas besoin d'un CRDT
+  - Membership correspond à l'union de ces vues
+    - Besoin de compute seulement lors d'une suppression
+  - Lorsqu'on perd la connexion d'un signaling server, peut GC ses infos
+    - On a de toute façon plus moyen de contacter ses noeuds depuis ce signaling
+    - Nécessite par contre d'envoyer son état local à l'ouverture d'une connexion pour repeupler l'ensemble
+- Permettrait de faire du load-balancing et d'augmenter la fault-tolerance du système
+- Lorsqu'un nouveau noeud essaie de rejoindre le réseau, peut utiliser différentes stratégies pour forcer l'inter-connexion
+  - Choisit un noeud ou plusieurs noeuds aléatoirement et fait transiter les messages vers le signaling responsable si besoin
 * Backlog
 ** TODO Stage : Écrire le sujet de stage pour l'intégration d'un /log-based message broker/ dans *MUTE*
 - Rédiger le sujet de stage basé sur cette proposition: [[stage-log-based-message-broker]]
