@@ -8697,6 +8697,53 @@ We say that H implements A under this refinement mapping iff, for each behavior 
   The inverse is also established: non-monotonic programs require runtime enforcement (coordination) to ensure consistent execution.
   As a program property, CALM enables reasoning via static program analysis, and limits or eliminates the use of runtime checks.
   #+END_QUOTE
+*** DONE PhD : Lire *Iodide: an experimental tool for scientific communication and exploration on the web*
+- S'agit d'un blogpost sur un outil de notebooks développé par Mozilla
+- Disponible ici : https://hacks.mozilla.org/2019/03/iodide-an-experimental-tool-for-scientific-communicatiodide-for-scientific-communication-exploration-on-the-web/
+- François nous posait la question récemment de l'effort que représenterait d'ajouter des fonctionnalités Jupyter-like dans MUTE
+- Serait intéressant de comparer les approches
+- Réflexions sur l'intégration de fonctionnalités Jupyter-like dans MUTE
+  - Document structuré
+    - Les documents dans Jupyter sont des documents structurés
+    - Ils sont composés de différentes cellules de différents types
+    - On pourrait considérer chaque cellule comme un document
+    - De façon à ce que chaque cellule puisse être éditée sans nécessiter de coordination, peut utiliser des CRDTs
+      - Doit proposer un CRDT spécifique à chaque type de cellule disponible
+    - À ce moment là, le document global serait une composition de CRDTs
+    - Pose des questions sur les opérations spécifiques à une telle composition
+      - Suppression d'une cellule
+	- On devrait pouvoir supprimer une cellule précédemment ajoutée
+	- Comment se comporte le système dans le cas d'une modification d'une cellule en parallèle de sa suppression?
+      - Déplacement d'une cellule
+	- On devrait pouvoir réordonner les cellules ajoutées
+	- Comment se comporte le système dans le cas de déplacements concurrents d'une même cellule?
+  - Exécution du code
+    - Dans un notebook, des cellules correspondent à des fragments de code à exécuter
+    - Pose des questions sur comment gérer ces exécutions de code
+    - Peut introduire dans la collaboration des bots en charge d'exécuter le code
+    - Ce qui pose différentes questions sur le fonctionnement de ses bots
+    - Rôle dans la collaboration?
+      - Est-ce que c'est vraiment un collaborateur avec qui on partage un document?
+      - Ou est-ce qu'il s'agit juste d'un serveur auquel on soumet des demandes d'exécution?
+      - Est-ce qu'il ne répond qu'à celui qui a demandé l'exécution ou à tous?
+    - Mode d'exécution?
+      - Normalement les cellules sont exécutées indépendamment
+      - Potentiellement, l'environnement actuel (variables existantes) ne correspondent plus aux cellules de codes exécutées
+	- Car elles ont été modifiées depuis leur dernière exécution
+      - L'exécution d'une cellule se limite à celle-ci
+	- On ne re-exécute pas les cellules précédentes
+      - À moins de changer cela, il faut donc transmettre son environnement au bot lors d'une demande d'exécution
+	- Paraît coûteux
+- Iodide
+  - Pas réellement un document structuré
+    - S'agit juste d'un document texte avec des balises pour délimiter les cellules
+    - Facilement compatible avec les CRDTs existants
+  - Exécute le programme directement dans le navigateur à l'aide de *WebAssembly*
+    - Pas besoin de partager un bot entre collaborateurs
+    - Pas besoin de partager un environnement entre le client et le bot
+- Pourrait essayer de forker Iodide et d'utiliser /mute-core/ pour fournir des fonctionnalités d'édition collaborative
+  - Pourrait se faire dans le cadre d'un stage
+  - Peut ensuite continuer sur l'intégration de mécanisme d'awareness dans l'outil si ça passe bien
 * Backlog
 ** TODO Stage : Écrire le sujet de stage pour l'intégration d'un /log-based message broker/ dans *MUTE*
 - Rédiger le sujet de stage basé sur cette proposition: [[stage-log-based-message-broker]]
