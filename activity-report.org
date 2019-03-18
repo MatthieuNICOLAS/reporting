@@ -8509,9 +8509,195 @@ We say that H implements A under this refinement mapping iff, for each behavior 
       - Permet de garantir que dans le cas d'opérations de renommage concurrentes
       - Pour tous les identifiants dépendant d'une opération de renommage autrefois perdante, dorénavant sur la branche gagnante
       - On arrivera à récupérer l'identifiant initial
-* Backlog
-** TODO IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
+- Lire *IPA: Invariant-Preserving Applications for Weakly Consistent Replicated Databases*
+  - Disponible http://www.vldb.org/pvldb/vol12/p404-balegas.pdf
+    - Par V. Balegas, S. Duarte, C. Ferreira, R. Rodrigues, N. Preguiça
+  - Idée
+    - La réplication optimiste permet généralement d'atteindre de meilleurs performances
+    - Notamment car elle permet la génération d'opérations concurrentes sans aucune coordination
+    - Ce qui, dans certains cas, peut résulter en des états incohérents en fonction de l'ordre d'exécution de ces opérations par sites
+    - Afin de prévenir ce problème, certains systèmes utilisent des mécanismes de synchronisation pour ces opérations qui pourraient provoquer un conflit
+    - Propose ici une nouvelle approche qui consiste à modifier les opérations conflictuelles pour qu'elles ne génèrent plus de conflits
+      - Bon, jusque là, ça ne me paraît pas nouveau pour un CRDT
+    - La modification des opérations n'influent pas sur leur comportement habituel
+    - Mais elle permet de résoudre les conflits lorsque des opérations concurrentes existent
+    - Propose un outil d'analyse statique pour déceler les conflits et proposer des modifications permettant de les résoudre
+  - Rétablissement d'invariants
+    - Chaque opération possède un ou plusieurs invariants requis pour sa bonne exécution
+    - Son exécution peut modifier la valeur d'autres invariants
+    - Le problème d'opérations concurrentes est qu'elles peuvent être générées sur un état commun qui est valide en regard de leurs invariants respectifs
+    - Mais l'exécution d'une de ces opérations invalide un invariant de la seconde, et inversement
+    - Propose donc d'étendre ces opérations pour, si besoin est, rétablir leurs invariants
+    - Revient donc à établir une priorité entre ces opérations
+    - Et à annuler l'effet de certaines d'entre elles afin de préserver l'invariant
+  -
+  - Remarques
+    - Coût en métadonnées
+      - Ne s'attarde que sur le temps d'exécution des opérations
+      - Mais la modification des opérations introduit un overhead d'un point de vue méta-données
+      - Par exemple, dans le cas du tournoi, s'inscrire à un tournoi est modifié pour regénérer le tournoi si besoin
+      - Ceci implique que
+	- Soit le tournoi n'est pas supprimé lors de sa suppression, juste caché
+	  - Auquel cas un mécanisme de GC reposant sur la stabilité causale est nécessaire
+	- Soit l'opération d'inscription embarque toutes les informations du tournoi pour pouvoir le recréer
+	  - Auquel cas je serai curieux de voir l'augmentation de la taille des opérations modifiées par rapport aux originales
+    - Duplication de la compensation
+      - Pour résoudre certains conflits, met en place un système externe de compensation
+      - Par contre, chaque replica en détectant un conflit peut déclencher un traitement de la part de ce système
+      - Il est donc possible qu'un même conflit soit détecté plusieurs fois par différents sites et que chacun déclenche une procédure de compensation
+      - Suppose que c'est le système externe qui gère la compensation qui est responsable de dé-dupliquer les compensations
+      - Mais ce n'est pas adressé ici
+** Semaine du <2019-02-25 Mon> au <2019-03-01 Fri>
+- Réunion suivi de thèse
+  - /Safety properties/ des fonctions de renommage
+    - /renameId()/ préserve l'ordre
+      - i.e. pour tout /id1/ et /id2/ tels que /id1 < id2/, on a /renameId(id1) < renameId(id2)/
+    - /reverseRenameId()/ préserve l'ordre
+      - Même chose qu'au dessus
+    - /reverseRenameId()/ inverse /renameId()/
+      - i.e. pour tout /id/, on a /reverseRenameId(renameId(id)) = id/
+      - Permet de garantir qu'on peut annuler l'effet d'un renommage perdant et revenir à l'/epoch/ ancêtre
+    - En fonction de la stratégie de priorité des epochs, peut nécessiter que /renameId()/ et /reverseRenameId() soient réciproques
+  - GC les opérations de renommage
+    - Pensais que je pouvais GC une /epoch/ dès qu'elle devenait stable
+    - Mais c'était incorrect
+    - Besoin de
+      - Attendre que tous les noeuds soient sur epoch prioritaire
+      - Que l'epoch soit une feuille
+  - Comparaison pire cas avec /Core & Nebula/
+    - /Core & Nebula/, renommage pessimiste
+      - Pire cas, n'arrive pas à faire le consensus
+      - N'arrive pas à réduire l'overhead de la structure (en RAM, CPU, bandwidth)
+    - Dans notre cas, renommage optimiste
+      - Pire cas ?
+	- N'arrive pas à GC les epochs
+	  - Mais profite déjà d'un bénéfice en RAM, CPU et bandwidth
+	- Ou n'arrive pas à se stabiliser sur une epoch
+	  - Là par contre, les perfs doivent en prendre un coup
+  - Réflexion sur le mécanisme de renommage
+    - Tradeoff sur la stratégie de priorité des epochs
+      - Pire cas différent en fonction de la stratégie choisie
+    - Pas besoin d'être sur la même epoch pour collaborer
+  - Plan
+    - Intro
+    - Séquences répliquées
+      - CRDTs
+      - Séquence
+      - Logoot?
+      - RGA?
+      - LogootSplit
+      - Problème des identifiants qui grossissent, de l'arbre qui grandit
+    - Renommage avec coordination
+      - Idée du renommage
+	- Identifiants plus petits
+	- Un seul bloc
+      - Exécution locale
+      - Gestion des opérations d'insertion/suppression concurrentes
+      - Exécution du renommage en distant
+      - *EpochStore*
+    - Renommage sans coordination
+      - Stratégie de priorité entre les différentes epochs
+      - Inversion du renommage perdant
+      - GC des epochs
+    - Évaluation
+    - Discussion
+      - Différences entre stratégies de priorité d'epochs
+      - Peut diverger sur l'epoch courante
+  - Questions plan
+    - Présenter dans un 1er temps l'approche décentralisée à la /Core & Nebula/ puis ensuite présenter les mécanismes pour supporter un système entièrement distribué
+      - Permet de proposer une approche initiale simplifiée dans un 1er temps
+      - Avant d'introduire les problèmes liés aux renommages concurrents
+      - Permettrait de bien présenter les 2 approches et leurs compromis respectifs
+  - Point sur les expérimentations
+    - Mis en place une simulation
+      - 5 bots qui écrivent de manière aléatoire, 10k opérations chacun
+    - Log les opérations jouées
+    - Conserve des snapshots au fur et à mesure de l'avancement
+    - Souhaite récupérer les différentes snapshots
+    - Puis jouer des opérations locales et distantes aléatoires sur les différentes snapshots pour estimer le temps d'exécution
+    - A révelé différents bugs
+      - Dans /mute-structs/ et dans le bot d'expérimentation
+  - Event sourcing
+  - Time series database
+    - Volume de lecture ?
+** Semaine du <2019-03-04 Mon> au <2019-03-08 Fri>
+*** DONE IUT : Corriger les projets étudiants réalisés dans le cadre du module JS
 - Lien de la classroom : https://classroom.github.com/classrooms/43989904-teaching-mnicolas/group-assignments/2018-lp-ciasie-prog-web-project
+*** CANCELLED PhD : Compléter et envoyer l'autorisation de cumul à l'IUT
+** Semaine du <2019-03-11 Mon> au <2019-03-15 Fri>
+*** DONE DISTRIBUTED SYSTEMS : Lire *Keeping CALM: When Distributed Consistency is Easy*
+- Par Joseph M. Hellerstein et Peter Alvaro
+- Disponible ici : https://arxiv.org/abs/1901.01930
+- Un post de /the morning paper/ y est consacré
+  - Disponible ici : https://blog.acolyer.org/2019/03/06/keeping-calm-when-distributed-consistency-is-easy/
+- Je me suis principalement basé sur ce commentaire
+- Part du constat qu'un système distribué offre de meilleures performances s'il est coordination-free
+- Pose la question de quand peut-on éviter la coordination et cherche à y apporter une réponse
+- Introduit la notion de /essential coordination/ et /accidental coordination/
+  - /essential coordination/
+    - Une coordination qui est nécessaire pour offrir une garantie, pour respecter une contrainte
+  - /accidental coordination/
+    - Une coordination qui aurait pu être évitée en proposant un meilleur design du système
+- Indique qu'une cause de /accidental coordinations/ est qu'on tâche de résoudre les problèmes de cohérence au plus bas niveau (le stockage)
+- Alors qu'on pourrait déléguer cela aux couches supérieures (l'application)
+- Formule la problématique de la manière suivante
+  #+BEGIN_QUOTE
+  What is the family of problems that can be consistely computed in a distributed fashion without coordination and what problems lie outside that family?
+  #+END_QUOTE
+- Afin de déterminer si un système peut être coordination-free, s'intéresse aux questions que ce système se pose et à la monotonicité des propriétés qu'il cherche à observer
+  - S'il s'agit d'un "Existe-t-il?", ∃, alors dès qu'une occurrence est détectée, on a la réponse
+    - Des occurrences supplémentaires ne changeraient pas ce fait
+  - S'il s'agit d'un "Est-ce qu'il n'existe pas?", ∄, alors on ne peut obtenir de réponse qu'après avoir pris connaissance de l'état de tout le système
+    - On ne peut pas prendre de décision dès qu'une occurrence est détectée
+    - Puisqu'il suffit d'un seul autre noeud pour lequel ce prédicat n'est pas respecté pour que le prédicat soit faux pour l'ensemble du système
+    - Il est donc nécessaire de vérifier ce prédicat pour chaque noeud avant de prendre une décision
+  - De même pour une question "Pour tout", ∀
+    - Il est intéressant de noter que ∄x · P(x) <=> ∀x · !P(x)
+- Par contre, si on autorise la suppression d'informations, la réponse à la question ∃ peut évoluer au cours du temps
+- On ne peut donc plus répondre à la question sans connaître l'état de l'intégralité du système s'il n'est pas monotone
+- Énonce le CALM Theorem de la manière suivante
+  #+BEGIN_QUOTE
+  Consistency as Logical Monotonicity (CALM)
+  A program has a consistent, coordination-free distributed implementation if and only if it is monotonic
+  #+END_QUOTE
+- Introduit la notion de commutativité et de confluence
+  - Commutativité
+    - Une opération binaire est commutative si l'ordre de ses opérandes n'a pas d'influence sur son résultat
+  - Confluence
+    - Une généralisation de la commutativité
+    - Une opération est confluente si elle produit le même set de résultats pour n'importe quel ordonnancement pour un même set d'inputs
+- Composition d'opérations confluentes
+  #+BEGIN_QUOTE
+  If the outputs of one confluent operation are consumed by another, the resulting composite operation is confluent.
+  Hence confluence can be applied to individual operations, components in a dataflow, or even entire distributed programs.
+  If we restrict ourselves to building programs by composing confluent operations, our program are confluent by construction, despite orderings of messages or execution races within and accross components.
+  #+END_QUOTE
+- Explique que les opérations confluentes sont les briques pour construire un système monotone
+  - Dans quel sens ?
+  - Je le comprends dans le sens "Pour construire un système monotone, doit utiliser des opérations monotones"
+  - À confirmer
+- Afin d'avoir un système sans coordination, explique qu'on doit toujours éviter les négations
+  - Suppression de données
+  - ∄ et ∀
+  - D'un point de vue état mutable, cela signifie qu'on peut ajouter des données, mais pas les modifier ou supprimer
+- Présente les CRDTs comme un framework pour construire un système monotone
+- Explique que l'immutabilité est un pattern monotone
+- Tandis que la mutabilité est non-monotone
+  - Me paraît pas évident
+  - À creuser
+- Présente le langage *Bloom* comme un langage spécifiquement conçu pour aider au développement d'applications CALM
+  - Rend les patterns monotones (et donc confluents) les plus simples à utiliser pour le développeur
+  - Effectue de l'analyse statique reposant sur les principes de CALM pour garantir la convergence du programme
+- Si on n'arrive pas à fournir une implémentation monotone d'une feature, propose de déplacer la coordination nécessaire en dehors du chemin critique
+- Propose une alternative consistant à procéder sans coordination et en mettant en place un mécanisme pour détecter les incohérences et de compensation
+- Termine sur la citation suivante
+  #+BEGIN_QUOTE
+  The CALM Theorem presents a positive result that delineates the frontier of the possible;
+  CALM shows that monotonicity, a property of a program, implies consistency, a property of the output of any execution of that program.
+  The inverse is also established: non-monotonic programs require runtime enforcement (coordination) to ensure consistent execution.
+  As a program property, CALM enables reasoning via static program analysis, and limits or eliminates the use of runtime checks.
+  #+END_QUOTE
+* Backlog
 ** TODO Stage : Écrire le sujet de stage pour l'intégration d'un /log-based message broker/ dans *MUTE*
 - Rédiger le sujet de stage basé sur cette proposition: [[stage-log-based-message-broker]]
 - Vise un.e étudiant.e de TN, 2A IL
@@ -8528,7 +8714,6 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - À partir de là, voir si je me place dans le même contexte
 ** TODO DISTRIBUTED SYSTEMS : Regarder *Distributed Transactions are dead, long live distributed transactions!*
 - Lien : https://www.reactivesummit.org/2018/schedule/distributed-transactions-are-dead-long-live-distributed-transactions
-** IN-PROGRESS PhD : Compléter et envoyer l'autorisation de cumul à l'IUT
 ** TODO PhD : Faire valider les formations scientifiques suivies
 ** TODO MUTE : Exploser le test "renameId() retains order between ids"
 - Ce test évalue de nombreux cas différents
