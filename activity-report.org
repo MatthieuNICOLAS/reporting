@@ -8764,10 +8764,252 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Permettrait de faire du load-balancing et d'augmenter la fault-tolerance du système
 - Lorsqu'un nouveau noeud essaie de rejoindre le réseau, peut utiliser différentes stratégies pour forcer l'inter-connexion
   - Choisit un noeud ou plusieurs noeuds aléatoirement et fait transiter les messages vers le signaling responsable si besoin
-* Backlog
-** TODO Stage : Écrire le sujet de stage pour l'intégration d'un /log-based message broker/ dans *MUTE*
+** Semaine du <2019-03-18 Mon> au <2019-03-22 Fri>
+- Meeting
+  - Mostly working on the draft of the paper on the renaming mechanism
+    - Wrote the background part
+    - Now working on the first part of the contribution, which is the renaming mechanism in the context of a centralised system
+    - Will share it with Gérald and Olivier once this part is done
+    - Is having some difficulties to break the renaming mechanism in smaller pieces to present it an incremental manner
+      - And not just bomb the reader with all the notions at once
+    - Was hoping to finish it today, but is more likely to finish it Monday, Tuesday at most
+  - Study a bit Iodide
+    - Mozilla's scientific notebook tool
+      - Concurrent to Jupyter
+    - https://hacks.mozilla.org/2019/03/iodide-an-experimental-tool-for-scientific-communicatiodide-for-scientific-communication-exploration-on-the-web/
+    - Could be one use case for our work
+    - Its design seems adapted to our work
+      - Should be not too difficult to integrate collaborative editing features in it compared to other tools
+    - Usually in notebook, the document is composed of several cells of different type
+      - Text
+      - Code
+      - Image
+    - Adding collaborative editing features would mean to provide CRDTs for each kind of cell and also a CRDT to compose them
+    - But in Iodide, the document is only a text document
+      - Is using a markup langage to logically split the document into cells
+      - We know how to replicate text
+    - Since the code is directly executed into the browser, won't require a bot
+      - with all the security issued it would raise
+    - They are interested in adding collaborative editing features
+      - It's in their roadmap
+      - Maybe we should give it a try
+** Semaine du <2019-04-01 Mon> au <2019-04-05 Fri>
+- Meeting
+  - Wrote a deliverable for OpenPaas
+  - Wrote a intership proposal to add a log-based message broker to MUTE architecture
+    - To act as a bridge when WebRTC connections failed
+    - Currently, it's the BotStorage which fill this role
+    - But the bot is unstable
+    - The main benefit of this approach is that this middleware won't need to understand the messages, just to relay them
+    - The goal is to learn more about this technology and the issues it may face
+  - Worked on the paper on the renaming mechanism
+    - Spent quite a lot of time struggling with the formalism to adopt
+    - I am interested in the formalism used in *Pure Operation-Based Replicated Data Types* by Baquero et al.
+    - But this formalism is not suited to complex data types as LogootSplit
+    - Fallback to formalism used in Logoot and LogootSplit paper
+*** DONE Stage : Écrire le sujet de stage pour l'intégration d'un /log-based message broker/ dans *MUTE*
 - Rédiger le sujet de stage basé sur cette proposition: [[stage-log-based-message-broker]]
 - Vise un.e étudiant.e de TN, 2A IL
+- Disponible à l'adresse suivant : https://coedit.re/sujet-stage-kafka
+** Semaine du <2019-04-16 Tue> au <2019-04-19 Fri>
+- CRDT : Roshi
+  - Un LWW-Element Set open-source développé et utilisé par SoundCloud
+  - Discussion HN disponible ici : https://news.ycombinator.com/item?id=19679321
+  - GitHub disponible ici : https://github.com/soundcloud/roshi
+  - Article de blog dédié disponible ici : https://developers.soundcloud.com/blog/roshi-a-crdt-system-for-timestamped-events
+  - Utilisé avant de répondre au problème suivant
+    - Propose une fonctionnalité de timeline nommée /stream/
+    - Affiche à l'utilisateur l'ensemble des évènements produits par ses contacts dans l'ordre chronologique
+  - Avait mis en place initialement une première stratégie, celle du /fan out on write/
+    - Consiste à écrire dans les /streams/ de chacun des followers de l'utilisateur lorsque ce dernier génère un évènement
+  - Cette approche présente plusieurs problèmes
+    - Plus l'utilisateur a de followers, plus d'écritures seront déclenchées suite à la génération d'un évènement
+    - De même, l'espace utilisé pour stocker les évènements augmente aussi avec le nombre de followers
+      - Puisque l'évènement est dupliqué dans l'inbox de chacun des followers
+  - Propose une alternative qui est /fan on read/
+    - Quand un utilisateur génère un évènement, il l'enregistre dans son outbox
+    - Lorsqu'un utilisateur calcule son /stream/, il aggrège les outboxes de tous ceux qu'il follow
+  - Cette approche pose néanmoins le problème suivant
+    - Il est difficile d'aggréger le contenu de milliers de outboxes (lecture, tri, fusion) dans un délai minimal
+  - À l'échelle de SoundCloud, le volume de données que représente les évènements avoisine les 100Go, ce qui peut tenir en RAM
+    - Ce qui améliore les perfs
+  - Le problème restant porte sur comment peupler les outboxes tout en permettant leur aggrégation efficacement
+    - Doit mettre en place de la réplication et du load-balancing des outboxes pour des raisons de performances
+  - Propose d'utiliser un LWW-Element Set pour stocker les évènements d'une outbox
+    - Ressemble fortement au LWW-Element Set proposé par Shapiro
+      - Maintient un ensemble des évènements ajoutés et un autre ensemble des évènements supprimés
+      - Chaque élément possède un timestamp
+      - Obtient l'ensemble des éléments contenus dans le set en retirant de l'ensemble des évènements ajoutés les évènements qui apparaissent dans l'ensemble des supprimés avec un timestamp supérieur
+    - La spécificité de leur CRDT est de retirer dès que possible un évènement d'un ensemble ou de l'autre
+      - Dès qu'un évènement est supprimé de façon effective, il est retiré de l'ensemble des ajouts
+      - Dès qu'un évènement est ajouté de façon effective, il est retiré de l'ensemble des suppressions
+    - Lorsqu'une écriture est réalisée, elle est broadcastée à l'ensemble des clusters
+    - Dès qu'un nombre défini de clusters a validé l'écriture, l'écriture est indiquée comme réussie à l'utilisateur
+    - Pour la lecture, plusieurs stratégies sont définies
+      - La lecture peut juste retourner l'état d'un cluster
+      - La lecture peut aussi récupérer l'état de plusieurs clusters
+      - Dans ce cas, des divergences peuvent être constatées
+      - Retourne l'union des sets dans ce cas de figure
+  - Requiert néanmoins une hypothèse forte qui est les timestamps associés aux évènements représentent de manière correcte l'ordre global de ces derniers
+    - Justifie cette hypothèse en expliquant que Roshi tourne sur leurs serveurs, qui utilisent un protocole de synchronisation d'horloge
+    - Et que le peu de cas incohérents restants n'ont qu'un impact limité
+      - Un "like" qui survit à un "unlike" car l'ordre des timestamps associés aux deux évènements est incorrect
+- DISTRIBUTED SYSTEMS : *Towards a Solution to the Red Wedding Problem*
+  - Papier publié par C.S Meiklejohn, H. Miller et Z. Lakhani au workshop HotEdge
+  - Disponible ici : http://christophermeiklejohn.com/publications/hotedge-2018-preprint.pdf
+  - Présente le problème du *Red Wedding*
+    - Avant, pendant puis après la diffusion d'un épisode de GoT, le wiki de la série souffre de multiples pics d'affluence
+      - Les téléspectateurs consultent les pages liées aux différents personnages de l'épisode, les évènements précédents
+      - Mais mettent aussi à jour les pages des personnages concernés ou des évènements ayant eu lieu au cours de l'épisode
+    - Le wiki, initialement prévu pour supporter un grand nombre de lectures, se retrouve à devoir supporter un grand nombre d'écritures
+    - Afin d'optimiser les performances de l'application pour supporter à la fois un grand nombre de lectures et d'écritures, propose d'utiliser
+      - l'edge computing pour diminuer les latences réseaux
+      - l'architecture serverless pour augmenter l'elasticité du système
+  - De cette manière, vise à
+    - Offrir des écritures rapides grâce à une latence faible
+    - Augmenter le débit global des écritures en les remontant en patch au Data Center pour limiter l'impact de ce dernier sur les perfs
+** Semaine du <2019-04-23 Tue> au <2019-04-26 Fri>
+- Meeting
+  - A envoyé une 1ère version du papier sur le mécanisme de renommage à Olivier et Gérald contenant que la présentation de l'approche centralisé
+    - Permis d'avoir quelques retours déjà sur le contenu
+    - Va servir de base pour une discussion sur la suite
+    - Doit fixer une réunion avec Gérald et Olivier pour cette discussion
+  - Travailler sur le papier m'a fait penser à une nouvelle approche
+    - Consiste à décomposer la donnée répliquée en 1 une valeur de base et un CRDT pour représenter les modifications depuis cette valeur
+    - En train de passer les revues les différents CRDTs pour voir
+  - Stage
+** Semaine du <2019-04-29 Mon> au <2019-05-03 Fri>
+- Lire le blogpost *Local-first*
+  - Disponible ici : https://www.inkandswitch.com/local-first.html
+  - Rédigé par Martin Kleppmann, Adam Wiggins, Peter van Hardenberg et Mark McGranaghan
+  - Présente les limites des applications centralisées
+    - Perte pour l'utilisateur de l'ownership de ses données au profit du provider
+    - Si le service vient à disparaître, le travail effectué sur l'application disparaît généralement aussi
+  - Présente les principes d'une nouvelle catégorie d'application : /Local-first software/
+    - Met l'accent sur la possibilité de conserver la propriété de ses données, de collaborer avec d'autres utilisateurs et de pouvoir travailler en mode déconnecté
+  - Définit 7 critères qu'idéalement doit remplir une application /Local-first/
+    1. Fast
+    2. Multi-device
+    3. Offline
+    4. Collaboration
+    5. Longevity
+    6. Privacy
+    7. User control
+  - Montre que les applications traditionnelles ne remplissent pas l'ensemble de ces critères à la fois
+  - Indique que les CRDTs sont la technologie de base permettant de nouvelles applications capables de remplir l'ensemble de ces critères
+  - A développé la libraire /Automerge/ pour fournir une implémentation de CRDTs
+    - Disponible ici : https://github.com/automerge/automerge
+  - À partir de /Automerge/ et de la couche réseau /Dat/, a développé une nouvelle libraire /Hypermerge/
+    - Disponible ici : https://github.com/automerge/hypermerge
+  - A développé 3 prototypes en se basant sur ces technologies
+  - *Trellis*, une adaptation de *Trello*
+    - Disponible ici : https://github.com/automerge/trellis#readme
+    - Vidéo de présentation : https://www.youtube.com/watch?v=L9fdyDlhByM
+  - *PixelPusher*, un logiciel de dessin en pixel art collaboratif
+    - Disponible ici : https://github.com/automerge/pixelpusher#readme
+    - Rapport de projet : https://medium.com/@pvh/pixelpusher-real-time-peer-to-peer-collaboration-with-react-7c7bc8ecbf74
+  - *PushPin*, un "mixed media canvas"
+    - Le projet le plus abouti
+    - Utilisé par leur équipe et par des testeurs externes
+    - Disponible ici : https://inkandswitch.github.io/pushpin/
+    - Vidéo de présentation : https://www.youtube.com/watch?v=Dox3XAoTCyg
+  - Visualizing document history is important
+    #+BEGIN_QUOTE
+    In a distributed collaborative system another user can deliver any number of changes to you at any moment.
+    Unlike centralized systems, where servers mediate change, local-first applications need to find their own solutions to these problems.
+    Without the right tools, it can be difficult to understand how a document came to look the way it does, what versions of the document exist, or where contributions came from.
+
+    In the Trellis project we experimented with a “time travel” interface, allowing a user to move back in time to see earlier states of a merged document,
+    and automatically highlighting recently changed elements as changes are received from other users.
+    The ability to traverse a potentially complex merged document history in a linear fashion helps to provide context and could become a universal tool for understanding collaboration.
+    #+END_QUOTE
+    - Souligne l'importance d'une fonctionnalité d'historique
+    - Après, cet historique a-t-il besoin d'être répliqué ?
+    - Est-ce qu'on peut juste fournir la sérialisation locale des opérations à l'utilisateur ?
+      - Et donc avoir des différences d'un utilisateur à l'autre
+    - Ou faut-il au contraire avoir un CRDT pour l'historique aussi ?
+  - CRDTs accumulate a large change history, which creates performance problem
+    #+BEGIN_QUOTE
+    Our team used PushPin for “real” documents such as sprint planning.
+    Performance and memory/disk usage quickly became a problem because CRDTs store all history, including character-by-character text edits.
+    These pile up, but can’t easily be truncated because it’s impossible to know when someone might reconnect to your shared document after six months away
+    and need to merge changes from that point forward.
+
+    We continue to optimize Automerge, but this is a major area of ongoing work.
+    #+END_QUOTE
+    - Semblerait qu'ils aient rencontré des problèmes de performances liés à l'utilisation prolongée des CRDTs, notamment de séquences
+    -
+  - Cloud servers still have their place for discovery, backup, and burst compute.
+    #+BEGIN_QUOTE
+    A real-time collaborative prototype like PushPin lets users share their documents with other users without an intermediating server.
+    This is excellent for privacy and ownership, but can result in situations where a user shares a document, and then closes their laptop lid before the other user has connected.
+    If the users are not online at the same time, they cannot connect to each other.
+
+    Servers thus have a role to play in the local-first world — not as central authorities, but as “cloud peers” that support client applications without being on the critical path.
+    For example, a cloud peer that stores a copy of the document, and forwards it to other peers when they come online, could solve the closed-laptop problem above.
+
+    Hashbase is an example of a cloud peer and bridge for Dat and Beaker Browser.
+
+    Similarly, cloud peers could be:
+
+      - an archival/backup location (especially for phones or other devices with limited storage);
+      - a bridge to traditional server APIs (such as weather forecasts or a stock tickers);
+      - a provider of burst computing resources (like rendering a video using a powerful GPU).
+
+    The key difference between traditional systems and local-first systems is not an absence of servers, but a change in their responsibilities:
+    they are in a supporting role, not the source of truth.
+    #+END_QUOTE
+  - Donne quelques pistes de recherche et de travail autour des applications /Local-first/
+    - Amélioration des performances des CRDTs
+    - Intégration non-immédiate des modifications des autres collaborateurs
+      - Actuellement, on propose des modèles où les modifications distantes sont directement intégrées dans ma copie à leur livraison
+      - D'un point de vue applicatif, peut vouloir rejeter des modifications, effectuer des modifications privées, ou reformater l'historique de mes modifications
+      - Effectue le parallèle avec les notions de "branches", "forks" et "rebasing" des systèmes de gestion de versions
+    - Gestion et compatibilité des versions différentes d'une application /Local-first/
+      - Des collaborateurs peuvent utiliser des versions différentes d'une même application
+      - Ces versions peuvent avoir des fonctionnalités et des modèles de données différents
+      - Comment écrire les applications pour permettre l'interopérabilité entre les différentes versions ?
+    - Notion de /online/
+      - Dans une application /Local-first/, on peut potentiellement collaborer avec d'autres pairs sans avoir accès à l'internet
+      - Comment communiquer à l'utilisateur qu'il travaille au sein d'une partition ?
+    - Historique du document
+      - Dans un système distribué sans coordination, chaque noeud peut jouer les opérations dans un ordre différent des autres en fonction des livraisons des messages
+      - Jusque là, nous utilisons un historique linéaire des versions pour représenter les changements
+      - Mais quand il n'y a plus d'ordre véritable, comment pouvons-nous retravailler cette représentation de l'historique ?
+	- De façon à ce que l'utilisateur puisse comprendre les étapes ayant mené à l'état actuel et qu'il puisse les communiquer à ses autres collaborateurs
+    - Contrôles d'accès en distribué
+      - Dans une application /Local-first/, rien ne peut empêcher un collaborateur de modifier son document
+      - Comment faire pour donner le choix aux autres utilisateurs d'accepter ou de refuser ses modifications ?
+      - Comment les notions de "share" et "permissions" évoluent dans ce nouveau paradigme ?
+* Backlog
+** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
+- Dans MUTE, quand une modification est effectuée, son traitement est le suivant
+  - L'opération locale est appliquée sur le modèle
+  - Une opération distante résultante est générée
+  - L'opération distante est broadcastée aux autres noeuds
+- Le problème provient de comment on gère la sauvegarde locale de l'état
+- L'état local est sauvegardé à intervals réguliers
+- Ceci permet d'éviter de sauvegarder l'état pour chaque opération
+- Cependant, cela créé le cas possible de divergence suivant
+  - Un noeud génère une opération, identifiée de manière unique à l'aide d'un Dot /<siteId, seq>/
+  - Le noeud propage l'opération avec succès
+  - Le noeud crash avant d'avoir sauvegardé son nouvel état
+    - Et donc la nouvelle valeur de /seq/
+  - Le noeud relance l'application
+  - À ce stade, le noeud n'a donc plus de traces de la dernière opération locale qu'il a effectué
+  - Le noeud effectue une nouvelle opération, qui va partager le même identifiant "unique" que l'opération précédente
+  - Le noeud propage l'opération
+  - À ce stade, on va assister à une partition
+    - Une partie des noeuds qui ont reçu et intégré la 1ère opération vont ignorer la 2nde, le dot étant identique
+    - Les autres noeuds vont recevoir et intégrer la 2nde
+- Il s'agit d'un cas d'équivocation
+  - Alors que le noeud est potentiellement honnête
+- Pistes de solution
+  - Sauvegarder l'état avant de propager les opérations
+    - Peut faire ça pour chaque opération
+      - Mais ça serait coûteux
+    - Peut donc mettre plutôt en place une bufferisation des opérations puis un envoi du batch après sauvegarde réussie
+    - Introduirait par contre de la latence dans le système
 ** TODO DISTRIBUTED SYSTEMS : Lire *Incremental Consistency Guarantees for Replicated Objects*
 - Par Rachid Guerraoui, Matej Pavlovic, Dragos-Adrian Seredinschi
 - Introduit la notion de *Correctables*, des objets répliqués dont les garanties de cohérence évoluent au cours de l'exécution
