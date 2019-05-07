@@ -8981,6 +8981,158 @@ We say that H implements A under this refinement mapping iff, for each behavior 
       - Dans une application /Local-first/, rien ne peut empêcher un collaborateur de modifier son document
       - Comment faire pour donner le choix aux autres utilisateurs d'accepter ou de refuser ses modifications ?
       - Comment les notions de "share" et "permissions" évoluent dans ce nouveau paradigme ?
+** Semaine du <2019-05-06 Mon> au <2019-05-10 Fri>
+- MUTE : Exploiter les résultats de l'expérience
+  - A fait tourner une expérience en fin de semaine dernière pour générer des traces d'utilisations
+  - Paramètres de l'expérience
+    - 5 bots
+    - 100k opérations chacun
+    - Une action d'insertion (85%) ou de suppression (15%) toutes les 300ms
+    - Avant chaque opération, 5% de chance de se déplacer dans le document
+  - L'expérience n'a pas pu aller jusqu'au bout suite à différents problèmes
+    - Les opérations jouées par un noeud sont ajoutées au fur et à mesure dans un fichier
+    - Pour chaque opération, les statistiques de la structure de données actuelles sont ajoutées au log
+      - Ceci était initialement prévu pour permettre de mieux expliquer et exploiter les temps d'intégration des opérations
+      - Mais comme on a changé de façon de procéder, que l'expérience sert dorénavant à générer des snapshots pour effectuer des mesures ensuite dessus
+      - Ces stats se révèlent inutiles
+      - Cependant elles nécessitent de parcourir la structure de données pour être calculées
+    - Le calcul des stats et l'écriture fréquente dans la fichier alourdissaientt l'exécution de la simulation
+    - De plus, une partition s'était produite
+      - Un noeud, le *Bot2*, travaillait de façon isolée sur un document
+	- D'après le vecteur d'état loggé, il aurait brièvement collaboré avec un autre noeud
+	- Mais l'identifiant de ce dernier ne correspond à aucun des autres bots
+      - Le *Bot2* était inconnu et deconnecté des autres bots
+    - L'objectif n'aurait donc jamais pu être atteint, les bots auraient attendu éternellement
+      - Chaque bot, après avoir effectué ses opérations, attend d'avoir observé toutes les opérations pour quitter
+    - Cette partition peut avoir été provoquée par un redémarrage du *Master* survenu après avoir démarré sa collaboration avec *Bot2*, mais avant que les autres ne démarrent
+      - Cependant, les logs montrent que le noeud avait lequel collaborait *Bot2* a effectué 154 opérations avant de s'arrêter
+      - Ça reviendrait à 45s de collaboration avant que le crash ne se produise
+      - 45s durant lesquelles aucun autre bot n'aurait démarré et ne se serait connecté au *Master*
+    - Cette explication s'avère donc peu convaincante
+  - Solutions
+    - Modifier /toJSON()/ de *LogootSRopes* pour exclure /mapBaseToBlock/
+      - Au passage, on a remarqué dans les snapshots qu'apparaissait le champ /mapBaseToBlock/
+      - Ce champ, qui associe à chaque base de position le bloc auquel elle correspond, est volumineux
+      - Mais n'est pas utilisé lors de la désérialisation de la séquence répliquée
+      - Le retirer de la sérialisation
+    - Bufferiser les opérations pour écrire dans le log que toutes les X opérations
+    - Retirer le calcul des stats de la structure de l'entrée de chaque opération
+    - Modifier la procédure de démarrage des bots pour qu'ils n'assument plus que *Master* est démarré
+      - Essayer de se connecter à *Master*
+      - Si la connexion échoue, ressayer au bout de quelques secondes, plusieurs fois si besoin
+      - Si au bout de plusieurs tentatives, la connexion n'a toujours pas pu être établie, quitter avec un message d'erreur
+      - Sinon, commencer à travailler sur le document
+    - Ajouter des logs concernant la couche réseau pour mieux observer l'évolution de la collaboration
+  - Mais j'ai tout de même pu récupérer 2 snapshots d'un site
+    - 1 snapshot après avoir observé 10k opérations, environ 7k caractères
+    - 1 snapshot après avoir observé 290k opérations, environ 200k caractères
+  - Ces snapshots peuvent être exploitées pour obtenir quelques résultats rapides
+    - Reste à définir quels résultats on souhaite obtenir
+    - Un bref coup d'oeil aux expérimentations d'autres papiers (Spanner, Dynamo) fait apparaitre que les stats généralement utilisées sont
+      - la moyenne du temps d'intégration d'une opération
+      - l'écart type
+      - des centiles, généralement le 99ème
+    - Peut, à partir d'une snapshot donnée, générer et exécuter des opérations locales puis des distantes
+    - Pour chaque opération
+      - Calculer le temps d'intégration
+      - Conserver l'ensemble de ces valeurs
+    - Peut ensuite utiliser chaque ensemble de valeurs obtenu pour calculer
+      - Le temps d'intégration moyen
+      - L'écart type
+      - Le temps médian
+      - Le 99ème centile
+    - Peut faire ces mesures pour les opérations d'insertions et de suppressions
+    - Pose le problème de la génération d'opérations locales
+      - Le principal problème concerne le nombre de caractères sur lesquelles l'opération porte
+      - Ce nombre ne devrait pas modifier le comportement de l'insertion
+      - Mais peut influer sur les performances de l'opération de suppression
+	- Si une opération de suppression modifie la racine, son prédecesseur et son successeur, le temps d'intégration nécessaire sera plus important que si elle ne modifiait qu'un bloc
+      - Sur combien d'éléments les opérations de suppression doivent-elles porter ?
+      - Pour le moment, peut générer différents ensembles d'opérations de suppression portant sur 1, 5 et 10 éléments
+  - Ces mesures aboutiraient à des fichiers de résultats de la forme suivante
+    #+BEGIN_QUOTE
+    {
+      "global": {
+        "local": { mean, median, ninetyNinePercentile, standardDeviation },
+        "remote":  { mean, median, ninetyNinePercentile, standardDeviation }
+      },
+      "insert": {
+        "local": { mean, median, ninetyNinePercentile, standardDeviation },
+        "remote":  { mean, median, ninetyNinePercentile, standardDeviation }
+      },
+      "remove1": {
+        "local": { mean, median, ninetyNinePercentile, standardDeviation },
+        "remote":  { mean, median, ninetyNinePercentile, standardDeviation }
+      },
+      "remove5": {
+        "local": { mean, median, ninetyNinePercentile, standardDeviation },
+        "remote":  { mean, median, ninetyNinePercentile, standardDeviation }
+      },
+      "remove10": {
+        "local": { mean, median, ninetyNinePercentile, standardDeviation },
+        "remote":  { mean, median, ninetyNinePercentile, standardDeviation }
+      },
+      "stats": { ... }
+    }
+    #+END_QUOTE
+  - En attendant d'avoir fini de modifier le code de /results-exploit/ en conséquence, j'ai fait tourner rapidement une expérience sur les snapshots précédentes pour avoir un ordre d'idée
+  - L'expérience consiste à générer et appliquer 1000 opérations sur des clones de la snapshot donnée
+    - Les opérations se font sur 1 seul caractère pour le moment
+    - Lors de la génération d'une opération, il est équiprobable qu'il s'agisse d'une insertion ou d'une suppression
+  - Les temps résultants sont exprimés en ns
+  - On obtient les fichiers de résultats suivants
+    - Pour la snapshot de 10k opérations
+      #+BEGIN_QUOTE
+      {
+        "local": {
+          "mean": 53731.568,
+          "median": 48630,
+          "ninetyNinePercentile": 277565,
+          "standardDeviation": 70099.00976909287
+        },
+        "remote": {
+          "mean": 91138.477,
+          "median": 74061,
+          "ninetyNinePercentile": 503819,
+          "standardDeviation": 106249.73596990005
+        }
+      }
+      #+END_QUOTE
+    - Pour la snapshot de 290k opérations
+      #+BEGIN_QUOTE
+      {
+        "local": {
+          "mean": 97693.909,
+          "median": 85672,
+          "ninetyNinePercentile": 702773.5,
+          "standardDeviation": 113293.02883307834
+        },
+        "remote": {
+          "mean": 176295.627,
+          "median": 142888.5,
+          "ninetyNinePercentile": 819070.5,
+          "standardDeviation": 145088.37949201127
+        }
+      }
+      #+END_QUOTE
+  - Plusieurs constats
+    - L'ordre de grandeur du temps d'intégration d'une opération est en dizaines de µs
+    - Ce temps n'a que très peu augmenté par rapport au nombre de caractères
+      - Il n'a même pas doublé
+  - *Ça risque d'être difficile d'axer l'argumentation du papier sur l'aspect temps d'intégration*
+    - L'augmentation est trop faible et n'indique pas un problème qui pourrait impacter l'expérience utilisateur
+    - Va falloir plutôt centrer la discussion sur l'aspect RAM et bandwidth
+  - On a relancé une expérience afin de générer de nouvelles snapshots
+  - On a constaté un phénomène intéressant
+    - Les noeuds ne travaillent pas tous autant
+      #+ATTR_HTML: :width 200px
+      #+ATTR_ORG: :width 200
+      [[file:~/Desktop/Screen Shot 2019-05-07 at 16.07.43.png]]
+    - Ces différences sont aussi bien sur l'aspect consommation CPU que consommation RAM
+    - Ce qui étonnant, c'est que les noeuds qui sont en avance qui consomment le moins
+    - Une raison qui expliquerait ce phénomène serait que le /querySync/, à partir d'un certain stade, ne permettrait plus aux noeuds de rattraper leur retard
+    - Mais au contraire contribuerait à augmenter ce retard
+    - À confirmer
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
@@ -9111,6 +9263,11 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Après la suppression du bloc inséré, on pourrait fusionner les deux parties du bloc initial pour le recréer
 - Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
 ** TODO CRDT : Lire *Kaleido*
+* Commandes utiles
+- Récupérer la dernière ligne du log de chaque container Docker tournant sur la machine
+  - /docker ps -q | xargs -i -t docker logs --tail=1 {}/
+- Supprimer le champ /renamingMap/ d'une snapshot donnée au format JSON et enregistrer le résultat obtenu
+  - /cat Snapshot.json | jq -jc 'del(.mapBaseToBlock)' > Snapshot-without-map.json/
 * Glossaire
 - <<<Eventual convergence>>> property
   #+BEGIN_QUOTE
