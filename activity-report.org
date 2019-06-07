@@ -9133,6 +9133,68 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Une raison qui expliquerait ce phénomène serait que le /querySync/, à partir d'un certain stade, ne permettrait plus aux noeuds de rattraper leur retard
     - Mais au contraire contribuerait à augmenter ce retard
     - À confirmer
+** Semaine du <2019-06-03 Mon> au <2019-06-07 Fri>
+- *The Bloom Clock*
+  - Disponible ici : https://arxiv.org/abs/1905.13064
+  - Idée
+    - Présente une nouvelle structure de donnée, la *Bloom Clock*
+    - Cette structure de donnée permet de déterminer avec une certaine probabilité l'ordre partiel entre des évènements d'un système distribué
+    - Il s'agit donc d'une alternative à la *Vector Clock*
+    - Son principal avantage, comparé à la *Vector Clock*, est que sa taille ne croît pas linéairement avec le nombre de noeuds
+    - Mais avec des paramètres que le développeur peut fixer, en fonction du niveau de confiance en la clock qu'il souhaite obtenir
+  - Rappel *Bloom Filter*
+    - Structure de donnée probabiliste, efficace en terme de consommation mémoire
+    - Permet de vérifier rapidement si un élément est dans un ensemble
+    - Afin de gagner en espace mémoire, cette structure de donnée introduit une notion de probabilité
+    - Cette structure de donnée ne peut pas retourner de faux négatifs, mais peut par contre retourner des faux positifs
+    - Concrètement, cela signifie que cette structure de donnée permet de certifier qu'un élément n'est pas dans l'ensemble
+    - Mais ne permet de dire avec certitude si un élément appartient à l'ensemble
+    - Ce comportement s'explique par le fonctionnement interne du *Bloom Filter*
+    - Définit un tableau de /m/ bits, tous initialisés à 0
+    - Définit /k/ fonctions de hash indépendantes, chacune associant n'importe quelle entrée à un index du tableau définit précédemment
+    - Lorsqu'un élément est ajouté à l'ensemble, passe à 1 chaque index du tableau correspondant aux résultats du hash de l'élément par les /k/ fonctions
+    - Lorsqu'on vérifie si un élément appartient à l'ensemble, vérifie les indexes correspondant aux résultats des /k/ fonctions de hash
+      - Si la valeur à un de ces indexes vaut 0, cela indique que l'élément n'a pas été ajouté à l'ensemble
+      - Si toutes les valeurs aux indexes valent 1, on ne peut pas tirer de conclusions
+    - En effet, il est possible que tous les indexes donnés par les hashs d'un élément correspondent à des 1
+    - Mais que ça résulte d'un effet de bord de l'ajout d'autres éléments
+      - Par exemple, l'ajout des éléments /X/ et /Y/ passent les indexes /{1, 3, 5, 6, 8, 9}/ à 1
+      - On ne peut plus savoir avec certitude si un élément correspondant à un sous-ensemble de ces indexes a été ajouté ou pas
+  - Fonctionnement
+    - Repose sur un *Counting Bloom Filter* de taille /m/ et avec /k/ fonctions de hash
+      - Comme un *Bloom Filter*, mais au lieu d'utiliser un tableau de bits, on utilise un tableau d'entiers
+    - À chaque fois qu'un event local est produit par un noeud, hash /k/ fois l'event avec les fonctions de hash et incrémente les entrées correspondants du *Bloom Filter*
+      - e.g. [0, 1, 1, 0, 0, 1] -> [1, 2, 1, 0, 1, 1]
+    - À la réception d'un event de la *Bloom Clock* associée, le noeud met à jour sa propre *Bloom Clock* ne prenant le maximum pairwise
+      - e.g. [0, 2, 1, 0, 1, 2] + [1, 2, 2, 0, 0, 2] -> [1, 2, 2, 0, 1, 2]
+  - Propriétés
+    - Concurrence
+      - Deux *Bloom Clocks* peuvent ne pas être comparables
+	- e.g. [0, 2, 1, 0, 1, 2] | [1, 2, 2, 0, 0, 2]
+      - Aucune clock ne domine l'autre
+      - Ceci ne peut pas être le résultat d'un faux négatif
+      - Cela indique forcément que les events estampillés sont concurrents
+    - Causalité
+      - Deux *Bloom Clocks* peuvent être ordonnées
+	- e.g. [1, 1, 1, 1, 1, 1] < [1, 2, 2, 1, 1, 2]
+      - Indique que le 1er event a eu lieu avant le second
+      - Peut être le résultat d'un faux positif
+	- Comme expliqué précédemment dans la partie *Bloom Filter*
+      - Ces events peuvent donc être en fait concurrents
+      - Créé donc une relation de causalité non-justifiée dans le cas d'un faux positif
+      - Ce qui entraîne une coordination non nécessaire, mais qui est en soit inoffensive pour la correction de l'application
+  - Factorisation d'entier
+    - Propose, pour mininimiser la taille des entiers du tableau, de soustraire la valeur minimale commune du tableau et de l'additionner à un compteur séparé
+    - Possible aussi avec les *Vector Clocks*, mais le problème est qu'il suffit qu'un seul noeud n'effectue plus de modifications pour que le mécanisme soit gelé
+    - Alors que dans les *Bloom Clocks*, comme les entrées sont incrémentées de façon aléatoire, garantit que toutes les entrées augmenteront de façon similaire
+  - Comparaison avec *Vector Clocks*
+    - Taille de la clock ne dépend plus du nombre de noeuds, une métrique qu'on ne maitrise pas dans les systèmes distribués
+    - Mais du taux de faux positifs qu'on autorise
+      - Se traduit en la taille /m/ du tableau et le nombre /k/ de fonctions de hash
+    - Permet de vérifier rapidement la concurrence entre deux events
+    - Et ne force potentiellement qu'une causalité inexistante lors d'un faux positif
+  - Reste à voir l'usage qu'on pourrait en faire
+  - Ou si d'autres variantes du *Bloom Filter* pourraient être réutilisés dans nos applications
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
@@ -9268,6 +9330,14 @@ We say that H implements A under this refinement mapping iff, for each behavior 
   - /docker ps -q | xargs -i -t docker logs --tail=1 {}/
 - Supprimer le champ /renamingMap/ d'une snapshot donnée au format JSON et enregistrer le résultat obtenu
   - /cat Snapshot.json | jq -jc 'del(.mapBaseToBlock)' > Snapshot-without-map.json/
+- Supprimer les lignes de 100 à 100000 d'un fichier
+  - /sed '100,100000d' file > file-truncated/
+- Insérer une image à une position absolue en LaTeX
+  #+BEGIN_BLOCK
+  \begin{picture}(0,0)
+    \put(5,-40){\hbox{\includegraphics[scale=0.8]{signature.png}}}
+  \end{picture}
+  #+END_BLOCK
 * Glossaire
 - <<<Eventual convergence>>> property
   #+BEGIN_QUOTE
