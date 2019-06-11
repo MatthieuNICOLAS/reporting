@@ -9195,6 +9195,62 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Et ne force potentiellement qu'une causalité inexistante lors d'un faux positif
   - Reste à voir l'usage qu'on pourrait en faire
   - Ou si d'autres variantes du *Bloom Filter* pourraient être réutilisés dans nos applications
+- Statistiques sur *Protobuf*
+  - Histoire de se faire un ordre d'idée des performances de *Protobuf* par rapport au reste de l'application
+  - A calculé quelques stats à partir des mesures qu'on a effectué dans le cadre des simulations
+  - Dans le fichier résultat de /mute-bot-random/, on a pour chaque opération /t1/ et /t2/
+    - /t1/ correspond au timestamp mesuré au plus proche de la couche réseau
+      - Correspond à la fin de la sérialisation dans le cas d'une opération locale
+      - Correspond au début de la désérialisation dans le cas d'une opération distante
+    - /t2/ correspond au timestamp mesuré au plus proche de la couche *Sync*
+      - Correspond au début de la sérialisation dans le cas d'une opération locale
+      - Correspond à la fin de la désérialisation dans le cas d'une opération distante
+  - Mis en place un petit script pour récupérer les temps correspondants à la (dé)sérialisation, 10k opérations de chaque type
+    #+BEGIN_BLOCK
+    const ops = JSON.parse(data)
+
+    let cptLocal = 0
+    let cptRemote = 0
+
+    const localOps = ops.filter((op: any) => op.type === "local" && cptLocal++ < 10000)
+    const remoteOps = ops.filter((op: any) => op.type === "remote" && cptRemote++ < 10000)
+
+    const localTimes = localOps.map((op: any) => {
+      return (op.time1[0] * 1000000000 + op.time1[1]) - (op.time2[0] * 1000000000 + op.time2[1])
+    })
+
+    const remoteTimes = remoteOps.map((op: any) => {
+      return (op.time2[0] * 1000000000 + op.time2[1]) - (op.time1[0] * 1000000000 + op.time1[1])
+    })
+
+    console.log(processTimes(localTimes))
+    console.log(processTimes(remoteTimes))
+    #+END_BLOCK
+  - Obtient les résultats suivants, en ns
+    - Sérialisation
+      #+BEGIN_BLOCK
+      {
+         mean: 1090985.2778,
+         median: 972866,
+         ninetyNinePercentile: 3333145,
+         standardDeviation: 424887.0168152513
+      }
+      #+END_BLOCK
+    - Désérialisation
+      #+BEGIN_BLOCK
+      {
+        mean: 70877.8204,
+        median: 58458,
+        ninetyNinePercentile: 149044,
+        standardDeviation: 108483.43933078331
+      }
+      #+END_BLOCK
+  - En résumé
+    - 70us pour désérialiser
+    - 1ms pour sérialiser
+    - Donc environ 150x plus coûteux de sérialiser que désérialiser
+  - Ce qui est intéressant de noter est que j'ai calculé ces stats sur les premières opérations de la collaboration et les dernières
+  - Et qu'on ne remarque pas d'impact significatif sur les performances
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
