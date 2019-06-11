@@ -9251,6 +9251,45 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Donc environ 150x plus coûteux de sérialiser que désérialiser
   - Ce qui est intéressant de noter est que j'ai calculé ces stats sur les premières opérations de la collaboration et les dernières
   - Et qu'on ne remarque pas d'impact significatif sur les performances
+** Semaine du <2019-06-11 Tue> au <2019-06-14 Fri>
+- MUTE: Déterminer comment on peut mesurer la taille de la structure de données
+  - Étant donné qu'on exporte et conserve des snapshots produites au cours des simulations
+  - Peut facilement mettre en place un script se contentant de réinstancier la structure de données
+  - Reste à déterminer comment on peut instrumentaliser ce script pour observer la consommation mémoire correspondant au document
+  - Comme indiqué par Cédric, les outils semblent limités
+  - Possible d'utiliser les outils de débuggage de Chrome
+    - Permet d'effectuer des /heap snapshots/
+    - Les snapshots peuvent ensuite être comparées l'une par rapport à l'autre pour identifier les différences
+    - Ici, peut faire une snapshot avant l'instanciation du document et une après
+    - En comparant les 2, capable d'obtenir la consommation mémoire du document
+    - Le package *heapdump* permet de déclencher ces snapshots de façon programmatique
+      - Disponible ici : https://github.com/bnoordhuis/node-heapdump
+    - Le problème reste cependant de les utiliser
+    - Il est nécessaire de les charger dans Chrome pour ensuite pouvoir les comparer
+    - Il n'y a pas l'air d'avoir API permettant d'automatiser ce processus et de récupérer les informations des snapshots
+    - Ceci limite grandement l'utilisabilité de cette solution
+  - Ceci a tout de même permis d'obtenir quelques mesures
+    - Après 10k opérations, la snapshot utilisée consommait 1,4Mo de RAM
+    - Après 1 950k opérations, la snapshot utilisée consommait 424Mo de RAM
+  - L'overhead par caractère a grossièrement augmenté de 50% entre les 2 snapshots
+  - Offre tout de même une base pour tester et comparer les résultats obtenus en utilisant des librairies implémentant la fonctionnalité /sizeof/ en JS
+    - *object-sizeof*
+      - Disponible ici : https://github.com/miktam/sizeof
+      - Pour la snapshot de 1,4Mo, retourne 2,29Mo
+      - Pour la snapshot de 424Mo, retourne 726,28Mo
+    - *sizeof*
+      - Disponible ici : https://github.com/lyroyce/sizeof
+      - Pour la snapshot de 1,4Mo, retourne 6,72Mo
+      - Pour la snapshot de 424Mo, ne termine pas
+  - Pense utiliser *object-sizeof* pour la suite
+    - Retourne des résultats 60-70% plus élevés que les /heap snapshots/
+    - Probablement car la librairie compte plusieurs fois les mêmes objets
+    - On maintient en effet plusieurs références pour un même objet, notamment les *Blocks*
+      - Maintient une référence d'un *Node* vers le *Block* correspondant
+      - Maintient une référence d'une base vers le *Block* correspondant dans /mapBaseToBlock/
+    - Si on remplace les valeurs de /mapBaseToBlock/ avec /undefined/ ou /null/, pour la snapshot de 1,4Mo, retourne 1,54Mo
+      - Ce qui fait "plus que" 10% de diff par rapport au résultat obtenu grâce aux /heap snapshots/
+  - Paraît être un compromis acceptable entre simplicité d'utilisation, automatisation possible et précision des résultats
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
