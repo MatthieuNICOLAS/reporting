@@ -9290,6 +9290,67 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Si on remplace les valeurs de /mapBaseToBlock/ avec /undefined/ ou /null/, pour la snapshot de 1,4Mo, retourne 1,54Mo
       - Ce qui fait "plus que" 10% de diff par rapport au résultat obtenu grâce aux /heap snapshots/
   - Paraît être un compromis acceptable entre simplicité d'utilisation, automatisation possible et précision des résultats
+  - Peut en fait assez facilement mettre en place une version modifiée de *object-sizeof* qui évite de compter plusieurs fois la taille d'objets référencés plusieurs fois
+    - Consiste juste à ajouter un marqueur aux objets visités précédemment
+    - Et de ne compter que les objets qui n'ont pas encore été marqués
+    - Suffit juste de modifier la fonction /sizeOfObject()/ de la manière suivante
+      #+BEGIN_SRC js
+      var sizeOfSymbol = Symbol()
+
+      function sizeOfObject (object) {
+        if (object == null) {
+          return 0
+        }
+
+        if (object[sizeOfSymbol]) {
+          return 8
+        }
+
+        var bytes = 0
+        for (var key in object) {
+          if (!Object.hasOwnProperty.call(object, key)) {
+            continue
+          }
+
+          bytes += sizeof(key)
+          try {
+            bytes += sizeof(object[key])
+          } catch (ex) {
+            if (ex instanceof RangeError) {
+              // circular reference detected, final result might be incorrect
+              // let's be nice and not throw an exception
+              bytes = 0
+            }
+          }
+        }
+
+        object[sizeOfSymbol] = true
+
+        return bytes
+      }
+      #+END_SRC
+    - Permet de rapprocher les mesures de ce qu'on a obtenu avec les /heap snapshots/
+      - Pour la snapshot de 1,4Mo, retourne 1,56Mo
+      - Pour la snapshot de 424Mo, retourne 481,78Mo
+    - Mesures obtenues grâce au snippet suivant
+      #+BEGIN_SRC js
+      const fs = require("fs")
+      const MuteStructs = require("mute-structs")
+      const sizeof = require("object-sizeof")
+
+      // const path = "/Users/matthieu/Downloads/Snapshot.10000.Master.json"
+      const path = "/Users/matthieu/Downloads/Snapshot.1950000.Master.json-without-map.json"
+
+      fs.readFile(path, (_, data) => {
+        const snapshot = JSON.parse(data)
+
+        const doc = MuteStructs.LogootSRopes.fromPlain(snapshot)
+        const sizeOfDoc = sizeof(doc)
+
+        console.log(`sizeOfDoc: ${sizeOfDoc}`)
+      })
+      #+END_SRC
+  - Reste à mettre ça au propre et l'ajouter à la partie expériences pour obtenir des mesures
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
