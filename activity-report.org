@@ -9351,6 +9351,39 @@ We say that H implements A under this refinement mapping iff, for each behavior 
       })
       #+END_SRC
   - Reste à mettre ça au propre et l'ajouter à la partie expériences pour obtenir des mesures
+- Mesure du temps d'intégration des opérations
+  - Pour avoir un ordre de grandeur du temps d'exécution d'une opération sur une snapshot de 2M opérations, j'ai repris mon script de test que j'utilise pour la taille de la structure de données
+  - J'ai pu constaté un phénomène /intéressant/
+  - Le temps d'intégration de l'opération était en ms
+    - 2ms pour l'opération locale
+    - 1,22ms pour l'opération distante
+  - Ces temps obtenus sont étranges si on les compare avec les temps obtenus précédemment
+    - Pour une snapshot à 10k opérations
+      - 50us pour une opération locale
+      - 75us pour une opération distante
+    - Pour une snapshot à 300k opérations
+      - 85us pour une opération locale
+      - 143us pour une opération distante
+  - On avait bel et bien constaté une augmentation du temps d'intégration des opérations au fur et à mesure de l'évolution de la structure de données
+  - Mais là l'écart était trop important
+  - Le plus perturbant était qu'on obtenait aussi des résultats aberrants en modifiant le script pour appliquer l'opération sur une snapshot à 10k opérations
+    - 1,75ms pour une opération locale
+    - 1ms pour une opération distante
+  - La raison de cet écart de performances semble être les optimisations auxquelles procéde le moteur JS
+  - Dans le cas des résultats obtenus précédemment, l'expérience consistait à mesurer le temps d'intégration de 10k opérations
+  - Le moteur JS a au fur et à mesure effectué à des optimisations du code exécuté
+    - Ce qui a permis d'obtenir les mesures indiquées
+  - Dans le cas du script d'aujourd'hui, l'expérience consistait juste à mesurer le temps d'intégration de 1 opération
+  - En modifiant pour le script pour appliquer au préalable un batch d'opérations à des documents "poubelles", puis en appliquant l'opération à mesurer, on retrouve des temps cohérents
+    - Pour une snapshot à 2M opérations
+      - 150us pour une opération locale
+      - 340us pour une opération distante
+  - Ceci soulève toutefois quelques questions sur les performances en conditions réelles de l'application
+    - Dans les scripts utilisés pour les mesures, on se focalise sur l'exécution du code que l'on souhaite étudier
+    - Le scope du programme est donc limité, ce qui permet au moteur JS de procéder à des optimisations de l'exécution de notre code
+    - Est-ce que ça sera aussi le cadre d'une application complète ?
+    - Ou l'optimisation de l'exécution de code portera plutôt sur l'interface graphique ou la couche réseau ?
+    - Y a-t-il finalement une limite à la quantité d'optimisations auxquelles procède le moteur JS ?
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
