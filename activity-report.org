@@ -9384,6 +9384,677 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Est-ce que ça sera aussi le cadre d'une application complète ?
     - Ou l'optimisation de l'exécution de code portera plutôt sur l'interface graphique ou la couche réseau ?
     - Y a-t-il finalement une limite à la quantité d'optimisations auxquelles procède le moteur JS ?
+- Meeting
+  - Read a technical report about *Bloom Clock*
+    - A new probabilistic data structure to track the causality of events in a distributed system
+    - Currently use *Vector Clocks* to do so
+      - The main drawback is that you need one entry in the vector for each node of the system
+      - It is not suited to dynamic distributed system with a large number of nodes
+    - Propose a new clock with a constant size
+    - Relies on a *Counting Bloom Filter*
+    - You pick the size of the clock according to the rate of false positives you can support
+    - By comparing two *Bloom Clock*, you can either
+      - Determine for sure that the events are concurrent
+      - or, that maybe, the events are causally related
+    - The probabilistic aspect of the data structure means that sometimes you may find that 2 events are causally related, according to their clock, while they are not
+    - For example, you would deliver messages in a given order while there is
+    - Have some trouble to find a good use case of this data structure
+  - Performing measurements on *LogotSplit* performances
+    - Were able to run a massive experiment, 10 bots performing overall 2M operations
+    - Retrieve snapshots to compute some stats
+    - For my contribution, assume that *LogootSplit* performances are getting worse over time on several aspects
+      - Operation integration time
+      - Memory usage
+      - Bandwidth consumption
+    - Wanted some stats to back up these hypotheses
+    - Compare 2 snapshots from the collaboration : one taken after 10k operations, one after 2M
+    - Operation integration time
+      - Is in microseconds
+      - 10k operations : around 50us
+      - 2M operations : around 150us
+      - "Only" 3 times slower
+      - Not really a problem from a user perspective
+    - May have to reconsider my storytelling on this aspect
+    - Memory usage
+      - 10k operations : around 1.4Mo (instead of 12Ko)
+      - 2M operations : around 414Mo (instead of 2Mo)
+** Semaine du <2019-06-24 Mon> au <2019-06-28 Fri>
+- Réunion suivi de thèse
+  - Pas avancé sur la rédaction du papier depuis la dernière réunion
+  - Plutôt concentré sur l'obtention de stats sur les performances de *LogootSplit*
+    - Temps d'intégration des opérations
+      - A effectué des mesures sur une snapshot à 10k opérations et 300k opérations
+	- 10k opérations
+	  #+BEGIN_BLOCK
+{
+    "local": {
+        "mean": 53731.568,
+        "median": 48630,
+        "ninetyNinePercentile": 277565,
+        "standardDeviation": 70099.00976909287
+    },
+    "remote": {
+        "mean": 91138.477,
+        "median": 74061,
+        "ninetyNinePercentile": 503819,
+        "standardDeviation": 106249.73596990005
+    }
+}
+         #+END_BLOCK
+        - 300k opérations
+          #+BEGIN_BLOCK
+{
+    "local": {
+        "mean": 97693.909,
+        "median": 85672,
+        "ninetyNinePercentile": 702773.5,
+        "standardDeviation": 113293.02883307834
+    },
+    "remote": {
+        "mean": 176295.627,
+        "median": 142888.5,
+        "ninetyNinePercentile": 819070.5,
+        "standardDeviation": 145088.37949201127
+    }
+}
+	  #+END_BLOCK
+      - Temps en us
+      - N'a même pas doublé
+      - Le temps d'intégration va difficilement pouvoir être présenté comme un problème à adresser
+      - Ce qui pose problème, c'est le JIT
+	- Dans les mesures obtenues, le JIT a permis de réduire les temps d'intégration
+	- À froid, les opérations mettent plutôt 2-3ms à être intégrer
+      - Comment je tourne autour du JIT ?
+	- Fais des opérations dans le vent avant d'effectuer les mesures ?
+	- Scope du JIT dans une réelle application ?
+    - Consommation mémoire
+      - Pour rappel
+	- Un caractère pèse 2 octets
+	- On a un overhead par bloc de 20 octets
+      - A effectué des mesures sur une snapshot de 10k opérations (6000 caractères) et 2M opérations (1 200 000 caractères)
+	- 6k caractères -> 1,4Mo
+	  - Ce qui donne un overhead par caractère de 231 octets
+	  - Minimum théorique -> 12ko et 20 octets
+	- 1 200k caractères -> 424Mo
+	  - Ce qui donne un overhead par caractères de 351 octets
+	  - Minimum théorique -> 2,4Mo et 20 octets
+      - D'un côté, une taille de document pourrait poser problème
+	- Comment faire si un nouvel utilisateur rejoint la collaboration ?
+	- Envoyer le log de 2M opérations serait bien trop coûteux
+	- Mais envoyer l'état est
+      - D'un autre côté, peut me rétorquer que c'est peu probable d'arriver à un tel stade
+      - Rencontré des difficultés pour obtenir ces mesures
+      - Les outils ne sont pas adaptés en JS
+      - Pour mesurer la taille d'une structure de données, recommandent d'utiliser les outils de débugging de *Chrome Tools*
+      - Nécessite de créer des dumps de la mémoire avant/après
+      - Le problème concerne plutôt l'exploitation des données
+      - Doit charger manuellement les dumps et les comparer à la main
+      - Donc il a fallu trouver une alternative
+      - Des librairies existantes implémentent une fonction /sizeof()/
+      - Mais les résultats obtenus étaient déconnants
+	- +60-70% pour /object-sizeof/
+	- x4, voire ne finit pas pour /sizeof/
+      - En investigant et en modifiant la librairie /object-sizeof/, a réussi à obtenir des mesures avec +10%
+      - Je ne vois pas comment faire mieux
+  - Notes
+    - JIT
+      - Voir pour faire des mesures plutôt dans le cadre d'une simulation se rapprochant de la réalité
+	- Limite faire brièvement des mesures dans MUTE directement pour avoir un ordre d'idée du comportement réel de l'application
+      - Voir si on peut avoir plusieurs scénarios
+	- Utilisateur avec code optimisé
+	- Utilisateur avec interpréteur
+    - Mesures réseau
+      - Mesurer la taille des opérations en JSON pour voir l'incrément
+    - Motivation
+      - L'article de Kleppmann sur Local-First nous motive
+    - Concernant la /garbage collection/
+      - Lire depuis le disque ne sera pas trop coûteux
+    - Suite
+      - Bouquiner https://queue.acm.org/detail.cfm?id=3321612
+      - Étudier Pulsar vs Kafka
+	- Voir quelles garanties offrent Pulsar, sous quelles conditions
+	- Voir si Aphyr a creusé là-dessus
+	  - http://jepsen.io/
+- Monitoring de Pulsar
+  - Lorsqu'on a discuté de *Pulsar Monitoring* et de son comportement étrange avec Olivier, il nous a parlé et recommandé d'utiliser la ELK Stack
+  - Il s'agit d'une stack logicielle utilisée pour le monitoring d'applications
+  - Son nom dérive des outils qui la compose
+    - Elastic Search
+    - Logstash
+    - Kibana
+  - Renommée depuis en Elastic Stack, car de nouveaux composants y ont été insérés
+  - Ce post semble la décrire de façon assez complète
+    - https://logz.io/learn/complete-guide-elk-stack/
+- Meeting
+  - Spend most of the time on the implementation of the renaming mechanism in MUTE
+  - Now have a running version with a button in the interface allowing to trigger a rename
+  - Was able to run easily a few scenarios
+  - Allow me to find a bug with the renaming functions
+  - Fixed it
+** Semaine du <2019-09-16 Mon> au <2019-09-20 Fri>
+- Programmation web sur client
+  - Cours
+    - TODO
+      - Ajouter une slide sur le syllabus du module
+      - Revoir slides sur la standardisation
+      - Revoir slides sur les parts de marchés des différents navigateurs
+      - Ajouter slide pour dire qu'on va faire de l'ES6 voir +
+	- On abordera dans un cours les outils utilisés pour rendre le code qu'on écrit compatible avec les vieux navigateurs
+      - Revoir slide /undefined/ pour ajouter qu'il s'agit de la valeur de retour par défaut d'une fonction
+** Semaine du <2019-10-14 Mon> au <2019-10-18 Fri>
+- Évaluation mécanisme de renommage
+  - Mémoire
+    - Prendre différentes snapshots obtenus via les expériences
+    - Mesurer
+      - Taille de la snapshot (contenu + métadonnées)
+      - Taille du contenu
+      - Taille des métadonnées
+    - Effectuer un renommage
+    - Mesurer
+      - Taille de la snapshot (contenu + métadonnées)
+      - Taille du contenu (aucune modif de ce côté là)
+      - Taille des métadonnées
+	- Séparer arbre et renamingMap ?
+      - Taille des métadonnées après GC de la renamingMap
+  - CPU
+    - Prendre différentes snapshots obtenus via les expériences
+    - Générer des opérations locales pour cette snapshot
+    - Mesurer
+      - Temps d'intégration de l'opération locale sur la snapshot initiale
+      - Temps d'intégration de l'opération distante correspondante sur la snapshot initiale
+      - Temps d'intégration du renommage local sur la snapshot initiale
+      - Temps d'intégration du renommage distant correspondant sur la snapshot initiale
+      - Temps d'intégration de l'opération distante sur la snapshot renommée
+	- S'agit d'une opération concurrente à l'opération de renommage
+	- Va inclure le temps de transformation de l'opération vers la nouvelle epoch
+      - Temps d'intégration de l'opération locale sur la snapshot renommée
+      - Temps d'intégration de l'opération distante correspondante' sur la snapshot renommée
+	- S'agit d'une opération causalement dépendante de l'opération de renommage
+	- Pas besoin de transformation
+- Cours JS
+** Semaine du <2020-02-10 Mon> au <2020-02-14 Fri>
+- Réunion dossier APP MUTE
+  - Définir les différentes briques selon lesquelles on pourrait décomposer MUTE
+    - Moteur de réplication /mute-core/ et /mute-structs/ par Victorien, Cédric, Philippe et moi
+    - Couche réseau /netflux/ par Philippe
+    - Cryptographie /mute-crypto/ par Jean-Philippe
+    - Éditeur collaboratif /mute/ par Philippe, Cédric (et JP?)
+  - Voir les taux de collaboration de chacun
+- Réunion papier PaPoc
+  - [X] Terme /priority/ qui pose problème) pour la compréhension
+    - Remplacer par position
+  - [X] Replace figures au plus proche de l'utilisation
+  - [X] Refaire figures
+    - Supporter le mode B/W
+      - Ajouter d'autres moyens de différenciation que la couleur
+      - Des dashed lines par exemple
+    - Refaire légendes
+    - Remplacer l'unité *Mo* par *MB*
+  - [X] Faire ref aux travaux de Claudia pour parler de l'étude du comportement utilisateur face au délai
+  - [X] Par rapport au paragraphe sur compression du /renommage/
+    - Reformuler pour dire "on peut borner la taille de l'opé de renommage en envoyant uniquement les composants permettant d'identifier les blocs de manière unique
+    - et en déclenchant le renommage arrivé à un nombre de blocs donné
+  - [X] Accentuer le fait qu'on peut pas se contenter d'envoyer le nouvel état après renommage
+  - [X] Déplacer annonce de l'absence de /rename/ concurrents à la conclusion
+  - [-] Ajouter /Summary/ à la fin de *background*, *proposition* et *evaluation*
+  - [X] Déplacer et retravailler *Related work*
+  - [-] Ajouter des lignes sur *Local-First Software* ?
+  - Peut gagner de la place en retirant la Figure 5.a et en décrivant l'exemple textuellement
+  - Peut gagner de la place en abrégeant la partie "on a pas réussi à obtenir de traces..." en "on a simulé des collaborations pour évaluer l'algo
+** Semaines du <2020-03-23 Mon> au <2020-04-03 Fri>
+- Meeting
+  - Good news everyone
+    - Our paper we submitted to PaPoc'20 has been accepted
+    - Mainly good reviews
+    - Have to make some changes before the 10th of April
+    - Unfortunately, still no news about the actual fate of the workshop : postponed or remote one ?
+  - Other news
+    - Tom's internship has been postponed to the 27th of April
+      - Still waiting for every parties to sign the amendment
+    - Working on my ATER applications
+      - Still need to send the complete files
+	- Updating my resume according to Olivier's feedback
+      - Have a meeting with Nadia Bellalem from the IUT Monday afternoon to discuss about doing my ATER there
+	- Hope they will accept an half-ATER
+	- Did somebody else ask for an half-ATER there ?
+      - Will contact other places
+  - Still trying to make sense out of Mergeable Replicated Data Types
+    - Propose a new approach to design Replicated Data Types
+      - State that existing approachs are too complex as they require to reason the effects of operations on different states, with different application order
+    - In their approach, they take care of the replication aspect for you
+    - The only things you have to consider are the characteristic relations of your data structure
+      - What describe the current version of your data structure ?
+      - For example, the characteristic relations of the List are the membership and the order of the elements in the list
+    - From these characteristic relations, derive automatically the merge functions
+      - This is powerful
+      - Especially since you can compose their MRDT
+      - This is the part i do not understand, how they do this
+    - Anyway, to handle merge they adopt a Git-like model
+      - So asynchronous model
+      - Store the different versions of the data structure
+	- Apply techniques to share elements between versions if possible
+      - The merge functions perform a three-way merge involving two concurrent versions and their Lowest Common Ancestor
+    - Perform an evaluation
+      - Measure the bandwidth consumption
+      - And the computation time required to merge two different versions
+      - Show that you need only to send the diff between your previous version and the new one, so measure the size difference between both
+    - Have some issues with it for now
+      - Evergrowing data structure unless you have a garbage collection mechanism
+      - Require causal delivery, which should impedes performances in large-scale system
+      - Do not compare to existing approaches
+      - Not clear how many % of the data structure is data and overhead in their benchmarks as there is no baseline or references
+      - There is close to no concurrency in their benchmarkes
+	- Unclear how would fare their approach in worse cases
+	  - Did not benchmark the growth of the data structure in concurrent settings
+	  - At most, the distance between two concurrent versions is of 1 commit
+    - Additional resources:
+      - Talk: https://www.youtube.com/watch?v=XPO2a2pksls
+      - Blogposts
+	- https://blog.acolyer.org/2019/11/25/mergeable-replicated-data-types-part-i/
+	- https://blog.acolyer.org/2019/11/27/mergeable-replicated-data-types-part-ii/
+** Semaines du <2020-04-06 Mon> au  <2020-04-24 Fri>
+- Meeting
+  - PaPoc'20
+    - Will take place online Monday
+    - With the help of Olivier and Gérald, prepared and recorded my talk
+    - Preparing answers to some potential questions
+  - Have been reading papers related to PaPoC and my work
+    - Kleppmann - Moving Elements in List CRDTs : https://martin.kleppmann.com/papers/list-move-papoc20.pdf
+      - Propose a generic construction to add move of single element to existing List CRDTs
+      - Not sure of how it ensures convergence
+	- Especially the scenario with a concurrent remove operation to the move one
+    - Weidner - Composing and Decomposing Op-Based CRDTs with Semidirect Products
+      - Propose a generic construction to compose CRDTs with same states but different operations
+      - Relies on Operational Transformation to deal with concurrent updates
+      - Close to my work, but does not fit entirely
+	- In my case, the rename operation is not commutative with itself, need more metadata to solve the conflict
+	- So can not decompose RenamableLogootSplit into 2 CRDTs with same states but different operations
+      - Looks interesting, still reading it
+  - Attiya - Specification and Complexity of Collaborative Text Editing
+    - Claudia is reviewing this paper for TCS
+    - An extended version of a previous paper for PODC
+    - Set the proof of the lower-bound in term of memory of a replicated list
+    - Should be part of the topic of PaPoC's keynote
+    - Maybe i will finally understand it
+  - Tom
+    - Internship starts Tuesday
+    - Listing some resources on distributed systems, membership protocols and JS
+    - Setting a roadmap
+- Potential questions
+  - Memory footprint - slide 8 : why RenamableLogootSplit worst-case scenario is still performing better than LogootSplit ?
+    - Good question
+    - Because we don't use the same data structure to store the current sequence and the former states
+    - For the current sequence, to be able to update it efficiently, we use a self-balancing binary search tree
+    - And we don't need such a complex data structure for former states
+      - Former states are immutable
+      - Only thing we do with them is to query them to find the predecessor of a given id
+      - A simple sorted array is enough for this use-case
+    - So, by replacing the self-balancing binary search tree by an array, we are able to save some space
+    - Otherwise, if we were using the same data structure in both cases, RLS would perform worse than LS in this case
+    - But only by a little : the rename operation consist in starting a new sequence (so creating a new block) and a new epoch
+    - So it should be negligeable compared to the size of the whole data structure at the time
+  - Correctness - slide 7 : how to ensure the correctness of the system
+    - Transformation functions have to comply with several properties
+    - Actually, the same as the catch-up protocol in the core-nebula approach
+      - Determinism : the renaming should result in the same output at every replica
+      - Non-disruptiveness : the renaming of an identifier from a previous epoch should not conflict with an identifier created at the new epoch
+      - Order preservation : the renaming should maintain the order of identifiers between epochs
+** Semaine du <2020-04-27 Mon> au <2020-04-30 Thu>
+- Specification and complexity of replicated objects
+  - visibility != message deliveries
+    - y a-t-il un intérêt à dissocier ces 2 notions ?
+  - Discute des modèles de cohérence les plus forts
+    - Y avait pas une preuve à ce sujet dans VFJC ?
+  - Theorem: an eventually consistent data store cannot satisfy a consistency model stronger than observable Causal consistency
+    - System model ?
+  - lower-bound
+    - Peut trouver une exécution telle qu'à la fin, il reste plus qu'un seul élément
+    - Mais qu'on se retrouve avec D tombstones ou qu'il possède un identifiant de taille D
+- Paxos vs Raft: Have we reached consensus on distributed consensus?
+  - Globalement, trouve dans l'industrie que 2 algos : Paxos et Raft
+  - Pose la question de lequel on devrait utiliser
+  - Les 2 algos visent à permettre la state machine replication
+  - Key difference between Paxos and Raft
+    - A lieu lors de l'élection de leader
+    - Paxos : les followers vont voter pour n'importe quel candidat, mais les votes vont inclurent les opérations que le candidat n'a pas observé
+    - Raft : les followers vont voter uniquement pour les candidats qui sont au même point ou en avance sureux
+  - Juge que Raft et Paxos sont aussi complexes l'un que l'autre, la complexité de Paxos vient de l'angle de sa présentation
+  - A juste fait remarquer pour le moment que les perfs de l'élection de leader de Raft étaient excellentes pour sa simplicité
+  - Pas eu le temps de conclure, à écourter son talk
+  - Donc pas de réponse, faut aller lire le papier
+- Low-Latency Geo-Replicated State Machines with Guaranteed Writes
+  - Utilise des groupes par région
+  - Chaque groupe a son compteur dédié
+  - Permet d'éviter les communications globales pour les écritures
+  - Par contre a besoin de tous les messages pour les lectures
+    - A l'air d'attendre que chaque groupe ait effectué le même nombre de message
+    - Que pasa si un groupe est trop en avance par rapport aux autres ?
+  - Utilise différentes techniques pour estimer et comparer le rythme de progression de chaque groupe
+    - Pour essayer de ne pas trop se distancer
+- Chronofold: a data structure for versioned text
+  - Want general-purpose editors and databases
+  - Multiple overheads
+    - Metadata, complexity, cognitive
+  - A l'air d'avoir 2 approches
+    - Si isolé, utilise le type primitif
+    - Si connecté, utilise la version répliquée du type
+  - Mais du coup, comment ça allège le cognitive overhead ?
+  - En fait propose un CRDT qui est un log des opérations
+    - L'ordre du log n'est pas forcément le même chez tous
+    - Mais le texte qui en est issue lui converge
+- Stage Tom
+  - Roadmap :
+    - Dépend de la deadline du rapport de stage
+    - <2020-04-28 Tue> au <2020-05-07 Thu>
+      - Auto-formation à l'aide des ressources prodiguées
+    - <2020-05-11 Mon> au <2020-05-29 Fri>
+      - Réalisation d'un prototype
+	- MUTE est un projet complexe
+	- Difficile de rentrer dedans
+	- Donc pour le moment, veux que tu te focalises sur le protocole de membership
+	- Sais pas encore exactement quel appli te faire faire
+	- Te permettra de :
+	  - Prendre la main/Gagner en expérience
+	  - D'avoir un environnement que tu maîtrises
+	  - Implémenter une 1ère version du protocole
+	  - D'avoir une base sur laquelle te reposer pour concevoir une version plus propre, plus maintenable dans MUTE
+    - <2020-06-01 Mon> au <2020-06-26 Fri>
+      - Intégration dans MUTE
+    - <2020-06-15 Mon> au <2020-07-03 Fri>
+      - Rapport de stage
+  - Plan de la discussion :
+    - Rappel du contexte
+      - Équipe de recherche travaillant sur les systèmes collaboratifs, en P2P
+	- Applications Local-First
+      - Nous on est spécialiste de la réplication de données
+      - S'assurer que les gens fassent évoluer les données, fassent des modifications mais qu'à la fin tout le monde obtienne le même état
+      - On a une application, MUTE (dev.coedit.re), qui nous sert à présenter nos travaux de recherches
+	- Éditeur de texte collaboratif pair-à-pair
+      - Pour la partie réplication de texte, on est bon
+      - Par contre, pour que la collaboration se déroule correctement, les utilisateurs ont besoin d'informations supplémentaires
+	- Ce qu'on appelle conscience de groupe
+	- Savoir qui est présent dans la collaboration
+	- Où ils sont actuellement dans le document (curseurs, sélections)
+      - Pour établir la liste des membres de la collab, utilise notre couche réseau, Netflux, pour connecter et faire communiquer les différents utilisateurs
+	- Permet de connecter de façon pair-à-pair les navigateurs, mais aussi d'ajouter des bots (serveurs) au réseau
+	  - Peut avoir des bots dédiés pour certaines tâches
+	- Plus développé activement depuis 1 an et demi, depuis la fin de contrat de l'ingé
+	- Technologies instables/en beta de base, ce qui ne fait qu'empirer le problème
+      - Donc on travaille sur ajouter/utiliser d'autres moyens de communication
+	- Mais certains n'offrent pas les informations sur les membres actuellement connectés
+	- En pratique, voit seulement les membres auxquels on est connecté via Netflux
+	- Peut donner lieu à des scénarios étranges où des modifications d'un utilisateur "fantôme" peuvent apparaître dans mon document
+      - Une autre fonctionnalité qu'on souhaite implémenter depuis longtemps est l'historique
+	- Pouvoir parcourir les différentes versions du document
+	- À l'heure actuelle, chaque utilisateur conserve toutes les modifications
+	- Par contre, on ne conserve pas l'identité des auteurs des modifs
+	- Plus précisément, on la conserve tant qu'ils
+    - Rappel du sujet
+      - Ajouter la fonctionnalité "Liste complète des membres de la collaboration" à MUTE
+	- Pour le moment, considère qu'on peut seulement "joindre" une collab, pas la quitter ou se faire virer
+      - Déplacer la fonctionnalité "Liste des membres de la session" dans MUTE
+	- Pour ça, compte te faire implémenter un protocol de membership
+    - Objectifs du stage
+      - MUTE
+	- Avoir de façon permanente la liste des collaborateurs ayant participé à la rédaction d'un document
+	- Rendre indépendante de la couche réseau la fonctionnalité de la conscience de groupe
+	  - Permettrait de rendre interchangeable et/ou cumulable les différentes couches réseaux
+      - Moi
+	- En apprendre plus sur les membership protocols, leur fonctionnement, limites et contraintes
+    - Roadmap
+    - Méthodes de travail
+      - Horaires
+	- Tu fais ce que tu veux
+	- Tant que le travail avance, osef
+	- J'essaie d'être connecté et présent sur Discord en journée ouvrée
+	- Si tu as des questions, n'hésite pas me MP pour me les poser
+	- Bon pas le soir à partir de 17h par contre
+      - Discussions
+	- Le salon B020 correspond à la salle de pause
+	- Généralement, pas des discussions sérieuses
+	- N'hésite pas à t'y connecter
+	- Dans les autres bureaux, s'agit de réunions
+	  - Évite de t'inviter
+      - Réunions informelles
+	- Normalement on a les pauses cafés/midi pour se croiser et discuter ensemble
+	- Là, ça s'annonce plus compliqué
+	- Donc fais signe si tu as envie de discuter
+	- On passera en vocal au besoin
+      - Réunions hebdomadaires
+	- Normalement le vendredi 14h
+	- Là, avec les jours fériés, ça sera jeudi
+	- En anglais
+	- Tour de l'équipe où chacun explique ce qu'il a fait cette semaine (en 3-5min)
+	- Là ça sera pour toi l'occasion de te présenter et d'expliquer vite fait ton sujet
+      - Reporting
+	- Je recommande de tenir un journal de bord
+	- Pour prendre des notes ce que tu as fait chaque jour
+	- Utile pour toi
+	  - Mettre à l'écrit ce que tu as fait permet de te forcer à comprendre ce que tu as fait
+	    - Ou te faire remarquer ce qui n'est pas clair pour toi
+	  - Permet de garder une trace de ce que tu fais
+	    - Pratique après une soirée ou un week-end pour retrouver où tu en étais
+	    - Allège ta charge mentale
+	  - Fournis une base pour le rapport de stage
+	- Utile pour nous
+	  - Outil de suivi de progression
+	  - Permet de détecter si tu rencontres des difficultés
+      - Git
+	- Utilise majoritairement Git pour versionner nos travaux
+	  - Code mais aussi journal de bord
+	- Donc a des repos sur Github
+	- Te laisse créer ton repo de journal de bord et nous filer le lien
+    - Moyens disponibles ?
+      - Machine ?
+      - Sur Nancy ? Si oui, peut p-e récupérer le PC portable chez Cédric et lui apporter
+    - Questions ?
+- Meeting
+  - PaPoC'20 took place on Monday
+    - Presented our work on RenamableLogootSplit
+    - Went fine
+    - Had a few questions
+      - More about the concurrent rename operations
+    - Hope we were able to stir some interest in our work
+    - A few interesting talks
+      - Added a few papers to my TO-READ list
+      - Heidi Howard on which distributed consensus algorithm to use between Paxos and Raft
+      - Chronofold
+      - Kleppmann spent his talk motivating a research issue which, I think, could be solved by revamping of my rename operation
+	- That's quite nice of him
+      - Composing and Decomposing Op-based CRDTs with Semidirect Products
+  - Tom internship began on Tuesday
+    - Have you met Tom ?
+    - Will be with us for the next 10 weeks
+    - Had a meeting with Tom & Victorien to set the context and objectives of his work
+      - And to give him resources to learn more about distributed systems, data replication
+      - And to discuss how we will organize ourselves
+  - Resumed my work on concurrent rename operations
+    - I'm trying to understand the transformation function that i wrote ages ago
+      - It's a good opportunity to check its correctness
+      - Most of it makes sense
+      - But there is one part, one case, i do not understand anymore
+** Semaine du <2020-05-04 Mon> au <2020-05-07 Thu>
+- Meeting
+  - ATER
+    - It seems i will get a half-ATER position at Polytech
+    - Quite happy about it
+    - Have a meeting tomorrow with Vincent Despre to learn more about the position
+  - Worked on the algorithm to undo the effect of a rename operation
+    - Used to deal with concurrent rename operations, by selecting one as the "winner" and undoing the others
+    - I wrote this algorithm months ago
+    - But as i was explaining last week, there was some cases i didn't understand anymore
+    - So i studied those cases
+    - Found an error in one of them, which could change the order between identifiers from one epoch to another
+      - Fixed it
+    - Found out there was a case i was handling which could never actually happen
+      - Removed it
+    - Was able to fix and simplify the transformation function
+  - Now several things to do:
+    - Update the function used to do rename operation
+      - Currently, my functions to do and to undo rename operation are not fully inverse
+      - If i undo a rename operation and then redo it, i don't reach the same state as before
+      - Not an actual issue in the current settings of my system, since i avoid such scenario
+      - But if i want to propose strategies to minimise the overall computations of the system in case of concurrent rename operations, need to get rid of this constraint
+    - Improve the performances of the algorithm
+      - For now, it is quite a naive implementation
+	- Transform id by id
+      - Should be able to transform block by block to improve the performances
+    - What to benchmark for this second part?
+      - Which scenario should follow the simulations?
+      - Which parameters should we use?
+  - Progress report
+    - Have to send progress report to doctoral school by June 5th
+    - Want to get rid of it as soon as possible
+    - Will focus on it next week
+- Réunion ATER
+  - Notes
+    - Plein de cours disponibles, en fonction de si on veut renforcer l'aspect enseignement de notre CV
+    - Cours faciles (440h)
+      - Découverte de l'informatique (1A)
+	- Besoin de préparation
+	- Même si moyen de récupérer d'autres modules d'autres composantes
+	- PHP ou Python
+	- Notion d'algo, les différentes instructions, les tableaux
+      - Java (2A)
+	- Responsable: Vincent
+	- Notion d'orientée objet
+	- Seulement TD
+      - BDD
+	- Responsable: Claude
+	- Découverte de BDD
+	- Plutôt pour ceux qui auraient un profil mathématique
+	- Un peu de code HTML/PHP pour interagir avec la BDD
+      - Encadrement de projets
+	- Roulette russe
+	- Peut permettre de gagner du temps ou au contraire
+    - Cours compliqués
+      - Systèmes distribués (J2EE)
+      - Programmation parallèle
+	- Pas rentré trop dans le détail
+	- Avoir plus de précisions
+    - Utilisation de Arche
+  - Questions
+    - Quel public ?
+      - Formation d'ingé généraliste à Polytech
+      - Mais existence d'une spé non ?
+    - Responsables de plusieurs groupes pour un même module ?
+  - Faire mail
+    - Lister les modules qui intéresseraient
+    - Si on veut les cours packés sur un semestre ou pas
+    - Où on en est dans la thèse
+** Semaine du <2020-05-11 Mon> au <2020-05-15 Fri>
+- Meeting
+  - Regarding Tom's internship
+    - I spent some time reviewing Tom's work on the prototype
+    - Had a meeting with Tom & Victorien to provide Tom some feedback
+    - Also to explain how we think he should refactor the code and why
+  - Otherwise, i worked on the progress report
+    - Send a first version to Olivier & Gérald
+    - Planning a meeting with them to discuss it
+** Semaines du <2020-05-18 Mon> au <2020-05-29 Fri>
+- Meeting
+  - Had a meeting with Olivier and Gerald
+    - To discuss about what is left to do in the scope of the PhD
+    - and to decide about the planning for the next year
+  - Continued to work on the renaming mechanism
+    - Update my transformation functions to be able to undo and then redo a rename operation without altering some ids
+    - This added more particular cases to my functions
+    - Now have to make sure that i'm not forgetting one
+    - And have to verify that the existing order between identifiers is still preserved by the rename functions
+** Semaine du <2020-06-02 Tue> au <2020-06-05 Fri>
+- Meeting
+  - Regarding the progress report
+    - To do so, i had a meeting with Stephan to discuss about my work this past year
+    - So he could fill his dedicated form
+    - So the progress report is completed and i sent it to the doctoral school
+  - Regarding Tom's internship
+    - Victorien and I discussed a bit with Tom to help him with his report, more precisely to set the oultine for now
+    - and discussed a bit about adding unit tests in his prototype to test the SWIM protocol implmentation
+  - For RenamableLogootSplit, was able to find a scenario in which the order between identifiers is broken by the renaming functions
+    - Added a corresponding test case
+    - But the result was a bit confusing : the test case passed instead of failing
+    - Spend some time investigating the reason why and actually, there is a bug in the function we use to generate a new id between two others
+      - The function is correct, but it does not behave as i expect
+      - More precisely, it does not generate the smallest suitable id in some cases
+    - Checked with Victorien, it is not intended
+    - Adding corresponding test case
+    - Fixing it
+** Semaine du <2020-06-08 Mon> au <2020-06-12 Fri>
+- Réflexions sur les simulations avec renommages concurrents
+  - Objectifs
+    - Vérifier la convergence du système
+      - Bon à mon avis, on ne tombera pas sur les cas problématiques vu leur faible probabilité de se produire
+      - Donc ça risque de ne pas beaucoup m'aider pour trouver des scénarios que je n'ai pas exploré
+      - Mais ça va me permettre de vérifier le travail effectué jusque là
+    - Obtenir l'évolution de la taille de la structure de données
+      - Globalement, compte reprendre le graphe de l'évolution de la taille du document que nous avions à présent
+	- https://github.com/MatthieuNICOLAS/2020-presentation-papoc/blob/master/img/snapshots-sizes.pdf
+      - Mais en ajoutant un paramètre supplémentaire : le nombre d'opérations de renommage concurrentes
+      - Faire varier le nombre d'opés de renommage de 1 à 4 en fonction des simus ?
+      - Permet de mettre en lumière l'impact d'opés de renommage concurrentes
+	- Multiplication de l'overhead car doit maintenir /l'ancien état/ de chaque opé
+    - Obtenir l'évolution du temps d'intégration de l'opé de renommage concurrente
+      - Se décompose en 4 parties
+	1. Ajout de la nouvelle epoch dans l'arborescence et de l'ancien état correspondant
+	2. Comparaison de la priorité de la nouvelle epoch par rapport à la courante
+	3. Annulation du renommage concurrent
+	4. Exécution du renommage
+	   - Qu'on a déjà mesuré précédemment : https://github.com/MatthieuNICOLAS/2020-presentation-papoc/blob/master/img/integration-time-rename.pdf
+      - 2 cas de figures par contre
+	1. L'opération de renommage est "perdante" par rapport à celle qu'on a déjà appliqué
+	   - Juste besoin de jouer les étapes 1. et 2. dans ce cas
+	   - Qui devraient être les moins coûteuses
+	2. L'opération de renommage est "gagnante" par rapport à celle qu'on a déjà appliqué
+	   - Dans ce cas, doit effectuer les 4 étapes
+    - Obtenir le temps d'intégration d'une opération concurrente à un renommage mais dépendante causalement d'une opé de renommage concurrente perdante
+      - Se décompose en 3 parties
+	1. Calcul du Lowest-Common Ancestor (LCA) de chaque epoch et obtention des chemins respectifs
+	2. Undos successifs des renommages perdants
+	3. Do successifs des renommages gagnants
+      - On a déjà mesuré le 3.
+	- Correspondant au temps d'intégration des opés concurrentes aux renommages sur cette figure
+	  - https://github.com/MatthieuNICOLAS/2020-presentation-papoc/blob/master/img/integration-time-boxplot-remote-operations-without-outliers.pdf
+  - Comportement de la simulation
+    - On reprend le même que précédemment
+      - 10 bots qui collaborent pour rédiger un document
+      - 2 phases : génération de contenu puis édition
+    - On génère "juste" des opérations de renommages concurrentes
+    - Comment créer et forcer la concurrence ?
+      - Auparavant, on avait 1 seul noeud qui générait une opé de renommage une fois atteint les 30k opés
+      - Mais on ne peut pas juste augmenter le nombre de noeuds déclenchant un renommage à ce stade
+	- Les noeuds ne progressent pas à la même vitesse
+	- Peut se retrouver avec 1 noeud qui déclenche un renommage avant que tous les autres n'aient observés 30k opérations
+	- Mais que les autres noeuds devant déclencher des renommages concurrents observent finalement ce renommage avant d'atteindre le seuil de 30k opés
+      - Plusieurs solutions possibles pour éviter ce problème
+	1. Un seul noeud déclenchent l'ensemble des renommages concurrents au lieu d'avoir différents noeuds
+	   - Au lieu de générer une opé de renommage, le noeud en génère plusieurs concurrentes en utilisant d'autres identités
+	   - L'API n'est pas prévue pour gérer un tel scénario
+	     - Absence d'une fonction /prepare()/ qui se contenterait de générer l'opération mais qui ne modifierait pas l'état de la séquence
+	   - Besoin de dupliquer la séquence au préalable
+	   - Ça fonctionnerait, mais quelques inconvénients
+	     - Ce procédé serait coûteux pour le noeud en charge de générer les renommages
+	       - Les multiples copies de l'état risquent de prendre des secondes
+	       - Bon après, c'est pas non plus trop impactant quelques secondes sur une simulation d'1h30
+	     - Les opérations générées reposeraient sur le même ancien état
+	       - Je préfererais avoir un peu d'entropie là-dessus
+        2. Plusieurs noeuds déclenchent des opés de renommage
+	   - Soit en atteignant 30k opés pour le 1er
+	   - Soit à la réception d'une opé de renommage pour les autres
+	     - Un noeud pourrait déterminer s'il doit générer une opé de renommage concurrente avant d'intégrer une opé de renommage reçue
+	   - Permettrait de répartir la charge de la génération des renommages sur plusieurs noeuds
+	   - Permettrait aussi d'avoir un peu d'entropie au niveau de l'état de la séquence au moment du renommage
+	   - Mais comment implémenter un tel comportement ?
+    - Quoique on repose sur une livraison causale des opérations de renommage dans l'implémentation actuelle
+      - Dans ce cas, est-ce que les opés de renommage ne seront pas toutes concurrentes si on se contente de les générer en arrivant à 30k opés ?
+      - Pour intégrer une opé de renommage, doit avoir au préalable observé ses 30k opés précédentes
+      - Dans ce cas, a déclenché sa propre opé de renommage
+    - Donc finalement, juste besoin que plusieurs noeuds génèrent des opés de renommage, et plus seulement /master/
+      - Et d'un paramètre permettant de faire varier ce nombre de noeuds
+- Meeting
+  - Regarding my work on RenamableLogootSplit
+    - Last week, i had identified a scenario where the renaming functions would break the intended order between identifiers
+    - Actually, i haven't been able to find a way to update the renaming functions to deal with the problematic identifiers.
+    - So i changed the function used to pick ids to prevent the generation of problematic ids
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
@@ -9527,6 +10198,16 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     \put(5,-40){\hbox{\includegraphics[scale=0.8]{signature.png}}}
   \end{picture}
   #+END_BLOCK
+- tmux
+  - tmux est un terminal virtuel qui nous permet de lancer des programmes de se détacher du terminal sans interrompre le programme
+  - Pratique pour démarrer un programme long sur une machine distante pour ne pas interrompre son exécution à la fin de la session ssh
+  - Créer un tmux
+    - `tmux`
+  - Se détacher d'un tmux
+    - Pas une commande à proprement parler, mais un raccourci clavier
+    - Ctrl + B (raccourci pour initier une commande) suivi de D (pour Detach)
+  - Se reconnecter à un tmux existant
+    - `tmux a -t 0`
 * Glossaire
 - <<<Eventual convergence>>> property
   #+BEGIN_QUOTE
