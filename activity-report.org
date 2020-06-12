@@ -10053,8 +10053,19 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Meeting
   - Regarding my work on RenamableLogootSplit
     - Last week, i had identified a scenario where the renaming functions would break the intended order between identifiers
-    - Actually, i haven't been able to find a way to update the renaming functions to deal with the problematic identifiers.
-    - So i changed the function used to pick ids to prevent the generation of problematic ids
+    - Actually, i haven't been able to find a way to edit the renaming functions to deal with the problematic identifiers.
+    - So i edited the function used to pick ids to prevent the generation of problematic ids
+  - Now i'm working on the experiments to evaluate RenamableLogootSplit in case of concurrent rename operations
+    - First thing i had to do was to tidy the repository
+      - Since i was in a rush to meet the deadline for PaPoC, i didn't take the time to organize the repository, to commit the last version of the code and the dataset
+      - I started to clean the repo months ago, but i did only a small part
+    - So i took some time to do it correctly this time
+    - Now the repository is up-to-date
+    - I will edit the experiment code to be able to run simulations with concurrent rename operations
+    - But before, i am refactoring the code of the simulation since it's a bit of a mess
+      - The execution flow is a bit tricky to understand
+      - Since we have 3 asynchronous loops
+  - Have you met B020 ?
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
