@@ -10310,11 +10310,11 @@ We say that H implements A under this refinement mapping iff, for each behavior 
       - Privilègier l'aide sur le fond et la clarification des explications
 ** Semaine du <2020-07-06 Mon> au <2020-07-10 Fri>
 *** Planned
-**** TODO Finir le script qui vérifie la validité d'une simulation
+**** DONE Finir le script qui vérifie la validité d'une simulation
 - Vérifie la convergence des textes finaux des différents noeuds
 - Vérifie le nombre d'opérations de renommage
 - Vérifie la concurrence des opérations de renommage
-**** TODO Vérifier la validité des simus que j'ai effectué en local
+**** DONE Vérifier la validité des simus que j'ai effectué en local
 - J'ai déjà vérifié manuellement la convergence des documents
 - Et la concurrence entre les opés de renommage
 - Pour le moment, juste détecté le scénario où la suppression d'un caractère échoue
@@ -10324,6 +10324,10 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Et le coup de l'anti-entropie qui, en livrant plusieurs opés d'un coup, pouvait faire passer une opé de renommage avant que le noeud n'ait  déclenché la sienne
   - Fixé depuis
 - Mais pas à l'abri d'avoir manqué un bug
+**** TODO Identifier l'origine de la divergence de /1594044965/
+- Voir si reproductible
+**** TODO Identifier l'origine de la divergence de /1593526494/
+- Voir si reproductible
 **** TODO Mettre à jour l'environnement sur la machine /coast-srv0/
 - Transférer la nouvelle image Docker
 - Transférer les nouveaux /docker-compose/
@@ -10341,6 +10345,29 @@ We say that H implements A under this refinement mapping iff, for each behavior 
   - Par contre, on stocke l'état d'un noeud au moment où il applique une opération
   - Peut donc récupérer les dépendances de chaque opé de renommage en récupérant l'état de leur auteur respectif à leur génération
     - Doit lire chaque fichier de log et uniquement conserver les opérations locales de renommage
+  - Par contre, le vecteur correspond à l'état du noeud au moment où il génère l'opération
+  - Pour que des opérations soient concurrentes, il faut donc que soit
+    - Les états soient concurrents
+    - Les états soient équivalents
+- Vérifier la validité des simus que j'ai effectué en local
+  - J'ai lancé le script de validation sur les résultats des différentes simulations
+    - 1593525002: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = false
+    - 1593525204: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = false
+    - 1593525518: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = false
+    - 1593526494: areDocsConvergent = false, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+    - 1594043801: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+    - 1594043929: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+    - 1594044020: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+    - 1594044164: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+    - 1594044965: areDocsConvergent = false, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  - De /1593525002/ à /1593525518/, doit s'agir de l'ancienne version où une opé de renommage délivrée via l'anti-entropie était appliquée avant de générer l'opé de renommage du noeud
+  - Les simus suivantes ont l'air de garantir la concurrence des opés
+  - Mais on a des problèmes de convervence
+  - /1594044965/ a l'air d'avoir eu le bug de la suppression qui échoue
+    - À vérifier
+  - /1593526494/ par contre est plus problématique
+    - On a 3 versions finales différentes
+    - Mais là ça a l'air d'être des blocs qui sont placés à des positions différentes d'une version à l'autre
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
