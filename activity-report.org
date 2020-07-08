@@ -10324,7 +10324,8 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Et le coup de l'anti-entropie qui, en livrant plusieurs opés d'un coup, pouvait faire passer une opé de renommage avant que le noeud n'ait  déclenché la sienne
   - Fixé depuis
 - Mais pas à l'abri d'avoir manqué un bug
-**** TODO Identifier l'origine de la divergence de /1594044965/
+**** IN-PROGRESS Identifier l'origine de la divergence de /1594044965/
+- Bot3 obtient un document final différent des autres collaborateurs
 - Voir si reproductible
 **** TODO Identifier l'origine de la divergence de /1593526494/
 - Voir si reproductible
@@ -10368,6 +10369,47 @@ We say that H implements A under this refinement mapping iff, for each behavior 
   - /1593526494/ par contre est plus problématique
     - On a 3 versions finales différentes
     - Mais là ça a l'air d'être des blocs qui sont placés à des positions différentes d'une version à l'autre
+- Identifier l'origine de la divergence de /1594044965/
+  - Utilisation du script /replay-log/ pour rejouer le log des opérations de Bot3
+    - Pas exactement le même déroulement puisqu'on joue uniquement des opérations distantes mais c'est le mieux qu'on puisse faire à l'heure actuelle
+  - On arrive à reproduire la divergence de Bot3
+  - Là où c'est le plus étrange, c'est qu'une assertion de /mute-structs/ échoue au cours de l'exécution
+    - Ça n'a donc pas l'air d'être le scénario où une simple suppression échoue
+    - Mais un autre bug
+  - L'assertion est la suivante /Assertion failed: The array should be sorted/
+  - Cette assertion est issue de la ligne de code suivante
+    - https://github.com/coast-team/mute-structs/blob/a8ca6943dd2362a65cfb7449611f4cf40afe0293/src/identifierinterval.ts#L50
+  - Elle est déclenchée si les identifiants ne sont pas triés dans l'ordre croissant lorsqu'on essaie de les refusionner en blocs
+    - Donc au cours de /insertRemote()/ et /delRemote()/ d'autres epochs
+    - Et au cours de l'inversion de renommages suite à un /renameRemote()/ gagnant
+  - Ici, l'assertion échoue au cours de l'exécution de l'opération 502 (503 dans le log de Bot3)
+  - Il s'agit d'un renommage distant forçant l'annulation du renommage que vient de jouer Bot3
+  - L'assertion échoue pour ces identifiants:
+    - other = [-2142925978, 332387740, 9, 35]
+    - value = [-2142925978, 332387740, 9, 34, 2147483647, 0, 0, 0, -2142925978, 332387740, 9, 36]
+  - On a donc value < other, alors qu'on devrait avoir l'inverse
+  - On remarque le second tuple composant value est MAX_TUPLE, le tuple que je me réserve pour pouvoir préserver l'ordre quand j'annule un renommage
+  - Ma fonction /reverseRenameId()/ doit donc être invalide pour un cas donné
+  - Ok, le scénario est un poil plus compliqué que je pensais initialement
+  - En fait, on a 3 opés de renommages qui se suivent
+    - L'opé 501 du log correspond au renommage local effectué par Bot3
+    - L'opé 502 du log correspond à un renommage concurrent qui gagne par rapport au renommage de Bot3
+      - L'annulant donc
+    - L'opé 503 du log correspond à un renommage concurrent qui gagne par rapport au renommage 502 du log
+      - L'annulant donc
+  - C'est au cours du 3ème renommage que l'assertion échoue
+  - On essaie d'annuler le renommage portant sur id = [-2142925978, -1991717368, 22, 107, -2142925978, 332387740, 9, 36]
+  - D'après les /console.log()/ ajoutés pour le debugging, on passe dans le cas suivant
+    - https://github.com/coast-team/mute-structs/blob/add-renaming-mechanism-reverse-rename/src/renamingmap/renamingmap.ts#L317-L327
+  - Sauf que successorId = [-2142925978, 332387740, 9, 35]
+  - Alors quelques éléments m'interpellent
+    - Pourquoi le tuple [-2142925978, 332387740, 9, 36] s'est retrouvé ajouté à un identifiant à gauche de [-2142925978, 332387740, 9, 35] ?
+    - Pourquoi lors de /mergeIdsIntoIntervals()/, les identifiants sont correctement ordonnés ?
+      - Dans le sens où on a [..., other, value, ...]
+      - Que other correspond à [-2142925978, 332387740, 9, 35] et que value devrait correspondre à [-2142925978, 332387740, 9, 36]
+  - Est-ce que c'est juste ma fonction permettant de récupérer le prédécesseur et le successeur qui renvoie un résultat incorrect ici ?
+    - Ce qui fausserait la transformation appliquée à l'identifiant
+    - Et casserait l'ordre existant entre les identifiants ?
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
