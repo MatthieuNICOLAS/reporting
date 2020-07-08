@@ -10324,11 +10324,24 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Et le coup de l'anti-entropie qui, en livrant plusieurs opés d'un coup, pouvait faire passer une opé de renommage avant que le noeud n'ait  déclenché la sienne
   - Fixé depuis
 - Mais pas à l'abri d'avoir manqué un bug
-**** IN-PROGRESS Identifier l'origine de la divergence de /1594044965/
+**** DONE Identifier l'origine de la divergence de /1594044965/
 - Bot3 obtient un document final différent des autres collaborateurs
 - Voir si reproductible
-**** TODO Identifier l'origine de la divergence de /1593526494/
+**** DONE Identifier l'origine de la divergence de /1593526494/
 - Voir si reproductible
+**** TODO Publier la version corrigée de /mute-structs/
+- J'ai modifié /mute-structs/ pour ne plus utiliser /renameIdInterval()/ qui est buggé
+  - Et plus à jour de toute façon suite aux modifs que j'ai fait pour que /renameId(reverseRenameId(id)) = reverseRenameId(renameId(id))/
+- Utilise à la place /renameId()/
+- Publier cette nouvelle version
+**** TODO Publier les scripts utilisés pour le debugging
+- Je n'ai pas encore ajouté le script /replayLog/ au repo de /results-exploit/
+- Nettoyer et commit ce code
+- Le script que j'ai utilisé pour décomposer et rejouer pas à pas les différentes étapes des renommages successifs s'est aussi avéré extrêmement pratique
+- Voir comment l'incorporer à /results-exploit/
+**** TODO Mettre à jour /mute-bot-random/ avec la version corrigée de /mute-structs/
+**** TODO Relancer des simus en local et vérifier leur validité
+- Une dizaine d'échantillons permettra de vérifier si des bugs sont encore présents
 **** TODO Mettre à jour l'environnement sur la machine /coast-srv0/
 - Transférer la nouvelle image Docker
 - Transférer les nouveaux /docker-compose/
@@ -10337,6 +10350,16 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Ne pas oublier de détruire la stack précédente avant de lancer l'expérience
 - Ou rendre dynamique le nom de la stack pour ne pas réutiliser le même
   - Permettrait de conserver les conteneurs pour du débugging si besoin
+**** TODO Retravailler /renameIdInterval()/
+- Le but de /renameIdInterval()/ est d'améliorer les perfs de RLS en renommant bloc par bloc plutôt qu'id par id
+- Mais la version actuelle du code présente plusieurs défauts
+  - /renameIdInterval()/ est buggée
+  - /renameIdInterval()/ duplique le code de /renameId()/
+  - /renameIdInterval()/ n'est pas à jour avec /renameId()/
+- Implémenter /renameIdInterval()/ est une perte de temps tant que les fonctions de renommage ne sont pas fixées
+- On pourrait cependant améliorer les perfs du mécanisme de renommage en déléguant le renommage à /renameId()/
+- Tout en mémorisant où on est dans la séquence pour accélérer la recherche du prédécesseur pour renommer le prochain id
+- IMO cela offrirait un bon compromis entre complexité du code, coût de sa maintenance et performances obtenues
 *** Done
 - Finir le script qui vérifie la validité d'une simulation
   - Me suis fait avoir
@@ -10410,6 +10433,64 @@ We say that H implements A under this refinement mapping iff, for each behavior 
   - Est-ce que c'est juste ma fonction permettant de récupérer le prédécesseur et le successeur qui renvoie un résultat incorrect ici ?
     - Ce qui fausserait la transformation appliquée à l'identifiant
     - Et casserait l'ordre existant entre les identifiants ?
+  - En skippant l'opération 502 du log, on corrige Bot3 qui atteint le même état final que les autres
+    - Il s'agit de l'opé de renommage distante qui override le renommage local de Bot3 pour être juste elle-même overridée dans la foulée par l'opé 503 du log
+  - J'ai simplifié le debugging en prenant directement les identifiants concernés et les /renamingMaps/ des opés
+    - id1AtEpoch0 = [-2142925978, 332387740, 9, 34]
+    - id2AtEpoch0 = [-2142925978, 332387740, 9, 35]
+    - id3AtEpoch0 = [-2142925978, 332387740, 9, 36]
+  - L'idée est de rejouer étape par étape les différents renommages successifs et suivre l'évolution de ces identifiants
+    - Application du renommage local 501
+    - /renamingMap501.renameId(idXAtEpoch0)/
+      - id1AtEpoch501 = [-2142925978,-1842942665,25,107]
+      - id2AtEpoch501 = [-2142925978,-1842942665,25,108]
+      - id3AtEpoch501 = [-2142925978,-1842942665,25,109]
+    - Réception du renommage distant 502
+    - Prioritaire par rapport au renommage précédent, il l'annule
+    - /renamingMap501.reverseRenameId(idXAtEpoch501)/
+      - id1AtEpoch0Prime = [-2142925978,332387740,9,34]
+      - id2AtEpoch0Prime = [-2142925978,332387740,9,35]
+      - id3AtEpoch0Prime = [-2142925978,332387740,9,36]
+    - On a bien /id = reverseRenameId(renameId(id))/ pour le moment
+    - Application du renommage distant 502
+    - /renamingMap502.renameId(idXAtEpoch0)/
+      - id1AtEpoch502 = [-2142925978,-1991717368,22,107,-2142925978,332387740,9,34]
+      - id2AtEpoch502 = [-2142925978,-1991717368,22,108]
+      - id3AtEpoch502 = [-2142925978,-1991717368,22,109]
+    - L'ordre est conservé pour le moment
+    - Réception du renommage distant 503
+    - Prioritaire par rapport au renommage précédent, il l'annule
+    - /renamingMap502.reverseRenameId(idXAtEpoch502)/
+      - id1AtEpoch0Bis = [-2142925978,332387740,9,34]
+      - id2AtEpoch0Bis = [-2142925978,332387740,9,35]
+      - id3AtEpoch0Bis = [-2142925978,332387740,9,36]
+    - On retombe sur les identifiants initiaux
+    - Le bug n'est pas reproduit
+    - Application du renommage distant 503
+    - /renamingMap503.renameId(idXAtEpoch0)/
+      - id1AtEpoch503 = [-2142925978,332387740,25,107]
+      - id2AtEpoch503 = [-2142925978,332387740,25,108]
+      - id3AtEpoch503 = [-2142925978,332387740,25,109]
+  - On n'arrive pas à reproduire le bug dans cette configuration
+  - La différence est qu'ici, on utilise /renameId()/ alors qu'on utilise /renameIdInterval()/ dans le code
+    - Permet de renommer des blocs directement pour plus d'efficacité
+  - En modifiant le replay pour utiliser /renameIdInterval()/, on obtient
+    - /renamingMap502.renameIdInterval(idIntervalAtEpoch0)[0].toIds()/
+      - id1AtEpoch502 = Id[-2142925978,-1991717368,22,107,-2142925978,332387740,9,34]
+      - id2AtEpoch502 = Id[-2142925978,-1991717368,22,107,-2142925978,332387740,9,35]
+      - id3AtEpoch502 = Id[-2142925978,-1991717368,22,107,-2142925978,332387740,9,36]
+    - /renamingMap502.reverseRenameId(idXAtEpoch502)/
+      - id1AtEpoch0Bis = Id[-2142925978,332387740,9,34]
+      - id2AtEpoch0Bis = Id[-2142925978,332387740,9,35]
+      - id3AtEpoch0Bis = Id[-2142925978,332387740,9,34,2147483647,0,0,0,-2142925978,332387740,9,36]
+  - On arrive à reproduire le bug ici
+  - Ça vient donc d'un bug de /renameIdInterval()/, qui "éclate" au moment de l'annulation du renommage ici
+  - La divergence est résolue en modifiant le code de /renameRemote()/ pour utiliser /renameId()/ au lieu de /renameIdInterval()/
+    - En rejouant le log de Bot3 avec cette nouvelle version de RLS, on retombe sur l'état final des autres bots
+  - Je n'ai pas identifié par contre l'erreur exacte se trouvant dans /renameIdInterval()/
+- Identifier l'origine de la divergence de /1593526494/
+  - Comme pour /1594044965/, l'erreur semble provenir de /renameIdInterval()/
+  - En rejouant le log de chacun des bots avec la nouvelle version de RLS, les noeuds convergent sur l'état final de Bot0
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
