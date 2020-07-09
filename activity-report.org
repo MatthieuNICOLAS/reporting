@@ -10342,14 +10342,18 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 **** DONE Mettre à jour /mute-bot-random/ avec la version corrigée de /mute-structs/
 **** DONE Relancer des simus en local et vérifier leur validité
 - Une dizaine d'échantillons permettra de vérifier si des bugs sont encore présents
-**** TODO Mettre à jour l'environnement sur la machine /coast-srv0/
+**** DONE Mettre à jour l'environnement sur la machine /coast-srv0/
 - Transférer la nouvelle image Docker
 - Transférer les nouveaux /docker-compose/
-**** TODO Programmer le lancement des simus
+**** DONE Faire tourner une simu sur /coast-srv0/ pour valider le déploiement
+**** IN-PROGRESS Programmer le lancement des simus
 - Revoir la config CRON : https://www.linuxtricks.fr/wiki/cron-et-crontab-le-planificateur-de-taches
 - Ne pas oublier de détruire la stack précédente avant de lancer l'expérience
 - Ou rendre dynamique le nom de la stack pour ne pas réutiliser le même
   - Permettrait de conserver les conteneurs pour du débugging si besoin
+**** TODO Ajouter une vérification sur l'ordre des identifiants /check-validity/
+- La simu /1594301620/ a de nouveau montré des assertions liées à l'ordre des identifiants échouées
+- Ajouter une fonction vérifiant que l'état final d'une collaboration est valide
 **** TODO Retravailler /renameIdInterval()/
 - Le but de /renameIdInterval()/ est d'améliorer les perfs de RLS en renommant bloc par bloc plutôt qu'id par id
 - Mais la version actuelle du code présente plusieurs défauts
@@ -10504,8 +10508,79 @@ We say that H implements A under this refinement mapping iff, for each behavior 
     - Correspond aux résultats suivants
       - 1594285830
       - 1594286384
+      - 1594297840
+      - 1594297977
   - Toutes ces simulations ont convergés et ont bien générés des opés de renommage concurrentes d'après le script /check-validity/
   - On a l'air bon pour générer le nouveau dataset !
+- Mettre à jour l'environnement sur la machine /coast-srv0/
+  - Transfert de la nouvelle image Docker /botrandom:2.0.0-1/
+  - Génération et transfert des nouveaux /docker-compose/
+    - /docker-compose-rls-150k-10b-30kr-Xrb.yml/
+    - Où X indique le nombre de /renamingBots/
+  - Transfert de la nouvelle version de /start.sh/
+- Faire tourner une simu sur /coast-srv0/ pour valider le déploiement
+  - Correspond à la simu /1594301620/
+  - J'ai récupérer les /outputs/ de la simu et vérifier le résultat
+  - Les noeuds ont convergé, ont généré le bon nombre d'opés de renommages avec la bonne concurrence
+  - Mais y a tout de même des assertions qui ont échoué à un moment donné
+    - N'a pas l'air touché tous les bots
+    #+BEGIN_SRC
+> docker logs afd74f439385 | grep failed
+Assertion failed: u is greater than l
+Assertion failed: result is an integer 32 in [l, u[
+Assertion failed: u is greater than l
+Assertion failed: result is an integer 32 in [l, u[
+Assertion failed: u is greater than l
+Assertion failed: result is an integer 32 in [l, u[
+Assertion failed: The array should be sorted
+
+> docker logs 5d36f7ae0f18 | grep failed
+Assertion failed: u is greater than l
+Assertion failed: result is an integer 32 in [l, u[
+Assertion failed: u is greater than l
+Assertion failed: result is an integer 32 in [l, u[
+Assertion failed: u is greater than l
+Assertion failed: result is an integer 32 in [l, u[
+Assertion failed: The array should be sorted
+
+> docker logs ca35e8b1eb07 | grep failed
+
+    #+END_SRC
+    - Cette assertion est vérifié lorsqu'on choisit une valeur de /random/ pour générer un nouvel identifiant
+    - Mais que la borne inf utilisée est plus grande que la borne sup
+    - En soit, n'a pas l'air de poser de problème
+      - Sur des valeurs données, /randomInt32()/ a l'air de donner une valeur comprise entre /l/ et /u/ même si on les inverse
+      - Mais il doit y avoir un risque d'overflow
+    - L'assertion la plus critique est la liste n'est pas triée
+    - Pose des problèmes pour la suite de la collaboration
+- Programmer le lancement des simus
+  - La question, c'est qu'est-ce que je veux comme dataset ?
+  - Me faudrait des snapshots de collaboration avec
+    - LS
+    - RLS renommage centralisé
+    - RLS 2 renommages concurrents
+    - RLS 3 renommages concurrents
+    - RLS 4 renommages concurrents
+  - On a déjà LS et RLS renommage centralisé
+  - Mais est-ce qu'on en refait ?
+    - On a fait quelques modifs sur le code de RLS, même si ça ne devrait pas impacté le renommage centralisé
+    - Par contre, le code de la simulation elle-même a bien évolué
+    - Et on a que 5-6 snapshots par catégorie pour le moment
+    - Ouais, on en refait
+  - Permet d'avoir 5 types d'expériences à faire tourner
+  - Peut en programmer une toutes les 4h
+  - Proposition de configuration CRON
+    #+BEGIN_SRC
+00 04 * * * /home/mute/mute-bot-random/start.sh /home/mute/mute-bot-random/create-docker-compose/docker-compose/docker-compose-ls-150k-10b.yml
+00 08 * * * /home/mute/mute-bot-random/start.sh /home/mute/mute-bot-random/create-docker-compose/docker-compose/docker-compose-rls-150k-10b-30kr-1rb.yml
+00 12 * * * /home/mute/mute-bot-random/start.sh /home/mute/mute-bot-random/create-docker-compose/docker-compose/docker-compose-rls-150k-10b-30kr-2rb.yml
+00 16 * * * /home/mute/mute-bot-random/start.sh /home/mute/mute-bot-random/create-docker-compose/docker-compose/docker-compose-rls-150k-10b-30kr-3rb.yml
+00 20 * * * /home/mute/mute-bot-random/start.sh /home/mute/mute-bot-random/create-docker-compose/docker-compose/docker-compose-rls-150k-10b-30kr-4rb.yml
+    #+END_SRC
+  - Permet ainsi d'effectuer une simu de chaque type quotidiennement
+  - Devrait donc avoir une vingtaine de simus par catégorie d'ici mon retour de vacs
+  - Reste plus qu'à la mettre en place
+    - Mais pour ça, faudrait déjà être sur que mes algos sont valides
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
@@ -10652,6 +10727,7 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - tmux
   - tmux est un terminal virtuel qui nous permet de lancer des programmes de se détacher du terminal sans interrompre le programme
   - Pratique pour démarrer un programme long sur une machine distante pour ne pas interrompre son exécution à la fin de la session ssh
+  - Cheat Sheet : https://tmuxcheatsheet.com/
   - Créer un tmux
     - `tmux`
   - Se détacher d'un tmux
