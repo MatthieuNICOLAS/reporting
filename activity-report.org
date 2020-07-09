@@ -10329,18 +10329,18 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Voir si reproductible
 **** DONE Identifier l'origine de la divergence de /1593526494/
 - Voir si reproductible
-**** TODO Publier la version corrigée de /mute-structs/
+**** DONE Publier la version corrigée de /mute-structs/
 - J'ai modifié /mute-structs/ pour ne plus utiliser /renameIdInterval()/ qui est buggé
   - Et plus à jour de toute façon suite aux modifs que j'ai fait pour que /renameId(reverseRenameId(id)) = reverseRenameId(renameId(id))/
 - Utilise à la place /renameId()/
 - Publier cette nouvelle version
-**** TODO Publier les scripts utilisés pour le debugging
+**** DONE Publier les scripts utilisés pour le debugging
 - Je n'ai pas encore ajouté le script /replayLog/ au repo de /results-exploit/
 - Nettoyer et commit ce code
 - Le script que j'ai utilisé pour décomposer et rejouer pas à pas les différentes étapes des renommages successifs s'est aussi avéré extrêmement pratique
 - Voir comment l'incorporer à /results-exploit/
-**** TODO Mettre à jour /mute-bot-random/ avec la version corrigée de /mute-structs/
-**** TODO Relancer des simus en local et vérifier leur validité
+**** DONE Mettre à jour /mute-bot-random/ avec la version corrigée de /mute-structs/
+**** DONE Relancer des simus en local et vérifier leur validité
 - Une dizaine d'échantillons permettra de vérifier si des bugs sont encore présents
 **** TODO Mettre à jour l'environnement sur la machine /coast-srv0/
 - Transférer la nouvelle image Docker
@@ -10491,6 +10491,21 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Identifier l'origine de la divergence de /1593526494/
   - Comme pour /1594044965/, l'erreur semble provenir de /renameIdInterval()/
   - En rejouant le log de chacun des bots avec la nouvelle version de RLS, les noeuds convergent sur l'état final de Bot0
+- Relancer des simus en local et vérifier leur validité
+  - J'ai relancé 2 types de simus de taille différentes
+  - Une simu de 4 bots effectuant 100 opés avec les 4 déclenchant un renommage toutes les 25 opés
+    - Correspond aux résultats suivants:
+      - 1594285147
+      - 1594285284
+      - 1594285363
+      - 1594285484
+      - 1594285544
+  - Une simu de 4 bots effectuant 1000 opés avec les 4 déclenchant un renommage toutes les 250 opés
+    - Correspond aux résultats suivants
+      - 1594285830
+      - 1594286384
+  - Toutes ces simulations ont convergés et ont bien générés des opés de renommage concurrentes d'après le script /check-validity/
+  - On a l'air bon pour générer le nouveau dataset !
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
