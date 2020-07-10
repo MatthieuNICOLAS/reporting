@@ -10346,7 +10346,7 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Transférer la nouvelle image Docker
 - Transférer les nouveaux /docker-compose/
 **** DONE Faire tourner une simu sur /coast-srv0/ pour valider le déploiement
-**** IN-PROGRESS Programmer le lancement des simus
+**** DONE Programmer le lancement des simus
 - Revoir la config CRON : https://www.linuxtricks.fr/wiki/cron-et-crontab-le-planificateur-de-taches
 - Ne pas oublier de détruire la stack précédente avant de lancer l'expérience
 - Ou rendre dynamique le nom de la stack pour ne pas réutiliser le même
@@ -10360,19 +10360,6 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Là où ça devient intéressant, c'est que ces erreurs se sont produites entre la 23k-ième et 24k-ième opération
 - Soit avant qu'un renommage n'ait eu lieu
 - Ça va peut-être plus simple à identifier et à resoudre que je ne le pensais
-**** TODO Ajouter une vérification sur l'ordre des identifiants /check-validity/
-- La simu /1594301620/ a de nouveau montré des assertions liées à l'ordre des identifiants échouées
-- Ajouter une fonction vérifiant que l'état final d'une collaboration est valide
-**** TODO Retravailler /renameIdInterval()/
-- Le but de /renameIdInterval()/ est d'améliorer les perfs de RLS en renommant bloc par bloc plutôt qu'id par id
-- Mais la version actuelle du code présente plusieurs défauts
-  - /renameIdInterval()/ est buggée
-  - /renameIdInterval()/ duplique le code de /renameId()/
-  - /renameIdInterval()/ n'est pas à jour avec /renameId()/
-- Implémenter /renameIdInterval()/ est une perte de temps tant que les fonctions de renommage ne sont pas fixées
-- On pourrait cependant améliorer les perfs du mécanisme de renommage en déléguant le renommage à /renameId()/
-- Tout en mémorisant où on est dans la séquence pour accélérer la recherche du prédécesseur pour renommer le prochain id
-- IMO cela offrirait un bon compromis entre complexité du code, coût de sa maintenance et performances obtenues
 *** Done
 - Finir le script qui vérifie la validité d'une simulation
   - Me suis fait avoir
@@ -10580,11 +10567,11 @@ Assertion failed: The array should be sorted
   - Peut en programmer une toutes les 4h
   - Proposition de configuration CRON
     #+BEGIN_SRC
-00 04 * * * /home/mute/mute-bot-random/start.sh /home/mute/mute-bot-random/create-docker-compose/docker-compose/docker-compose-ls-150k-10b.yml
-00 08 * * * /home/mute/mute-bot-random/start.sh /home/mute/mute-bot-random/create-docker-compose/docker-compose/docker-compose-rls-150k-10b-30kr-1rb.yml
-00 12 * * * /home/mute/mute-bot-random/start.sh /home/mute/mute-bot-random/create-docker-compose/docker-compose/docker-compose-rls-150k-10b-30kr-2rb.yml
-00 16 * * * /home/mute/mute-bot-random/start.sh /home/mute/mute-bot-random/create-docker-compose/docker-compose/docker-compose-rls-150k-10b-30kr-3rb.yml
-00 20 * * * /home/mute/mute-bot-random/start.sh /home/mute/mute-bot-random/create-docker-compose/docker-compose/docker-compose-rls-150k-10b-30kr-4rb.yml
+00 04 * * * /mnt-data/mute-bot-random/start.sh /mnt-data/mute-bot-random/create-docker-compose/docker-compose/docker-compose-ls-150k-10b.yml
+00 08 * * * /mnt-data/mute-bot-random/start.sh /mnt-data/mute-bot-random/create-docker-compose/docker-compose/docker-compose-rls-150k-10b-30kr-1rb.yml
+00 12 * * * /mnt-data/mute-bot-random/start.sh /mnt-data/mute-bot-random/create-docker-compose/docker-compose/docker-compose-rls-150k-10b-30kr-2rb.yml
+00 16 * * * /mnt-data/mute-bot-random/start.sh /mnt-data/mute-bot-random/create-docker-compose/docker-compose/docker-compose-rls-150k-10b-30kr-3rb.yml
+00 20 * * * /mnt-data/mute-bot-random/start.sh /mnt-data/mute-bot-random/create-docker-compose/docker-compose/docker-compose-rls-150k-10b-30kr-4rb.yml
     #+END_SRC
   - Permet ainsi d'effectuer une simu de chaque type quotidiennement
   - Devrait donc avoir une vingtaine de simus par catégorie d'ici mon retour de vacs
@@ -10629,7 +10616,60 @@ Assertion failed: result is an integer 32 in [l, u[
   - Cette erreur vient du fait qu'on se contente de comparer les valeurs de /random/ pour prendre une décision
   - Ajout du test unitaire correspondant
   - Correction de /createBetweenPosition()/
-  - Publication de la nouvelle version de /mute-structs/
+  - Publication de la nouvelle version de /mute-structs/ et de /mute-core/
+  - Déploiement d'une nouvelle image Docker /botrandom:2.0.0-2/
+  - J'ai relancé une simu qui correspond à l'identifiant /1594385712/
+  - Rencontre de nouveau l'assertion qui échoue dans les logs de Bot3
+    - Assertion failed: u is greater than l
+    - Assertion failed: result is an integer 32 in [l, u[
+  - Entre la 14k-ième opé et la 15k-ième
+    - Donc de nouveau avant qu'un renommage n'ait eu lieu
+  - En détaillant l'exécution de l'opé 14500 du log, on obtient une insertion entre /id1/ et /id2/ avec
+    - id1 = [1299177438,729105824,2,2,1279447764,-1373009215,3,1,-1740835101,729105824,82,3,2147483645,480160154,251,0]
+    - id2 = [1299177438,729105824,2,2,1279447764,-1373009215,3,1,-1740835101,729105824,82,4]
+  - Ce qui mène à une génération d'un nouveau int32 aléatoire entre
+    - tuple1.random + 1 = 2147483646
+    - tuple2.random = 2147483646
+  - On a donc bien de nouveau une erreur dans l'algorithme de génération des ids
+  - Il s'agit ici d'un overflow de la valeur de /random/
+  - Modification de /createBetweenPosition()/ pour détecter le cas où /tuple1.random + 1 = INT32_TOP_USER/
+    - Dans ce cas, ajoute /tuple1/ à /tuples/ et charge le prochain tuple
+  - Devrait permettre d'éviter l'overflow
+  - Déploiement de la nouvelle image Docker /botrandom:2.0.0-3/
+  - J'ai relancé une simu qui correspond à l'identifiant /1594392615/
+  - Arrivé à mi-parcours, toujours pas d'assertions qui échouent
+  - Je programme pour les tâches CRON
+    - Faudra que je fasse un point au bout de quelques simus pour vérifier les résultats
+- Meeting
+  - Spend the week working on the simulations
+    - Wanted it ready today so i can program automated simulations for next weeks
+    - To generate a dataset i can exploit when i will be back from holidays
+    - But i encountered bugs
+      - Spend the week trying to understand errors leading to bugs, writing corresponding test cases and fixing them
+      - Fixed the last one i'm aware of this morning
+    - Will run a simu this afternoon to check if the output is valid
+** Semaine du <2020-07-29 Wed> au <2020-07-31 Fri>
+*** Planned
+**** TODO Ajouter une vérification sur l'ordre des identifiants /check-validity/
+- La simu /1594301620/ a de nouveau montré des assertions liées à l'ordre des identifiants échouées
+- Ajouter une fonction vérifiant que l'état final d'une collaboration est valide
+**** TODO Vérifier la validité des simulations effectuées
+- Les simus devraient avoir tournées pendant mes vacs et générer un bon dataset
+- Récupérer les datasets et vérifier s'ils sont valides
+**** TODO Faire la procédure d'inscription en 4ème année de doctorat
+**** TODO Mettre à jour le pseudo-code de /renameId()/
+**** TODO Écrire en pseudo-code /reverseRenameId()/
+**** TODO Rédiger le plan détaillé du papier
+**** TODO Retravailler /renameIdInterval()/
+- Le but de /renameIdInterval()/ est d'améliorer les perfs de RLS en renommant bloc par bloc plutôt qu'id par id
+- Mais la version actuelle du code présente plusieurs défauts
+  - /renameIdInterval()/ est buggée
+  - /renameIdInterval()/ duplique le code de /renameId()/
+  - /renameIdInterval()/ n'est pas à jour avec /renameId()/
+- Implémenter /renameIdInterval()/ est une perte de temps tant que les fonctions de renommage ne sont pas fixées
+- On pourrait cependant améliorer les perfs du mécanisme de renommage en déléguant le renommage à /renameId()/
+- Tout en mémorisant où on est dans la séquence pour accélérer la recherche du prédécesseur pour renommer le prochain id
+- IMO cela offrirait un bon compromis entre complexité du code, coût de sa maintenance et performances obtenues
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
