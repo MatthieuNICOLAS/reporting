@@ -10351,6 +10351,15 @@ We say that H implements A under this refinement mapping iff, for each behavior 
 - Ne pas oublier de détruire la stack précédente avant de lancer l'expérience
 - Ou rendre dynamique le nom de la stack pour ne pas réutiliser le même
   - Permettrait de conserver les conteneurs pour du débugging si besoin
+**** DONE Identifier l'origine des assertions qui échouent
+- J'ai relancé une simu sur /coast-srv0/ pour voir si elle arrivait à terme sans erreurs
+- Il s'agit de la simu /1594365581/
+- J'ai de nouveau eu des assertions qui ont échoués
+  - Assertion failed: u is greater than l
+  - Assertion failed: result is an integer 32 in [l, u[
+- Là où ça devient intéressant, c'est que ces erreurs se sont produites entre la 23k-ième et 24k-ième opération
+- Soit avant qu'un renommage n'ait eu lieu
+- Ça va peut-être plus simple à identifier et à resoudre que je ne le pensais
 **** TODO Ajouter une vérification sur l'ordre des identifiants /check-validity/
 - La simu /1594301620/ a de nouveau montré des assertions liées à l'ordre des identifiants échouées
 - Ajouter une fonction vérifiant que l'état final d'une collaboration est valide
@@ -10581,6 +10590,46 @@ Assertion failed: The array should be sorted
   - Devrait donc avoir une vingtaine de simus par catégorie d'ici mon retour de vacs
   - Reste plus qu'à la mettre en place
     - Mais pour ça, faudrait déjà être sur que mes algos sont valides
+- Identifier l'origine des assertions qui échouent
+  - Si l'erreur ne provient pas du mécanisme de renommage
+  - Une cause possible est ma modif récente de /createBetweenPosition()/
+    - Je l'avais retravaillé lorsque j'avais détecté un bug sur la génération des identifiants
+    - Les identifiants générés étaient valides, mais ils étaient parfois inutilement rallongé
+    - Ma modif visait à générer les identifiants valides les plus court
+    - À voir si je ne me suis pas planté en cours de route
+  - Comment reproduire le bug pour identifier un scénario problématique ?
+    - Peut reprendre le log du Bot avec les erreurs
+    - Rejouer toutes les opés comme des distantes jusqu'à arriver à la 23k-ième
+    - Puis à partir de là, pour chaque insertion locale, la jouer en mode local
+      - Cela va générer un identifiant incorrect pour la suite de la collaboration
+      - Mais on peut corriger ça en le supprimant derrière
+    - Puis la jouer en mode distant
+  - Ok ça marche, c'est reproductible
+    #+BEGIN_SRC
+Applying local insert  23282
+Assertion failed: u is greater than l
+Assertion failed: result is an integer 32 in [l, u[
+Applying local insert  23292
+Assertion failed: u is greater than l
+Assertion failed: result is an integer 32 in [l, u[
+Applying local insert  23300
+Assertion failed: u is greater than l
+Assertion failed: result is an integer 32 in [l, u[
+    #+END_SRC
+  - En détaillant l'exécution de l'opé 23283 du log, on obtient une insertion entre /id1/ et /id2/ avec
+    - id1 = [-2044317204,1071916823,0,0,873648595,2080302764,0,0,1896718419,1071916823,4,1,2071699641,2050845961,33,1,2147483566,2080302764,149,6,1949301666,2050845961,156,7,1612053367,2050845961,313,1]
+    - id2 = [-2044317204,1071916823,0,0,873648595,2080302764,0,0,1896718419,1071916823,4,1,2071699641,2050845961,33,1,2147483566,2080302764,149,6,1949301666,2050845961,156,8,-1502599174,2080302764,186,1]
+  - Ce qui mène à une génération d'un nouveau int32 aléatoire entre
+    - tuple1.random + 1 = 16120533671
+    - tuple2.random = -1502599174
+  - On a donc bien une erreur dans l'algorithme de génération des ids
+  - Ici, on ne devrait pas comparer ces 2 valeurs de /random/ et les utiliser pour en générer un nouveau
+  - Puisqu'on observe une différence au niveau des /offsets/ des tuples précédents
+  - Le comportement attendu pour ce scénario est de recopier tuple1 et d'ajouter un nouveau tuple avec 1612053367 < /random/
+  - Cette erreur vient du fait qu'on se contente de comparer les valeurs de /random/ pour prendre une décision
+  - Ajout du test unitaire correspondant
+  - Correction de /createBetweenPosition()/
+  - Publication de la nouvelle version de /mute-structs/
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
@@ -10714,6 +10763,8 @@ Assertion failed: The array should be sorted
 * Commandes utiles
 - Récupérer la dernière ligne du log de chaque container Docker tournant sur la machine
   - /docker ps -q | xargs -i -t docker logs --tail=1 {}/
+- Filtrer les conteneurs Docker par image
+  - /docker ps --filter "ancestor=botrandom:2.0.0-1"/
 - Supprimer le champ /renamingMap/ d'une snapshot donnée au format JSON et enregistrer le résultat obtenu
   - /cat Snapshot.json | jq -jc 'del(.mapBaseToBlock)' > Snapshot-without-map.json/
 - Supprimer les lignes de 100 à 100000 d'un fichier
