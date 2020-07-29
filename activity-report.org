@@ -10650,13 +10650,17 @@ Assertion failed: result is an integer 32 in [l, u[
     - Will run a simu this afternoon to check if the output is valid
 ** Semaine du <2020-07-29 Wed> au <2020-07-31 Fri>
 *** Planned
+**** DONE Vérifier la validité des simulations effectuées
+- Les simus devraient avoir tournées pendant mes vacs et générer un bon dataset
+- Récupérer les datasets et vérifier s'ils sont valides
+**** IN-PROGRESS Identifier l'origine de la divergence de la simu /1594576801/
+- De l'ensemble des simus, c'est la seule qui diverge
+- Seul /Bot3/ obtient un résultat différent des autres noeuds
+- Rejouer son log pour déterminer l'origine de cette divergence
+**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
 **** TODO Ajouter une vérification sur l'ordre des identifiants /check-validity/
 - La simu /1594301620/ a de nouveau montré des assertions liées à l'ordre des identifiants échouées
 - Ajouter une fonction vérifiant que l'état final d'une collaboration est valide
-**** TODO Vérifier la validité des simulations effectuées
-- Les simus devraient avoir tournées pendant mes vacs et générer un bon dataset
-- Récupérer les datasets et vérifier s'ils sont valides
-**** TODO Faire la procédure d'inscription en 4ème année de doctorat
 **** TODO Mettre à jour le pseudo-code de /renameId()/
 **** TODO Écrire en pseudo-code /reverseRenameId()/
 **** TODO Rédiger le plan détaillé du papier
@@ -10670,6 +10674,325 @@ Assertion failed: result is an integer 32 in [l, u[
 - On pourrait cependant améliorer les perfs du mécanisme de renommage en déléguant le renommage à /renameId()/
 - Tout en mémorisant où on est dans la séquence pour accélérer la recherche du prédécesseur pour renommer le prochain id
 - IMO cela offrirait un bon compromis entre complexité du code, coût de sa maintenance et performances obtenues
+*** Done
+- Vérifier la validité des simulations effectuées
+  - Les simulations ont bien tourné pendant mes vacances
+  - J'ai dorénavant les traces de 94 simulations
+  - En parcourant les logs de ces simus, je n'ai rencontré qu'une seule /assertion failed/
+    #+BEGIN_NOTE
+docker logs 55b545cc08e2
+Assertion failed: this must be less than next
+Assertion failed: The array should be sorted
+Trying to duplicate existing identifiers:  t { idBegin: t { tuples: [ [t] ] }, end: 17736 } t { idBegin: t { tuples: [ [t] ] }, end: 17738 }
+    #+END_NOTE
+  - Il faudra creuser l'origine de cette erreur
+    - Il s'agit du log de /Bot3/ de l'expérience /1594576801/
+  - À part cette anomalie, l'ensemble des simus ont l'air de s'être correctement déroulées
+  - Reste à valider maintenant le résultat final
+  - Le problème que j'ai est que ça représente 172Go de données
+    - Et que je n'ai pas assez de place sur mon SSD pour récupérer tout ça
+  - De quoi ai-je besoin pour vérifier la validité de chaque simu ?
+  - Pour le moment, nécessite
+    - Les fichiers /string.BotX.txt/ des 10 bots pour vérifier la convergence
+    - Les fichiers /Logs.BotX.json/ des /renamingBots/ pour vérifier le nombre d'opés de renommage et leur concurrence
+  - En regroupant les simus par paramètres, peut facilement récupérer le strict minimum et les valider par batch
+  - A mis en place un script pour DL uniquement les fichiers nécessaires à la validation des simus
+  - Pour l'instant, a seulement DL les simus avec 4 /renamingBots/
+  - A exécuté /check-validity/ sur les fichiers résultats
+  - Obtient la sortie suivante
+    #+BEGIN_NOTE
+1594749601: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595354402: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594836001: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595268002: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595527201: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594392615: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595700001: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594455838: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595095201: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594663201: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594490401: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595440802: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594576801: areDocsConvergent = false, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595872801: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594406971: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595613601: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595959201: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594922401: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595181601: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595008801: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595786402: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+    #+END_NOTE
+  - Remarque que l'ensemble des simus ont convergé
+  - Sauf au cours de la simu /1594576801/
+    - C'est la simu qu'on a relevé plus tôt avec une assertion qui a sauté
+    - Dans cette simu, seul /Bot3/ a un résultat différent des autres noeuds
+  - Exécution de /check-validity/ sur le reste des simus
+    - avec 3 /renamingBots/
+      #+BEGIN_NOTE
+  1595685601: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1594735201: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1595858402: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1595599201: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1595512801: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1594994401: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1594562401: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1595944802: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1594476001: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1595426401: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1595253601: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1594821601: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1595080801: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1595772002: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1594908001: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1594648801: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1595340002: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+  1595167201: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+      #+END_NOTE
+    - avec 2 /renamingBots/
+      #+BEGIN_NOTE
+1594807201: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595152801: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594720802: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594634401: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594548002: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595844001: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595412001: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594980001: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595325601: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595498401: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595584801: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594461601: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595066402: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594893601: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595930401: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595239202: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595757601: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595671202: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+      #+END_NOTE
+    - avec 1 /renamingBot/
+      #+BEGIN_NOTE
+1595311202: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595743201: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595052001: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594965601: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595656801: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595397602: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594792802: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1596002401: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595829602: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595224801: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595484001: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594706401: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594533601: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594879201: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1594620002: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595570402: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595916001: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+1595138401: areDocsConvergent = true, isNumberOfRenameOpsValid = true, areRenameOpsConcurrent = true
+      #+END_NOTE
+    - pour LogootSplit
+      #+BEGIN_NOTE
+MD5 (1594519201/string.Bot0.txt) = 516f4591ea16bafdedf75440d5d20ff3
+MD5 (1594519201/string.Bot1.txt) = 516f4591ea16bafdedf75440d5d20ff3
+MD5 (1594519201/string.Bot2.txt) = 516f4591ea16bafdedf75440d5d20ff3
+MD5 (1594519201/string.Bot3.txt) = 516f4591ea16bafdedf75440d5d20ff3
+MD5 (1594519201/string.Bot4.txt) = 516f4591ea16bafdedf75440d5d20ff3
+MD5 (1594519201/string.Bot5.txt) = 516f4591ea16bafdedf75440d5d20ff3
+MD5 (1594519201/string.Bot6.txt) = 516f4591ea16bafdedf75440d5d20ff3
+MD5 (1594519201/string.Bot7.txt) = 516f4591ea16bafdedf75440d5d20ff3
+MD5 (1594519201/string.Bot8.txt) = 516f4591ea16bafdedf75440d5d20ff3
+MD5 (1594519201/string.Bot9.txt) = 516f4591ea16bafdedf75440d5d20ff3
+MD5 (1594605601/string.Bot0.txt) = da0a6bc6cf22a156faab912c369c8269
+MD5 (1594605601/string.Bot1.txt) = da0a6bc6cf22a156faab912c369c8269
+MD5 (1594605601/string.Bot2.txt) = da0a6bc6cf22a156faab912c369c8269
+MD5 (1594605601/string.Bot3.txt) = da0a6bc6cf22a156faab912c369c8269
+MD5 (1594605601/string.Bot4.txt) = da0a6bc6cf22a156faab912c369c8269
+MD5 (1594605601/string.Bot5.txt) = da0a6bc6cf22a156faab912c369c8269
+MD5 (1594605601/string.Bot6.txt) = da0a6bc6cf22a156faab912c369c8269
+MD5 (1594605601/string.Bot7.txt) = da0a6bc6cf22a156faab912c369c8269
+MD5 (1594605601/string.Bot8.txt) = da0a6bc6cf22a156faab912c369c8269
+MD5 (1594605601/string.Bot9.txt) = da0a6bc6cf22a156faab912c369c8269
+MD5 (1594692001/string.Bot0.txt) = 44e7f2dffbdd6439ada51ac68a68bd1c
+MD5 (1594692001/string.Bot1.txt) = 44e7f2dffbdd6439ada51ac68a68bd1c
+MD5 (1594692001/string.Bot2.txt) = 44e7f2dffbdd6439ada51ac68a68bd1c
+MD5 (1594692001/string.Bot3.txt) = 44e7f2dffbdd6439ada51ac68a68bd1c
+MD5 (1594692001/string.Bot4.txt) = 44e7f2dffbdd6439ada51ac68a68bd1c
+MD5 (1594692001/string.Bot5.txt) = 44e7f2dffbdd6439ada51ac68a68bd1c
+MD5 (1594692001/string.Bot6.txt) = 44e7f2dffbdd6439ada51ac68a68bd1c
+MD5 (1594692001/string.Bot7.txt) = 44e7f2dffbdd6439ada51ac68a68bd1c
+MD5 (1594692001/string.Bot8.txt) = 44e7f2dffbdd6439ada51ac68a68bd1c
+MD5 (1594692001/string.Bot9.txt) = 44e7f2dffbdd6439ada51ac68a68bd1c
+MD5 (1594778401/string.Bot0.txt) = ecf03ff3b3f0ad92e95af9511e651755
+MD5 (1594778401/string.Bot1.txt) = ecf03ff3b3f0ad92e95af9511e651755
+MD5 (1594778401/string.Bot2.txt) = ecf03ff3b3f0ad92e95af9511e651755
+MD5 (1594778401/string.Bot3.txt) = ecf03ff3b3f0ad92e95af9511e651755
+MD5 (1594778401/string.Bot4.txt) = ecf03ff3b3f0ad92e95af9511e651755
+MD5 (1594778401/string.Bot5.txt) = ecf03ff3b3f0ad92e95af9511e651755
+MD5 (1594778401/string.Bot6.txt) = ecf03ff3b3f0ad92e95af9511e651755
+MD5 (1594778401/string.Bot7.txt) = ecf03ff3b3f0ad92e95af9511e651755
+MD5 (1594778401/string.Bot8.txt) = ecf03ff3b3f0ad92e95af9511e651755
+MD5 (1594778401/string.Bot9.txt) = ecf03ff3b3f0ad92e95af9511e651755
+MD5 (1594864801/string.Bot0.txt) = 4659c79a6218b32d4d309f187f066ee5
+MD5 (1594864801/string.Bot1.txt) = 4659c79a6218b32d4d309f187f066ee5
+MD5 (1594864801/string.Bot2.txt) = 4659c79a6218b32d4d309f187f066ee5
+MD5 (1594864801/string.Bot3.txt) = 4659c79a6218b32d4d309f187f066ee5
+MD5 (1594864801/string.Bot4.txt) = 4659c79a6218b32d4d309f187f066ee5
+MD5 (1594864801/string.Bot5.txt) = 4659c79a6218b32d4d309f187f066ee5
+MD5 (1594864801/string.Bot6.txt) = 4659c79a6218b32d4d309f187f066ee5
+MD5 (1594864801/string.Bot7.txt) = 4659c79a6218b32d4d309f187f066ee5
+MD5 (1594864801/string.Bot8.txt) = 4659c79a6218b32d4d309f187f066ee5
+MD5 (1594864801/string.Bot9.txt) = 4659c79a6218b32d4d309f187f066ee5
+MD5 (1594951201/string.Bot0.txt) = f1560f24bca16d0c1b6c309861e7dfd9
+MD5 (1594951201/string.Bot1.txt) = f1560f24bca16d0c1b6c309861e7dfd9
+MD5 (1594951201/string.Bot2.txt) = f1560f24bca16d0c1b6c309861e7dfd9
+MD5 (1594951201/string.Bot3.txt) = f1560f24bca16d0c1b6c309861e7dfd9
+MD5 (1594951201/string.Bot4.txt) = f1560f24bca16d0c1b6c309861e7dfd9
+MD5 (1594951201/string.Bot5.txt) = f1560f24bca16d0c1b6c309861e7dfd9
+MD5 (1594951201/string.Bot6.txt) = f1560f24bca16d0c1b6c309861e7dfd9
+MD5 (1594951201/string.Bot7.txt) = f1560f24bca16d0c1b6c309861e7dfd9
+MD5 (1594951201/string.Bot8.txt) = f1560f24bca16d0c1b6c309861e7dfd9
+MD5 (1594951201/string.Bot9.txt) = f1560f24bca16d0c1b6c309861e7dfd9
+MD5 (1595037602/string.Bot0.txt) = df30bd5f281ead16e30f19fee522a4fb
+MD5 (1595037602/string.Bot1.txt) = df30bd5f281ead16e30f19fee522a4fb
+MD5 (1595037602/string.Bot2.txt) = df30bd5f281ead16e30f19fee522a4fb
+MD5 (1595037602/string.Bot3.txt) = df30bd5f281ead16e30f19fee522a4fb
+MD5 (1595037602/string.Bot4.txt) = df30bd5f281ead16e30f19fee522a4fb
+MD5 (1595037602/string.Bot5.txt) = df30bd5f281ead16e30f19fee522a4fb
+MD5 (1595037602/string.Bot6.txt) = df30bd5f281ead16e30f19fee522a4fb
+MD5 (1595037602/string.Bot7.txt) = df30bd5f281ead16e30f19fee522a4fb
+MD5 (1595037602/string.Bot8.txt) = df30bd5f281ead16e30f19fee522a4fb
+MD5 (1595037602/string.Bot9.txt) = df30bd5f281ead16e30f19fee522a4fb
+MD5 (1595124002/string.Bot0.txt) = afd7d5ecafce42e42348e611aa6d8d54
+MD5 (1595124002/string.Bot1.txt) = afd7d5ecafce42e42348e611aa6d8d54
+MD5 (1595124002/string.Bot2.txt) = afd7d5ecafce42e42348e611aa6d8d54
+MD5 (1595124002/string.Bot3.txt) = afd7d5ecafce42e42348e611aa6d8d54
+MD5 (1595124002/string.Bot4.txt) = afd7d5ecafce42e42348e611aa6d8d54
+MD5 (1595124002/string.Bot5.txt) = afd7d5ecafce42e42348e611aa6d8d54
+MD5 (1595124002/string.Bot6.txt) = afd7d5ecafce42e42348e611aa6d8d54
+MD5 (1595124002/string.Bot7.txt) = afd7d5ecafce42e42348e611aa6d8d54
+MD5 (1595124002/string.Bot8.txt) = afd7d5ecafce42e42348e611aa6d8d54
+MD5 (1595124002/string.Bot9.txt) = afd7d5ecafce42e42348e611aa6d8d54
+MD5 (1595210401/string.Bot0.txt) = 7407df9f8b7141f0288d9123d7cabb67
+MD5 (1595210401/string.Bot1.txt) = 7407df9f8b7141f0288d9123d7cabb67
+MD5 (1595210401/string.Bot2.txt) = 7407df9f8b7141f0288d9123d7cabb67
+MD5 (1595210401/string.Bot3.txt) = 7407df9f8b7141f0288d9123d7cabb67
+MD5 (1595210401/string.Bot4.txt) = 7407df9f8b7141f0288d9123d7cabb67
+MD5 (1595210401/string.Bot5.txt) = 7407df9f8b7141f0288d9123d7cabb67
+MD5 (1595210401/string.Bot6.txt) = 7407df9f8b7141f0288d9123d7cabb67
+MD5 (1595210401/string.Bot7.txt) = 7407df9f8b7141f0288d9123d7cabb67
+MD5 (1595210401/string.Bot8.txt) = 7407df9f8b7141f0288d9123d7cabb67
+MD5 (1595210401/string.Bot9.txt) = 7407df9f8b7141f0288d9123d7cabb67
+MD5 (1595296801/string.Bot0.txt) = 5c57439da887b0ddd30aa3ff4b531ff2
+MD5 (1595296801/string.Bot1.txt) = 5c57439da887b0ddd30aa3ff4b531ff2
+MD5 (1595296801/string.Bot2.txt) = 5c57439da887b0ddd30aa3ff4b531ff2
+MD5 (1595296801/string.Bot3.txt) = 5c57439da887b0ddd30aa3ff4b531ff2
+MD5 (1595296801/string.Bot4.txt) = 5c57439da887b0ddd30aa3ff4b531ff2
+MD5 (1595296801/string.Bot5.txt) = 5c57439da887b0ddd30aa3ff4b531ff2
+MD5 (1595296801/string.Bot6.txt) = 5c57439da887b0ddd30aa3ff4b531ff2
+MD5 (1595296801/string.Bot7.txt) = 5c57439da887b0ddd30aa3ff4b531ff2
+MD5 (1595296801/string.Bot8.txt) = 5c57439da887b0ddd30aa3ff4b531ff2
+MD5 (1595296801/string.Bot9.txt) = 5c57439da887b0ddd30aa3ff4b531ff2
+MD5 (1595383201/string.Bot0.txt) = 9faedecfb921b93b78f74f087065da16
+MD5 (1595383201/string.Bot1.txt) = 9faedecfb921b93b78f74f087065da16
+MD5 (1595383201/string.Bot2.txt) = 9faedecfb921b93b78f74f087065da16
+MD5 (1595383201/string.Bot3.txt) = 9faedecfb921b93b78f74f087065da16
+MD5 (1595383201/string.Bot4.txt) = 9faedecfb921b93b78f74f087065da16
+MD5 (1595383201/string.Bot5.txt) = 9faedecfb921b93b78f74f087065da16
+MD5 (1595383201/string.Bot6.txt) = 9faedecfb921b93b78f74f087065da16
+MD5 (1595383201/string.Bot7.txt) = 9faedecfb921b93b78f74f087065da16
+MD5 (1595383201/string.Bot8.txt) = 9faedecfb921b93b78f74f087065da16
+MD5 (1595383201/string.Bot9.txt) = 9faedecfb921b93b78f74f087065da16
+MD5 (1595469601/string.Bot0.txt) = 344faa3afa6140b42cd3a7dfc85cbae9
+MD5 (1595469601/string.Bot1.txt) = 344faa3afa6140b42cd3a7dfc85cbae9
+MD5 (1595469601/string.Bot2.txt) = 344faa3afa6140b42cd3a7dfc85cbae9
+MD5 (1595469601/string.Bot3.txt) = 344faa3afa6140b42cd3a7dfc85cbae9
+MD5 (1595469601/string.Bot4.txt) = 344faa3afa6140b42cd3a7dfc85cbae9
+MD5 (1595469601/string.Bot5.txt) = 344faa3afa6140b42cd3a7dfc85cbae9
+MD5 (1595469601/string.Bot6.txt) = 344faa3afa6140b42cd3a7dfc85cbae9
+MD5 (1595469601/string.Bot7.txt) = 344faa3afa6140b42cd3a7dfc85cbae9
+MD5 (1595469601/string.Bot8.txt) = 344faa3afa6140b42cd3a7dfc85cbae9
+MD5 (1595469601/string.Bot9.txt) = 344faa3afa6140b42cd3a7dfc85cbae9
+MD5 (1595556002/string.Bot0.txt) = e60a897d314616236aa90ac42596a953
+MD5 (1595556002/string.Bot1.txt) = e60a897d314616236aa90ac42596a953
+MD5 (1595556002/string.Bot2.txt) = e60a897d314616236aa90ac42596a953
+MD5 (1595556002/string.Bot3.txt) = e60a897d314616236aa90ac42596a953
+MD5 (1595556002/string.Bot4.txt) = e60a897d314616236aa90ac42596a953
+MD5 (1595556002/string.Bot5.txt) = e60a897d314616236aa90ac42596a953
+MD5 (1595556002/string.Bot6.txt) = e60a897d314616236aa90ac42596a953
+MD5 (1595556002/string.Bot7.txt) = e60a897d314616236aa90ac42596a953
+MD5 (1595556002/string.Bot8.txt) = e60a897d314616236aa90ac42596a953
+MD5 (1595556002/string.Bot9.txt) = e60a897d314616236aa90ac42596a953
+MD5 (1595642401/string.Bot0.txt) = 8874642b8731164e456689dc45ef241f
+MD5 (1595642401/string.Bot1.txt) = 8874642b8731164e456689dc45ef241f
+MD5 (1595642401/string.Bot2.txt) = 8874642b8731164e456689dc45ef241f
+MD5 (1595642401/string.Bot3.txt) = 8874642b8731164e456689dc45ef241f
+MD5 (1595642401/string.Bot4.txt) = 8874642b8731164e456689dc45ef241f
+MD5 (1595642401/string.Bot5.txt) = 8874642b8731164e456689dc45ef241f
+MD5 (1595642401/string.Bot6.txt) = 8874642b8731164e456689dc45ef241f
+MD5 (1595642401/string.Bot7.txt) = 8874642b8731164e456689dc45ef241f
+MD5 (1595642401/string.Bot8.txt) = 8874642b8731164e456689dc45ef241f
+MD5 (1595642401/string.Bot9.txt) = 8874642b8731164e456689dc45ef241f
+MD5 (1595728802/string.Bot0.txt) = a8b9fada713db8ee5f4fdda960662dd1
+MD5 (1595728802/string.Bot1.txt) = a8b9fada713db8ee5f4fdda960662dd1
+MD5 (1595728802/string.Bot2.txt) = a8b9fada713db8ee5f4fdda960662dd1
+MD5 (1595728802/string.Bot3.txt) = a8b9fada713db8ee5f4fdda960662dd1
+MD5 (1595728802/string.Bot4.txt) = a8b9fada713db8ee5f4fdda960662dd1
+MD5 (1595728802/string.Bot5.txt) = a8b9fada713db8ee5f4fdda960662dd1
+MD5 (1595728802/string.Bot6.txt) = a8b9fada713db8ee5f4fdda960662dd1
+MD5 (1595728802/string.Bot7.txt) = a8b9fada713db8ee5f4fdda960662dd1
+MD5 (1595728802/string.Bot8.txt) = a8b9fada713db8ee5f4fdda960662dd1
+MD5 (1595728802/string.Bot9.txt) = a8b9fada713db8ee5f4fdda960662dd1
+MD5 (1595815202/string.Bot0.txt) = 3fb0c45494a8844619da97aa403681b3
+MD5 (1595815202/string.Bot1.txt) = 3fb0c45494a8844619da97aa403681b3
+MD5 (1595815202/string.Bot2.txt) = 3fb0c45494a8844619da97aa403681b3
+MD5 (1595815202/string.Bot3.txt) = 3fb0c45494a8844619da97aa403681b3
+MD5 (1595815202/string.Bot4.txt) = 3fb0c45494a8844619da97aa403681b3
+MD5 (1595815202/string.Bot5.txt) = 3fb0c45494a8844619da97aa403681b3
+MD5 (1595815202/string.Bot6.txt) = 3fb0c45494a8844619da97aa403681b3
+MD5 (1595815202/string.Bot7.txt) = 3fb0c45494a8844619da97aa403681b3
+MD5 (1595815202/string.Bot8.txt) = 3fb0c45494a8844619da97aa403681b3
+MD5 (1595815202/string.Bot9.txt) = 3fb0c45494a8844619da97aa403681b3
+MD5 (1595901601/string.Bot0.txt) = d2600732d4495864fa232ca1d7bf0999
+MD5 (1595901601/string.Bot1.txt) = d2600732d4495864fa232ca1d7bf0999
+MD5 (1595901601/string.Bot2.txt) = d2600732d4495864fa232ca1d7bf0999
+MD5 (1595901601/string.Bot3.txt) = d2600732d4495864fa232ca1d7bf0999
+MD5 (1595901601/string.Bot4.txt) = d2600732d4495864fa232ca1d7bf0999
+MD5 (1595901601/string.Bot5.txt) = d2600732d4495864fa232ca1d7bf0999
+MD5 (1595901601/string.Bot6.txt) = d2600732d4495864fa232ca1d7bf0999
+MD5 (1595901601/string.Bot7.txt) = d2600732d4495864fa232ca1d7bf0999
+MD5 (1595901601/string.Bot8.txt) = d2600732d4495864fa232ca1d7bf0999
+MD5 (1595901601/string.Bot9.txt) = d2600732d4495864fa232ca1d7bf0999
+MD5 (1595988001/string.Bot0.txt) = 82c4812a55693aec993875fe5087ba73
+MD5 (1595988001/string.Bot1.txt) = 82c4812a55693aec993875fe5087ba73
+MD5 (1595988001/string.Bot2.txt) = 82c4812a55693aec993875fe5087ba73
+MD5 (1595988001/string.Bot3.txt) = 82c4812a55693aec993875fe5087ba73
+MD5 (1595988001/string.Bot4.txt) = 82c4812a55693aec993875fe5087ba73
+MD5 (1595988001/string.Bot5.txt) = 82c4812a55693aec993875fe5087ba73
+MD5 (1595988001/string.Bot6.txt) = 82c4812a55693aec993875fe5087ba73
+MD5 (1595988001/string.Bot7.txt) = 82c4812a55693aec993875fe5087ba73
+MD5 (1595988001/string.Bot8.txt) = 82c4812a55693aec993875fe5087ba73
+MD5 (1595988001/string.Bot9.txt) = 82c4812a55693aec993875fe5087ba73
+      #+END_NOTE
+  - Observe que toute ces simus convergent et semblent valides, sans exception cette fois-ci
+- Identifier l'origine de la divergence de la simu /1594576801/
+  - Rejeu du log de /Bot3/ à partir de son log et du script /replay-log/
+  - Un rejeu complet redonne le même résultat
+  - L'échec des assertions et la divergence sont reproductibles
+    - Malgré qu'on joue des opérations distantes
+  - Les assertions ne sont pas déclenchées par les mêmes opérations
+  - L'opération 30061 du log de /Bot3/ déclenche l'assertion suivante
+    #+BEGIN_NOTE
+Assertion failed: this must be less than next
+    #+END_NOTE
+  - L'opération 60001 du log de /Bot3/ déclenche les assertions suivantes
+    #+BEGIN_NOTE
+Assertion failed: The array should be sorted
+Trying to duplicate existing identifiers:  t { idBegin: t { tuples: [ [t] ] }, end: 17735 } t { idBegin: t { tuples: [ [t] ] }, end: 17737 }
+    #+END_NOTE
+- Faire la procédure d'inscription en 4ème année de doctorat
+  - Liste des pièces à fournir
+    - http://doctorat.univ-lorraine.fr/sites/default/files/user/etre-doctorant/r%C3%A9inscription/3bPi%C3%A8ces%20%C3%A0%20fournir%20r%C3%A9inscription%20d%C3%A9rogatoire%2024072020.pdf
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
@@ -10801,6 +11124,8 @@ Assertion failed: result is an integer 32 in [l, u[
 - Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
 ** TODO CRDT : Lire *Kaleido*
 * Commandes utiles
+- Obtenir la taille d'un dossier
+  - /du -h -d 0 <path>/
 - Récupérer la dernière ligne du log de chaque container Docker tournant sur la machine
   - /docker ps -q | xargs -i -t docker logs --tail=1 {}/
 - Filtrer les conteneurs Docker par image
