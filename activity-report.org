@@ -10653,14 +10653,14 @@ Assertion failed: result is an integer 32 in [l, u[
 **** DONE Vérifier la validité des simulations effectuées
 - Les simus devraient avoir tournées pendant mes vacs et générer un bon dataset
 - Récupérer les datasets et vérifier s'ils sont valides
+**** DONE Ajouter une vérification sur l'ordre des identifiants /check-validity/
+- La simu /1594301620/ a de nouveau montré des assertions liées à l'ordre des identifiants échouées
+- Ajouter une fonction vérifiant que l'état final d'une collaboration est valide
 **** IN-PROGRESS Identifier l'origine de la divergence de la simu /1594576801/
 - De l'ensemble des simus, c'est la seule qui diverge
 - Seul /Bot3/ obtient un résultat différent des autres noeuds
 - Rejouer son log pour déterminer l'origine de cette divergence
 **** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
-**** TODO Ajouter une vérification sur l'ordre des identifiants /check-validity/
-- La simu /1594301620/ a de nouveau montré des assertions liées à l'ordre des identifiants échouées
-- Ajouter une fonction vérifiant que l'état final d'une collaboration est valide
 **** TODO Mettre à jour le pseudo-code de /renameId()/
 **** TODO Écrire en pseudo-code /reverseRenameId()/
 **** TODO Rédiger le plan détaillé du papier
@@ -10990,6 +10990,114 @@ Assertion failed: this must be less than next
 Assertion failed: The array should be sorted
 Trying to duplicate existing identifiers:  t { idBegin: t { tuples: [ [t] ] }, end: 17735 } t { idBegin: t { tuples: [ [t] ] }, end: 17737 }
     #+END_NOTE
+- Ajouter une vérification sur l'ordre des identifiants /check-validity/
+  - En soi, cette fonction n'est pas difficile à écrire
+  - La question, c'est sur quoi l'appliquer ?
+  - Pour chaque simu, on a plusieurs bots
+  - Pour chaque bot, on a plusieurs snapshots
+  - Mais même cela n'est pas suffisant
+  - On peut avoir une anomalie d'ordre à un instant T qui est résolue à l'instant T+1
+    - Par exemple si un des éléments gênant est supprimé
+  - Pour être sûr, faudrait vérifier l'ordre des identifiants après chaque opération pour chaque bot
+  - Bien trop coûteux pour que je me mette cette vérification en place
+  - La génération de mes stats se basent sur les différentes snapshots de /Bot0/
+  - Afin d'assurer mes mesures, peut au moins valider chacune de ces snapshots
+  - Possède 5 snapshots pour /Bot0/
+    - 30k, 60k, ..., 150k
+  - Ajout d'une fonction /checkIdentifiersOrder()/
+    - Vérifie que l'ordre des identifiants d'un document est bien respecté
+  - Ajout d'une fonction /checkDocsValidity()/
+    - Vérifie pour l'ensemble des snapshots d'une simulation que l'ordre des identifiants est bien respecté
+  - J'ai exécuté /checkDocsValidity()/ sur les snapshots issus des simus
+    - avec 4 /renamingBots/
+      #+BEGIN_NOTE
+1594749601: areDocsValid = true
+1595354402: areDocsValid = true
+1594836001: areDocsValid = true
+1595268002: areDocsValid = true
+1595095201: areDocsValid = true
+1595527201: areDocsValid = true
+1594392615: areDocsValid = true
+1594663201: areDocsValid = true
+1594490401: areDocsValid = true
+1594455838: areDocsValid = true
+1594576801: areDocsValid = true
+1595700001: areDocsValid = true
+1595440802: areDocsValid = true
+1594406971: areDocsValid = true
+1595872801: areDocsValid = true
+1595613601: areDocsValid = true
+1594922401: areDocsValid = true
+1595959201: areDocsValid = true
+1595181601: areDocsValid = true
+1595008801: areDocsValid = true
+1595786402: areDocsValid = true
+      #+END_NOTE
+    - avec 3 /renamingBots/
+      #+BEGIN_NOTE
+1595599201: areDocsValid = true
+1595858402: areDocsValid = true
+1595685601: areDocsValid = true
+1595512801: areDocsValid = true
+1595253601: areDocsValid = true
+1594476001: areDocsValid = true
+1594735201: areDocsValid = true
+1594994401: areDocsValid = true
+1595426401: areDocsValid = true
+1594562401: areDocsValid = true
+1595944802: areDocsValid = true
+1595080801: areDocsValid = true
+1595772002: areDocsValid = true
+1594908001: areDocsValid = true
+1594821601: areDocsValid = true
+1595167201: areDocsValid = true
+1594648801: areDocsValid = true
+1595340002: areDocsValid = true
+      #+END_NOTE
+    - avec 2 /renamingBots/
+      #+BEGIN_NOTE
+1594807201: areDocsValid = true
+1595325601: areDocsValid = true
+1594720802: areDocsValid = true
+1595412001: areDocsValid = true
+1594634401: areDocsValid = true
+1594548002: areDocsValid = true
+1595152801: areDocsValid = true
+1595844001: areDocsValid = true
+1595498401: areDocsValid = true
+1594980001: areDocsValid = true
+1595584801: areDocsValid = true
+1595066402: areDocsValid = true
+1594461601: areDocsValid = true
+1595930401: areDocsValid = true
+1594893601: areDocsValid = true
+1595239202: areDocsValid = true
+1595757601: areDocsValid = true
+1595671202: areDocsValid = true
+      #+END_NOTE
+    - avec 1 /renamingBot/
+      #+BEGIN_NOTE
+1595052001: areDocsValid = true
+1595743201: areDocsValid = true
+1595397602: areDocsValid = true
+1595656801: areDocsValid = true
+1594965601: areDocsValid = true
+1596002401: areDocsValid = true
+1595484001: areDocsValid = true
+1594792802: areDocsValid = true
+1595311202: areDocsValid = true
+1595829602: areDocsValid = true
+1595224801: areDocsValid = true
+1594879201: areDocsValid = true
+1594620002: areDocsValid = true
+1594533601: areDocsValid = true
+1594706401: areDocsValid = true
+1595570402: areDocsValid = true
+1595138401: areDocsValid = true
+1595916001: areDocsValid = true
+      #+END_NOTE
+  - Aucune snapshot testé n'a présenté d'incohérence sur l'ordre des identifiants
+  - Ces données me paraissent donc robustes pour effectuer des mesures et servir de base à de nouvelles simulations
 - Faire la procédure d'inscription en 4ème année de doctorat
   - Liste des pièces à fournir
     - http://doctorat.univ-lorraine.fr/sites/default/files/user/etre-doctorant/r%C3%A9inscription/3bPi%C3%A8ces%20%C3%A0%20fournir%20r%C3%A9inscription%20d%C3%A9rogatoire%2024072020.pdf
