@@ -10656,10 +10656,17 @@ Assertion failed: result is an integer 32 in [l, u[
 **** DONE Ajouter une vérification sur l'ordre des identifiants /check-validity/
 - La simu /1594301620/ a de nouveau montré des assertions liées à l'ordre des identifiants échouées
 - Ajouter une fonction vérifiant que l'état final d'une collaboration est valide
-**** IN-PROGRESS Identifier l'origine de la divergence de la simu /1594576801/
+**** DONE Identifier l'origine de la divergence de la simu /1594576801/
 - De l'ensemble des simus, c'est la seule qui diverge
 - Seul /Bot3/ obtient un résultat différent des autres noeuds
 - Rejouer son log pour déterminer l'origine de cette divergence
+**** DONE Résoudre le bug de l'insertion à une position incorrecte constaté au cours de la simu /1594576801/
+- On a observé qu'une opération d'insertion cassait l'ordre entre les identifiants au cours de cette simu pour /Bot3/
+- Il s'agit de l'opé 30026 de son log qui insère /id1/
+- Après l'application de cette opération, on obtient /id1 > id2/ alors qu'on devrait avoir l'inverse
+  - avec id1 = [-715644894,1856204310,605,8767,-715644894,-2109304170,0,4,-1467816092,309175868,0,11,380530952,309175868,2,0,2091161459,-779556849,559,3]
+  - et   id2 = [-715644894,1856204310,605,8767,-715644894,-2109304170,0,4,-1467816092,309175868,0,11,380530952,309175868,2,0,2091161459,-779556849,559,2,-1847675807,309175868,566,0]
+- Résoudre ce bug
 **** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
 **** TODO Mettre à jour le pseudo-code de /renameId()/
 **** TODO Écrire en pseudo-code /reverseRenameId()/
@@ -10990,6 +10997,87 @@ Assertion failed: this must be less than next
 Assertion failed: The array should be sorted
 Trying to duplicate existing identifiers:  t { idBegin: t { tuples: [ [t] ] }, end: 17735 } t { idBegin: t { tuples: [ [t] ] }, end: 17737 }
     #+END_NOTE
+  - On remarque un autre problème en appliquant /checkIdentifiersOrder()/ au fur et à mesure qu'on rejoue le log
+  - L'ordre des identifiants n'est plus valide à partir de l'opération 30026 du log de /Bot3/
+  - Il s'agit de l'opération suivante
+    #+BEGIN_NOTE
+{
+    "type": "remote",
+    "site": -2109304170,
+    "localOperation": [
+        {
+            "index": 8776,
+            "author": -779556849,
+            "content": "u"
+        }
+    ],
+    "operation": {
+        "id": -779556849,
+        "clock": 2980,
+        "operation": {
+            "epoch": {
+                "id": {
+                    "replicaNumber": 0,
+                    "epochNumber": 0
+                }
+            },
+            "op": {
+                "id": {
+                    "tuples": [
+                        {
+                            "random": -715644894,
+                            "replicaNumber": -2109304170,
+                            "clock": 0,
+                            "offset": 4
+                        },
+                        {
+                            "random": -1467816092,
+                            "replicaNumber": 309175868,
+                            "clock": 0,
+                            "offset": 11
+                        },
+                        {
+                            "random": 380530952,
+                            "replicaNumber": 309175868,
+                            "clock": 2,
+                            "offset": 0
+                        },
+                        {
+                            "random": 2091161459,
+                            "replicaNumber": -779556849,
+                            "clock": 559,
+                            "offset": 3
+                        }
+                    ]
+                },
+                "content": "u"
+            }
+        }
+    }
+}
+    #+END_NOTE
+  - On détecte l'incorrection suivante en utilisant /checkIdentifiersOrder()/ sur le nouvel état
+    - Alors qu'on devrait avoir /id1 < id2/ pour chaque pair d'identifiants consécutifs
+    - On a /id1 > id2/ pour une paire d'identifiants
+      - id1 = [-715644894,1856204310,605,8767,-715644894,-2109304170,0,4,-1467816092,309175868,0,11,380530952,309175868,2,0,2091161459,-779556849,559,3]
+      - id2 = [-715644894,1856204310,605,8767,-715644894,-2109304170,0,4,-1467816092,309175868,0,11,380530952,309175868,2,0,2091161459,-779556849,559,2,-1847675807,309175868,566,0]
+  - On remarque que /id1/ est l'identifiant inséré par l'opération 30026
+  - Pour quelle raison cet identifiant n'est pas inséré à la bonne position ?
+    - Serait-ce un bug de *LogootSRopes* ?
+  - Mais à partir de là, d'autres erreurs découlent
+    - Par exemple l'assertion qui échoue lors de l'exécution de l'opé 30061
+    - L'erreur survient quand on essaie d'insérer /id2'/
+      - /id2'/ = [-715644894,1856204310,605,8767,-715644894,-2109304170,0,4,-1467816092,309175868,0,11,380530952,309175868,2,0,2091161459,-779556849,559,6]
+    - On se retrouve à vouloir append /id2'/ à /id1'/
+      - /id1'/ = [-715644894,1856204310,605,8767,-715644894,-2109304170,0,4,-1467816092,309175868,0,11,380530952,309175868,2,0,2091161459,-779556849,559,5]
+    - Mais on se rend compte à ce moment là qu'après /id1'/ se trouve /id3'/
+      - /id3'/ = [-715644894,1856204310,605,8767,-715644894,-2109304170,0,4,-1467816092,309175868,0,11,380530952,309175868,2,0,2091161459,-779556849,559,2,-1847675807,309175868,566,0]
+    - Et que l'état présente une incohérence au niveau de l'ordre des identifiants
+    - On remarque que /id3' = id2/
+    - Par contre, dans ce scénario, comment a-t-on pu insérer /id1'/ sans déclencher d'erreur ?
+      - Devrait en toute logique reproduire le scénario qui déclenche l'erreur étudiée ici
+      - Qu'est-ce qui diffère ?
+  - Pour le moment, vais me focaliser sur l'erreur produite par l'application de l'opération 30026
 - Ajouter une vérification sur l'ordre des identifiants /check-validity/
   - En soi, cette fonction n'est pas difficile à écrire
   - La question, c'est sur quoi l'appliquer ?
@@ -11098,6 +11186,29 @@ Trying to duplicate existing identifiers:  t { idBegin: t { tuples: [ [t] ] }, e
       #+END_NOTE
   - Aucune snapshot testé n'a présenté d'incohérence sur l'ordre des identifiants
   - Ces données me paraissent donc robustes pour effectuer des mesures et servir de base à de nouvelles simulations
+- Résoudre le bug de l'insertion à une position incorrecte constaté au cours de la simu /1594576801/
+  - Afin de mieux comprendre, a affiché le prédecesseur de /id1/, /id0/
+    - id0 = [-715644894,1856204310,605,8767,-715644894,-2109304170,0,4,-1467816092,309175868,0,11,380530952,309175868,2,0,2091161459,-779556849,559,3]
+  - On remarque que /id0/ et /id1/ sont appendables
+  - Une cause possible du bug serait qu'on append dans des cas où nous devrions pas
+  - Pour simplifier le débug, génère une snapshot juste avant l'application de l'opé 30026
+  - Constate qu'il y a bien un problème avec l'append via le debugging
+  - Pour valider l'append, se contente de comparer ce qu'on ajoute avec le noeud à droite dans l'arbre
+    - https://github.com/coast-team/mute-structs/blob/a956f18656503753cb60bdf8e546d21a9990a0f8/src/logootsropes.ts#L258-L259
+  - Mais ce noeud n'est pas forcément le successeur
+  - Il peut avoir par exemple des enfants à gauche
+  - C'est ce qui se produit dans le cas présent
+  - Doit donc modifier l'algo pour se comparer au successeur à la place
+  - Victorien m'indique que c'est un bug qu'on a déjà résolu
+  - Effectivement, on a détecté puis corrigé ce bug en mars 2019
+    - Le fix est apporté par ce commit : https://github.com/coast-team/mute-structs/commit/91f24b52a2a5a7fb695b92baf087cd5e4b8ce8b9
+  - Mais les commits correspondant n'ont jamais été intégrés à la branche du renommage
+  - J'ai pu rejouer le log de /Bot3/ en intégrant manuellement ces changements, pour tester
+  - Cela corrige son exécution
+    - Les assertions n'échouent plus
+    - /Bot3/ atteint le même état que les autres noeuds
+  - Fusion des commits dans la branche du mécanisme de renommage
+  - Release de la version 2.0.0 de /mute-structs/ incorporant ce fix
 - Faire la procédure d'inscription en 4ème année de doctorat
   - Liste des pièces à fournir
     - http://doctorat.univ-lorraine.fr/sites/default/files/user/etre-doctorant/r%C3%A9inscription/3bPi%C3%A8ces%20%C3%A0%20fournir%20r%C3%A9inscription%20d%C3%A9rogatoire%2024072020.pdf
