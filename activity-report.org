@@ -10667,20 +10667,6 @@ Assertion failed: result is an integer 32 in [l, u[
   - avec id1 = [-715644894,1856204310,605,8767,-715644894,-2109304170,0,4,-1467816092,309175868,0,11,380530952,309175868,2,0,2091161459,-779556849,559,3]
   - et   id2 = [-715644894,1856204310,605,8767,-715644894,-2109304170,0,4,-1467816092,309175868,0,11,380530952,309175868,2,0,2091161459,-779556849,559,2,-1847675807,309175868,566,0]
 - Résoudre ce bug
-**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
-**** TODO Mettre à jour le pseudo-code de /renameId()/
-**** TODO Écrire en pseudo-code /reverseRenameId()/
-**** TODO Rédiger le plan détaillé du papier
-**** TODO Retravailler /renameIdInterval()/
-- Le but de /renameIdInterval()/ est d'améliorer les perfs de RLS en renommant bloc par bloc plutôt qu'id par id
-- Mais la version actuelle du code présente plusieurs défauts
-  - /renameIdInterval()/ est buggée
-  - /renameIdInterval()/ duplique le code de /renameId()/
-  - /renameIdInterval()/ n'est pas à jour avec /renameId()/
-- Implémenter /renameIdInterval()/ est une perte de temps tant que les fonctions de renommage ne sont pas fixées
-- On pourrait cependant améliorer les perfs du mécanisme de renommage en déléguant le renommage à /renameId()/
-- Tout en mémorisant où on est dans la séquence pour accélérer la recherche du prédécesseur pour renommer le prochain id
-- IMO cela offrirait un bon compromis entre complexité du code, coût de sa maintenance et performances obtenues
 *** Done
 - Vérifier la validité des simulations effectuées
   - Les simulations ont bien tourné pendant mes vacances
@@ -11212,6 +11198,171 @@ Trying to duplicate existing identifiers:  t { idBegin: t { tuples: [ [t] ] }, e
 - Faire la procédure d'inscription en 4ème année de doctorat
   - Liste des pièces à fournir
     - http://doctorat.univ-lorraine.fr/sites/default/files/user/etre-doctorant/r%C3%A9inscription/3bPi%C3%A8ces%20%C3%A0%20fournir%20r%C3%A9inscription%20d%C3%A9rogatoire%2024072020.pdf
+- Spécifier les mesures à effectuer sur la taille du document
+  - Pour PaPoC, on avait mesuré la taille de documents LS et RLS
+  - À chaque fois, on avait noté
+    - /nbOpes/ : le nombre d'opérations ayant conduit à cet état
+    - /type/ : le cas correspondant à la mesure
+      - 4 valeurs possibles : /ls, content, rlsWithoutGC, rlsWithGC/
+    - /size/ : la taille mesurée
+  - Les mesures étaient effectuées pour des snapshots toutes les 10k opérations
+    - Implique qu'il va falloir regénérer les snapshots intermédiaires
+    - On a un script pour ça
+  - Pour les mesures liées à l'effet du renommage, on en faisait 2
+  - Une sur la snapshot, donc juste avant le renommage
+  - Puis une après avoir renommée cette snapshot, donc juste après le renommage
+  - Ça marchait lorsqu'on avait qu'un seul noeud qui déclenchait le renommage
+  - Mais est-ce que ça a toujours du sens lorsqu'on a des renommages concurrents ?
+  - Car maintenant, juste après le seuil du renommage, les noeuds devraient recevoir plusieurs opés de renommage concurrentes
+  - Comment représenter cela ?
+** Semaine du <2020-08-03 Mon> au <2020-08-07 Fri>
+*** Planned
+**** DONE Spécifier les mesures à effectuer sur la taille du document
+- Voir ce qu'on avait fait pour le papier pour PaPoC
+- Voir comment l'adapter à notre nouveau dataset
+**** DONE Générer les snapshots requises pour les mesures de la taille du document
+- Recréer les snapshots tous les 10k opés à partir du log pour chaque simulation
+- Générer les snapshots juste après avoir appliqué les différentes opés de renommages
+  - Repartir des snapshots avant un renommage et appliquer les X opés de renommage de cet epoch
+**** DONE Effectuer les mesures de tailles des documents
+**** DONE Générer les nouveaux graphes
+- Générer les graphes comparant l'évolution de la taille de documents en fonction du nombre de /renamingBots/ à partir des nouvelles mesures
+**** TODO Spécifier les mesures à effectuer sur le temps d'intégration des opérations
+- J'ai vraiment du mal à voir ce qui peut être pertinent pour cette nouvelle évaluation
+- Y réfléchir et se fixer des objectifs clairs
+**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
+**** TODO Mettre à jour le pseudo-code de /renameId()/
+**** TODO Écrire en pseudo-code /reverseRenameId()/
+**** TODO Rédiger le plan détaillé du papier
+**** TODO Retravailler /renameIdInterval()/
+- Le but de /renameIdInterval()/ est d'améliorer les perfs de RLS en renommant bloc par bloc plutôt qu'id par id
+- Mais la version actuelle du code présente plusieurs défauts
+  - /renameIdInterval()/ est buggée
+  - /renameIdInterval()/ duplique le code de /renameId()/
+  - /renameIdInterval()/ n'est pas à jour avec /renameId()/
+- Implémenter /renameIdInterval()/ est une perte de temps tant que les fonctions de renommage ne sont pas fixées
+- On pourrait cependant améliorer les perfs du mécanisme de renommage en déléguant le renommage à /renameId()/
+- Tout en mémorisant où on est dans la séquence pour accélérer la recherche du prédécesseur pour renommer le prochain id
+- IMO cela offrirait un bon compromis entre complexité du code, coût de sa maintenance et performances obtenues
+*** Done
+- Spécifier les mesures à effectuer sur la taille du document
+  - Créer des snapshots intégrant toutes les opés de renommages ?
+    - Je pourrais recréer des snapshots incorporant l'ensemble des opés de renommage à partir du log d'un bot
+    - Les snapshots actuelles montrent la taille du doc avant le renommage
+    - Ces snapshots là me permettraient de montrer la taille du doc après les renommages
+    - Ça devrait bien illustrer l'inflation de la taille de l'état en fonction du nombre de renommages concurrents
+  - Comment faire pour créer ces snapshots ?
+    - Je pourrais tout simplement reprendre la snapshot à {3,6,9,12,15}0k opés de /Bot0/
+    - Et appliquer dessus les opés de renommages provenant du log
+    - Ou pour simplifier
+    - Je pourrais simplement recréer des snapshots à partir du log à {3,6,9,12}1k opés et à l'état final
+  - La seule interrogation que j'ai est la suivante
+  - Est-ce que toutes les opés de renommages sont bien reçues par /Bot0/ 1k opés après le seuil de renommage ?
+    - Je pense, vu le scénario de la simulation
+    - Mais je préfererais vérifier
+    - Comment ?
+    - Peux tout simplement compter le nombre d'opés de renommages observées au moment de générer la snapshot
+  - Maintenant, qu'est-ce que je mesure ce coup-ci ?
+  - On reprend les mesures précedentes
+    - /nbOpes/
+    - /type/
+    - /size/
+  - Et on ajoute une mesure pour identifier le cas dans lequel on se trouve
+    - /nbRenamingBots/: prendrait pour valeur 1, 2, 3 ou 4
+  - Permet ainsi de décomposer les résultats en plusieurs graphes
+    - Des exemples sont présentés sur cette page : https://seaborn.pydata.org/generated/seaborn.relplot.html#seaborn.relplot
+  - Mais ce champ n'a aucun sens pour /content/ et /ls/
+  - Comment gérer d'ailleurs ces 2 courbes ?
+  - Les faire apparaître sur chaque graphe pour comparer aux résultats de RLS ?
+  - Ça me paraît mieux
+  - Mais peut porter à confusion
+  - Pourquoi répéter les mêmes courbes si elles sont identiques ?
+    - Donne un point de comparaison pour les résultats de RLS
+  - Pourquoi présenter sur des graphes différents les résultats, si c'est les différentes perfs de RLs qu'on veut comparer ?
+    - Car les mettre sur un seul graphe nuirait à la lisibilité globale
+  - Est-ce que je peux réduire simplement la quantité d'infos à afficher ?
+    - Je pourrais seulement afficher les résultats de RLS pour 1, 2 et 4 /renamingBots/
+    - Mais j'ai peur que dans tous les cas que les courbes qui correspondent à /rlsWithGC/ soient confondues
+    - Et que ça soit elles qui rendent la lecture difficile
+  - Pourra toujours remanier le .csv pour changer l'affichage au besoin
+  - Bref, comment faire pour répeter les courbes correspondant à /content/ et /ls/ sur chaque graphe ?
+  - *Pandas* considère comme /NaN/ la valeur du champ /nbRenamingBots/ si je l'omets pour les lignes /content/ et /ls/ dans le .csv
+  - Ces lignes ne sont pas prises en compte ensuite lors de la génération des graphes
+  - Je ne peux pas faire mieux que simplement dupliquer ces lignes pour chaque valeur de /nbRenamingBots/ ?
+  - Pour le moment, je pars sur le format suivant
+    #+BEGIN_NOTE
+nbOpes,type,size,nbRenamingBots
+10000,content,A,1
+10000,ls,B,1
+10000,content,A,2
+10000,ls,B,2
+...
+10000,ls,A,4
+20000,content,C,1
+...
+150000,ls,D,4
+10000,rlsWithoutGC,E,1
+10000,rlsWithGC,E,1
+...
+30000,rlsWithoutGC,F,1
+30000,rlsWithGC,F,1
+31000,rlsWithoutGC,G,1
+31000,rlsWithGC,H,1
+...
+    #+END_NOTE
+- Générer les snapshots requises pour les mesures de la taille du document
+  - Je disposais déjà du script /generate-intermediate-snapshots/
+  - Mise à jour de ce dernier pour gérer la nouvelle arborescence
+  - Générer les snapshots pour {1,2,4,5,...,14}0k opés est straightforward à partir d'un log
+  - Générer les snapshots /after-rename-ops/ l'est moins
+  - Utilise l'algorithme suivant
+    - Extrait du log l'ensemble des opérations de renommages
+    - Les regroupe par epochs
+      - Consiste simplement à recréer des sous-tableaux de taille /nbRenamingBots/
+    - Puis pour chaque groupe
+      - Réinstancie la snapshot finale de cette epoch ({3,6,9,12,15}0k opés)
+      - Applique chacune des opérations de renommage du groupe
+      - Sauvegarde la snapshot obtenue
+  - Me retrouve donc avec des snapshots correspondantes à l'état à {3,6,9,12,15}0k opés mais renommées
+    - Ignore les potentielles opérations se trouvant dans le log entre cet état et les opés de renommages distantes
+- Effectuer les mesures de tailles des documents
+  - Mise à jour du script /snapshot-sizes/
+    - Ajout du nouveau paramètre /nbRenamingBots/
+    - Modification du code pour en tenir compte
+      - Pour LS, se contente de dupliquer les mesures pour chaque valeur de /nbRenamingBots/
+      - Pour RLS, permet d'accéder aux différentes simulations correspondantes
+    - Modification du code pour obtenir la taille d'une snapshot après renommage
+      - Auparavant, le script déclenchait lui-même un renommage sur les snapshots à {3,6,9,12,15}0k opés
+      - Et mesurait la taille de la snapshot avant et après GC
+      - Ça fonctionnait lorsqu'on avait qu'un seul noeud qui effectuait les renommages
+      - Plus le cas dorénavant
+      - Mais maintenant, on a des snapshots dédiées /after-rename-ops/
+      - Se base directement sur ces dernières pour mesurer la taille du doc avant et après GC
+  - L'exécution du script s'est correctement déroulée
+  - Et nous a permis d'obtenir de nouvelles mesures
+- Générer les nouveaux graphes
+  - Mise à jour du script pour générer 4 graphes et non plus 1
+    - 1 graphe pour chaque valeur de /nbRenamingBots/
+  - L'exécution du script nous a permis d'obtenir la figure suivante
+    #+BEGIN_NOTE
+[[file:img/snapshot-sizes.png]]
+    #+END_NOTE
+  - Sur ces figures, les courbes /content/ et /LS/ sont identiques
+  - Seules celles concernant /RLS/ sont uniques
+  - On remarque que les courbes correspondantes à /RLS with GC/ sont similaires
+  - Tandis que celles correspondantes à /RLS w/o GC/ augmentent avec le nombre de /renamingBots/
+  - Correspond au résultat théorique attendu
+    - L'augmentation du nombre de /renamingBots/ a pour effet d'accroître la taille de la structure de données
+    - Pour chaque opération de renommage, chaque noeud va conserver un /former state/ supplémentaire
+    - C'est un peu masqué par l'échelle logarithmique, mais la taille de la structure va augmenter à chaque seuil de renommage par un facteur multiplié par /nbRenamingBots/ dans le cas /RLS w/o GC/
+    - Ce qui se traduit ici par une courbe en escaliers montant
+    - Mais ceci n'affecte pas le cas /RLS with GC/
+    - Puisqu'on GC les /former states/ immédiatement dans ce cas, leur multiplication n'a pas d'effet permanent
+    - On retrouve donc bien des courbes similaires pour ce cas, peu importe la valeur de /nbRenamingBots/
+  - Peut donc tirer comme conclusion que l'augmentation du nombre d'opés de renommages concurrentes a un effet délétère sur les performances mémoires de la structure
+  - Mais que cet effet négatif n'est que ponctuel
+  - L'overhead introduit par les renommages concurrents sera supprimé à terme lorsqu'une stabilité sera atteinte
+  - On note aussi que ce n'est qu'à partir de 4 noeuds renommant à chaque fois en concurrence que RLS performe moins bien que LS sur l'aspect mémoire pour cette implémentation
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
