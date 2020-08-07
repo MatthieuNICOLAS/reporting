@@ -11227,7 +11227,7 @@ Trying to duplicate existing identifiers:  t { idBegin: t { tuples: [ [t] ] }, e
 **** DONE Effectuer les mesures de tailles des documents
 **** DONE Générer les nouveaux graphes
 - Générer les graphes comparant l'évolution de la taille de documents en fonction du nombre de /renamingBots/ à partir des nouvelles mesures
-**** TODO Spécifier les mesures à effectuer sur le temps d'intégration des opérations
+**** IN-PROGRESS Spécifier les mesures à effectuer sur le temps d'intégration des opérations
 - J'ai vraiment du mal à voir ce qui peut être pertinent pour cette nouvelle évaluation
 - Y réfléchir et se fixer des objectifs clairs
 **** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
@@ -11363,6 +11363,57 @@ nbOpes,type,size,nbRenamingBots
   - Mais que cet effet négatif n'est que ponctuel
   - L'overhead introduit par les renommages concurrents sera supprimé à terme lorsqu'une stabilité sera atteinte
   - On note aussi que ce n'est qu'à partir de 4 noeuds renommant à chaque fois en concurrence que RLS performe moins bien que LS sur l'aspect mémoire pour cette implémentation
+- Spécifier les mesures à effectuer sur le temps d'intégration des opérations
+  - Pour PaPoC, on avait mesuré
+    - Le temps d'intégration d'opérations d'insertion
+      - Le temps d'inté d'une insertion locale en fonction de la taille de la snapshot
+      - Le temps d'inté d'une insertion distante en fonction de la taille de la snapshot
+      - Le temps d'inté d'une insertion distante concurrente au renommage en fonction de la taille de la snapshot
+    - Le temps d'intégration d'opérations de renommage
+      - Le temps d'inté d'un renommage local en fonction de la taille de la snapshot
+      - Le temps d'inté d'un renommage distant en fonction de la taille de la snapshot
+  - Déjà, est-ce qu'on peut retravailler ces mesures ?
+    - Le temps d'inté des renommages peut être representé sous forme de boxplots
+      - Pourquoi avais-je utilisé une représentation linéaire ?
+      - Me semble que c'était car j'avais peu de documents donc un nombre de mesures réduit
+      - Mais maintenant j'ai un dataset plus complet
+      - Je devrais pouvoir effectuer assez de mesures pour faire des boxplots intéressantes
+  - Qu'est-ce que je peux ajouter comme nouvelles mesures ?
+    - Temps d'inté d'insertions
+      - Pourrait ajouter une nouvelle mesure pour les temps d'inté d'insertion distante provenant d'epochs concurrentes
+	- À quelle fréquence faire apparaître cette stat ?
+	  - Possible à partir du 1er renommage uniquement
+	  - Peut par contre mesurer son temps d'intégration sur toutes les snapshots suivantes
+	    - Permettrait d'illustrer l'augmentation du coût de la transformation au fur et à mesure que la "distance" entre l'epoch d'origine et la courante s'accroît
+	    - Mais est-ce vraiment intéressant ?
+	- Comment la faire apparaître sans surcharger le graphe actuel ?
+    - Temps d'inté de renommages
+      - Peut ajouter une mesure du temps d'intégration d'un renommage concurrent gagnant
+	- Devrait ajouter un overhead correspondant à l'annulation du renommage courant
+      - Peut ajouter une mesure du temps d'intégration d'un renommage concurrent perdant
+	- Devrait rester faible et constant car consiste seulement à ajouter une entrée dans les /former states/
+  - Correspond globalement aux réflexions que j'avais eu auparavant à ce sujet
+  - Comment obtenir ces mesures ?
+    - Temps d'inté de renommages
+      - Prendre une snapshot {3,6,9,12,15}0k opés avant renommage
+      - En instancier 4 copies avec des /replicaNumbers/ différents
+	1. Une avec le /replicaNumber = 0/
+	2. Une avec le /replicaNumber/ de base
+	3. Une avec le /replicaNumber/ le plus grand possible
+	4. Une avec le /replicaNumber/ le plus petit possible
+      - Effectuer un renommage local sur les copies 2, 3 et 4
+      - Puis appliquer l'opé de renommage de base sur la copie avec le /replicaNumber = 0/
+      - Puis appliquer l'opé de renommage prioritaire sur la copie avec le /replicaNumber = 0/
+      - Puis appliquer l'opé de renommage non-prioritaire sur la copie avec le /replicaNumber = 0/
+      - En mesurant le temps pour chacune de ces étapes, peut générer un .csv avec les données suivantes
+	- /nbOpes/
+	- /type/ avec comme valeurs possibles "local", "remote", "winningConcurrent" et "losingConcurrent"
+	- /time/
+      - J'ai environ 80 documents RLS
+      - Donc ~80 temps par couple (nbOpes,type)
+      - Est-ce suffisant ou dois-je boucler pour en générer plus ?
+      - J'avais ~110 temps pour chaque couple pour PaPoC
+      - Peut boucler 3x histoire d'accroître le dataset
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
