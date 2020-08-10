@@ -11227,23 +11227,9 @@ Trying to duplicate existing identifiers:  t { idBegin: t { tuples: [ [t] ] }, e
 **** DONE Effectuer les mesures de tailles des documents
 **** DONE Générer les nouveaux graphes
 - Générer les graphes comparant l'évolution de la taille de documents en fonction du nombre de /renamingBots/ à partir des nouvelles mesures
-**** IN-PROGRESS Spécifier les mesures à effectuer sur le temps d'intégration des opérations
+**** DONE Spécifier les mesures à effectuer sur le temps d'intégration des opérations
 - J'ai vraiment du mal à voir ce qui peut être pertinent pour cette nouvelle évaluation
 - Y réfléchir et se fixer des objectifs clairs
-**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
-**** TODO Mettre à jour le pseudo-code de /renameId()/
-**** TODO Écrire en pseudo-code /reverseRenameId()/
-**** TODO Rédiger le plan détaillé du papier
-**** TODO Retravailler /renameIdInterval()/
-- Le but de /renameIdInterval()/ est d'améliorer les perfs de RLS en renommant bloc par bloc plutôt qu'id par id
-- Mais la version actuelle du code présente plusieurs défauts
-  - /renameIdInterval()/ est buggée
-  - /renameIdInterval()/ duplique le code de /renameId()/
-  - /renameIdInterval()/ n'est pas à jour avec /renameId()/
-- Implémenter /renameIdInterval()/ est une perte de temps tant que les fonctions de renommage ne sont pas fixées
-- On pourrait cependant améliorer les perfs du mécanisme de renommage en déléguant le renommage à /renameId()/
-- Tout en mémorisant où on est dans la séquence pour accélérer la recherche du prédécesseur pour renommer le prochain id
-- IMO cela offrirait un bon compromis entre complexité du code, coût de sa maintenance et performances obtenues
 *** Done
 - Spécifier les mesures à effectuer sur la taille du document
   - Créer des snapshots intégrant toutes les opés de renommages ?
@@ -11387,15 +11373,19 @@ nbOpes,type,size,nbRenamingBots
 	    - Permettrait d'illustrer l'augmentation du coût de la transformation au fur et à mesure que la "distance" entre l'epoch d'origine et la courante s'accroît
 	    - Mais est-ce vraiment intéressant ?
 	- Comment la faire apparaître sans surcharger le graphe actuel ?
+      - Permettrait d'illustrer le surcoût induit par l'annulation de l'effet d'un renommage
     - Temps d'inté de renommages
       - Peut ajouter une mesure du temps d'intégration d'un renommage concurrent gagnant
-	- Devrait ajouter un overhead correspondant à l'annulation du renommage courant
+	- Permettrait d'illustrer l'overhead correspondant à l'annulation du renommage courant
       - Peut ajouter une mesure du temps d'intégration d'un renommage concurrent perdant
 	- Devrait rester faible et constant car consiste seulement à ajouter une entrée dans les /former states/
+	- Permettrait d'illustrer qu'une opération de renommage peut avoir un surcoût négligeable
+	- Ouvre alors la discussion sur l'impact de l'ordre dans lequel on reçoit les opérations de renommage
+	  - Peut proposer des stratégies pour éviter le pire cas où on applique toutes les opés de renommage
   - Correspond globalement aux réflexions que j'avais eu auparavant à ce sujet
   - Comment obtenir ces mesures ?
     - Temps d'inté de renommages
-      - Prendre une snapshot {3,6,9,12,15}0k opés avant renommage
+      - Prendre une snapshot LS {3,6,9,12,15}0k opés +avant renommage+
       - En instancier 4 copies avec des /replicaNumbers/ différents
 	1. Une avec le /replicaNumber = 0/
 	2. Une avec le /replicaNumber/ de base
@@ -11407,13 +11397,107 @@ nbOpes,type,size,nbRenamingBots
       - Puis appliquer l'opé de renommage non-prioritaire sur la copie avec le /replicaNumber = 0/
       - En mesurant le temps pour chacune de ces étapes, peut générer un .csv avec les données suivantes
 	- /nbOpes/
-	- /type/ avec comme valeurs possibles "local", "remote", "winningConcurrent" et "losingConcurrent"
+	- /type/ avec comme valeurs possibles "local", "remote", "winningConcurrentRename" et "losingConcurrentRename"
 	- /time/
       - J'ai environ 80 documents RLS
       - Donc ~80 temps par couple (nbOpes,type)
       - Est-ce suffisant ou dois-je boucler pour en générer plus ?
       - J'avais ~110 temps pour chaque couple pour PaPoC
-      - Peut boucler 3x histoire d'accroître le dataset
+      - Peut boucler +3x+ 6x histoire d'accroître le dataset
+      - Ah ben non en fait
+      - Ces mesures se faisaient à partir de documents LS
+	- Le but de ces mesures étaient d'ouvrir la discussion sur quand renommer
+	- Mais le nombre de blocs des documents RLS se fait réinitialiser à chaque renommage
+	- Donc le temps d'inté de l'opé de renommage n'aurait pas évolué pas puisque j'utilisais /renameIdInterval()/
+	  - Dont la complexité dépendait du nombre de blocs
+	- J'avais donc utilisé des documents LS comme base pour les mesures pour PaPoC
+	  - Ces documents ne sont pas renommés
+	  - Et ont leur nombre de blocs qui croît de façon continue
+      - Mais je n'ai plus /renameIdInterval()/ actuellement
+      - À voir comment j'arrive à réimplémenter cette fonction
+      - Mais dans le doute, on va continuer de travailler sur des snapshots LS
+      - Du coup je n'ai "que" 20 documents différents
+      - Donc on va augmenter le nombre d'itérations à 6
+	- Histoire d'avoir 100+ temps par couple
+    - Temps d'inté d'insertions
+      - Pour chaque documents LS
+	- Prendre une snapshot {1,2,...,15}k opés
+	- Boucler
+	  - En instancier 2 copies
+	  - Effectuer une opé locale sur la 1ère copie
+	  - Appliquer l'opé distante sur la 2nd copie
+	  - Logger les temps mesurés
+	- On faisait 500 itérations pour générer le dataset de PaPoC
+	- Ça fait beaucoup (trop?) de mesures
+	- Mais ça permet d'introduire un peu de variation en "tapant" à différents endroits de la séquence
+	  - Même si 500 positions ça reste peu sur les 60k positions possibles à terme
+	- On part donc sur +500+ 100 itérations
+      - Pour chaque document RLS
+	- Boucler
+	  - En instancier 2 copies
+	  - Effectuer une opé locale sur la 1ère copie
+	  - Appliquer l'opé distante sur la 2nd copie
+	  - Logger les temps mesurés
+	  - Si on est à un seuil de renommage
+	    - En instancier 3 nouvelles copies
+	      - Tel que le /replicaNumber/ de la 1ère soit prioritaire sur celui de la 2nd
+	    - Effectuer un renommage sur les 3 copies
+	    - Appliquer l'opé distante générée précédemment sur la 3ème copie
+	    - Appliquer le renommage distant de la 2nd copie sur la 1ère copie
+	    - Effectuer une opé locale sur la 2nd copie
+	    - Appliquer l'opé distante sur la 1ère copie
+        - Est-ce que j'ai besoin de boucler 500x aussi ?
+	- J'ai 80 documents RLS, soit 4x plus que de documents LS
+	- Donc boucler +125x+ 25x me permettrait de générer le même nombre d'entrées pour chacune des catégories
+      - En mesurant le temps pour chacune de ces étapes, peut générer un .csv avec les données suivantes
+	- /nbOpes/
+	- /type/ avec comme valeurs possibles "localLS", "remoteLS", "localRLS", "remoteRLS", "remoteRLSFromPreviousEpoch" et "remoteRLSFromConcurrentEpoch"
+	- /time/
+      - Avec les paramètres indiqués ci-dessus, j'aurais 10k entrées par couple (nbOpes,type)
+	- Est-ce overkill ?
+	- On va réduire à 2k entrées par couple, ça me paraît déjà largement suffisant
+	- Donc je divise par 5 les itérations
+      - Dans le doute, je vais aussi ajouter le paramètre /nbRenamingBots/ aux entrées afin de pouvoir comparer les résultats si besoins
+	- Je ne pense pas que ce paramètre impacte les perfs sur cet aspect
+	- Mais je peux me tromper
+	- Autant ajouter cette info pour pouvoir facilement revoir nos conclusions au besoin
+  - Récapitulatif
+    - Ajout du paramètre /nbRenamingBots/ aux entrées de /integration-time-insert-op/
+    - Ajout d'une mesure du temps d'inté d'insertions distantes provenant d'epochs concurrentes
+    - Ajout d'une mesure du temps d'intégration d'un renommage concurrent gagnant
+    - Ajout d'une mesure du temps d'intégration d'un renommage concurrent perdant
+    - Pour les temps d'inté d'insertions, vise 2000 entrées par couple (nbOpes,type)
+    - Pour les temps d'inté de renommage, vise 120 entrées par couple (nbOpes, type)
+** Semaine du <2020-08-10 Mon> au <2020-08-14 Fri>
+*** Planned
+**** IN-PROGRESS Implémenter la nouvelle version de /integration-times-insert-op/
+- Fusionner /integration-times-ls/ et /integration-times-rls/
+- Ajouter l'attribut /nbRenamingBots/ aux entrées
+- Ajouter la mesure du temps d'inté d'insertions distantes provenant d'epochs concurrentes
+  - avec "remoteRLSFromConcurrentEpoch" comme /type/
+**** TODO Implémenter la nouvelle version de /integration-times-rename-op/
+- Effectuer les mesures que tous les 30k opés
+  - Au lieu de 10k
+- Ajouter la mesure du temps d'intégration d'un renommage concurrent gagnant
+  - avec "winningConcurrentRename" comme /type/
+- Ajouter la mesure du temps d'intégration d'un renommage concurrent perdant
+  - avec "losingConcurrentRename" comme /type/
+**** TODO Retravailler /renameIdInterval()/
+- Le but de /renameIdInterval()/ est d'améliorer les perfs de RLS en renommant bloc par bloc plutôt qu'id par id
+- Mais la version actuelle du code présente plusieurs défauts
+  - /renameIdInterval()/ est buggée
+  - /renameIdInterval()/ duplique le code de /renameId()/
+  - /renameIdInterval()/ n'est pas à jour avec /renameId()/
+- Implémenter /renameIdInterval()/ est une perte de temps tant que les fonctions de renommage ne sont pas fixées
+- On pourrait cependant améliorer les perfs du mécanisme de renommage en déléguant le renommage à /renameId()/
+- Tout en mémorisant où on est dans la séquence pour accélérer la recherche du prédécesseur pour renommer le prochain id
+- IMO cela offrirait un bon compromis entre complexité du code, coût de sa maintenance et performances obtenues
+- /integration-times-rename-op/ permettra d'évaluer le gain de perfs
+**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
+**** TODO Mettre à jour le pseudo-code de /renameId()/
+**** TODO Écrire en pseudo-code /reverseRenameId()/
+**** TODO Rédiger le plan détaillé du papier
+*** Done
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
