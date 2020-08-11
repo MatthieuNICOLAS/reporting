@@ -11475,7 +11475,7 @@ nbOpes,type,size,nbRenamingBots
 - Ajouter l'attribut /nbRenamingBots/ aux entrées
 - Ajouter la mesure du temps d'inté d'insertions distantes provenant d'epochs concurrentes
   - avec "remoteRLSFromConcurrentEpoch" comme /type/
-**** IN-PROGRESS Corriger le code permettant de trancher entre 2 epochs
+**** DONE Corriger le code permettant de trancher entre 2 epochs
 - Lorsqu'un noeud applique une nouvelle opération de renommage distante, il compare la nouvelle epoch à son epoch courante pour déterminer s'il doit transitionner vers cette epoch
 - Pour cela, je génère l'identifiant complet de chaque epoch et les compare en utilisant l'ordre lexicographique
   - De la forme /[replicaNumber1, epochNumber1, replicaNumber2, epochNumber2...]/
@@ -11530,6 +11530,14 @@ nbOpes,type,size,nbRenamingBots
     - A découvert un bug en vérifiant que l'algo se comportait comme attendu
     - La copie prioritaire n'est pas celle que je pensais, mais seulement de temps en temps
     - A découvert que c'est lié au signe de /replicaNumber/ en débuggant
+- Corriger le code permettant de trancher entre 2 epochs
+  - Ajout de la fonction /compareEpochFullIds()/
+    - Permet de comparer deux ids d'epochs et retourne l'ordre entre les deux
+  - Ajout de tests unitaires vérifiant que le comportement de /compareEpochFullIds()/ est celui attendu
+  - Modification du code de /renameRemote()/ pour utiliser /compareEpochFullIds()/ plutôt que l'opérateur < pour déterminer l'ordre entre 2 epochs
+  - Release de /mute-structs@2.0.1/
+  - J'ai executé /integration-times-insert-op/ pour vérifier si ça corrigeait bien le problème constaté
+  - L'exécution s'est correctement déroulé
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
