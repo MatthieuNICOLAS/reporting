@@ -11492,7 +11492,7 @@ nbOpes,type,size,nbRenamingBots
   #+END_NOTE
 - L'opérateur < gère les nombres négatifs de manière inattendue et contraire au résultat souhaité lorsqu'il est utilisé pour comparer des tableaux d'entiers
 - Doit donc modifier l'expression utilisée pour mettre en place correctement un ordre lexicographique entre les epochs
-**** TODO Implémenter la nouvelle version de /integration-times-rename-op/
+**** DONE Implémenter la nouvelle version de /integration-times-rename-op/
 - Effectuer les mesures que tous les 30k opés
   - Au lieu de 10k
 - Ajouter la mesure du temps d'intégration d'un renommage concurrent gagnant
@@ -11510,6 +11510,19 @@ nbOpes,type,size,nbRenamingBots
 - Tout en mémorisant où on est dans la séquence pour accélérer la recherche du prédécesseur pour renommer le prochain id
 - IMO cela offrirait un bon compromis entre complexité du code, coût de sa maintenance et performances obtenues
 - /integration-times-rename-op/ permettra d'évaluer le gain de perfs
+**** TODO Effectuer les nouvelles mesures des temps d'intégration sur le nouveau dataset
+- Maintenant que /integration-times-insert-op/ et /integration-times-rename-op/ ont été MàJ
+- Peut lancer ces scripts sur notre nouveau dataset pour obtenir les nouveaux temps
+- Je pense réutiliser /coast-dev2/ pour cela afin de pouvoir comparer les temps à ceux qu'on a présentés à PaPoC
+- Doit setup l'environnement pour effectuer ces mesures sur /coast-dev2/
+  - Transférer la nouvelle version de /results-exploit/
+  - Transférer les snapshots des documents
+- NE PAS OUBLIER : utiliser l'option --jitless de *Node*
+  - Permet de désactiver les optimisations effectuées par le moteur JS, si je comprends bien
+  - Permettra de mieux contrôler l'environnement de simulation
+  - Doit donc utiliser les commandes suivantes
+    - /node --max-old-space-size=8192 --jitless dist/bot-results.js --integration-times-insert-op/
+    - /node --max-old-space-size=8192 --jitless dist/bot-results.js --integration-times-rename-op/
 **** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
 **** TODO Mettre à jour le pseudo-code de /renameId()/
 **** TODO Écrire en pseudo-code /reverseRenameId()/
@@ -11538,6 +11551,32 @@ nbOpes,type,size,nbRenamingBots
   - Release de /mute-structs@2.0.1/
   - J'ai executé /integration-times-insert-op/ pour vérifier si ça corrigeait bien le problème constaté
   - L'exécution s'est correctement déroulé
+- Implémenter la nouvelle version de /integration-times-rename-op/
+  - Instanciation de 2 copies du document supplémentaires
+    - Instanciais déjà 2 copies
+    - La 1ère permettait de mesurer le temps d'intégration d'une opé locale de renommage
+    - La 2nde de mesurer le temps d'intégration d'une opé distante de renommage
+  - Chacune de ces copies génère une opé de renommage
+  - Ces opérations sont ensuite appliquées à la 2nde copie
+  - L'ordre d'application de ces opérations permet de mesurer
+    - Le temps d'intégration d'une opé de renommage concurrente "gagnante" contre l'epoch actuelle dans un 1er temps
+    - Le temps d'intégration d'une opé de renommage concurrente "perdante" contre l'epoch actuelle dans un 2nd temps
+  - J'ai executé /integration-times-rename-op/ pour vérifier si /seqRemote/ progressait bien à travers les epochs comme attendu
+  - Pas remarqué de bug
+  - Les temps mesurés à cette occasion présentent les tendances suivantes
+    - Pas de changements au niveau de /local/
+    - /remote/ augmente plus fortement et rapidement que précédemment
+      - Atteint un pic vers 4s à 120k opés
+      - Notamment car on utilise plus /renameIdInterval()/ actuellement
+    - /winningConcurrentRemote/ est légèrement plus coûteux que /remote/
+      - Dû au fait qu'on doit annuler l'effet du renommage concurrent avant d'appliquer le nouveau
+      - Mais ce surcoût est faible par rapport au coût d'appliquer le renommage
+      - Les boxplots sont principalement côte à côte
+    - /losingConcurrentRemote/ est "gratuite" par rapport au reste
+      - Prend seulement quelques ms à terme
+      - Cohérent, vu que ça consiste juste à ajouter une entrée dans une map
+      - Son "vrai" coût n'est en fait pas mesuré
+      - Puisqu'on ne mesure pas le temps de désérialisation de l'opé
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
