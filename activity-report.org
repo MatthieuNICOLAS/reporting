@@ -11470,11 +11470,28 @@ nbOpes,type,size,nbRenamingBots
     - Pour les temps d'inté de renommage, vise 120 entrées par couple (nbOpes, type)
 ** Semaine du <2020-08-10 Mon> au <2020-08-14 Fri>
 *** Planned
-**** IN-PROGRESS Implémenter la nouvelle version de /integration-times-insert-op/
+**** DONE Implémenter la nouvelle version de /integration-times-insert-op/
 - Fusionner /integration-times-ls/ et /integration-times-rls/
 - Ajouter l'attribut /nbRenamingBots/ aux entrées
 - Ajouter la mesure du temps d'inté d'insertions distantes provenant d'epochs concurrentes
   - avec "remoteRLSFromConcurrentEpoch" comme /type/
+**** IN-PROGRESS Corriger le code permettant de trancher entre 2 epochs
+- Lorsqu'un noeud applique une nouvelle opération de renommage distante, il compare la nouvelle epoch à son epoch courante pour déterminer s'il doit transitionner vers cette epoch
+- Pour cela, je génère l'identifiant complet de chaque epoch et les compare en utilisant l'ordre lexicographique
+  - De la forme /[replicaNumber1, epochNumber1, replicaNumber2, epochNumber2...]/
+- Dans le code, utilise l'expression suivante : /currentEpochFullId < newEpochFullId/
+- Cette expression semblait traduire le comportement attendu
+  #+BEGIN_NOTE
+[1, 1] < [2, 1] = true
+[1, 1] < [1, 1, 10, 2] = true
+[1, 1, 10, 2] < [2, 1] = true
+  #+END_NOTE
+- Mais je suis tombé sur un contre-exemple en faisant tourner /integration-times-insert-op/
+  #+BEGIN_NOTE
+[-23, 1] < [-22, 1] = false
+  #+END_NOTE
+- L'opérateur < gère les nombres négatifs de manière inattendue et contraire au résultat souhaité lorsqu'il est utilisé pour comparer des tableaux d'entiers
+- Doit donc modifier l'expression utilisée pour mettre en place correctement un ordre lexicographique entre les epochs
 **** TODO Implémenter la nouvelle version de /integration-times-rename-op/
 - Effectuer les mesures que tous les 30k opés
   - Au lieu de 10k
@@ -11498,6 +11515,21 @@ nbOpes,type,size,nbRenamingBots
 **** TODO Écrire en pseudo-code /reverseRenameId()/
 **** TODO Rédiger le plan détaillé du papier
 *** Done
+- Implémenter la nouvelle version de /integration-times-insert-op/
+  - Fusion de /integration-times-ls/ et /integration-times-rls/
+  - Décomposition en fonctions de leur code respectif
+    - Possède maintenant une fonction permettant de mesurer les temps d'inté pour une snapshot donnée
+    - /computeIntegrationTimesRLS/ étant plus complexe, décomposée aussi en fonctions
+    - Notamment pour les mesures de temps d'inté d'opérations d'une epoch précédente et d'une epoch concurrente
+  - Ajout du champ /nbRenamingBots/ aux entrées
+  - Mise à jour des valeurs du champ /type/
+    - Utilise dorénavant "localLS", "remoteLS", "localRLS", "remoteRLS", "remoteRLSFromPreviousEpoch" et "remoteRLSFromConcurrentEpoch"
+  - Implémentation de /computeIntegrationTimeOpFromConcurrentEpoch()/
+    - Afin de générer des epochs concurrentes, instancie 2 copies d'une même snapshot
+    - Afin de gérer la priorité entre les copies, incrémente le /replicaNumber/ de la snapshot avant la création de la copie
+    - A découvert un bug en vérifiant que l'algo se comportait comme attendu
+    - La copie prioritaire n'est pas celle que je pensais, mais seulement de temps en temps
+    - A découvert que c'est lié au signe de /replicaNumber/ en débuggant
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
@@ -11656,6 +11688,8 @@ nbOpes,type,size,nbRenamingBots
     - Ctrl + B (raccourci pour initier une commande) suivi de D (pour Detach)
   - Se reconnecter à un tmux existant
     - `tmux a -t 0`
+- Convertir un PDF en noir et blanc
+  - /convert -colorspace GRAY -density 400 -quality 100 main.pdf gray.pdf/
 * Glossaire
 - <<<Eventual convergence>>> property
   #+BEGIN_QUOTE
