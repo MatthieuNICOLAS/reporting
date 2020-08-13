@@ -11499,7 +11499,7 @@ nbOpes,type,size,nbRenamingBots
   - avec "winningConcurrentRename" comme /type/
 - Ajouter la mesure du temps d'intégration d'un renommage concurrent perdant
   - avec "losingConcurrentRename" comme /type/
-**** TODO Retravailler /renameIdInterval()/
+**** DONE Retravailler /renameIdInterval()/
 - Le but de /renameIdInterval()/ est d'améliorer les perfs de RLS en renommant bloc par bloc plutôt qu'id par id
 - Mais la version actuelle du code présente plusieurs défauts
   - /renameIdInterval()/ est buggée
@@ -11510,7 +11510,7 @@ nbOpes,type,size,nbRenamingBots
 - Tout en mémorisant où on est dans la séquence pour accélérer la recherche du prédécesseur pour renommer le prochain id
 - IMO cela offrirait un bon compromis entre complexité du code, coût de sa maintenance et performances obtenues
 - /integration-times-rename-op/ permettra d'évaluer le gain de perfs
-**** TODO Effectuer les nouvelles mesures des temps d'intégration sur le nouveau dataset
+**** IN-PROGRESS Effectuer les nouvelles mesures des temps d'intégration sur le nouveau dataset
 - Maintenant que /integration-times-insert-op/ et /integration-times-rename-op/ ont été MàJ
 - Peut lancer ces scripts sur notre nouveau dataset pour obtenir les nouveaux temps
 - Je pense réutiliser /coast-dev2/ pour cela afin de pouvoir comparer les temps à ceux qu'on a présentés à PaPoC
@@ -11572,11 +11572,77 @@ nbOpes,type,size,nbRenamingBots
       - Dû au fait qu'on doit annuler l'effet du renommage concurrent avant d'appliquer le nouveau
       - Mais ce surcoût est faible par rapport au coût d'appliquer le renommage
       - Les boxplots sont principalement côte à côte
+      - Du coup, ça indique qu'il est important d'optimiser /renameId()/
+	- Notamment en proposant /renameIdInterval()/
+      - Mais moins pertinant d'optimiser /reverseRenameId()/
     - /losingConcurrentRemote/ est "gratuite" par rapport au reste
       - Prend seulement quelques ms à terme
       - Cohérent, vu que ça consiste juste à ajouter une entrée dans une map
       - Son "vrai" coût n'est en fait pas mesuré
       - Puisqu'on ne mesure pas le temps de désérialisation de l'opé
+- Effectuer les nouvelles mesures des temps d'intégration sur le nouveau dataset
+  - Transfert des snapshots sur /coast-dev2/
+    - J'ai rencontré des difficultés à setup l'authentification par clé SSH
+      - Permet de ne pas avoir à taper le mdp pour chaque snapshot à envoyer
+    - La connexion SSH nécessitait le mdp malgré l'ajout de la clé publique dans les clés autorisées sur /coast-dev2/
+    - C'était dû à une mauvaise configuration des droits utilisateurs sur les dossiers ~/, ~/.ssh/ et les fichiers contenus dans ce dossier
+    - Les droits étaient trop permissifs par rapport à ce qui est attendu
+    - Pourquoi l'authentification par clé échouait silencieusement et aucun message d'erreur n'était fourni !?
+  - Transfert de /bot-results.js/ sur /coast-dev2/
+  - Exécution de /integration-times-insert-op/
+- Retravailler /renameIdInterval()/
+  - D'après la réflexion présentée dans la description de cette tâche
+  - Il ne s'agit pas tant de proposer une nouvelle version de /renameIdInterval()/
+  - Mais plutôt une nouvelle version de /renameId()/
+  - L'idée est d'extirper la recherche du predecesseur de /renameId()/ afin de pouvoir l'effectuer plus finement en fonction de la situation
+    - Vu qu'il s'agit de la partie la plus coûteuse de l'opération
+  - /renameId()/ prendrait alors /predecessorId/ et /successorId/ en paramètres
+  - Et on aurait différentes fonctions qui se chargerait d'obtenir ces paramètres et d'appeler /renameId()/
+  - J'en distingue 2 pour le moment
+    - /renameIds()/ qui est appelée lors de l'application d'une opération distante d'insertion et de suppression nécessitant une transformation
+      - Utiliserait alors une recherche dichotomique pour trouver la valeur initiale de /predecessorId/ et de /successorId/
+	- Puisque l'opération peut affecter n'importe quelle position de la séquence
+      - Puis parcourerait séquentiellement les identifiants pour chaque élément
+	- Puisqu'on insère ou supprime des éléments consécutifs
+	- Mais il est possible qu'on doive parcourir des identifiants inutiles
+	  - Notamment si une insertion concurrente massive a été réalisée pile à cet endroit de la séquence
+	- S'agit du pire scénario
+	- Reste à déterminer à partir de quand ça redevient avantageux de réutiliser la recherche dichotomique
+    - /renameSeq()/ qui est appelée lors de l'application d'une opération distante de renommage gagnante
+      - Parcourerait séquentiellement les identifiants
+      - Puisqu'il est probable que la majorité des éléments des 2 états soient identiques
+  - Donc, déjà, besoin de retravailler /renameId()/
+  - Le problème d'ajouter /predecessorId/ et /successorId/ en paramètres de /renameId()/ est que ces paramètres sont indéfinis dans certains cas
+  - On se retrouve donc avec une fonction un peu bâtarde, avec 4-5 paramètres dont la sémantique et l'utilité dépend en fait du cas courant
+  - Pour corriger cela, décompose /renameId()/ en plusieurs fonctions traitant chacune un cas particulier
+    - /renameIdLessThanFirstId()/ pour idToRename < firstId
+    - /renameIdFromIndex()/ pour idToRename ∈ renamedIds
+    - /renameIdGreaterThanLastId()/ lastId < idToRename
+    - /renameIdFromPredecessorId()/ pour firstId < idToRename < lastId
+  - Permet ainsi de définir précisément quels paramètres on a besoin pour chacun de ces cas
+  - Définit une fonction /toto()/
+    - Permet de renommer "efficacement" une liste d'identifiants
+    - Prend en paramètres
+      - /idsToRename/ : la liste des identifiants à renommer
+      - /initialIndex/ : l'index à partir du quel on va commencer à parcourir /renamedIds/ à la recherche de /idToRename/ ou de leur prédecesseur
+    - Mémorise l'index du dernier prédecesseur utilisé pour cela
+    - Globalement, pour chaque /idToRename/
+      - Se contente de parcourir /renamedIds/ à partir du dernier index à la recherche de /idToRename/ ou de son prédecesseur
+      - Puis, en fonction du cas dans lequel on se trouve, appelle la fonction de renommage adaptée
+    - Rend accessible /toto()/ par le biais des 2 fonctions /renameIds()/ et /renameSeq()/
+      - Ces fonctions génèrent une valeur pour /initialIndex/
+      - Puis appelle /???()/ avec cette valeur
+      - Dans le cas de /renameSeq()/, /initialIndex = -1/
+      - Dans le cas de /renameIds()/, on effectue une recherche dichotomique pour trouver l'index de l'élément ou de son prédecesseur
+  - Modification de /renameFromEpochToCurrent()/ pour permettre de choisir d'utiliser /renameIds()/ ou /renameSeq()/ en fonction de la situation
+    - Ré-écriture de la fonction au passage
+    - Auparavant, générais un tableau de /transformationFn()/ à appliquer successivement sur les identifiants
+    - C'était possible car la signature de /renameId()/ et de /reverseRenameId()/ correspondaient
+    - Mais maintenant on a plus que /renameIds()/ ou /renameSeq()/
+    - Donc séparation du traitement de l'inversion de renommages et du traitement de l'application de renommages
+  - MàJ du code de /insertRemote()/, /delRemote()/ et /renameRemote()/ pour utiliser la nouvelle version de /renameFromEpochToCurrent()/
+  - MàJ du code des tests unitaires sur /renameId()/ pour utiliser dorénavant /renameIds()/
+  - Reste juste à lui trouver un nom
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
@@ -11728,13 +11794,13 @@ nbOpes,type,size,nbRenamingBots
   - tmux est un terminal virtuel qui nous permet de lancer des programmes de se détacher du terminal sans interrompre le programme
   - Pratique pour démarrer un programme long sur une machine distante pour ne pas interrompre son exécution à la fin de la session ssh
   - Cheat Sheet : https://tmuxcheatsheet.com/
-  - Créer un tmux
-    - `tmux`
+  - Créer un tmux nommé
+    - /tmux new -s matthieu/
   - Se détacher d'un tmux
     - Pas une commande à proprement parler, mais un raccourci clavier
     - Ctrl + B (raccourci pour initier une commande) suivi de D (pour Detach)
   - Se reconnecter à un tmux existant
-    - `tmux a -t 0`
+    - /tmux a -t matthieu/
 - Convertir un PDF en noir et blanc
   - /convert -colorspace GRAY -density 400 -quality 100 main.pdf gray.pdf/
 * Glossaire
