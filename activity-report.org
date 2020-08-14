@@ -11510,7 +11510,7 @@ nbOpes,type,size,nbRenamingBots
 - Tout en mémorisant où on est dans la séquence pour accélérer la recherche du prédécesseur pour renommer le prochain id
 - IMO cela offrirait un bon compromis entre complexité du code, coût de sa maintenance et performances obtenues
 - /integration-times-rename-op/ permettra d'évaluer le gain de perfs
-**** IN-PROGRESS Effectuer les nouvelles mesures des temps d'intégration sur le nouveau dataset
+**** DONE Effectuer les nouvelles mesures des temps d'intégration sur le nouveau dataset
 - Maintenant que /integration-times-insert-op/ et /integration-times-rename-op/ ont été MàJ
 - Peut lancer ces scripts sur notre nouveau dataset pour obtenir les nouveaux temps
 - Je pense réutiliser /coast-dev2/ pour cela afin de pouvoir comparer les temps à ceux qu'on a présentés à PaPoC
@@ -11590,6 +11590,81 @@ nbOpes,type,size,nbRenamingBots
     - Pourquoi l'authentification par clé échouait silencieusement et aucun message d'erreur n'était fourni !?
   - Transfert de /bot-results.js/ sur /coast-dev2/
   - Exécution de /integration-times-insert-op/
+    - A permis d'obtenir la figure suivante
+      #+BEGIN_NOTE
+      [[file:img/integration-time-boxplot-remote-operations-without-outliers.png]]
+      #+END_NOTE
+    - Réflexions sur les mesures obtenues
+      - On retrouve des temps similaires pour /remoteLS/ et /remoteRLS/ par rapport à ce qu'on avait pour PaPoC
+      - On constate une légère augmentation pour /remoteRLSFromPreviousEpoch/
+        - D'où est-ce que ça pourrait venir ?
+        - Mais le principal est que ce cas obtient des performances similaires au cas /remoteRLS/
+      - Et on observe un surcoût raisonnable pour le traitement du cas /remoteRLSFromConcurrentEpoch/
+        - Le surcoût est dû à l'étape /reverseRenameId()/ supplémentaire par rapport à /remoteRLSFromPreviousEpoch/
+        - Ce surcoût est d'environ 100ms
+        - Donc +30%
+        - Mais les performances obtenues sont équivalentes à celles obtenues par /remoteLS/
+  - Exécution de /integration-times-rename-op/
+    - A fait tourner 2 versions
+    - La version avant l'implémentation de /renameIds()/ et la version d'après
+    - M'attend à obtenir de meilleures performances avec la seconde version
+    - A obtenu les figures suivantes
+      #+BEGIN_NOTE
+      [[file:img/comparison-integration-times-rename-op-bugged.png]]
+      #+END_NOTE
+    - Ok, what the hell?
+    - Pour expliquer ce qui est présenté sur ces figures
+      - En orange on a /remote/, le temps d'inté d'une opération de renommage distante
+      - En rouge on a /winningConcurrentRemote/, le temps d'inté d'une opération de renommage distante concurrente et prioritaire par rapport au renommage courant
+      - À gauche, la figure présente les temps obtenus avant l'implémentation de /renameSeq/
+      - À droite, après
+    - L'implémentation de /renameSeq/ avait pour but d'améliorer les perfs de /remote/ et de /winningConcurrentRemote/
+      - En évitant tout simplement de faire une recherche dichotomique pour chaque identifiant à renommer
+      - Si on considère /idsToRename/ la liste des identifiants composant l'état actuel, de taille /n/, et /renamedIds/ la liste des identifiants composant l'état renommé par l'opé, de taille /m/
+	- On avait avant une complexité de /n * log(m)/
+	- On a maintenant une complexité de /n + m/
+	- Comme on se place dans le cas du renommage, on a approximativement /n = m/
+    - On constate aucun changement pour le cas /remote/
+      - Déjà ça c'est surprenant
+    - Et on constate des résultats variant énormément pour /winningConcurrentRemote/
+      - Pour une même taille de document
+      - On obtient à la fois des temps similaires aux temps avant /renameSeq/
+      - Et des temps bien meilleurs
+      - Par exemple, pour les snapshots à 150k opés, on a des temps
+	- À 12s
+	- À 5ms
+	  - Ce qui est le même temps que /losingConcurrentRemote/
+    - Ok, en fait la version de /integration-times-rename-op/ executée n'utilise pas la bonne version de /mute-structs/
+      - On retrouve dans le code notamment le bug sur la priorité des epochs
+      - Du coup, les mesures effectuées pour /winningConcurrentRemote/ correspondent en réalité au cas /losingConcurrentRemote/ pour certaines snapshots
+	- Celles où /replicaNumber < 0/
+    - D'où
+      - Ces écarts de performances déconnants pour le cas /winningConcurrentRemote/
+      - Et l'absence de différence au niveau des performances du cas /remote/
+    - Correction de la version de /mute-structs/ et re-exécution du script
+    - A obtenu les figures suivantes
+      #+BEGIN_NOTE
+[[file:img/comparison-integration-times-rename-op-fixed.png]]
+      #+END_NOTE
+    - Ok, là ça a du sens
+    - On constate une amélioration à la fois des temps /remote/ et /winningConcurrentRemote/
+      - Un facteur d'environ x6 d'accélération
+    - Plutôt cool comme résultat car il nous permet de repousser le moment où on atteint la seconde d'intégration à des documents de 60k opés
+      - Soit environ 36k caractères vu nos taux d'insertions et suppressions
+      - Soit des documents d'environ 9 pages
+      - 1s d'opti pour 9 pages, ça me paraît plutôt cheap
+    - Sinon concernant la comparaison /remote/ vs /winningConcurrentRemote/
+      - /winningConcurrentRemote/ est environ 33% plus lente que /remote/
+      - S'explique par la passe préalable de /reverseRenameId()/
+      - Ce qui est raccord avec l'overhead qu'on observe dans le cas /remoteRLSFromConcurrentEpoch/ de /integration-times-insert-op/
+      - Ça me semble acceptable comme surcoût
+    - Donc si on fait une figure globale, on obtient
+      #+BEGIN_NOTE
+[[file:img/integration-time-boxplot-rename-op-without-outliers.png]]
+      #+END_NOTE
+    - On note
+      - Pas de variation des temps /local/ par rapport aux résultats présentés à PaPoC
+      - Un temps d'intégration de /losingConcurrentRemote/ négligeable par rapport aux autres
 - Retravailler /renameIdInterval()/
   - D'après la réflexion présentée dans la description de cette tâche
   - Il ne s'agit pas tant de proposer une nouvelle version de /renameIdInterval()/
