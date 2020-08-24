@@ -11523,10 +11523,6 @@ nbOpes,type,size,nbRenamingBots
   - Doit donc utiliser les commandes suivantes
     - /node --max-old-space-size=8192 --jitless dist/bot-results.js --integration-times-insert-op/
     - /node --max-old-space-size=8192 --jitless dist/bot-results.js --integration-times-rename-op/
-**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
-**** TODO Mettre à jour le pseudo-code de /renameId()/
-**** TODO Écrire en pseudo-code /reverseRenameId()/
-**** TODO Rédiger le plan détaillé du papier
 *** Done
 - Implémenter la nouvelle version de /integration-times-insert-op/
   - Fusion de /integration-times-ls/ et /integration-times-rls/
@@ -11718,6 +11714,167 @@ nbOpes,type,size,nbRenamingBots
   - MàJ du code de /insertRemote()/, /delRemote()/ et /renameRemote()/ pour utiliser la nouvelle version de /renameFromEpochToCurrent()/
   - MàJ du code des tests unitaires sur /renameId()/ pour utiliser dorénavant /renameIds()/
   - Reste juste à lui trouver un nom
+** Semaine du <2020-08-17 Mon> au <2020-08-21 Fri>
+*** Planned
+**** DONE Rédiger le plan détaillé du papier
+*** Done
+- Rédiger le plan détaillé du papier
+  - La principale question est "Quel est le scope du papier ?"
+  - On a déjà présenté la version centralisé à PaPoC
+  - Donc insister sur la version distribuée ici
+  - Mais ça me paraît nécessaire de remettre le contenu de PaPoC
+  - Me retrouve avec trop de choses à dire sur la version distribuée
+    - Relation de /priority()/ entre les epochs
+    - /reverseRenameId()/ pour annuler l'effet des renommages perdants
+    - MàJ des règles pour GC les epochs et les /former states/ associés
+  - Je fais donc une section dédiée
+  - Modification du plan pour avoir
+    - Une section *Overview* où je présente le /system model/ et l'approche proposée
+    - Une section *RLS in centralised settings* où je reprends le contenu du papier pour PaPoC
+    - Une section *RLS in distributed settings* où j'aborde les points indiqués ci-dessus
+  - Je ne suis pas trop sûr pour la partie *Overview*, à discuter avec Olivier et Gérald
+    - Mais je ne vois pas comment faire la transition entre le *Background* et la contribution autrement
+    - Et elle me permet de factoriser la partie /system model/
+  - Ajout d'une partie *Discussion*
+    - Permet d'aborder et de développer les différentes pistes d'améliorations de la contribution
+      - Déchargement des /former states/ sur le disque
+      - L'élaboration de stratégies plus efficaces pour /priority/
+      - Délayer la transition à une nouvelle /epoch/ en cas de détection de concurrence
+  - Me paraît bon comme ça pour le moment
+  - Reste plus qu'à rédiger tout ça
+  - Et compléter les nouvelles parties
+    - Ajouter un exemple pour /reverseRenameId()/
+    - Ajouter l'algo pour /reverseRenameId()/
+    - Est-ce que j'ajoute aussi un exemple pour /priority/ ?
+      - Je pourrais ajouter le schéma d'une arborescence d'epochs
+	- Faire apparaître les liens de /priority/ et l'epoch courante
+      - À laquelle j'ajoute une nouvelle epoch prioritaire
+	- Insister sur le changement d'epoch courante
+      - Pas sûr de la valeur ajoutée à vrai dire
+      - Je mets ça de côté pour le moment, je reconsidérai ça une fois que j'aurai fini la 1ère version en fonction des retours
+- Réunion cours Polytech
+  - Questions
+    - Corona
+      - Quelles sont les mesures prises par Polytech pour la rentrée ?
+      - Séances en présentiel ou à distance ?
+	- Quels outils pour les cours à distance ?
+    - Cours BDD
+      - Objectifs du module ?
+      - Public ?
+	- Qu'est-ce qu'ils ont comme connaissances ?
+      - Volume horaire ?
+      - Mon rôle là-dedans ?
+	- Chargé de groupes ou seulement de TDs/TPs ?
+      - Format de l'évaluation ?
+      - Possible d'obtenir les droits d'enseignant pour le module sur Arche ?
+	- Ou dois-je en créer un nouveau ?
+      - Possible d'obtenir les sources des fichiers présents sur Arche ?
+    - Cours Python
+      - Objectifs du module ?
+      - Public ?
+      - Volume horaire ?
+      - Mon rôle là-dedans ?
+      - Format de l'évaluation ?
+      - Est-ce Charles le responsable de module ?
+    - Emploi du temps
+      - Est-ce normal que je n'ai encore rien qui apparaît sur ADE ?
+      - Ou faut-il que je contacte quelqu'un pour demander de corriger ça ?
+	- Qui dans ce cas
+  - Notes réunion
+    - Directives Corona
+      - Pour les alternants
+	- Pas de mesures particulières pour le corona
+	- Entre 10-18 étudiants
+      - Pour Python
+	- Probablement la moitié en présentiel, la moitié à distance
+	- Propose Microsoft Teams
+    - BDD
+      - Démarre 7 septembre
+      - étudiants 3ème année en apprentissage
+	- Assez varié comme profil
+      - 12h de cours et 24h de TD
+      - objectifs
+	- connaître conception de BDDs
+	- apprendre les langages SQL
+      - Responsable de groupe
+	- je peux faire ce qui me paraît le mieux
+      - le projet aide bien à motiver
+      - aide aussi dans un projet transversal I2S au second semestre
+	- environ 20h
+	- J'interviendrai aussi dans ce module
+    - Python
+      - étudiant en 1ère année
+      - responsable de 2 groupes de TD
+      - objectifs
+	- apprendre les bases de l'algo genre PLM
+      - Principalement sous la forme de TPs
+      - Le plus compliqué abordé, c'est réaliser une liste chaînée
+    - ADE
+      - Ça devrait arriver bientôt
+    - Bureau
+      - J'ai un bureau à dispo
+      - Voir à la rentrée ce qu'il en est pour râler si besoin
+** Semaine du <2020-08-24 Mon> au <2020-08-28 Fri>
+*** Planned
+**** IN-PROGRESS Planifier le cours de BDD pour la rentrée
+- Mon cours de BDD démarre vers le 7 septembre
+- J'ai accès aux cours et documents des années précédentes
+- Mais quelques soucis
+- J'ai pas accès aux sources des PDFs
+  - Par exemple, pour le 1er cours, j'ai juste accès au poly distribué aux étudiants avec plusieurs slides par page
+  - Ça va pas être terrible à présenter en l'état
+  - J'ai demandé plusieurs fois les sources, mais pas de réponse pour le moment
+- Je ne peux donc pas simplement retravailler les polys pour les adapter à mon style
+- De la manière dont c'est fait, j'ai un peu de mal à voir comment alterner cours et TDs pour que ça reste agréable
+- Les exemples de code me paraissent obsolètes
+  - Les codes PHP utilisent l'API /mysqli_connect/
+  - Me semble qu'elle était déjà plus ou moins obsolète quand j'étais en DUT
+  - Faudrait donc MàJ les exemples de code pour utiliser PDO
+    - Ou du moins l'API utilisée dorénavant
+- Pour les TDs, les sujets me paraissent inégaux et peu utilisables pour certains en l'état
+  - Le sujet *Bibliothèque* décrit sommairement le système à modéliser, mais ne donne aucune consigne
+  - Le sujets *Hôtel* et *Tissus* sont des sujets de DS d'années passées
+    - Ils sont complets
+    - Mais demandent notamment aux étudiants de normaliser le schéma relationnel qu'ils proposent
+  - Le sujet *Norm* me paraît nickel pour un TD sur la normalisation de schémas relationnels
+  - Le sujet *Compagnie Aérienne* me paraît bon pour travailler la réalisation d'un diagramme de classes UML à partir de la description d'un système
+  - Le sujet *Relationnel* est bon pour faire travailler l'algèbre relationnel, mais besoin de retravailler sa présentation
+  - Le sujet *Restaurant*est bon pour faire travailler les requêtes SQL
+- Pour les TPs
+  - J'ai juste pu regarder le sujet *Artistes*
+  - Me paraît bon pour faire travailler la gestion d'une BDD "à la main" et sa manipulation par le biais de code PHP
+  - Faudra que j'utilise Windows pour dézip l'autre TP
+- Je vais donc devoir passer du temps à refaire les supports et certains sujets
+- Définir le planning et le sujets des cours pour la rentrée
+  - Mais j'aimerai bien avoir un emploi du temps au préalable pour savoir combien d'heures je dois préparer
+**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
+**** TODO Mettre à jour le pseudo-code de /renameId()/
+**** TODO Écrire en pseudo-code /reverseRenameId()/
+**** TODO Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
+- On a des figures pour présenter le fonctionnement
+  - De LS
+  - D'un renommage local avec RLS
+  - De la gestion des opés d'insertion concurrente à un renommage
+- En faire pour présenter et expliquer le cas avec des renommages concurrents
+*** Done
+- Planifier le cours de BDD pour la rentrée
+  - Support 1
+    - Titre
+      - Introduction
+    - Contenu
+      - Me présenter
+      - Règles pour le déroulement du cours
+      - Organisation du module
+      - Présentation du module
+	- Objectifs
+	- Syllabus
+      - Notion de BDDs
+	- Problématiques et besoins liés au stockage de données
+	- SGBD et ses fonctionnalités
+	- Types de SGBDs (relationnels, colonnes, documents, graphes)
+	- Tour d'horizon des SGBDs relationnelles
+    - Estimation
+      - 30min
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
