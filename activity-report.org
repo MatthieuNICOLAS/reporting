@@ -11816,6 +11816,7 @@ nbOpes,type,size,nbRenamingBots
       - Voir à la rentrée ce qu'il en est pour râler si besoin
 ** Semaine du <2020-08-24 Mon> au <2020-08-28 Fri>
 *** Planned
+**** DONE Mettre à jour le pseudo-code de /renameId()/
 **** IN-PROGRESS Planifier le cours de BDD pour la rentrée
 - Mon cours de BDD démarre vers le 7 septembre
 - J'ai accès aux cours et documents des années précédentes
@@ -11847,16 +11848,25 @@ nbOpes,type,size,nbRenamingBots
 - Je vais donc devoir passer du temps à refaire les supports et certains sujets
 - Définir le planning et le sujets des cours pour la rentrée
   - Mais j'aimerai bien avoir un emploi du temps au préalable pour savoir combien d'heures je dois préparer
-**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
-**** TODO Mettre à jour le pseudo-code de /renameId()/
-**** TODO Écrire en pseudo-code /reverseRenameId()/
-**** TODO Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
+**** IN-PROGRESS Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
 - On a des figures pour présenter le fonctionnement
   - De LS
   - D'un renommage local avec RLS
   - De la gestion des opés d'insertion concurrente à un renommage
 - En faire pour présenter et expliquer le cas avec des renommages concurrents
+**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
+**** TODO Écrire en pseudo-code /reverseRenameId()/
 *** Done
+- Mettre à jour le pseudo-code de /renameId()/
+  - Je me suis inspiré du rework que j'ai fait pour /renameIds()/
+  - La décomposition de /renameId()/ en différents cas avec leurs sous-fonctions permet d'éviter de surcharger le papier
+  - Peut détailler un cas dans le "corps" du papier et présenter les autres en annexes
+  - Par contre, les modifications depuis la version de PaPoC complexifient énormément l'algo IMO
+  - Il s'agit des modifs apportées pour que /renameId(reverseRenameId(id)) = id/
+  - Les conditions sont particulièrements salées à lire et comprendre
+  - Je devrais utiliser une fonction pour simplifier la compréhension du code
+  - Mais j'ai du mal à la concevoir
+  - Pour le moment, je préfère laisser en l'état et avoir un pseudo-code proche du code
 - Planifier le cours de BDD pour la rentrée
   - Support 1
     - Titre
@@ -11875,6 +11885,21 @@ nbOpes,type,size,nbRenamingBots
 	- Tour d'horizon des SGBDs relationnelles
     - Estimation
       - 30min
+- Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
+  - En quoi pourrait consister ce schéma ?
+  - Qu'est-ce qu'on veut illustrer avec ce schéma ?
+  - Qu'un noeud, à la réception d'une opération de renommage concurrente prioritaire par rapport à son epoch courante
+    - Annule l'effet du renommage ayant mené à l'epoch courante afin d'obtenir un état équivalent à l'epoch ancêtre commune aux 2 renommages concurrents
+    - Puis applique l'effet du renommage prioritaire afin d'obtenir le nouvel état
+  - J'ai besoin de faire apparaître l'epoch courante de la séquence et l'arborescence des epochs par rapport aux schémas actuels
+  - Ça pourrait simplifier et alléger le schéma si je pouvais aussi identifier les opérations, notamment de renommage
+    - Le scénario de l'exemple pourrait être A qui reçoit une opé de renommage générée par B juste après l'opération d'insertion de l'exemple précédent
+    - Si je pouvais identifier cette opération, le schéma pourrait se focaliser sur les étapes successifs de A alors qu'il applique l'opération
+    - On aurait alors
+      1. État initial de A
+      2. État après avoir ajouter l'epoch de l'opé de B et l'avoir identifier comme nouvelle epoch courante
+      3. État après avoir annuler l'effet du renommage de A
+      4. État après avoir appliquer l'effet du renommage de B
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
