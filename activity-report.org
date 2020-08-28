@@ -11817,6 +11817,7 @@ nbOpes,type,size,nbRenamingBots
 ** Semaine du <2020-08-24 Mon> au <2020-08-28 Fri>
 *** Planned
 **** DONE Mettre à jour le pseudo-code de /renameId()/
+**** DONE Écrire en pseudo-code /reverseRenameId()/
 **** IN-PROGRESS Planifier le cours de BDD pour la rentrée
 - Mon cours de BDD démarre vers le 7 septembre
 - J'ai accès aux cours et documents des années précédentes
@@ -11855,7 +11856,14 @@ nbOpes,type,size,nbRenamingBots
   - De la gestion des opés d'insertion concurrente à un renommage
 - En faire pour présenter et expliquer le cas avec des renommages concurrents
 **** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
-**** TODO Écrire en pseudo-code /reverseRenameId()/
+**** TODO Débugger /reverseRenameIdGreaterThanNewLastId()/
+- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
+- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
+- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
+- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
+- /reverseRenameId(newId)/ renvoie /newId/
+- On a donc /reverseRenameId(renameId(id)) != id/
+- Détecter et gérer ce cas
 *** Done
 - Mettre à jour le pseudo-code de /renameId()/
   - Je me suis inspiré du rework que j'ai fait pour /renameIds()/
@@ -11867,6 +11875,18 @@ nbOpes,type,size,nbRenamingBots
   - Je devrais utiliser une fonction pour simplifier la compréhension du code
   - Mais j'ai du mal à la concevoir
   - Pour le moment, je préfère laisser en l'état et avoir un pseudo-code proche du code
+- Écrire en pseudo-code /reverseRenameId()/
+  - J'ai décomposé le code de /reverseRenameId()/ en sous-fonctions afin de simplifier la lecture et compréhension
+    - Globalement de la même façon que j'avais découpé /renameId()/
+  - Je trouve le code highlighté dans le cadre de l'article plutôt élégant et compréhensible
+    - Càd le code du cas où /newFirstId < id < newLastId/ et que /isRenamedId(id) = false/
+  - J'ai mis le code correspondant aux autres cas en annexe
+  - Le principal problème que j'ai est un de mise en page
+  - Mes instructions sont trop longues et débordent sur la ligne suivante
+  - En modifiant le nom des variables, arrive à les faire tenir sur une ligne
+  - Reste juste les noms de fonctions à abréger
+  - Peut modifier /renameId()/ en /renId()/ et /reverseRenameId()/ en /revRenId()/
+  - Distinction de /getFirstOffset()/ et /getLastOffset()/ pour simplifier la lecture et compréhension
 - Planifier le cours de BDD pour la rentrée
   - Support 1
     - Titre
@@ -11900,6 +11920,18 @@ nbOpes,type,size,nbRenamingBots
       2. État après avoir ajouter l'epoch de l'opé de B et l'avoir identifier comme nouvelle epoch courante
       3. État après avoir annuler l'effet du renommage de A
       4. État après avoir appliquer l'effet du renommage de B
+- Réunion cours de Python
+  - 6h de CM
+  - 22h TD
+  - Cours et TPs inspirés de
+    - https://www.brianheinold.net/python/A_Practical_Introduction_to_Python_Programming_Heinold.pdf
+  - Évaluation
+    - 3 projets
+    - 1 DS
+  - Principale question est de savoir le scope du module
+    - Souhaiterait faire un peu d'objet et de programmation d'UI avec Tkinter
+    - Me paraît personnellement un peu trop ambitieux
+    - Recentrait le cours sur algo et un peu de structures de données
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
