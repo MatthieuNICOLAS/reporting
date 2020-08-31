@@ -11818,7 +11818,7 @@ nbOpes,type,size,nbRenamingBots
 *** Planned
 **** DONE Mettre à jour le pseudo-code de /renameId()/
 **** DONE Écrire en pseudo-code /reverseRenameId()/
-**** IN-PROGRESS Planifier le cours de BDD pour la rentrée
+**** DONE Planifier le cours de BDD pour la rentrée
 - Mon cours de BDD démarre vers le 7 septembre
 - J'ai accès aux cours et documents des années précédentes
 - Mais quelques soucis
@@ -11849,21 +11849,6 @@ nbOpes,type,size,nbRenamingBots
 - Je vais donc devoir passer du temps à refaire les supports et certains sujets
 - Définir le planning et le sujets des cours pour la rentrée
   - Mais j'aimerai bien avoir un emploi du temps au préalable pour savoir combien d'heures je dois préparer
-**** IN-PROGRESS Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
-- On a des figures pour présenter le fonctionnement
-  - De LS
-  - D'un renommage local avec RLS
-  - De la gestion des opés d'insertion concurrente à un renommage
-- En faire pour présenter et expliquer le cas avec des renommages concurrents
-**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
-**** TODO Débugger /reverseRenameIdGreaterThanNewLastId()/
-- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
-- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
-- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
-- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
-- /reverseRenameId(newId)/ renvoie /newId/
-- On a donc /reverseRenameId(renameId(id)) != id/
-- Détecter et gérer ce cas
 *** Done
 - Mettre à jour le pseudo-code de /renameId()/
   - Je me suis inspiré du rework que j'ai fait pour /renameIds()/
@@ -11888,7 +11873,7 @@ nbOpes,type,size,nbRenamingBots
   - Peut modifier /renameId()/ en /renId()/ et /reverseRenameId()/ en /revRenId()/
   - Distinction de /getFirstOffset()/ et /getLastOffset()/ pour simplifier la lecture et compréhension
 - Planifier le cours de BDD pour la rentrée
-  - Support 1
+  - Support 0
     - Titre
       - Introduction
     - Contenu
@@ -11898,13 +11883,58 @@ nbOpes,type,size,nbRenamingBots
       - Présentation du module
 	- Objectifs
 	- Syllabus
+	- Lien avec les autres modules
+	  - Projet tranversal I2S
       - Notion de BDDs
 	- Problématiques et besoins liés au stockage de données
 	- SGBD et ses fonctionnalités
-	- Types de SGBDs (relationnels, colonnes, documents, graphes)
-	- Tour d'horizon des SGBDs relationnelles
+	  - LDD
+	  - LMD
+	  - Partage des données
+	  - Confidentialité des données
+	  - Sécurité de fonctionnement
+      - Notion de conception de BDD
     - Estimation
       - 30min
+  - Support 1
+    - Titre
+      - Conception d'une base de données
+    - Contenu
+      - Rappel des différentes méthodes de conception et de notre choix d'utiliser des diagrammes de classes UML
+      - Introduction rapide UML
+      - Présentation diagramme de classes
+	- Classe
+	- Association
+	- Cardinalité
+      - Mise en lumière des différentes questions de conception
+      - Exemple/Exercice
+      - Cas spéciaux d'associations
+	- Classe d'association
+	- Hiérarchies de classes
+	- Agrégation / Composition
+	- Contraintes
+	- Associations n-aires
+      - Exemple/Exercice
+      - Patron de conception
+	- Ligne de commande
+	- Composite
+    - Estimation
+      - 2h
+  - TD 1
+    - Titre
+      - Conception d'une base de données
+    - Contenu
+      - Faudrait plusieurs énoncés décrivant un système dont on doit concevoir la BDD
+      - Reste par contre à voir comment on peut découper le TD pour avoir une progression et guider les étudiants étape par étape
+	- Pourrait commencer par décrire et faire modéliser des entités
+	- Puis introduire des relations entre ces entités
+      - Une question avec une relation ternaire serait cool à avoir
+      - Une autre avec une relation réflexive serait intéressante aussi
+    - Estimation
+      - 2h
+  - Ok j'ai enfin mon EDT pour la rentrée, j'ai 4h la 1ère semaine
+  - Donc ça devrait suffire comme contenu pour la 1ère semaine
+  - Y a plus qu'à
 - Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
   - En quoi pourrait consister ce schéma ?
   - Qu'est-ce qu'on veut illustrer avec ce schéma ?
@@ -11932,6 +11962,70 @@ nbOpes,type,size,nbRenamingBots
     - Souhaiterait faire un peu d'objet et de programmation d'UI avec Tkinter
     - Me paraît personnellement un peu trop ambitieux
     - Recentrait le cours sur algo et un peu de structures de données
+** Semaine du <2020-08-31 Mon> au <2020-09-04 Fri>
+*** Planned
+**** DONE Contacter Claude pour lui poser les différentes questions que j'ai sur le module de BDD
+- A-t-il un planning ou une feuille de route du module ?
+  - Pour savoir combien de temps consacrer à chaque notion/partie du module
+- Quels sont les liens entre le module de BDD et les autres modules ?
+  - J'ai noté qu'il servirait dans le cadre du projet tranversal I2S (si c'est bien ça l'intitulé)
+  - Mais y a-t-il d'autres modules où les étudiants auront besoin de concevoir/d'utiliser une BDD ?
+- Est-ce que les étudiants connaissent déjà UML ?
+  - Pour savoir à quel point j'insiste sur le formalisme
+- Comment le module est-il évalué ?
+  - Dans les cours disponibles sur Arche, mentionne un DS de 2h
+  - Est-ce que c'est aussi le cas pour les alternants ?
+  - Y a-t-il moyen de remplacer ça par un projet ?
+- Y a-t-il besoin d'imprimer les supports de cours et sujets de TDs pour les étudiants ?
+  - Ou ont-ils des machines à disposition pour y accéder ?
+**** IN-PROGRESS Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
+- On a des figures pour présenter le fonctionnement
+  - De LS
+  - D'un renommage local avec RLS
+  - De la gestion des opés d'insertion concurrente à un renommage
+- En faire pour présenter et expliquer le cas avec des renommages concurrents
+**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
+**** TODO Préparer le support de cours 0
+**** TODO Préparer le support de cours 1
+**** TODO Préparer le sujet de TD 1
+**** TODO Débugger /reverseRenameIdGreaterThanNewLastId()/
+- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
+- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
+- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
+- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
+- /reverseRenameId(newId)/ renvoie /newId/
+- On a donc /reverseRenameId(renameId(id)) != id/
+- Détecter et gérer ce cas
+*** Done
+- Contacter Claude pour lui poser les différentes questions que j'ai sur le module de BDD
+  - Mail envoyé, en l'attente d'une réponse
+  - J'ai eu une réponse
+    - Le planning est globalement le suivant
+      - Diagrammes de classes UML pour BD: 40% du temps, soit 2h de CM et 4h de TD
+      - Traduction UML vers relationnel: rapide, soit 1h de CM et 2h de TD
+      - Normalisation: 40% du temps, soit 2h de CM et 4h de TD
+      - Mise en place d'une BDD et SQL: rapide, soit 1h de CM et 2h de TD
+    - Le module de BD2 suit le module de BD1 et la majorité des étudiants utilisent une BD au cours du projet transversal II
+      - Me semblait que pour mon groupe, le module était la fusion de BD1 et de BD2
+      - Ah non on distingue bien les 2 modules
+      - Me faudra donc prendre du temps pour évaluer les étudiants sur les 18h qui correspondent à BD1
+    - Les étudiants n'ont pas vu UML dans le cadre d'un module précédent
+    - Pour l'évaluation, faisait
+      - Un DS de 2h
+	- Conception d'une BD
+	- Normalisation
+	- Algèbre relationnel (ou requêtes SQL?)
+	- Revoir les sujets précédents pour voir si j'oublie quelque chose
+      - Un TP noté
+	- Conception d'une BD
+	- Mise en place avec MySQL
+      - Ouais, faudra pas traîner pour avoir le temps de faire les 2 évaluations
+	- Même si le TP noté est facilement transformable en projet à la maison
+    - Pas besoin d'imprimer les documents
+  - Plus d'infos sur la formation que suivent les étudiants que j'aurais
+    - http://polytech-nancy.univ-lorraine.fr/sites/dev-esstin.univ-lorraine.fr/files/users/Ecole/Documents/plaquette_polytech_nancy_2019-20-light.pdf
+    - http://polytech-nancy.univ-lorraine.fr/sites/dev-esstin.univ-lorraine.fr/files/users/Formation/Documents/programme_des_etudes_specialite_2i_2019-2020.pdf
+    - http://polytech-nancy.univ-lorraine.fr/fr/cycle-ingenieur/internet-industriel-apprentissage
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
