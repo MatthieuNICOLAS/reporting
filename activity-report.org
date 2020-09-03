@@ -11978,6 +11978,8 @@ nbOpes,type,size,nbRenamingBots
   - Y a-t-il moyen de remplacer ça par un projet ?
 - Y a-t-il besoin d'imprimer les supports de cours et sujets de TDs pour les étudiants ?
   - Ou ont-ils des machines à disposition pour y accéder ?
+**** DONE Préparer le support de cours 0
+**** IN-PROGRESS Préparer le support de cours 1
 **** IN-PROGRESS Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
 - On a des figures pour présenter le fonctionnement
   - De LS
@@ -11985,8 +11987,6 @@ nbOpes,type,size,nbRenamingBots
   - De la gestion des opés d'insertion concurrente à un renommage
 - En faire pour présenter et expliquer le cas avec des renommages concurrents
 **** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
-**** TODO Préparer le support de cours 0
-**** TODO Préparer le support de cours 1
 **** TODO Préparer le sujet de TD 1
 **** TODO Débugger /reverseRenameIdGreaterThanNewLastId()/
 - J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
@@ -12026,6 +12026,183 @@ nbOpes,type,size,nbRenamingBots
     - http://polytech-nancy.univ-lorraine.fr/sites/dev-esstin.univ-lorraine.fr/files/users/Ecole/Documents/plaquette_polytech_nancy_2019-20-light.pdf
     - http://polytech-nancy.univ-lorraine.fr/sites/dev-esstin.univ-lorraine.fr/files/users/Formation/Documents/programme_des_etudes_specialite_2i_2019-2020.pdf
     - http://polytech-nancy.univ-lorraine.fr/fr/cycle-ingenieur/internet-industriel-apprentissage
+- Réunion SWIM
+  - Le but de la réunion est de faire le point avec Oscar et Gérald où en était l'implémentation de SWIM par Tom dans MUTE
+  - Préparation de la réunion
+    - Ressources disponibles
+      - Repo Git avec les ressources, notamment vidéo sur membership : https://github.com/MatthieuNICOLAS/2020-stage-membership
+      - Livre /Designing Data-Intensive Applications/ de Kleppmann
+      - Papier SWIM : http://www.cs.cornell.edu/info/projects/spinglass/public_pdfs/SWIM.pdf
+      - Rapport de stage de Tom : https://github.com/TomMendez/Stage_LORIA_MendezTom_2020/blob/master/Rapport_de_stage_Tom_MendezPorcel_LORIA.pdf
+    - Point sur le stage de Tom
+      - MUTE
+	- Décomposable en 3 couches
+	  - UI
+	    - Correspond à /mute/
+	    - Glue entre les différents composants de MUTE
+	    - Et interface graphique pour interagir avec
+	  - Coeur
+	    - /mute-core/
+	    - Rassemble les données répliquées par chaque pair
+	      - Document, Collaborator...
+	  - Couche réseau
+	    - /netflux/
+	- Problème actuel
+	  - Couche réseau n'est plus maintenue
+	    - L'ingénieur qui développait la couche réseau n'est plus dans l'équipe
+	  - Construite sur l'API WebRTC pour faire du pair-à-pair
+	  - Mais elle était assez instable à l'époque, notamment par rapport à l'implem des navigateurs qui avaient des comportements différents
+	  - Au final, une couche qu'on ne maitrise plus et qui présente des bugs
+	- Souhaite la remplacer
+	  - Y a des projets similaires qui ont dev et qui maintiennent leur couche réseau
+	    - Dat
+	      - https://github.com/hyperswarm/hyperswarm
+	      - https://docs.yjs.dev/ecosystem/connection-provider/y-hyper
+	    - IPFS
+	      - https://libp2p.io/
+	- Mais on a un couplage entre la couche réseau et le coeur
+	- Notamment, c'est la couche réseau qui fournit la liste des collaborateurs à l'application
+      - SWIM : Scalable Weakly-consistent Infection-style Process Group Membership Protocol
+	- S'agit d'un protocole de membership (gestion de groupe) pair-à-pair
+	- Permet à un pair de lister les autres pairs disponibles actuellement
+	- Fonctionne par rounds
+	- Chaque round, chaque pair choisit aléatoirement un autre pair de la liste et le /ping/
+	- Si reçoit une réponse /ack/, Ok, attend sagement le prochain round
+	- Si pas de réponse, contacte d'autres pairs en utilisant le message /ping-req/ pour leur demander de /ping/ le pair ne répondant plus
+	- S'ils reçoivent une réponse, Ok, fausse alerte
+	- Si pas de réponse dans le temps imparti, pair est déclaré /suspect/
+	- Le pair /suspect/ a un délai pour se déclarer /alive/ s'il est toujours présent
+	- Sinon il est déclaré comme /dead/ par les autres pairs et retiré de la liste
+	- Ça c'est pour la partie détection de failures (pannes)
+	- SWIM permet aux pairs de propager les informations du groupe en les ajoutant aux messages /ping/, /ack/, /ping-req/
+      - Tom a réalisé une application prototype pour tester une implémentation du protocole SWIM : https://github.com/TomMendez/Stage_LORIA_MendezTom_2020/tree/master/code/prototype
+      - Puis a entrepris l'implémentation dans MUTE
+	- A travaillé majoritairement dans /mute-core/, branche /feature/swim-integration/
+	  - Refonte de *CollaboratorService*
+	  - Implémentation des structures de données de SWIM
+	  - Implémentation du protocole
+	- Et un peu dans /mute/
+	  - Suppression de liens entre *CollaboratorService* et la couche réseau
+	  - MàJ des liens entre *CollaboratorService* l'interface graphique
+	  - Pas l'air d'être pushée, je vais voir pour corriger ça
+      - Ce qui reste à faire : majoritairement de l'intégration
+	- Vérifier le mécanisme de /join/
+	  - Pas précisé dans le papier comment un pair rejoint le réseau
+	  - Donc on a mis en place le mécanisme suivant
+	  - Quand un noeud est seul, envoie périodiquement le message /data-request/ pour qu'un pair lui donne la liste des collaborateurs
+	  - Puis bascule ensuite sur le protocole SWIM
+	  - Si pair vient à se retrouver de nouveau seul, rebascule sur l'envoi périodique de /data-request/
+	  - Pas sûr de comment le /data-update/ est géré
+	    - Fusion de l'état ou simple remplacement ?
+	    - Si remplacement, peut s'avérer problématique
+	- Vérifier le mécanisme de /piggyback/
+	  - Me semble qu'on a un bug avec les events qui sont propagés à l'infini
+	  - Alors qu'il devrait être propagé par chaque noeud un nombre limité de fois
+	  - Peut se retrouver à voir des noeuds déconnectés depuis longtemps car ils sont "rappelés" par les autres noeuds
+        - Étudier la possibilité de conserver l'id malgré un /Confirm id/
+	  - On utilise /muteCoreId/ pour identifier les pairs
+	  - Cet id est conservé par un pair d'une session à l'autre
+	  - Par contre, dans le protocole, les ids sont jetables
+	  - D'où la priorité de /Confirm id/ sur tous les autres messages notamment /Alive id/
+	  - Le pair est censé changer d'id à ce moment là
+	  - Nous on voulait overrider /Confirm id incarn/ par un /Alive id incarn+1/ ou /Join id incarn+1/
+	  - Vérifier qu'on introduit pas un bug
+	- Supprimer l'utilisation de /networkId/ dans /mute-core/
+	  - Finalement, /mute-core/ est encore couplé à la couche réseau
+	  - Car utilise les /networkIds/ pour router les messages
+	  - Besoin d'une refonte de /mute-core/ et de la glue entre /mute/ et /netflux/ pour s'en débarrasser
+  - Notes réunion
+    - Feuille de route
+      - Reprendre les tests unitaires que Tom avait réalisé dans son prototype
+	- https://github.com/TomMendez/Stage_LORIA_MendezTom_2020/blob/master/code/prototype/test/app.test.ts
+      - Et les intégrer dans /mute-core/
+	- Probablement besoin de les adapter car y a eu des changements de structures de données et d'API qui ont été fait pour correspondre à l'existant de /mute-core/ (archi, protobuf)
+      - Permettra de voir l'état actuel de l'implémentation, de détecter potentiellement des bugs et d'améliorer la robustesse du code
+	- Illustrera p-e le bug du /piggyback/ et de la priorité entre les messages
+- Réunion papier
+  - Le but de la réunion est de faire le point sur les résultats obtenus cet été, le draft du papier et se mettre d'accord sur la suite des évènements
+  - Préparation de la réunion
+    - A fait tourner 20 simulations pour chaque valeur de /nbRenamingBots/ : de 0 à 4
+    - Dans les résultats obtenus, a observé qu'une seule divergence
+      - Un noeud sur les 10 obtenait un résultat différent des autres
+      - En investigant, découvert qu'il s'agissait d'un bug non pas du renommage mais de l'arbre
+      - S'agissait d'un problème de la fonction d'append qu'on avait rencontré et corrigé dans /master/, mais que je n'avais pas fusionné dans ma branche
+      - En fusionnant les commits dans ma branche, corrige le bug
+    - Donc pas de divergence constaté liée au mécanisme de renommage
+    - J'ai aussi validé que les simulations effectuées respectaient les contraintes posées
+      - On a bien /nbRenamingBots/ opérations concurrentes de renommage à chaque étape
+    - Évaluation de la consommation mémoire
+      - J'ai voulu comparer la consommation mémoire de RLS en fonction de /nbRenamingBots/
+      - Réalisation d'un graphique par valeur de /nbRenamingBots/
+      - Les valeurs de /content/ et de /LS/ servent de point de comparaison
+	- Meilleure façon de présenter cela ?
+      - Observe que /RLS with GC/ n'est pas affectée par /nbRenamingBots/
+      - Tandis que /RLS w/o GC/ augmente au fur et à mesure
+      - Correspond aux résultats attendus
+	- L'augmentation de /nbRenamingBots/ implique une augmentation du nombre de /former states/ que les noeuds doivent conserver pour transformer d'éventuelles futures opérations
+	- Une fois les opérations de renommage causalement stables, peut supprimer ces /former states/
+	- Donc finalement, pas d'influence dans le meilleur scénario
+	- Au contraire, l'overhead mémoire augmente avec le nombre de /former states/ dans le cas où l'on peut pas les GC
+      - Peut toujours offload les /former states/ sur le disque pour limiter l'impact de ce cas de figure
+    - Évaluation des performances des opérations d'insertions
+      - J'ai ré-effectué mes mesures de perfs sur les opérations d'insertion
+      - Observe pas de différences pour le temps d'insertion des opérations /local/ et /remote/ de /LS/ et de /RLS/
+      - Observe une augmentation du temps d'inté des opérations /remote/ provenant de l'epoch précédente
+	- S'explique par ma refonte du code
+	  - Auparavant j'avais une fonction /renameIdInterval()/
+	  - Mais plus à jour depuis que j'avais retravaillé /renameId()/ pour rendre réciproques /renameId()/ et /reverseRenameId()/
+	  - Pour simplifier le code et sa maintenance, j'ai supprimé /renameIdInterval()/
+	  - Travaille donc sur la liste des identifiants au lieu de la liste des blocs
+	- Résultats obtenus restent meilleurs que ceux de /LS/
+      - Nouvelle mesure : temps d'inté des opérations /remote/ provenant d'epochs concurrentes
+	- Implique un overhead par rapport au cas des opérations /remote/ provenant de l'epoch précédente
+	  - Puisqu'on doit annuler l'effet du renommage précédent au préalable
+	- Se traduit bien dans les résultats obtenus
+	- Au final, résultats comparables à ceux de LS dans ce "pire" cas
+      - Par contre, n'a pas mesuré l'évolution du temps d'inté en fonction du nombre d'epochs de distance
+	- Toujours fait des mesures où la distance en epochs est minimale
+	- Mais peut inférer des mesures présentés
+	  - Calcul de l'overhead de /renameId()/
+	  - Calcul de l'overhead de /reverseRenameId()/
+    - Évaluation des performances des opérations de renommage
+      - Au lieu d'évaluer le coût de renommer par pas de 10k opés, évalue par pas de 30k
+      - On retrouve le temps d'inté de l'opé en /local/, pas de diff avec la version de PaPoC
+      - Les temps d'inté de l'opé en /remote/ ont augmenté
+	- Passage de /renameIdInterval()/ à /renameId()/
+	- J'ai bossé un peu dessus pour améliorer les perfs, notamment en modifiant la fonction de recherche du prédecesseur
+	  - Avant, recherche dichotomique pour chaque id
+	  - Alors qu'on parcourt 2 listes triées avec potentiellement un grand nombre d'élément en commun
+	  - Maintenant, parcourt les 2 listes de manière parallèle
+      - Constate toujours qu'on est dans l'ordre de centaines de ms, atteint rapidement 1s (60k opés)
+      - 2 nouvelles mesures spécifiques aux renommages concurrents
+      - Temps d'inté d'une opération de renommage concurrente et prioritaire
+	- Implique un overhead car nécessite d'annuler l'effet du renommage qu'on vient d'appliquer
+	- Se retrouve dans les résultats obtenus
+	- Je savais que l'inversion du renommage était plus efficace que le renommage
+	- Mais tout de même surpris par les performances
+	- Un overhead de "seulement" 10%
+      - Temps d'inté d'une opération de renommage concurrente mais non-prioritaire
+	- Se contente d'ajouter le /former state/ à la structure de données
+	- Négligeable
+	- On veut que toutes les opés de renommages soient non-prioritaires
+	- En fait, ces mesures sont incomplètes
+	- On ne mesure pas en effet le coût de sérialisation et de désérialisation des opés
+	- Qui ne doit pas être négligeable vu la taille des données transférées
+      - Ne voit pas comment mieux présenter ces résultats
+      - Mais le rapport entre les différentes échelles n'est pas terrible
+    - Concernant le reste du papier, plusieurs problèmes restants
+      - Faire apparaître les epochs sur les différents états
+	- Pas trouvé de représentation simple et légère
+	- Nécessaire pour un schéma du processus de /reverseRenameId()/
+      - Fonctions de transformations
+	- Pas confiant des modifs que j'ai faite pour avoir /reverseRenameId(renameId(id)) = id/
+	  - Déjà pour une opération de renommage donnée
+	  - Mais alors pour des opérations de renommages concurrentes
+	- Et dans un sens, je me donne raison
+	- Trouvé un cas qui n'était pas géré en ré-écrivant les fonctions en pseudo-code
+	  - /revRenIdGreaterThanNewLastId(renIdGreaterThanLastId(id)) != id/ pour /id/ tel que /lastId < id < newLastId/
+	- J'ai pas encore trouvé et implémenté de solution pour ce cas là
+	- Y en a p-e d'autres
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
