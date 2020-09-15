@@ -11979,23 +11979,6 @@ nbOpes,type,size,nbRenamingBots
 - Y a-t-il besoin d'imprimer les supports de cours et sujets de TDs pour les étudiants ?
   - Ou ont-ils des machines à disposition pour y accéder ?
 **** DONE Préparer le support de cours 0
-**** IN-PROGRESS Préparer le support de cours 1
-**** IN-PROGRESS Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
-- On a des figures pour présenter le fonctionnement
-  - De LS
-  - D'un renommage local avec RLS
-  - De la gestion des opés d'insertion concurrente à un renommage
-- En faire pour présenter et expliquer le cas avec des renommages concurrents
-**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
-**** TODO Préparer le sujet de TD 1
-**** TODO Débugger /reverseRenameIdGreaterThanNewLastId()/
-- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
-- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
-- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
-- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
-- /reverseRenameId(newId)/ renvoie /newId/
-- On a donc /reverseRenameId(renameId(id)) != id/
-- Détecter et gérer ce cas
 *** Done
 - Contacter Claude pour lui poser les différentes questions que j'ai sur le module de BDD
   - Mail envoyé, en l'attente d'une réponse
@@ -12203,6 +12186,211 @@ nbOpes,type,size,nbRenamingBots
 	  - /revRenIdGreaterThanNewLastId(renIdGreaterThanLastId(id)) != id/ pour /id/ tel que /lastId < id < newLastId/
 	- J'ai pas encore trouvé et implémenté de solution pour ce cas là
 	- Y en a p-e d'autres
+  - Notes réunion
+    - Plan du papier
+      - Peut faire sauter la section *4.2 Dealing with concurrent simple updates*
+	- Pas importante pour la compréhension du reste du papier
+	- Pas le focus tout simplement
+	- Peut simplement référencer le papier de PaPoC pour dire que c'est géré
+    - Deadline
+      - Fin septembre/mi octobre
+      - Les deadlines des confs sont en automne
+- Notes sur *Are CRDTs suitable for shared editing?*
+  - Blogpost sur l'utilisation de CRDTs pour l'édition collaborative
+    - Disponible ici https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/
+    - S'agit +/- d'une réponse à des commentaires faits par des devs d'éditeurs de texte
+      #+BEGIN_QUOTE
+[..] the cost of such a representation is significant, and in
+the end, I judged the requirement for converging positions
+to be too obscure to justify that level of extra complexity and memory use.
+      #+END_QUOTE
+      #+BEGIN_QUOTE
+[..] CRDT is not pulling its (considerable) weight.
+      #+END_QUOTE
+    - Veut montrer qu'il y a un intérêt
+    - Benchmark de l'implémentation du Sequence-CRDT *YATA CRDT* disponible dans Y.js
+      - Présenté ici https://www.researchgate.net/publication/310212186_Near_Real-Time_Peer-to-Peer_Shared_Editing_on_Extensible_Data_Types
+    - A l'air d'être une variante de RGA, à creuser
+    - Introduit une notion de blocs
+      - Inspirée par https://coek.info/pdf-a-string-wise-crdt-algorithm-for-smart-and-large-scale-collaborative-editing-sys.html
+    - Évalue ses performances
+      - Possède une suite de benchmarks pour tester différents scénarios
+	- https://github.com/dmonad/crdt-benchmarks
+      - Argue qu'un CRDT doit obtenir des bonnes performances dans tous les scénarios d'utilisation possible (append, prepend)
+	- Un peu mitigé par rapport à cette volonté
+	- Certains patterns d'édition collaborative me paraissent rares (prepend-only)
+	- Autant je suis d'accord qu'il ne faut pas avoir des performances dégueulasses non-plus
+	- Autant je pense qu'on ne peut pas avoir de solution universelle et qu'il vaut mieux privilégier les scénarios d'utilisations
+	  - Surtout si ça permet de retirer une couche de complexité qui a l'air d'être d'une des raisons pour la non-adoption de CRDTs
+      - Évalue le temps de chargement d'un document
+	- Correspond au /parseTime/
+	- Y a une notion de /encoded document/
+	  - Serait intéressant de se pencher sur ce que ça signifie
+	  - Et le procédé utilisé
+	- Indique qu'il s'agit selon lui de la mesure la plus importante car bloquante
+	  - Ça se tient
+	- Mais nous on ne mesure pas cette stat
+	- Et notre implémentation ne fait pas particulièrement d'effort sur ce point
+	- Piste d'amélioration
+      -
+- Préparer le support de cours 1
+  - Il faudra que je contacte Claude pour une question sur les opérations dans le diagramme de classes
+    - Autant dans le cadre de la conception objet, l'intérêt des opérations me paraît évident pour faire apparaître le rôle et les responsabilités d'une entité
+    - Autant dans le cadre de la conception d'une BD, je ne vois pas
+    - À part pour déterminer si certaines infos sont stockées ou calculées
+      - Exemple de l'âge comme attribut ou opération
+    - Claude précise dans ses slides que dans le cas de la conception de BD, se concentre sur les données donc attributs et associations
+    - Mais note tout de même des opérations dans le cas dirigé
+** Semaine du <2020-09-07 Mon> au <2020-09-11 Fri>
+*** Planned
+**** DONE Préparer le support de cours 1
+**** DONE Préparer le sujet de TD 1
+**** DONE Mettre en place le module Arche pour mon cours de BD
+**** DONE Préparer le support de cours 2
+- Beaucoup des étudiants ont déjà fait de la BD au cours de leur formation précédente
+- J'ai peur que le TD1 ne tienne pas les 2h de la séance de <2020-09-09 Wed>
+- Faudrait préparer les slides supplémentaires que j'avais scrappé du 1er cours
+  - Réflexions sur classes, attributs et associations
+  - Classes d'associations
+  - Contraintes
+  - Associations n-aires
+  - Hiérarchie de classes
+  - Agrégation
+  - Composition
+  - Exemple combinaison de hiéarchie de classes et compositions avec le design pattern composite
+  - Patron de conception
+    - Ligne de commande
+      - Il a un meilleur nom ?
+    - Composite
+      - Trouver d'autres exemples par contre
+      - L'exemple du compte bancaire me parle difficilement
+**** DONE Rédiger section sur /priority/
+**** DONE Préparer le sujet de TD 2
+- Porterait sur les nouvelles notions introduites dans le CM2
+- Faudrait un exercice sur les associations n-aires
+  - J'aime bien l'exemple du ciné, reste à en trouver un autre
+- Faudrait un exercice sur la hiérarchie de classes
+  - Le schéma conceptuel proposé dans l'exercice 5 du TP1 de TN est plutôt cool dans le genre
+  - Faudrait juste écrire un énoncé y menant
+*** Done
+- Préparer le support de cours 1
+  - Par rapport au cours de Claude, j'ai retiré les slides concernant les cas d'associations spéciaux et autres
+  - Je préfère déjà faire une séance de TD pour travailler les bases et les amener à réfléchir sur ces questions
+  - Pourrait réutiliser les exemples vus en TD
+- Préparer le sujet de TD 1
+  - Peut proposer 4 exercices
+    1. Bibliothèque
+       - Peut utiliser cet exo pour une introduction simple
+       - Peut utiliser cet exo pour faire réfléchir sur les associations avec attribut
+	 - Un emprunt possède une date limite de retour
+    2. Tennis
+       - Difficulté peut venir des associations multiples entre *Joueur* et *Match*
+       - Peut utiliser cet exo pour faire réfléchir sur les contraintes d'intégrité
+	 - Gagnant doit appartenir à participants
+	 - Terrain ne doit être reservé qu'une fois à un créneau donné
+	 - Joueur ne peut participer qu'à un match à la fois
+    3. Vente par Correspondance
+       - Peut demander de reprendre l'exemple du cours, mais en permettant maintenant les commandes de comporter plusieurs produits
+       - Permet de faire réfléchir au design pattern Entité/PartieEntité
+    4. Twitch
+       - Peut essayer un autre format d'énoncé
+       - Plutôt que de décrire les données, décrit les fonctionnalités
+       - Et c'est aux étudiants ensuite de proposer un schéma conceptuel
+       - À la réflexion, je me demande ce que cet exercice apporte
+       - Il permet aux étudiants de continuer de s'entraîner
+       - Mais il ne permet d'introduire/d'entrevoir une nouvelle notion
+       - Le retire pour le moment
+- Préparer le support de cours 2
+  - Les patrons de conception en matière de conception de schéma de BD ont l'air bien moins référencés/compilés que ne peuvent l'être leur équivalent en COO
+  - À moins que je sois passé à côté
+  - Faudrait demander à Claude s'il peut m'indiquer des ressources sur le sujet
+  - Tant que j'y suis, faudrait que je lui demande aussi pour les contraintes d'intégration
+    - On modélise bien ça avec des notes en UML ?
+    - Comment on pourrait représenter des contraintes d'unicité temporelle ? Genre un joueur ne peut participer qu'à un match à un moment donné
+- Rédiger section sur /priority/
+  - Je n'arrive pas à créer un fil cohérent pour cette section
+  - J'ai envie d'introduire la notion de /epochs tree/
+  - Car j'en ai besoin pour définir la relation /priority/
+    - Puisque j'utilise la position de l'epoch dans l'arbre pour la désigner comme /primary/
+  - Et m'en servirai dans la section suivante pour parler de l'inversion du renommage
+    - Besoin de la notion de /Lowest-Common Ancestor/
+  - Mais en soit, pour définir /priority/, pas besoin de l'arbre
+  - Juste d'un ordre total entre les epochs
+  - J'ai pas forcément besoin que l'/epochs tree/ converge
+    - En fonction de /priority/, l'ordre des siblings peut ne pas avoir d'importance
+  - Ouais en fait, peut me passer de l'arbre dans cette section
+  - Je pourrais simplement expliquer qu'on définit un ordre total entre les /epochs/ à partir de l'ordre lexicographique
+  - Et introduire l'arbre au moment de parler d'inversion du renommage
+** Semaine du <2020-09-14 Mon> au <2020-09-18 Fri>
+*** Planned
+**** DONE Contacter Claude par rapport aux questions soulevées au cours du TD1
+- Comment peut-on exprimer une cardinalité /x ou y/ en UML ?
+  - Sait exprimer une cardinalité exactement /x/, une cardinalité range de /x/ à /y/
+  - Mais on n'a pas trouvé comment exprimer /x ou y/
+  - Est-ce possible ?
+- Peut-on avoir des attributs à NULL dans le schéma conceptuel ?
+  - J'étais en train de préparer un exercice où des locataires effectuent des locations d'appartement
+  - J'aurai bien aimé mettre la date de fin de location en attribut de l'entité Location
+  - Mais on ne connaît pas initialement cette date
+- La notion de design pattern en BD
+  - Je n'ai pas réussi à retrouver des ressources concernant les patrons de conception pour les schémas conceptuels
+  - En as-tu quelques unes à recommander ?
+  - Ou est-ce moins documenté qu'en conception orientée objet ?
+**** DONE Préparer le support de cours 3
+- Schéma relationnel
+- Passer du diagramme de classe au schéma relationnel ?
+- Normalisation ?
+**** DONE Préparer le sujet de TD 3
+- Porte sur la convertion d'un schéma conceptuel vers schéma relationnel
+- 3 exercices qui me paraissent intéressants
+  - Bibliothèque
+  - Vente par correspondance
+  - Cinéma
+**** IN-PROGRESS Jeter un oeil au CM1 d'algo
+- Charles m'a envoyé y a déjà un petit moment un 1er jet pour le CM1
+- Faudrait que je prenne le temps de regarder ça et de lui faire des éventuels retours
+**** IN-PROGRESS Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
+- On a des figures pour présenter le fonctionnement
+  - De LS
+  - D'un renommage local avec RLS
+  - De la gestion des opés d'insertion concurrente à un renommage
+- En faire pour présenter et expliquer le cas avec des renommages concurrents
+**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
+**** TODO Débugger /reverseRenameIdGreaterThanNewLastId()/
+- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
+- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
+- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
+- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
+- /reverseRenameId(newId)/ renvoie /newId/
+- On a donc /reverseRenameId(renameId(id)) != id/
+- Détecter et gérer ce cas
+*** Done
+- Jeter un oeil au CM1 d'algo
+  - Section 2
+    - Tu mentionnes les règles de nommage pour les variables
+    - Y a-t-il une convention typographique en Python ?
+      - Genre snake case ?
+      - Dans ce cas, l'indiquer et montrer un exemple pourrait être utile
+  - Section 4
+    - La consigne de l'exercice ne me paraît pas clair
+    - Tu parles de "assigner" à /pseudo/, sauf que tu utilises "assigner" pour parler d'affectation auparavant
+  - Section 5
+    - Pareil, j'ai du mal à comprendre l'exercice
+    - Dans le sens où, à quoi servent /borne_inf/ et /borne_sup/ ?
+    - À part personnaliser l'affichage ?
+  - Section 6
+    -
+  - Section 8
+    - Est-ce qu'ils connaissent l'algèbre booléen ?
+    - Une table de vérité des différents opérateurs logiques pourrait leur être utile si ce n'est pas le cas
+- Préparer le support de cours 3
+  - J'ai du mal à déterminer l'ordre dans lequel agencer le cours
+  - D'après les slides de Claude et de Malika, parle déjà de schéma relationnel et de normalisation
+  - Avant de parler de comment passer du schéma conceptuel au schéma relationnel
+  - Définit une clé étrangère comme une clé candidate d'une autre relation
+    - Pourquoi candidate et non pas primaire ?
+    - À quel moment on veut une clé candidate qui n'est pas la primaire ?
+  - Finalement, pour des contraintes de temps, laisse la normalisation pour le cours suivant
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
@@ -12332,7 +12520,7 @@ nbOpes,type,size,nbRenamingBots
 - Lors d'un split, un bloc est coupé en deux et un nouveau bloc est inséré au milieu
 - Après la suppression du bloc inséré, on pourrait fusionner les deux parties du bloc initial pour le recréer
 - Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
-** TODO CRDT : Lire *Kaleido*
+** TODO [#B] CRDT : Lire *Kaleido*
 * Commandes utiles
 - Obtenir la taille d'un dossier
   - /du -h -d 0 <path>/
