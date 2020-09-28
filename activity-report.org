@@ -12346,24 +12346,16 @@ to be too obscure to justify that level of extra complexity and memory use.
   - Bibliothèque
   - Vente par correspondance
   - Cinéma
-**** IN-PROGRESS Jeter un oeil au CM1 d'algo
+**** DONE Préparer le sujet de cours 4
+- Normalisation
+**** DONE Jeter un oeil au CM1 d'algo
 - Charles m'a envoyé y a déjà un petit moment un 1er jet pour le CM1
 - Faudrait que je prenne le temps de regarder ça et de lui faire des éventuels retours
-**** IN-PROGRESS Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
-- On a des figures pour présenter le fonctionnement
-  - De LS
-  - D'un renommage local avec RLS
-  - De la gestion des opés d'insertion concurrente à un renommage
-- En faire pour présenter et expliquer le cas avec des renommages concurrents
-**** IN-PROGRESS Faire la procédure d'inscription en 4ème année de doctorat
-**** TODO Débugger /reverseRenameIdGreaterThanNewLastId()/
-- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
-- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
-- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
-- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
-- /reverseRenameId(newId)/ renvoie /newId/
-- On a donc /reverseRenameId(renameId(id)) != id/
-- Détecter et gérer ce cas
+**** DONE Préparer le sujet de TD noté
+- Me faudrait 2-3 exercices de réalisation de schéma conceptuel
+  - Agence de super-héros
+  - Pokemon ?
+  - Médiathèque ?
 *** Done
 - Jeter un oeil au CM1 d'algo
   - Section 2
@@ -12379,10 +12371,29 @@ to be too obscure to justify that level of extra complexity and memory use.
     - Dans le sens où, à quoi servent /borne_inf/ et /borne_sup/ ?
     - À part personnaliser l'affichage ?
   - Section 6
-    -
+    - La phrase "une boucle peut contenir des variables" ne me paraît pas très claire
+      - Tu veux parler de l'itérateur ?
+      - Ou tu veux dire qu'on peut créer une variable dans la boucle ?
+      - Dans ce cas, modifier l'exemple pour faire apparaître explicitement une variable me paraît mieux
   - Section 8
     - Est-ce qu'ils connaissent l'algèbre booléen ?
     - Une table de vérité des différents opérateurs logiques pourrait leur être utile si ce n'est pas le cas
+  - Section 10
+    - De mémoire, les étudiants ont généralement du mal avec la notion de tableaux à plusieurs dimensions
+  - Remarques globales
+    - J'ai un peu de mal avec l'ordre des sections
+    - Par exemple, je considère les boucles plus complexes que les structures conditionnelles
+    - Ça me paraît plus cohérent dans la courbe de progression de voir déjà les structures conditionnelles avant d'aborder les boucles
+      - Surtout que les boucles finalement repose sur une condition pour savoir jusqu'à quand boucler
+    - Pareil, la section sur les fonctions me paraît bien tardive
+      - Me paraît importante car élément indispensable pour pouvoir décomposer notre tâche en plusieurs sous-tâches plus simples à aborder/effectuer
+  - J'ai directement été voir Charles pour en discuter avec lui
+  - Il va faire quelques modifs par rapport à mes retours normalement
+  - On est toujours dans le flou par rapport au début du module
+  - Normalement ça commence la semaine du <2020-09-28 Mon>
+  - Mais pas de confirm
+  - On verra d'ici là pour préparer les TPs
+  - Consiste en une liste d'exercices tirés du livre *A Pratical Introduction*
 - Préparer le support de cours 3
   - J'ai du mal à déterminer l'ordre dans lequel agencer le cours
   - D'après les slides de Claude et de Malika, parle déjà de schéma relationnel et de normalisation
@@ -12391,6 +12402,103 @@ to be too obscure to justify that level of extra complexity and memory use.
     - Pourquoi candidate et non pas primaire ?
     - À quel moment on veut une clé candidate qui n'est pas la primaire ?
   - Finalement, pour des contraintes de temps, laisse la normalisation pour le cours suivant
+- Préparer le support de cours 4
+  - Le cours de Claude allait jusqu'à la forme normale Boyce-Codd
+  - Et mentionnait la 4NF
+  - Me paraît pas nécessaire d'aller jusque là
+  - Vais arrêter le cours de normalisation à la 3NF
+  - Et mentionner les autres
+  - Ajout d'une mention de la dénormalisation
+    - Pourquoi ?
+    - Comment ?
+    - Quand ?
+- Faire la procédure d'inscription en 4ème année de doctorat
+** Semaine du <2020-09-21 Mon> au <2020-09-25 Fri>
+*** Planned
+**** DONE Préparer le sujet de TD 4
+- Normalisation
+- 3 exercices me paraît un bon nombre
+  - 2 vus en cours, un 3ème à la maison pour ceux qui veulent pousser
+**** DONE Rédiger titre, résumé de la thèse et liste des publications
+**** DONE Rédiger plan détaillé du manuscrit
+**** DONE Préparer le support de cours 5
+**** DONE Faire la procédure d'inscription en 4ème année de doctorat
+- Liste des pièces à fournir
+  - http://doctorat.univ-lorraine.fr/sites/default/files/user/etre-doctorant/r%C3%A9inscription/3bPi%C3%A8ces%20%C3%A0%20fournir%20r%C3%A9inscription%20d%C3%A9rogatoire%2024072020.pdf
+  - [X] Feuillet scientifique signé par directeurs de thèse et labo
+  - [X] Lettre du directeur de thèse (état avancement, raisons retard, date de soutenance prévue)
+  - [X] Lettre de motivation du doctorant (raisons retard)
+  - [X] Titre et résumé de la thèse
+  - [X] Rapport et avis du comité de suivi individuel
+  - [X] Plan de thèse détaillé avec quantification du travail effectué/restant à faire
+  - [X] Liste des publications
+    - Sous quel format ?
+  - [X] Convention individuelle de formation signé par directeur de thèse
+  - [X] Formulaire RGPD
+  - [X] Attestation d'assurance "responsabilité civile - vie privée"
+*** Done
+- Rédiger plan détaillé du manuscrit
+  - Est-ce que ça vaut vraiment le coup de distinguer la version centralisée de RLS de la version distribuée ?
+    - Quelques différences entres les deux
+      - Propriétés à respecter
+      - Algorithme de /renameId()/
+      - Conditions pour GC les anciens états
+  - Mais est-ce que ça ne fait pas trop remplissage ?
+    - Vraiment besoin de présenter l'évaluation de RLS en centralisé ?
+      - Qu'est-ce que ça apporte par rapport à l'évaluation de la version distribué ?
+  - Dans ce cas, comment retravailler le plan ?
+  - J'ai du mal à déterminer où parler des /related work/
+    - Dans l'état de l'art ?
+    - Ou après la proposition ?
+- Rédiger titre, résumé de la thèse et liste des publications
+  - Ajout du titre et du résumé au manuscrit
+  - Ajout des publications
+    - Middleware
+    - PaPoC'20
+- Préparer le sujet de TD 4
+  - L'exercice 1 du TD2 de TN est intéressant
+    - Définition de clés, identification des FNs, décomposition en 3FN
+  - L'exercice 1 du TD /norm/ de Polytech me paraît aussi intéressant
+    - Identification des redondances, identifications des DFs, déduction de clé, identifications des FNs, décompostion en 3FN
+  - L'exercice 2 du TD /norm/ de Polytech est cool aussi
+    - Permet de rapidement travailler les notions du cours
+    - Me paraît pas mal comme exercie introductif
+    - Juste p-e retravailler les exemples autour de *Employe* qui me paraissent pas super clairs
+  - Peut faire la sélection suivante
+    - Exo 2 du TD /norm/ de Polytech
+    - Exo 1 du TD /norm/ de Polytech
+    - Exo 1 du TD2 de TN
+- Préparer le support de cours 5
+  - Porte sur l'algèbre relationnelle
+  - Dans le cours de Claude, mentionne et catégorise les 8 opérateurs
+  - Va un peu plus loin dans le cours de Malika
+    - Parle de *Calcul Relationnel de Tuples (CRT)*
+    - À voir si ça aurait une quelconque utilité de l'ajouter
+  - Par contre, le cours de Malika mentionne que l'algèbre relationnelle est un *langage déclaratif*
+  - Me paraît intéressant de retenir cet élément pour expliquer la liberté que possède le SGBD pour optimiser les requêtes
+    - Sans que ça casse les applications d'une mise à jour à l'autre
+  - Alors j'ai rajouté quelques slides sur les jointures externes
+    - Par contre, aucune idée de à quel point ça peut être utiliser dans le monde véritable
+    - ça serait cool d'avoir des retours là-dessus
+** Semaine du <2020-09-28 Mon> au <2020-10-02 Fri>
+*** Planned
+**** IN-PROGRESS Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
+- On a des figures pour présenter le fonctionnement
+  - De LS
+  - D'un renommage local avec RLS
+  - De la gestion des opés d'insertion concurrente à un renommage
+- En faire pour présenter et expliquer le cas avec des renommages concurrents
+**** TODO Préparer sujet de TD5
+**** TODO Préparer sujet de partiel de BD1
+**** TODO Débugger /reverseRenameIdGreaterThanNewLastId()/
+- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
+- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
+- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
+- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
+- /reverseRenameId(newId)/ renvoie /newId/
+- On a donc /reverseRenameId(renameId(id)) != id/
+- Détecter et gérer ce cas
+*** Done
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
