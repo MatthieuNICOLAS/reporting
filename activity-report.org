@@ -12482,14 +12482,83 @@ to be too obscure to justify that level of extra complexity and memory use.
     - ça serait cool d'avoir des retours là-dessus
 ** Semaine du <2020-09-28 Mon> au <2020-10-02 Fri>
 *** Planned
-**** IN-PROGRESS Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
+**** DONE Préparer sujet de TD5
+**** DONE Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
 - On a des figures pour présenter le fonctionnement
   - De LS
   - D'un renommage local avec RLS
   - De la gestion des opés d'insertion concurrente à un renommage
 - En faire pour présenter et expliquer le cas avec des renommages concurrents
-**** TODO Préparer sujet de TD5
-**** TODO Préparer sujet de partiel de BD1
+**** DONE Publier correction du TD5
+- Histoire de permettre aux étudiants de s'entraîner pour le partiel et de vérifier leurs résultats
+**** DONE Rédiger section sur GC des anciens états
+*** Done
+- Préparer sujet de partiel de BD1
+  - Porte sur l'ensemble du module, sauf la réalisation d'un schéma conceptuel
+  - Dure 1h50
+  - Quoi prévoir comme exercices ?
+  - Un exercice de conversion d'un schéma conceptuel en schéma relationnel en 3NF
+  - Un exercice d'identification des NFs d'un schéma relationnel et de conversion en 3NF
+  - Un exercice d'interrogation d'une BD relationnel à l'aide de l'algèbre relationnelle
+  - Si on compte 30min par exo, ça laisse une petite marge aux étudiants
+  - BDs possibles
+    - Collecte de données de parties d'*Among Us*
+    - Hôtel
+    - Mediathèque
+- Faire un schéma d'un exemple pour illustrer /reverseRenameId()/
+  - Réalisation d'un schéma présentant 2 renommages concurrents
+  - Et comment le noeud A annule son renommage puis applique le /primary/ renommage à la réception de ce dernier
+  - Modification de la représentation des séquences pour faire apparaître l'epoch actuelle
+  - Serait p-e cool de faire apparaître carrément l'/epoch tree/ mais du mal à voir comment faire
+  - Reste à avoir des retours là-dessus
+- Rédiger section sur GC des anciens états
+  - À voir à quel niveau de détail je rentre
+  - J'ai des règles, est-ce que j'essaie de les justifier via un exemple ?
+  - Ajout de figures présentant une exécution abstraite et l'évolution de les /epoch trees/ respectifs des participants
+  - Permet d'offrir une base pour expliquer quand et pourquoi appliquer ces règles de GC
+  - Pas sûr de voir comment expliquer aisément le scénario décrit par l'exécution par contre
+    - Nouveau formalisme
+    - Pas vraiment la suite du scénario précédent puisqu'on a là 2 renommages de chaque côté
+    - Est-ce qu'1 seul renommage de chaque noeud pour retomber sur le scénario de la fig 2 suffirait ?
+  - Reste à faire apparaître les epochs GC dans la figure 3c avec la règle correspondante pour chaque
+    - AeA1 et AeA8 sont GC grâce à la règle 2, car A sait que tous les noeuds ont au moins migré sur eB2
+      - Et que plus aucune opérations ne peut être émise depuis l'epoch eA1 et eA8
+      - Et donc plus ces epochs ne seront plus nécessaires pour les transformations futures
+    - Ae0 est GC grâce à la règle 1 car A sait que tous les noeuds ont migré sur la branche eB2
+** Semaine du <2020-10-05 Mon> au <2020-10-09 Fri>
+*** Planned
+**** DONE Créer équipe Teams pour 1A groupe 2 et groupe 5
+- Ajouter les liens d'invitations sur Arche
+**** DONE Préparer slides introduction TDs Algo
+- Se présenter
+- Présenter organisation (pour le moment)
+  - Moitié en présentiel, l'autre à distance
+  - Mode asynchrone pour ceux à distance
+    - Jusqu'à la prochaine séance pour faire le TD
+  - N'hésitez pas à me contacter par mail pour me poser vos questions même après la fin de la séance
+    - Par contre, peut mettre un certain temps à y répondre
+  - Recommande de vous mettre par binômes
+    - 1 membre du binôme dans chaque sous-groupe
+    - Poser en priorité les questions éventuelles au binôme présent lors de la session du TD
+- Présenter Anaconda et Spyder
+  - Un défaut : bien lourd
+  - Pour ceux qui travaillent sur leur machine
+    - Installer Anaconda
+      - https://www.anaconda.com/products/individual
+    - Peut installer simplement Python
+      - Faire attention à bien installer Python3 et non pas Python2
+    - Et utiliser l'IDE de leur choix
+      - Visual Studio Code, PyCharm, Vim
+    - PIP est un gestionnaire de paquets directement fourni avec les versions récentes de Python
+      - Permettra d'installer les libraires nécessaires lors des TPs futurs
+- Présenter format des TDs
+  - Reprend une sélection des exercices du livre *Pratical Introduction to Python Programming*
+- TD1
+  - 2 listes d'exercices + 1 problème
+    1. Prise en main de l'environnement de développement, premiers programmes à base de manipulations de variables et print()
+    2. Utilisation de la boucle Pour
+    3. Problème : Division posée
+**** DONE Préparer sujet de partiel de BD1
 **** TODO Débugger /reverseRenameIdGreaterThanNewLastId()/
 - J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
 - /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
@@ -12499,6 +12568,13 @@ to be too obscure to justify that level of extra complexity and memory use.
 - On a donc /reverseRenameId(renameId(id)) != id/
 - Détecter et gérer ce cas
 *** Done
+- Préparer sujet de partiel de BD1
+  - Exercice 1
+    - Conversion schéma conceptuel en schéma relationnel à base d'une BD Among Us
+  - Exercice 2
+    - Normalisation d'une BD de Twitch
+  - Exercice 3
+    - Requêtes algébrique d'une BD de Hero Corp
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
