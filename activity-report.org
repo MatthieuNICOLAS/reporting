@@ -12559,14 +12559,6 @@ to be too obscure to justify that level of extra complexity and memory use.
     2. Utilisation de la boucle Pour
     3. Problème : Division posée
 **** DONE Préparer sujet de partiel de BD1
-**** TODO Débugger /reverseRenameIdGreaterThanNewLastId()/
-- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
-- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
-- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
-- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
-- /reverseRenameId(newId)/ renvoie /newId/
-- On a donc /reverseRenameId(renameId(id)) != id/
-- Détecter et gérer ce cas
 *** Done
 - Préparer sujet de partiel de BD1
   - Exercice 1
@@ -12575,6 +12567,162 @@ to be too obscure to justify that level of extra complexity and memory use.
     - Normalisation d'une BD de Twitch
   - Exercice 3
     - Requêtes algébrique d'une BD de Hero Corp
+** Semaine du <2020-10-12 Mon> au <2020-10-16 Fri>
+*** Planned
+**** DONE Algo : Faire un rappel sur les notions importantes du TD1
+- Notion de paramètres de fonctions
+- /print()/ avec concaténation de chaîne de caractères et paramètres nommé /sep/
+- Utilisation de /eval()/
+  - Interprète une expression passée en paramètre
+  - Permet de convertir une chaîne de caractères en nombre
+  - Mais peut aussi exécuter des instructions Python
+- Variable d'itération dans les boucles /for/
+- Paramètres de /range()/
+**** DONE Papier : Rédiger présentation des simus et benchmarks
+**** TODO Papier : Rédiger partie sur convergence
+**** TODO Papier : Rédiger partie sur mesures de la conso mémoire
+**** TODO Papier : Rédiger partie sur mesures du temps d'inté des opés standards
+**** TODO Papier : Rédiger partie sur mesures du temps d'inté des opés de renommage
+- Reste à définir comment représenter ces mesures
+- Le rapport d'échelle fout en l'air la lecture du graphique
+- Olivier suggérait d'utiliser un tableau pour contourner le problème
+- À tester
+**** TODO Algo : Recréer les groupes d'étudiants sur Arche
+**** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
+- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
+- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
+- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
+- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
+- /reverseRenameId(newId)/ renvoie /newId/
+- On a donc /reverseRenameId(renameId(id)) != id/
+- Détecter et gérer ce cas
+**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
+- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
+- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
+  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
+  - Leur approche est du coup probablement générique
+  - À vérifier
+  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
+**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
+- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
+- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
+  - Ou les pistes de réflexions que cela dessine
+**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
+- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
+- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
+- Version courte du papier avait été présenté à PaPoC'20
+  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
+  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
+- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
+- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
+- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
+  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
+  - Mais qui possèdent des opérations différentes
+  - Chacune de ces opérations est commutative avec elle-même
+  - Mais elles ne sont pas commutatives entre elles
+    - L'exemple de l'addition et de la multiplication
+  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
+  - Moi l'opération de renommage n'est pas commutative avec elle-même
+  - Je ne peux donc pas utiliser la même technique
+- À valider au cours d'une nouvelle lecture
+*** Done
+- Algo : faire un rappel sur les notions importantes du TD1
+  - Serait bien aussi d'ajouter quelques slides sur les notions utiles pour le TD2
+    - Utilisation de /randint()/
+    - Fonctions built-ins /abs()/ et /round()/
+    - Autres fonctions disponibles dans le module /math/
+    - if, else, elif
+    - == et !=
+    - and, or, not
+- Papier : Rédiger présentation des simus et benchmarks
+  - J'ai repris la majorité du contenu de PaPoC
+  - Et j'ai tenté de retravailler les phrases pour supprimer les ambiguités et améliorer la forme
+  - Le seul paragraphe qui change réellement est celui sur le renommage
+  - Ajout de l'info qu'on a 1 à 4 /renaming bots/ dans la simu en fonction de la session
+  - C'est ces /renaming bots/ qui déclenchent des opés de renommage chaque fois qu'ils observent 30k opés
+  - J'indique aussi que ces opérations sont générées de façon à être concurrentes
+- Code review Oscar
+  - A extrait la liste des collaborateurs de *CollaboratorsService*
+    - Permet de séparer la logique du protocole (messages) de la structure utilisée pour représenter la liste
+    - Permet de faire facilement des tests unitaires uniquement sur la liste
+    - Notamment pour tester les différentes règles de fusion de la liste avec les évènements transmis en /piggyback/ des messages du protocole
+      - S'apparente à fusion de /State-based CRDTs/
+  - A mis en place des tests unitaires sur cette nouvelle classe
+  - Retours
+    - *CollaboratorsService*
+      - Pourquoi possède toujours les streams /updateSubject/, /joinSubject/ et /leaveSubject/ ?
+	- Normalement, ne devrait plus en avoir besoin puisqu'on utilise/expose les streams de *Piggyback* ?
+	- Ça se confirme avec les getters /remoteUpdate$/, /join$/, et /leave$/
+	- Mais du coup, à quoi servent tous les /next()/ sur ces streams ?
+	- À supprimer/retravailler
+      - Pourquoi les cas /data-request/ et /data-update/ sont différents des autres vis à vis de *Piggyback* ?
+	- Dans les autres cas, on utilise /Piggyback.handlePG()/ pour traiter les évènements liés à la liste des collabs
+	- Mais ici on le traite directement dans *CollabsService*
+	- Pourquoi ?
+	- Concernant le cas /data-request/, le choix de la valeur de /incarnation/ me paraît suspect
+	- Concernant le cas /data-update/, pourquoi on en tient compte que dans le cas où *PG* distant possède plus d'entrées que le local ?
+	- Question subsidiaire : quand sont envoyés les messages /data-request/ et /data-update/ ?
+      - Pourquoi /handlePG()/ existe toujours dans *CollabsService* ?
+      - À quoi sert /updateUI()/ ?
+	- Si on a les streams pour envoyer les évènements de /join/, /leave/ et /update/ à l'UI
+	- À quoi nous sert /updateUI()/ ?
+	- Peut-on la retirer ?
+      - Peut-on améliorer /pingProcedure()/ ?
+	- Notamment toute la partie du code pour choisir 2 pairs pour /ping-req/
+	  - Dispose d'une fonction dans *Piggyback* pour lister les pairs connectés
+	  - Pourquoi ne pas l'utiliser ?
+	  - D'ailleurs, je vois pas l'intérêt de passer par un *Set*
+	  - Peut simplement /filter()/ la liste des pairs connectés pour garder uniquement ceux dont l'id est différent de /me.id/ et /idCollab/
+	- Et la partie sur la gestion de la non-réponse au /ping-req/
+	  - Pourquoi pas utiliser /handlePG()/ ?
+	  - Et pourquoi on déclare le pair comme /Confirm/ dans un cas ?
+      - /localUpdate()/ me paraît invalide
+	- Globalement, ce que ça fait à l'heure actuelle c'est
+	  - Ça supprime notre entrée de la liste des collaborateurs
+	  - Ça recréé une nouvelle entrée avec le même /me.id/, la nouvelle version de notre *ICollaborator* et surtout /incarn = 0/
+	  - D'après les règles sur la priorité des messages, personne n'est censé accepter cette info
+	    - Page 7 de http://www.cs.cornell.edu/info/projects/spinglass/public_pdfs/SWIM.pdf
+	- À retravailler
+      - Annexe : à quoi sert /gossip/ ?
+	- Initialisée à /true/
+	- Utilisée dans le /setInterval()/ pour déterminer si on effectue une action ou pas
+	- Uniquement passée à /false/ dans /dispose()/
+	- Par contre, l'interval continue à tourner dans ce cas
+	- À retravailler
+    - *Piggyback*
+      - Indiquer le type de retour dans la signature de fonction
+	- Toujours mieux d'être explicite
+	- Pour moi, pas de type de retour précisé indique que le type de retour est /void/
+      - Utiliser les valeurs de *EnumNumPG* plutôt que /1, 2, 3, 4/
+	- Qui ne permettent pas de comprendre dans quel cas on se trouve, à moins de connaître la correspondance
+	- Pour simplifier la lecture du code, utiliser /EnumNumPG/
+      - /createToPG()/
+	- Pourquoi on teste si /compteurPG != undefined/ ?
+	- Dans quel cas de figure ça se produit ?
+      - /getListConnectedCollab()/ et /nbCollab()/ pourraient être des /getters/ en fait
+	- D'ailleurs, pourrait simplifier /nbCollab()/ en juste /getListConnectedCollab().length()/
+      - /handlePG()/
+	- Me paraît étrange de séparer la MàJ des infos des collabs de la MàJ de leur statut
+	  - Intuitivement, je dirais qu'on met à jour les infos des collabs seulement si on met à jour leur statut
+	- Attention, en JS comparé deux objets uniquements avec /===/ vérifie seulement si leurs références sont identiques
+	  - Donc même si les objets sont des clones, s'il s'agit pas du même objet, /obj1 === obj2/ renvoie /false/
+	  - Donc dans le traitement de la MàJ des infos du collab, tu as toujours /PGEntry.collab !== elem.collab/ qui est vrai
+	  - Pour comparer proprement des objets, faut une fonction qui compare chacun des champs
+	- Je me demande l'intérêt de /EnumNum.Joined/
+	  - Pas présente dans le papier de Swim
+	  - Je ne vois pas à quel moment elle est utile
+	  - Voir si nécessaire
+	- Dans le cas /EnumNum.Suspect/ où c'est moi qui suis suspecté
+	  - Utilise la valeur de /incarn/ fournie dans le message
+	  - Alors que potentiellement, ma dernière valeur de /incarn/ est différente/plus grande
+	  - Si je me base sur celle du message, peut me retrouver à envoyer des évènements /obsolètes/ aux yeux des autres pairs qui sont à jour
+	- Dans pas mal de cas, le 1er test effectué est de vérifier on a déjà une entrée pour le collaborateur
+	  - Fait rien le cas échéant
+	  - Est-ce vraiment utile ?
+	  - Quels scénarios problématiques cela empêche ?
+	  - Est-ce que ça n'introduit pas juste des scénarios de bugs finalement ?
+	    - Si je n'observe pas un pair /join/, je vais snober toutes les prochaines infos à son sujet
+	  - Est-ce que juste accepter cette donnée n'est pas plus simple et safe ?
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
