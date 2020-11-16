@@ -12579,52 +12579,7 @@ to be too obscure to justify that level of extra complexity and memory use.
 - Variable d'itération dans les boucles /for/
 - Paramètres de /range()/
 **** DONE Papier : Rédiger présentation des simus et benchmarks
-**** TODO Papier : Rédiger partie sur convergence
-**** TODO Papier : Rédiger partie sur mesures de la conso mémoire
-**** TODO Papier : Rédiger partie sur mesures du temps d'inté des opés standards
-**** TODO Papier : Rédiger partie sur mesures du temps d'inté des opés de renommage
-- Reste à définir comment représenter ces mesures
-- Le rapport d'échelle fout en l'air la lecture du graphique
-- Olivier suggérait d'utiliser un tableau pour contourner le problème
-- À tester
-**** TODO Algo : Recréer les groupes d'étudiants sur Arche
-**** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
-- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
-- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
-- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
-- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
-- /reverseRenameId(newId)/ renvoie /newId/
-- On a donc /reverseRenameId(renameId(id)) != id/
-- Détecter et gérer ce cas
-**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
-- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
-- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
-  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
-  - Leur approche est du coup probablement générique
-  - À vérifier
-  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
-**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
-- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
-- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
-  - Ou les pistes de réflexions que cela dessine
-**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
-- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
-- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
-- Version courte du papier avait été présenté à PaPoC'20
-  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
-  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
-- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
-- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
-- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
-  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
-  - Mais qui possèdent des opérations différentes
-  - Chacune de ces opérations est commutative avec elle-même
-  - Mais elles ne sont pas commutatives entre elles
-    - L'exemple de l'addition et de la multiplication
-  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
-  - Moi l'opération de renommage n'est pas commutative avec elle-même
-  - Je ne peux donc pas utiliser la même technique
-- À valider au cours d'une nouvelle lecture
+**** DONE Papier : Rédiger partie sur convergence
 *** Done
 - Algo : faire un rappel sur les notions importantes du TD1
   - Serait bien aussi d'ajouter quelques slides sur les notions utiles pour le TD2
@@ -12723,6 +12678,381 @@ to be too obscure to justify that level of extra complexity and memory use.
 	  - Est-ce que ça n'introduit pas juste des scénarios de bugs finalement ?
 	    - Si je n'observe pas un pair /join/, je vais snober toutes les prochaines infos à son sujet
 	  - Est-ce que juste accepter cette donnée n'est pas plus simple et safe ?
+- Algo : TD3
+  - Je prépare les exos du chap *Miscellaneous Topics 1* pour le prochain TD
+  - L'exo 6 est intéressant, mais peut s'avérer difficile
+    - Nécessite l'utilisation de boucles imbriquées
+  - L'exo 7
+    - Repose sur la notion d'entier sans facteur carré
+    - S'agit d'un nombre qui n'est pas divisible par un carré d'entier
+    - Donc globalement un nombre qui n'a pas de diviseur dont la racine carré est un entier
+    - Peut facilement vérifier ça d'un nombre en Python avec l'instruction /sqrt(nombre).is_integer()/
+  - L'exo 8 est cool pour apprendre à swapper les variables
+    - Peut être intéressant vu les problèmes que j'ai constaté chez certains étudiants pour manipuler les valeurs de variables
+  - L'exo 9 me paraît inintéressant par contre
+  - L'exo 10 est cool
+  - Un peu de mal à voir l'intérêt du 11
+  - L'exo 12 est sympa
+  - Pour l'exo 13, on a pas fait l'exercice correspondant dans le chapitre précédent
+  - L'exo 14 est cool
+** Semaine du <2020-10-19 Mon> au <2020-10-23 Fri>
+*** Planned
+**** DONE Algo : Recréer les groupes d'étudiants sur Arche
+**** DONE Algo : Préparer slides pour TD3
+**** DONE Papier : Rédiger partie sur mesures de la conso mémoire
+**** DONE Papier : Rédiger partie sur mesures du temps d'inté des opés standards
+**** DONE Papier : Rédiger partie sur mesures du temps d'inté des opés de renommage
+- Reste à définir comment représenter ces mesures
+- Le rapport d'échelle fout en l'air la lecture du graphique
+- Olivier suggérait d'utiliser un tableau pour contourner le problème
+- À tester
+*** Done
+- Algo : Préparer slides pour TD3
+  - Plan
+    - Correction des exos 3 et 5 du If
+    - Notions pour TD3
+      - Swap de variables
+      - Manipulation des strings
+	- Chaîne de caractères
+	- Indexes
+	- Fonctions et méthodes
+	- Erreurs communes
+	  - Out of range
+	  - Immutabilité
+    - Consignes DM
+    - Consignes TD3
+      - Finir exo 9 et 12 du If
+      - Chap 5. Ex: 1, 3, 7, 8, 11, 12.
+      - Chap 6. Ex: 1, 5, 11, 18, 24.
+- Papier
+  - Retours Olivier
+    - Pas clair ce qui fait qu'une opé de renommage est /primary/ ou /secondary/
+    - Essayer de faire apparaître l'aspect fédération, progression et convergence vers un même état
+      - Communications entre les noeuds
+      - Génération et réception des opérations de renommage
+      - Évolution de l'arbre des epochs auprès de chaque noeud
+	- Et pourquoi/comment on passe d'un état à l'autre
+    - Re-prévoir réunion après avoir vu Gérald
+** Semaine du <2020-10-26 Mon> au <2020-10-30 Fri>
+*** Planned
+**** DONE Papier : Rédiger section /offloading/
+**** DONE Papier : Rédiger section /effective priority relation/
+**** DONE Papier : Rédiger section /postponing transition/
+*** Done
+- Papier : Rédiger section /effective priority relation/
+  - Propose d'ajouter des métriques sur l'état du système dans les opérations de renommage au moment de leur génération
+    - Nombre de noeuds à l'epoch parente
+    - Nombre d'opérations générées à l'epoch parente
+      - Pas forcément simple/peu gourmand en calculs d'obtenir cette info
+    - Distance depuis l'epoch /origin/
+    - Taille du document
+    - Taille des modifs
+      - Ne pas juste compter le nombre d'éléments actuels
+      - Mais le total des caractères ajoutés et supprimés
+  - Permet globalement de représenter le travail accumulé jusque là
+  - Reste à construire une relation de /priorité/ en se basant dessus
+  - Comment ?
+  - On cherche à minimiser le nombre de sauts dans l'arbre des epochs d'un point de vue global
+    - Faudrait que la métrique suive une courbe exponentielle
+    - Pour limiter les retours en arrière conséquents
+  - Se baser sur une représentation du travail accumulé résulte en une métrique /self-feeding/
+    - Une epoch prioritaire va attirer les noeuds à cette epoch
+    - Qui vont produire du contenu/alimenter les métriques de cette epoch
+    - Leur collaboration va résulter en la génération d'un nouveau renommage, dont la priorité sera renforcé
+  - Mais je ne peux pas "emprisonner" les noeuds dans une branche donnée
+    - Toujours possible que les noeuds produisent et alimentent des branches parallèles
+    - Et qu'ils passent de l'une à l'autre de façon périodique
+- Papier : Rédiger section /postponing transition/
+  - Pour déterminer quand on peut considérer une opé de renommage d'un ensemble d'opés concurrentes, calcule un indice de confiance
+  - Sur quoi se baser pour le calculer ?
+    - Temps passé depuis la réception d'opés de renommage concurrentes ?
+    - Nombre de noeuds connectés pouvant potentiellement émettre un renommage concurrent ?
+      - Donc toujours à l'epoch parente
+- Algo : Préparer le TD4
+  - Correction des exos ??? du TD3
+  - Notions pour TD4
+    - Déclaration de liste
+      - /l = [1,2,3,4]/
+      - /l = eval(input("Saisir une liste:"))/
+      - Peut contenir des valeurs de types différentes
+	- Mais généralement une mauvaise pratique
+    - Parcours de liste
+      - /for i in range(len(l)/
+      - /for elem in l/
+    - Indices, slices, duplication de liste
+    - Fonctions
+      - /len(), sum(), min(), max()/
+    - Méthodes
+      - /append(), insert(), remove(), reverse()/
+      - Attention à la modification /in-place/ de la liste
+      - Peut avoir besoin de dupliquer la liste
+    - Opérateurs
+      - /+, *, del/
+      - À vérifier ce qu'est /del/ exactement
+      - /del/ fonctionne avec des slices
+  - TD4
+  - Reste à voir comment organiser la séance pour la faire en full-distanciel
+    - D'un côté me paraît nécessaire d'autoriser l'asynchrone
+    - Mais je pense perdre les étudiants si pas de discussion direct plusieurs semaines de suite
+    - Voir ce qui est préconisé par Polytech et ce qu'ont fait les autres lors du 1er confinement
+    - Pourrait être cool de recréer des ilots d'étudiants
+      - Leur permettrait de discuter entre eux et de s'entraider
+      - Permettrait de donner des explications par petits groupes
+      - Faudrait que les étudiants puissent me prévenir qu'ils ont une question et que je puisse /join in/
+	- Sans que ça spam/s'accumule de tous les côtés
+      - Est-ce que Teams permet de faire ça simplement ?
+    - Le point en début de séance pour corriger exos de la séance précédente + faire un rappel de cours ne devrait pas changer
+      - Comment gérer pour ce qui peuvent pas y assister ?
+      - Moyen d'enregistrer une réunion sur Teams ?
+** Semaine du <2020-11-02 Mon> au <2020-11-06 Fri>
+*** Planned
+**** DONE Algo : Préparer le TD4
+**** DONE BD1 : Corriger les copies du 1er partiel
+**** DONE BD1 : Corriger les copies du 2nd partiel
+*** Done
+- Algo : Préparer le TD4
+  - D'après la rep de Vincent, serait mieux d'utiliser Teams
+  - Mais en vrai plus pratique d'utiliser Discord
+  - Bon j'ai proposé aux étudiants de passer à Discord
+    - J'attend leur réponse
+- Meeting
+  - Papier
+    - Rédigé la partie contribution et évaluation
+    - Reste à MàJ Related work et Conclusion par rapport à PaPoC
+    - Et à remettre l'intro et background
+    - Déjà eu des retours de la part d'Oliver sur Contribution
+    - Reste à discuter avec Gérald
+  - Tjrs un bug dans mes fonctions de renommages
+  - Oscar
+    - A fini de refactoring de l'intégration de Swim de Tom dans MUTE
+    - Cette semaine, on fait des tests manuel
+      - Quelques bugs d'intégration qu'Oscar a fixé
+    - Devrait pouvoir release cette version une fois que ça sera un peu plus éprouvé
+** Semaine du <2020-11-09 Mon> au <2020-11-13 Fri>
+*** Planned
+**** DONE BD2 : Envoyer un mail aux étudiants de BD avec les informations principales
+- Notes de BD1
+- Lien du module Arche
+- Lien du Discord
+- Logiciel(s) à installer pour le module
+**** DONE Algo : Préparer TD5
+**** DONE BD2 : Préparer le CM1
+**** DONE BD2 : Préparer le CM2
+**** DONE BD2 : Préparer le TD1
+*** Done
+- Algo : Préparer TD5
+  - Correction
+    - Chap 7, ex 2
+    - Chap 8, ex 6
+  - Cours
+    - Boucle /while/
+      - Rappel boucle
+      - Rappel cas d'utilisation de la boucle /for/
+	- Connaît à l'avance nombre d'itérations
+      - Cas d'utilisation boucle /while/
+	- À utiliser dans tous les autres cas
+	- Traduisons les : quand on ne connaît pas à l'avance le nombre d'itérations à faire
+	  - Exemple : recherche si élément présent dans une liste
+	  - Peut m'arrêter dès que je l'ai trouvé, pas besoin de parcourir toute la liste dans ce cas
+      - Attention, plus propice à des erreurs
+	- Car possible de boucler à l'infini
+      - Syntaxe
+      - Exemple
+      - Warning
+	- Arrête pas instantanément la boucle dès que la condition devient /False/, on finit l'itération courante
+	- Si /instructions/ ne modifie pas /condition/, boucle à l'infini
+	- Si /condition/ ne peut pas devenir /False/, boucle à l'infini
+	- Si /condition/ est /False/ lorsqu'on arrive sur la boucle, skip la boucle
+  - TD5
+  - Charles m'a envoyé la liste d'exercices
+    - Pas convaincu de certains exercices
+    - Le 7.b) nous fait utiliser /for/ et /break/
+    - Le 18 me paraît pas ouf
+      - Pas d'intérêt à utiliser une boucle /while/
+      - J'ai rien dit, on peut retomber sur les mêmes coordonnées plusieurs fois
+      - On ne connait donc pas le nombre d'itérations nécessaires
+- BD2 : Préparer le CM1
+  - Bon finalement on m'a indiqué que j'aurais 4h de BD2 avec les étudiants cette semaine
+  - Donc besoin de prévoir un peu plus large qu'initialement
+  - Contenu
+    - Quelles sont les points que l'on doit aborder dans le cadre de ce module ?
+    - Mise en place d'une BD
+      - SGBD à utiliser (MySQL)
+    - Langage SQL
+      - Interrogation d'une BD
+	- Même chose qu'on a commencé à faire en BD1 avec l'algèbre relationnel
+	- + les opérateurs SQL (DISTINCT, COUNT, MIN, MAX, SUM, AVG, GROUP BY, HAVING BY)
+      - Création d'une BD
+	- Tout ce qui est lié à la création/MàJ/suppression de tables
+	- L'ajout de contraintes d'intégrité
+      - Manipulation des données
+	- INSERT, DELETE, UPDATE
+    - Notions supplémentaires
+      - Vues
+      - Relations temporaires
+      - Procédures stockées
+      - Transactions
+	- Anomalies possibles
+	- Principes
+	- Mécanisme de verrous
+      - Triggers
+    - Utilisation depuis un langage de programmation
+      - PHP
+	- Présentation programmation web
+	- Voir comment on fait de nos jours pour se connecter à une BD et effectuer des requêtes
+      - Git
+	- Voir déjà eu un cours par ailleurs
+  - Planning
+    - On a 18h dans le cadre du module
+    - Faudrait que j'en réserve 2h pour un TP noté
+    - Peut en conserver 2 autres pour lancer le projet
+    - Séance 1 : <2020-11-12 Thu>
+      - Intro + Interrogation d'une BD
+    - Séance 2 : <2020-11-12 Thu>
+      - Création, modification et suppression de BDs + interrogation
+    - Séance 3 : <2020-11-19 Thu>
+      - Interrogation avancée (Group by, Having by, exists, not exists)
+    - Séance 4 : <2020-11-20 Fri>
+      - TD noté + vues, tables temporaires, procédures stockées, transactions, triggers
+    - Séance 5 : <2020-11-25 Wed>
+      - Programmation web avec PHP
+    - Séance 6 : <2020-12-02 Wed>
+      - Interaction avec une BD en PHP
+    - Séance 7 : <2020-12-04 Fri>
+      - Récap conception into BD + application web
+    - Séance 8 : <2020-12-09 Wed>
+      - Ouverture NoSQL
+    - Séance 9 : <2020-12-09 Wed>
+      - Projet
+  - Questions
+    - Quelles différences entre vues et relations temporaires ?
+      - D'après les réponses suivantes, on a
+	- [[https://www.quora.com/What-are-the-pros-and-cons-of-temporary-tables-vs-views-in-mysql]]
+      - Vue = macro/alias
+	- Existe que le temps de la requête
+	- Référence les données des tables initiales
+	  - Obtiendra donc toujours les données actuelles
+	- Repose sur les indexes des relations initiales pour traiter les requêtes
+	- Uniquement en mémoire, donc si taille > mémoire, rencontre un problème
+	- Certaines sont MàJ-ables
+	- À utiliser
+	  - Quand un alias permettrait de simplifier une requête autrement complexe
+	  - Souhaiterait utiliser un alias à plusieurs endroits de notre requête
+      - Relation temporaire
+	- Existe le temps de la session
+	  - Donc possible d'effectuer plusieurs requêtes dessus
+	- Copie des données des relations initiales à un instant T
+	  - Si les relations initiales sont MàJ ensuite, ne verra pas les modifs dans la relation temporaire
+	  - Résultats des requêtes potentiellement outdated
+	- Stockée sur disque
+	- Peut être MàJ, mais n'aura pas d'effet sur les relations initiales
+	- À utiliser
+	  - Veut effectuer plusieurs requêtes dessus
+	  - En utilisant plusieurs requêtes successives plutôt qu'une (dans le sens, peut pas le faire d'un coup)
+	  - Taille des données nécessaires > cache
+	  - Veut utiliser des indexes spécifiques pour optimiser ces requêtes
+	  - Si veut une copie d'une table pour faire des calculs longs sans verrouiller la table d'origine, peut utiliser une temporary table comme snapshot
+    - Quels cas d'usages pour les triggers ?
+- BD2 : Préparer le TD1
+  - 2 exercices
+    - 1 sur créer la BD, la remplir à l'aide de phpMyAdmin puis effectuer quelques requêtes
+    - 1 sur manipuler une BD toute faite
+  - Stock
+    - Recréer la BD présentée en cours
+    - La repeupler
+    - Effectuer quelques requêtes
+      - Produits présents dans le dépôt 2
+	- SELECT nom, pu, qte FROM produits p, stocks s WHERE p.prod_id = s.prod_id AND depot_id=2
+      - Capacité maximale d'un dépôt
+	- SELECT MAX(volume) FROM depots
+      - Prix moyen des produits présent dans le dépôt 3
+	- SELECT AVG(pu) FROM produits p, stocks s WHERE p.prod_id = s.prod_id AND depot_id=3
+      - Produits stockés dans les dépôts qui sont en rupture de stock dans ce dépôt (< 10)
+	- SELECT p.prod_id, nom, d.depot_id, adr FROM produits p, depots d, stocks s WHERE p.prod_id = s.prod_id AND d.depot_id= s.depot_id AND qte < 10
+      - Identifiant et adresse du dépôt ayant la capacité maximale
+	- SELECT depot_id, adr FROM depots WHERE volume IN (SELECT MAX(volume) FROM depots)
+      - Coût total de la marchandise par dépôt par produit
+	- SELECT depot_id, s.prod_id, pu * qte FROM produits p, stocks s WHERE p.prod_id = s.prod_id
+  - Bibliothèque
+    - Importer la BD à partir du SQL fournit
+    - Écrire son schéma relationnel
+      - Pays(id_pays, pays)
+      - Auteurs(id_auteur, nom, prenom, nationalite)
+      - Livres(id_livre, titre, date_parution, id_auteur)
+      - Tags(id_tag, libelle)
+      - TagsParLivre(id_livre, id_tag)
+      - Lecteur(id_lecteur, nom, prenom)
+      - Emprunt(id_livre, id_lecteur, date_emprunt, est_rendu)
+    - Effectuer quelques requêtes
+      - Nom et prénom des auteurs sud-coréens ou japonais
+      - Liste des emprunts de John Doe
+      - Nombre de livres non-rendus par XXX
+      - Titre, date de parution, noms et prénoms des auteurs de livres parus en 2020
+      - Liste des livres possédant le tag "Humour" et "Fantastique"
+      - Nombre d'emprunt par Jane Smith
+- BD2 : Préparer le CM2
+  - Dans le 1er cours, a vu comment interroger une BD MySQL
+  - Mais seulement /SELECT/, /FROM/, /WHERE/, /IN/ et les fonctions d'agrégation
+  - Peut faire un cours sur le reste des opérateurs
+    - /UNION/
+    - /INTERSECT/
+    - /MINUS/
+    - /GROUP BY/
+    - /HAVING/
+    - /ORDER BY/
+  - Rajouter /DIV/ aussi ?
+** Semaine du <2020-11-16 Mon> au <2020-11-20 Fri>
+*** Planned
+**** DONE Algo : Préparer TD6
+**** IN-PROGRESS Algo : Corriger DM1
+**** TODO BD2 : Préparer TD2
+**** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
+- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
+- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
+- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
+- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
+- /reverseRenameId(newId)/ renvoie /newId/
+- On a donc /reverseRenameId(renameId(id)) != id/
+- Détecter et gérer ce cas
+**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
+- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
+- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
+  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
+  - Leur approche est du coup probablement générique
+  - À vérifier
+  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
+**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
+- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
+- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
+  - Ou les pistes de réflexions que cela dessine
+**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
+- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
+- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
+- Version courte du papier avait été présenté à PaPoC'20
+  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
+  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
+- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
+- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
+- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
+  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
+  - Mais qui possèdent des opérations différentes
+  - Chacune de ces opérations est commutative avec elle-même
+  - Mais elles ne sont pas commutatives entre elles
+    - L'exemple de l'addition et de la multiplication
+  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
+  - Moi l'opération de renommage n'est pas commutative avec elle-même
+  - Je ne peux donc pas utiliser la même technique
+- À valider au cours d'une nouvelle lecture
+*** Done
+- Algo : Préparer TD6
+  - Rappel de cours
+    - Fonctions de conversion
+      - Pourquoi ?
+      - Comportement de /int()/, /float()/, /str()/ et /list()/
+    - Fichiers texte
+      - Pourquoi ?
+      - C'est quoi un fichier texte ?
+      - Ouvrir, lire et écrire un fichier texte
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
