@@ -13004,8 +13004,186 @@ to be too obscure to justify that level of extra complexity and memory use.
 ** Semaine du <2020-11-16 Mon> au <2020-11-20 Fri>
 *** Planned
 **** DONE Algo : Préparer TD6
-**** IN-PROGRESS Algo : Corriger DM1
-**** TODO BD2 : Préparer TD2
+**** DONE BD2 : Préparer TD2
+**** DONE Algo : Corriger DM1
+*** Done
+- Algo : Préparer TD6
+  - Rappel de cours
+    - Fonctions de conversion
+      - Pourquoi ?
+      - Comportement de /int()/, /float()/, /str()/ et /list()/
+    - Fichiers texte
+      - Pourquoi ?
+      - C'est quoi un fichier texte ?
+      - Ouvrir, lire et écrire un fichier texte
+- Algo : Corriger DM1
+  - Groupe 2
+    - Gros soupçon de copie de code
+      - DUFOUR Matteis a le même exo 1 que BOUTALLAKA Basma
+      - DUFOUR Matteis a le même exo 2 que BEN FATMA Rayen
+** Semaine du <2020-11-23 Mon> au <2020-11-27 Fri>
+*** Planned
+**** DONE Algo : Préparer TD7
+**** DONE BD2 : Préparer CM3
+*** Done
+- Algo : Préparer TD7
+  - Fonctions
+    - Déjà utilisé des fonctions
+      - print(), min(), len()
+    - Principe
+      - Programme qui génère un résultat
+      - Spécifié par son nom
+      - Résultat
+	- Soit message dans la console, soit retourne une valeur
+      - Peut nécessiter/utiliser des paramètres pour produire ce résultat
+    - Voir maintenant définir les notres
+      - Exemple fonction sans paramètre et sans retour
+      - Exemple fonction valeur de retour
+      - Exemple fonction paramètre
+      - Exemple fonction paramètre par défaut
+    - À quoi ça sert ?
+      - Permet de décomposer notre programme
+      - Réutilisable
+	- Dans un même programme
+	- Dans des projets différents
+    - Intérêts
+      - Factoriser du code
+	- Éviter de répéter (copier/coller) du code et donc des bugs
+      - Décomposer notre programme en plusieurs étapes
+	- Bien plus simple de résoudre un problème petit bout par petit bout que tout d'un coup
+	- Répartir les responsabilités
+	  - Utile aussi dans le cadre de projets
+	  - Permet de tester chaque partie de notre programme de façon indépendante
+      - Notre programme consiste seulement en un code glue entre les différents appels de fonctions
+- BD2 : Préparer CM3
+  - SQL pour créer et manipuler les tables
+  - Création
+    - Types
+    - Contraintes d'intégrité
+      - Voir les différents comportements avec les clés étrangères
+      - C'est quoi RESTRICT ?
+	- Même chose que NO ACTION d'après le lien suivant
+	  - https://stackoverflow.com/questions/5809954/mysql-restrict-and-no-action
+      - Comment se comporte SET NULL ?
+	- Si la clé étrangère fait partie de la clé primaire, on a un souci non ?
+	- Pas possible, car effectivement nécessiterait que l'attribut concerné puisse avoir pour valeur NULL
+	- Interdit par définition pour les attributs appartenant à la clé primaire
+      - Bon à savoir, les contraintes avec CHECK ne sont juste pas prises en compte avec MySQL jusqu'à la version 8.xx
+	- https://dev.mysql.com/doc/refman/8.0/en/create-table-check-constraints.html
+  - Modification
+  - Suppression
+** Semaine du <2020-11-30 Mon> au <2020-12-04 Fri>
+*** Planned
+**** DONE Algo : Préparer TD8
+- On continue sur les fonctions
+- Correction des exos 1 et 4 du TD7
+  - L'exo 4 permet de corriger au passage l'exo 3
+**** DONE DB2 : Préparer TD3
+- Est-ce que ça vaut le coup de faire un TD sur la création/modification de BDs via requêtes SQL ?
+- Et manipulation (insertion, MàJ, suppression) de tuples
+- Oui je pense, notamment pour la partie gestion de tuples
+  - Sera utile pour quand on fera une app PHP pour ajouter/éditer/supprimer depuis un formulaire
+**** DONE BD2 : Préparer CM4
+- Démarrer PHP me paraît une bonne idée
+  - Permet de voir les potentiels problèmes techniques avec eux
+  - Et de au moins mettre en place un Hello world
+- Ce qu'il faudrait voir
+  - Principes d'une application web
+    - Notions de clients et de serveurs
+  - Différentes technologies web
+    - HTML, CSS, JS et PHP
+  - Principe de base de PHP
+    - Permet de générer du HTML de manière dynamique
+  - Principales instructions
+    - Générer de l'HTML
+    - Variables
+    - Instructions conditionnelles
+    - Boucles
+  - Connexion à une BD
+  - Formulaires
+  - Gestion des comptes utilisateurs
+    - Est-ce que je dois aborder ça dans ce module ?
+**** DONE BD2 : Préparer TD4
+- Faire Hello, world
+- Faire Hello, $username
+- Exo sur boucle répétant de l'HTML
+  - Table de multiplication ?
+- Afficher contenu de la table acteurs de la BD filmographie
+  - Se décompose en 3 questions
+  - Dans le fichier /acteurs.php/
+  - Écrire une fonction /getPDO()/ permettant de récupérer une connexion à la base de données /acteurs/ sous la forme d'un objet *PDO*
+  - Écrire une fonction /getActeurs()/ permettant de récupérer la liste des acteur-rice-s depuis la base de données sous la forme d'un objet *PDOStatement*
+  - Écrire le script permettant de générer un tableau (<table>) listant les différents acteur-rice-s et leurs données respectives
+*** Done
+- BD2 : Préparer TD3
+  - Consiste en l'écriture des requêtes pour la création et modification d'une DB
+  - Consiste en l'écriture des requêtes pour la création et modification de tuples
+  - Reste à trouver un cas
+  - Une BD cinéma me paraît pas mal
+  - Peut facilement s'en sortir avec 3 relations
+    - acteurs(id_acteur, nom, prenom, date_naiss)
+    - films(id_film, titre, date_sortie, duree)
+    - roles(id_acteur, id_film, nom_complet_personnage)
+  - Reste à voir les requêtes à écrire
+    - Créer la table acteurs
+    - Créer la table films
+    - Peupler la table acteurs
+    - Peupler la table films
+    - Créer la table roles
+    - Peupler la table roles
+- BD2 : Préparer CM4
+  - M'arrête à la partie connexion d'une BD et récupération d'une contenu d'une table
+  - Garde les formulaires et l'insertion/modification pour la prochaine séance
+** Semaine du <2020-12-07 Mon> au <2020-12-11 Fri>
+*** Planned
+**** DONE Algo : Préparer TD9
+- Pas de cours à proprement parler
+- Juste corriger l'exercice sur /primes()/ me paraît suffisant
+  - Histoire de leur montre un peu de pseudo-code
+**** DONE BD2 : Préparer CM5
+- On s'est arrêté lors du dernier cours aux bases du langage
+  - Plus précisément, on allait voir les chaînes de caractères
+- Reste à parler de
+  - Formulaires
+  - Requêtes préparées
+    - Parler d'injections SQL/ne jamais avoir confiance dans les entrées utilisateurs
+  - Factorisation de code
+    - Juste include/require ?
+    - Ou je parle des namespaces ?
+**** DONE BD2 : Préparer Projet
+- Consisterait en la réalisation d'une appli PHP permettant de gérer une BD
+  - Consultation des données
+  - Ajout
+  - Modification
+  - Suppression
+- Peut p-e reprendre la BD /filmographie/
+- Pourrait ajouter la notion de séries et de providers
+  - Un show peut être soit une série ou un film
+  - Un-e acteur-rice peut jouer dans des shows
+  - Un-e acteur-rice peut avoir plusieurs roles dans un même show
+    - /American Horror Story/ est une série anthologie où d'une saison à l'autre, on retrouve les mêmes acteur-rice-s qui incarnent des personnages différents
+    - Eddie Murphy incarne plusieurs personnages dans le film /Le Professeur foldingue/
+    - Peut faire l'objet d'une question ouverte du style "Proposer une modification du schéma relationnel permettant de gérer ce type de cas"
+  - Un provider propose dans son catalogue des shows
+**** DONE Papier : Rédiger section sur /core-nebula/
+**** IN-PROGRESS Algo : Corriger DM2
+- Ça serait pas mal de faire ça avant les vacs
+- Histoire qu'iels soient fixé-e-s et moi débarrassé
+**** TODO Algo : Préparer TD10
+- Correction
+  - L'exo recherche dichotomique me paraît intéressant à faire avec eux
+  - Pareil pour un 1er exo de tri
+**** TODO BD2 : Préparer et tourner CM6
+- Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
+  - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
+- Histoire qu'iels puissent tout de même découvrir ces sujets, je vais faire une VOD
+**** TODO Papier : Rédiger section sur /LSEQ/
+**** TODO Papier : Rédiger conclusion
+**** TODO Papier : Rédiger section sur /LogootSplit/
+**** TODO Papier : Déplacer section sur /RenamableLogootSplit/ dans *Background*
+- L'idée est de mettre en background le papier de PaPoC
+- Les limites deviennent donc celles de la 1ère version de RLS
+- La contribution du papier courant devient donc le passage à une version de RLS capable de gérer les renommages concurrents
 **** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
 - J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
 - /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
@@ -13044,15 +13222,47 @@ to be too obscure to justify that level of extra complexity and memory use.
   - Je ne peux donc pas utiliser la même technique
 - À valider au cours d'une nouvelle lecture
 *** Done
-- Algo : Préparer TD6
-  - Rappel de cours
-    - Fonctions de conversion
-      - Pourquoi ?
-      - Comportement de /int()/, /float()/, /str()/ et /list()/
-    - Fichiers texte
-      - Pourquoi ?
-      - C'est quoi un fichier texte ?
-      - Ouvrir, lire et écrire un fichier texte
+- BD2 : Préparer CM5
+  - Formulaires
+    - Pour quoi faire ?
+      - Permet de récupérer les saisies de l'utilisateur
+    - Formulaire HTML
+      - Méthode
+      - Action
+      - Types de champ
+	- Text
+	- Select
+	- Date
+	- Hidden
+	  - Pour passer en douce une donnée utile pour nous, genre un id
+    - Récupération des données
+  - Requêtes préparées
+    - Exemple d'utilisation
+      #+BEGIN_BLOCK
+    $sql = 'SELECT titre, YEAR(date_sortie) annee_sortie, nom_complet_personnage
+    FROM films f, roles r
+    WHERE f.id_film = r.id_film
+    AND id_acteur = :id_acteur';
+    $statement = $pdo->prepare($sql);
+    $statement->execute(array(':id_acteur' => $idActeur));
+      #+END_BLOCK
+    - Quand utiliser ?
+      - Tout le temps, d'après ces commentaires : https://stackoverflow.com/questions/24988867/when-should-i-use-prepared-statements
+    - Permet de sanitizer les entrées de l'utilisateur
+      - Et donc d'éviter les injections SQL
+      - Même si les certaines valeurs sont censées être fixes
+	- <select> dans un formulaire
+      - En vrai, possible de forger une requête avec outil en ligne de commande (cURL) ou des outils plus friendly (Postman, extension pour navigateur)
+    - Pose la question des performances
+      - Instinctivement, la requête préparée doit impliquer un coût supplémentaire
+      - Est-ce pénalisant si finalement exécute la requête qu'une seule et unique fois ?
+      - Le SGBD doit conserver en cache la requête préparée
+      - Mais implique quand même un aller-retour entre l'app et la BD
+      - Donc a un coût
+      - D'après plusieurs posts, coût négligeable par rapport aux gains de sécu
+	- https://stackoverflow.com/questions/10863598/mysql-php-pdo-prepared-statements-performance-issues-vs-security
+      - À surveiller, mais que si on commence à avoir des problèmes de perfs trop présents
+  - Factorisation de code
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
