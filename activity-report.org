@@ -13166,61 +13166,6 @@ to be too obscure to justify that level of extra complexity and memory use.
     - Peut faire l'objet d'une question ouverte du style "Proposer une modification du schéma relationnel permettant de gérer ce type de cas"
   - Un provider propose dans son catalogue des shows
 **** DONE Papier : Rédiger section sur /core-nebula/
-**** IN-PROGRESS Algo : Corriger DM2
-- Ça serait pas mal de faire ça avant les vacs
-- Histoire qu'iels soient fixé-e-s et moi débarrassé
-**** TODO Algo : Préparer TD10
-- Correction
-  - L'exo recherche dichotomique me paraît intéressant à faire avec eux
-  - Pareil pour un 1er exo de tri
-**** TODO BD2 : Préparer et tourner CM6
-- Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
-  - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
-- Histoire qu'iels puissent tout de même découvrir ces sujets, je vais faire une VOD
-**** TODO Papier : Rédiger section sur /LSEQ/
-**** TODO Papier : Rédiger conclusion
-**** TODO Papier : Rédiger section sur /LogootSplit/
-**** TODO Papier : Déplacer section sur /RenamableLogootSplit/ dans *Background*
-- L'idée est de mettre en background le papier de PaPoC
-- Les limites deviennent donc celles de la 1ère version de RLS
-- La contribution du papier courant devient donc le passage à une version de RLS capable de gérer les renommages concurrents
-**** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
-- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
-- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
-- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
-- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
-- /reverseRenameId(newId)/ renvoie /newId/
-- On a donc /reverseRenameId(renameId(id)) != id/
-- Détecter et gérer ce cas
-**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
-- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
-- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
-  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
-  - Leur approche est du coup probablement générique
-  - À vérifier
-  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
-**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
-- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
-- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
-  - Ou les pistes de réflexions que cela dessine
-**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
-- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
-- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
-- Version courte du papier avait été présenté à PaPoC'20
-  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
-  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
-- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
-- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
-- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
-  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
-  - Mais qui possèdent des opérations différentes
-  - Chacune de ces opérations est commutative avec elle-même
-  - Mais elles ne sont pas commutatives entre elles
-    - L'exemple de l'addition et de la multiplication
-  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
-  - Moi l'opération de renommage n'est pas commutative avec elle-même
-  - Je ne peux donc pas utiliser la même technique
-- À valider au cours d'une nouvelle lecture
 *** Done
 - BD2 : Préparer CM5
   - Formulaires
@@ -13263,6 +13208,644 @@ to be too obscure to justify that level of extra complexity and memory use.
 	- https://stackoverflow.com/questions/10863598/mysql-php-pdo-prepared-statements-performance-issues-vs-security
       - À surveiller, mais que si on commence à avoir des problèmes de perfs trop présents
   - Factorisation de code
+** Semaine du <2020-12-14 Mon> au <2020-12-18 Fri>
+*** Planned
+**** DONE Algo : Préparer TD10
+- Correction
+  - L'exo recherche dichotomique me paraît intéressant à faire avec eux
+  - Pareil pour un 1er exo de tri
+**** DONE Papier : Rédiger section sur /LSEQ/
+**** DONE Papier : Rédiger conclusion
+**** DONE Papier : Refaire une passe sur le papier avant envoi à Gérald et Olivier
+- Histoire de vérifier si y a pas des faux-raccords dans le contenu que j'ai ajouté
+- Peut aussi en profiter pour remplacer cette figure sur le temps d'intégration des opérations de renommages qui a un problème d'échelle
+  - Voir ce que donnerait un tableau à la place
+*** Done
+- Algo : Préparer TD10
+  - Charles m'a contacté concernant cette prochaine séance
+    - Souhaite donner le DM3 dans le courant de la semaine
+    - Faut donc avoir couvert les pré-requis du DM cette semaine
+    - Càd la recherche dichotomique, algorithmes de tri et les objets
+  - Correction
+    - Correction
+      - Recherche dichotomique
+      - Tri par sélection
+    - Cours sur les objets
+      - Principe
+	- Paradigme de programmation désormais courant dans les langages
+	- Permet de définir de nouveaux types
+	- qui vont représenter des concepts (Personne, Voiture, Compte bancaire)
+	- Possède un état
+	  - Décrit par l'ensemble de ses attributs
+	- Et peut effectuer un certains nombres d'actions/d'opérations
+	  - Décrites par ses méthodes
+      - Constructeur __init__
+	- Permet de construire un exemplaire de l'objet
+	- On parle d'instance
+      - Paramètre /self/
+      - Attributs/Propriétés
+      - Méthodes
+      - __str__
+      - Avantages
+	- Permettra de généraliser puis de spécialiser des comportements à l'aide de l'héritage
+	- Peut être utilisé en tant que boîte noire par d'autres programmes
+- Papier : Rédiger section sur /LSEQ/
+  - Du mal à voir comment je peux introduire le doublement de base
+- Meeting
+  - Réunion avec Gérald et Olivier pour faire le point
+    - Maintenant que j'ai fini le gros des cours, peut me concentrer sur la recherche de nouveau
+    - Reprise de l'écriture du papier sur la version distribuée de mon algo de renommage
+      - A ajouté la partie Related Work et Conclusion
+      - A envoyé cette nouvelle version à Gérald et Olivier
+	- Retours normalement courant de semaine pro
+      - Reste maintenant le refactoring de la partie background/début contribution par rapport aux retours que j'ai déjà eu de leur part
+    - Problème étant où l'envoyer ?
+      - ICDCS'21
+	- Abstract le 6 janvier, papier le 13
+	- En l'état, pas atteignable
+	- Mais si deadline reportée, ça se tente
+      - PODC'21
+	- Abstract le 11 février, papier le 15
+	- Mais mon papier est probablement pas assez théorique
+      - TPDS
+	- Journal
+	- Faudrait retravailler le papier pour inclure la partie PaPoC
+      - On en rediscute la semaine de la rentrée en fonction de mon avancée
+    - A discuté de la suite du programme
+      - Rédaction du manuscrit
+      - Travail sur la proposition de stratégies pour la génération de
+	- Définir les données qui peuvent être pris en considération pour la décision de génération d'un renommage
+	- Proposer des stratégies à partir de celles-ci
+	- Identifier avantages/inconvénients de ces stratégies
+	  - Potentiellement une agressive, une conservatrice
+** Semaine du <2020-12-21 Mon> au <2020-12-25 Fri>
+*** Planned
+**** DONE Algo : Corriger DM2
+- Ça serait pas mal de faire ça avant les vacs
+- Histoire qu'iels soient fixé-e-s et moi débarrassé
+*** Done
+** Semaine du <2021-01-04 Mon> au <2021-01-08 Fri>
+*** Planned
+**** DONE Algo : Préparer TD11
+*** Done
+- Algo : Préparer TD11
+  - Consiste à revoir et terminer le TD10
+  - Correction de l'exo 1 en live
+    - Jusqu'à la question e)
+    - Permet ainsi de voir la définition de classe, l'instanciation, les méthodes spéciales
+  - Rappel sur le DM3
+    - Insister sur lectures des consignes
+    - Notamment, par rapport à ce que prend en entrée/paramètre/argument et ce que retourne les fonctions demandées
+    - Si on vous demande d'écrire une fonction qui prend une ligne du fichier donné en paramètre et qui renvoie un objet Ville
+      - Si vous m'écrivez une fonction qui prend autre chose en paramètre ou retourne autre chose, c'est incorrect
+	- Même si ça marche
+	- Vous faites du hors-sujet
+    - Et lorsque l'entrée n'est pas précisée, prenez le temps de réfléchir
+      - Dans tous les cas, on précise ce qu'on attend en sortie
+      - Reste à déterminer de quelles données vous avez besoin pour produire ce résultat
+- Répétition Quentin
+  - Début à 10:13
+  - Slide 5
+    - Mot-clés positifs alors que tu veux dire le contraire
+  - Slide 7
+    - Pas forcément clair le lien entre les différentes étapes IMO
+  - Slide 11
+    - C'est quoi un processus "marqué" ?
+      - Contraire d'un processus aléatoire
+  - Slide 12/13
+    - Pas trop clair ton schéma de structure en étoile je trouve
+  - Slide 15
+    - Différence entre Hub et inter-organisationnelle ?
+  - Slide 28
+    - Faire apparaître les différentes couleurs sur l'image de la page HAL aussi ?
+  - Slide 32-34
+    - Redonner la sémantique de ces paramètres ?
+  - Slide 40
+    - Paraît étrange les 2 1ers points par rapport au titre de la slide
+  - Problème au niveau de l'affichage de tes slides ?
+    - Affiche souvent plusieurs étapes d'un coup, mais en plusieurs étapes
+    - C'est normal ?
+  - Choix des thetas
+    - Pour apparition d'un lien, d'un hub ou d'un inter-organisationnelle ?
+    - Comment ce choix s'est fait ?
+    - Un autre choix est-il possible ?
+  - Typos
+    - Plan
+      - Entre chercheurS ?
+- Meeting
+  - Bonne année
+  - Réunion avec Olivier et Gérald pour discuter du papier sur RLS
+    - ICDCS n'a pas repoussé sa deadline, donc c'est mort
+    - Dorénavant vise TPDS
+      - Journal et plus une conf, doit revoir le format du papier
+      - Idée est de fusionner l'article pour PaPoC et celui que j'ai commencé à rédiger pour avoir un article complet sur RLS centralisé puis distribué
+    - On se revoit dans une dizaine de jours pour en rediscuter
+    - J'avais envoyé avant les vacances une version du papier
+      - M'ont fait part de quelques remarques/questions
+      - M'envoient la liste complète des corrections à apporter dans l'aprem
+  - Assisté à la soutenance blanche de Quentin
+    - Pas grand chose à redire, ça me paraît bien
+** Semaine du <2021-01-11 Mon> au <2021-01-15 Fri>
+*** Planned
+**** CANCELLED Papier : Rédiger section sur /LogootSplit/
+**** CANCELLED Papier : Déplacer section sur /RenamableLogootSplit/ dans *Background*
+- L'idée est de mettre en background le papier de PaPoC
+- Les limites deviennent donc celles de la 1ère version de RLS
+- La contribution du papier courant devient donc le passage à une version de RLS capable de gérer les renommages concurrents
+**** DONE Papier : Retrouver références pour mécanisme d'anti-entropie
+- À l'heure actuelle, je ne cite aucune référence lorsque j'indique qu'on utilise un mécanisme d'anti-entropie
+- On avait avec Victorien et Gérald retrouvé des références à ce sujet pour un livrable d'OpenPaaS
+- Voir pour retrouver et ajouter ces références au papier
+**** DONE Cours : Contacter Vincent pour infos supplémentaires sur le projet Informatique
+- Questions à poser
+  - Sur emploi du temps, j'ai rien vendredi aprem mais je vois que lui a les 2I de 13 à 17h, est-ce normal ?
+  - Merci pour le mail à Claude, sa réponse aide un peu à voir ce qui est attendu des étudiants
+  - Mentionne un sujet sur sa page dans son mail à Tesnim, quelle page ?
+    - J'ai fait un tour sur vdespre.free.fr mais j'ai rien vu qui correspondrait
+  - Infos que je n'ai pas
+    - C'est quoi le but du projet ?
+    - Volume horaire ?
+    - Date ?
+    - Rendus intermédiaires ?
+    - Y a des exemples de projets des années passées ?
+**** DONE Papier : Relire *Logoot-Undo: Distributed Collaborative Editing System on P2P Networks*
+- A été publié dans TPDS
+- Permettra de voir le format/les termes employés
+- Dispo ici : https://ieeexplore.ieee.org/document/5374392
+**** DONE Cours : Préparer slides sur UML et les diagrammes de classe
+- La 1ère séquence du projet doit se conclure sur l'élaboration, au propre, du diagramme de classe du projet
+- Et de la mise en place du squelette de classes correspondant sur un repo git
+- Pour le moment, on a juste vu l'utilisation du diagramme de classe dans la conception de base de données
+- Préparer quelques slides pour rappeler formalisme et expliquer utilisation dans la conception orientée objet
+- Différences majeures
+  - Types des attributs
+  - Associations se traduisent en attributs, non plus en relation
+  - Méthodes
+  - Correspondance entre diagrammes et classes
+- Insister sur intérêt/utilisation
+**** DONE Papier : Prendre en compte remarques d'Olivier
+- Olivier m'a envoyé ses remarques/notes
+- Faire les modifs en conséquences
+**** TODO Papier : Fusionner le papier de PaPoC et le draft pour la version distribuée
+- ICDCS n'a pas reporté sa deadline
+  - C'est donc mort pour ça
+- Du coup, vise maintenant le journal TPDS
+- Doit donc remanier le format du papier en conséquence
+- Idée est d'avoir un papier global avec une présentation de la version centralisée (PaPoC) puis distribuée (draft)
+**** TODO Papier : Relire *A Conflict-Free Replicated JSON Datatype* de Kleppmann
+- A été publié dans TPDS
+- Permettra de voir le format/les termes employés
+- Dispo ici : https://arxiv.org/abs/1608.03960
+**** TODO Papier : Relire *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
+- A été publié dans TPDS
+- Permettra de voir le format/les termes employés
+- Dispo ici : https://ieeexplore.ieee.org/document/4668339
+**** TODO BD2 : Préparer et tourner CM6
+- Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
+  - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
+- Histoire qu'iels puissent tout de même découvrir ces sujets, je vais faire une VOD
+**** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
+- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
+- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
+- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
+- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
+- /reverseRenameId(newId)/ renvoie /newId/
+- On a donc /reverseRenameId(renameId(id)) != id/
+- Détecter et gérer ce cas
+**** TODO CRDT : Lire *Merging OT and CRDT Algorithms*
+- Par Mehdi Ahmed-Nacer, Pascal Urso, Valter Balegas et Nuno Preguiça
+- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
+- Suis curieux de voir s'il s'agit d'une architecture à la Legion ou d'une intégration de OT dans un CRDT
+  - Ce qui se rapprocherait plus de ce que j'ai pu faire
+- Dispo ici : https://hal.inria.fr/hal-00957167
+**** TODO CRDT : Lire *Chronofold: a data structure for versioned text*
+- Par Victor Grishchenko et Mikhail Patrakeev
+- Présenté à PaPoC'20
+- De mémoire, s'agissait d'une séquence répliquée construite à partir du log ordonné des opérations
+- À 1ère vue, ne rentre pas dans une des approches habituelles pour concevoir les Sequence CRDTs
+- À creuser
+- Dispo ici : https://dl.acm.org/doi/10.1145/3380787.3393680
+**** TODO CRDT : Lire *Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types*
+- Par Petru Nicolaescu, Kevin Jahns, Michael Derntl, Ralf Klamma
+- S'agit du CRDT implémenté par Yjs (https://github.com/yjs/yjs), qui est développé par Kevin Jahns
+  - Qui est le framework présenté et évalué dans le blogpost *Are CRDTs suitable for shared editing?* (https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/)
+  - Par Kevin Jahns justement
+- Me semble qu'on retrouve une structure similaire à WOOT/RGA pour représenter les Séquences
+- Dispo ici : https://www.researchgate.net/publication/310212186_Near_Real-Time_Peer-to-Peer_Shared_Editing_on_Extensible_Data_Types
+**** TODO CRDT : Lire *A string-wise CRDT algorithm for smart and large-scale collaborative editing systems*
+- Par Xiao Lv, Fazhi He, Weiwei Cai, Yan Cheng
+- A inspiré la notion d'item, l'équivalent des blocs, dans Yjs
+- À lire
+- Dispo ici : https://coek.info/pdf-a-string-wise-crdt-algorithm-for-smart-and-large-scale-collaborative-editing-sys.html
+**** TODO CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
+- A remarqué ce /draft/ sur la page de Kleppmann
+- Peut être intéressant de voir comment leurs travaux ont avancé depuis PaPoC
+- Disponible ici : https://martin.kleppmann.com/papers/move-op.pdf
+**** TODO CRDT : Lire *File system on CRDT*
+- Par Mehdi Ahmed-Nacer, Stéphane Martin, Pascal Urso
+- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
+- Vu que c'est une direction possible de mes travaux (utilisation de CRDT + OT pour concevoir une structure répliquée représentant un système de fichiers distribué), suis curieux
+- N'a pas contre pas été publié/peer-reviewé
+- Dispo ici : https://hal.inria.fr/hal-00720681
+**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
+- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
+- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
+  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
+  - Leur approche est du coup probablement générique
+  - À vérifier
+  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
+**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
+- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
+- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
+  - Ou les pistes de réflexions que cela dessine
+**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
+- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
+- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
+- Version courte du papier avait été présenté à PaPoC'20
+  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
+  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
+- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
+- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
+- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
+  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
+  - Mais qui possèdent des opérations différentes
+  - Chacune de ces opérations est commutative avec elle-même
+  - Mais elles ne sont pas commutatives entre elles
+    - L'exemple de l'addition et de la multiplication
+  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
+  - Moi l'opération de renommage n'est pas commutative avec elle-même
+  - Je ne peux donc pas utiliser la même technique
+- À valider au cours d'une nouvelle lecture
+*** Done
+- Cours : Contacter Vincent pour infos supplémentaires sur le projet Informatique
+  - Il s'agit du projet dispo à l'adresse suivante : http://vdespre.free.fr/Downloads/Java2A/Projet.pdf
+  - Afin d'en discuter, a planifié une réunion mercredi 13
+    - Soit à 13h30, soit à 16h en fonction des dispos de Tesnim
+  - C'est à 13h30
+  - Questions à aborder
+    - C'est quoi le but du projet ?
+      - D'après le message de Claude, on évalue
+	- analyse des besoins
+	- qualité de la modélisation (classes, relations, contraintes)
+	- organisation du logiciel
+	- Eléments de sûreté : proc. stockées, transactions, triggers, sauvegardes ...
+	- qualité de l'interface
+	- validation par rapport aux besoins
+      - Est-ce toujours ça ?
+    - C'est quoi l'objectif à atteindre ?
+      - Le sujet a l'air plutôt libre
+      - Qu'est-ce qu'ils doivent rendre forcément, quels éléments composent la base de ce qui est attendu ?
+    - Volume horaire ?
+    - Organisation des groupes ?
+    - Choix de l'encadrant ?
+    - Date ?
+    - Rendus intermédiaires ?
+    - Interface admin ?
+      - Pour ajouter/modifier évènements par exemple
+      - Pourrait alors avoir 2 applis, une utilisateur, une admin
+    - Quid de la POO ?
+      - Projet porté sur la conception orientée objet
+      - Important ?
+	- Pas vu l'objet en PHP
+	- Peut leur filer des ressources à ce sujet
+    - Gestion de version, utilisation de git ?
+    - Cours sur Arche ?
+  - Réunion
+    - 15 étudiants
+    - 7 groupes (6 groupes de 2, un seul trinôme)
+    - 2 groupes doivent faire du Java pur
+    - 2 autres doivent faire la BDD
+    - Volume horaire
+      - 50h
+      - Environ 3-4h par semaine
+    - Préfère la partie en client lourd
+    - Interface graphique
+      - awt
+    - Javadoc/Documentation
+      - Demandé
+    - Jalons explicites
+      - Réunion une fois par semaine
+    - Conception orientée objet
+      - Main doit faire une ligne
+    - Soutenance
+      - Courant fin mai/début juin
+    - Rendus
+      - Pas de rapport
+      - Code + documentation
+      - Mais une présentation
+    - Évaluation
+      - Si travail honnête, 12
+      - Voir réguliarité, bonne volonté, s'ils jouent le jeu
+    - Conseils
+      - Faire réunion à la fin et au début de chaque séquence pour faire le point et les relancer
+    - 1ère séquence
+      - Peut partir sur conception orientée objet
+	- Objectif de la séquence est de faire le diagramme de classe au propre + squelette correspondant sur un git
+    - 2ème séquence
+      - Code
+    - 3ème séquence
+      - Préparation du rendu
+      - Préparation des soutenances
+  - Cours
+    - P3
+      - Design, diagramme de classe
+      - Préparer les packages, fichiers
+      - Prise en main de git
+    - P4
+      - Code + début de doc
+      - Vise à avoir un projet fonctionnel à l'issue de cette période
+    - P5
+      - Fini le code
+      - Met la documentation en forme
+      - Prépare soutenance
+    - Rendu
+      - Accès au code, Javadoc et slides
+    - Organisation
+      - Binômes et 1 trinôme
+      - Niveau homogène
+      - Utilisation de git
+	- Règle : Pas de travail de 2 étudiants en même temps sur le même fichier
+	- Pas pusher code qui compile pas
+      - 4h par semaine
+      - Heures dans l'EDT
+	- Heures prévues pour bosser le projet
+	- Peuvent être utilisées pour contacter et discuter avec encadrants
+    - Jeu doit être graphique ?
+      - 1ère phase : jeu qui fonctionne, en texte
+      - 2ème phase : jeu avec une interface graphique (AWT)
+	- Peut récupérer images (créditer artiste ?)
+      - 3ème phase : Sauvegarde en BD
+      - Phase 1 et 2 par tout le monde
+      - Phase 3 pour seulement quelques groupes
+	- Demande pas mal de taf supplémentaires
+    - Questions
+      - Droit à d'autres librairies ?
+	- Pour UI, pourquoi pas
+	- Mais sinon, à demander et gérer au cas par cas
+      - Droit à Unity ?
+	- Au cas par cas
+      - Droit au langage ?
+	- Si à l'aise
+	- En POO en tout cas
+    - Binôme
+      - Tisserand - Laguette
+	- Vincent
+      - Giroux - Greve
+	- Tesnim
+      - Seznec - Thouvenin - Maimbourg
+	- M'en occuperait
+      - Bluem - Noel
+	- Vincent
+      - Champseix - Masschelein
+	- M'en occuperait
+      - Brouillard - Soria
+	- Tesnim
+      - Schoumacher - Terrien
+	- Vincent
+    - 1ère semaine
+      - Choisir thème
+      - Réfléchir règles
+      - Quelles fonctionnalités ?
+- Papier : Prendre en compte remarques d'Olivier
+  - Majoritairement des corrections
+  - Quelques annotations que je ne suis pas sûr de comprendre dont il faudra rediscuter
+    - 6.1
+      - ?
+    - 7.1
+      - Orientation ?
+      - Est-ce bien le bon terme ?
+  - Autres correcitons où je suis pas sûr
+    - Début page 7 : storing -> storage of => *the* storage of ?
+    - 6.1, page 7 : in -> given => ça marche dans ce cas-là ?
+    - 7.2, page 8 : once again -> as in the previous approach => as *with* the previous approach ?
+- Papier : Relire *Logoot-Undo: Distributed Collaborative Editing System on P2P Networks*
+  - Contenu
+    - Undo naïf consiste généralement à générer une opération inverse à l'opération initiale
+    - Ne fonctionne généralement pas
+      - Exemple du undo d'une suppression
+      - Si multiples undo concurrents, texte réinséré plusieurs fois
+    - Propose d'associer un degré aux différents éléments de la séquence
+      - Par défaut, 1, indique que la ligne est visibile
+      - Si supprimé ou /undo/ de l'/insert/, passe à 0
+      - Peut devenir négatif si plusieurs /undos/ ou /removes/ en concurrence
+      - /redo/ incrémente le degré
+      - En cas de /undos/ concurrents, force autant de /redos/ pour faire ré-apparaître la ligne
+	- Les /undos/ concurrents ont un effet accumulatif et non pas idempotent
+    - Ajoute une structure de données à l'état, le /cemetery/
+      - Permet de ne pas polluer l'état du document avec ce degré
+      - Ou de ne pas forcer le parcours du log des opés avant l'affichage du document
+      - Utilisée uniquement pour stocker les lignes ayant un degré < 0
+	- Les lignes avec 1 sont présentes dans le document, donc pas besoin de les reproduire
+	- Les lignes avec 0 sont juste absentes du doucment, donc pas besoin de les reproduire
+	- Uniquement besoin de gérer les autres cas
+  - Remarques sur papier dans TPDS par rapport à ICDCS
+    - Papier de Logoot publié à ICDCS 2009 dispo ici : https://hal.inria.fr/inria-00432368/
+    - Reprend des paragraphes entiers pour *Background*, *Related Work*
+      - Parfois développe juste ces paragraphes
+    - Dans section *Editing a Logoot-Undo document*
+      - Re-présente Logoot
+      - Re-présente la /Random identifier allocation strategy/
+      - Mais introduit la /Boundary identifier allocation strategy/
+    - Section *Modifying a Logoot-Undo document...*
+      - Nouvelle section
+    - Développe la sous-section *Correctness of the approach* en une section complète dans TPDS
+      - Retravaille la preuve de l'/eventual consistency/ pour Logoot-Undo
+      - Ajoute une preuve de la préservation de l'intention
+      - Ajoute une analyse et comparaison de la complexité de Logoot-Undo par rapport à WOOT et MOT2
+    - La partie évaluation a l'air d'être peu ou prou la même
+      - La présentation des résultats a l'air d'avoir un peu changé
+      - De nouveaux articles (/random articles/) ont été ajoutés à l'évaluation
+- Papier : Remarques sur papiers de TPDS
+  - J'ai l'impression que les papiers ont une composante théorique/formelle prononcée
+  - Les 3 papiers que j'ai regardé embarque une preuve de leur correction
+  - Le papier de Logoot-Undo a été complété par rapport à celui de Logoot avec une analyse de sa complexité
+  - Seul finalement le papier de Logoot-Undo présente une évaluation expérimentale
+  - Est-ce juste une mauvaise pioche ou ça correspond à la ligne éditoriale du journal ?
+- Papier : Retrouver références pour mécanisme d'anti-entropie
+  - Il s'agissait du L2.2 *Implantation du composant middleware de réplication hybride pair-à-pair V1*
+    - Dispo ici : https://research.linagora.com/download/attachments/16580772/SP2_L2-2_ImplantationDuComposantMiddlewareDeReplicationHybridePairAPair_VF.pdf?version=1&modificationDate=1493975898000
+  - La référence qu'on avait citée est *Detection of Mutual Inconsistency in Distributed Systems*
+    - Abstract dispo ici : https://dl.acm.org/doi/10.1109/TSE.1983.236733
+  - J'ai pris le temps de voir par quels papiers cet article est cité, histoire de trouver d'autres papiers qui pourraient m'intéresser
+    - On retrouve quelques papiers de la littérature CRDTs
+      - *A Scalable Conflict-Free Replicated Set Data Type*
+	- Par Andrei Deftu et Jan Griebsch en 2013
+	- Dispo ici : https://ieeexplore.ieee.org/document/6681588
+      - *A Conflict-Free Replicated JSON Datatype*
+      - *Delta state replicated data types*
+      - *DottedDB: Anti-Entropy without Merkle Trees, Deletes without Tombstones*
+	- Me fait penser qu'il faudrait que je relise un peu sur les mécanismes d'anti-entropie basés sur les Merkle Trees pour me rafraîchir la mémoire à ce sujet
+    - On retrouve d'autres papiers qui ont l'air de proposer des améliorations
+      - *Version stamps-decentralized version vectors*
+	- Par Paulo Sérgio Almeida, Carlos Baquero et Victor Fonte en 2002
+	- Argumente que le design de base des /version vectors/ pose problème en cas de partition
+	  - Comment choisir son identité ? (si je comprends bien)
+	- Propose un mécanisme de capture de la causalité alternatif
+	- Peut-être l'ancêtre de *Interval Tree Clock* en fait
+	- Dispo ici : https://ieeexplore.ieee.org/document/1022304
+      - *Concise version vectors in WinFS*
+	- Par Dahlia Malkhi et Doug Terry en 2007
+	- Présentent /predecessor vectors with exceptions (PVEs)/
+	- Permettrait de réduire l'overhead (metadata et network) dû aux /version vectors/
+	- Dispo ici : https://link.springer.com/article/10.1007/s00446-007-0044-y
+      - *Interval Tree Clocks*
+	- Par Paulo Sérgio Almeida, Carlos Baquero et Victor Fonte en 2008
+      - *Log' version vector: Logging version vectors concisely in dynamic replication*
+	- Par Hyun-Gul Roh, Myeongjae Jeon, Euiseong Seo, Jinsoo Kim et Joonwon Lee en 2010
+	- Propose /log-prime/, un nouvel encodage du /version vector/ qui aurait une taille fixe, composée de 3 entrées
+	- Sacrifierait un peu de précision, mais éviterait mécanisme de GC du /version vector/
+	- Dispo ici : https://www.sciencedirect.com/science/article/abs/pii/S0020019010001158
+      - *Adaptive Version Clocks and the OffSync Protocol*
+	- Par Christoph P. Neumann, Andreas M. Wahl et Richard Lenz en 2012
+	- A l'air d'adapter les /version vectors/ de façon à les rendre viable dans un système dynamique
+	- Dispo ici : https://ieeexplore.ieee.org/document/6280383/
+      - *Scalable eventually consistent counters over unreliable networks*
+	- Par Paulo Sérgio Almeida et Carlos Baquero en 2017
+	- Semble proposer un compteur dont l'état ne croît pas linéairement avec le nombre de nodes
+	- Se base sur le principe des /Handoff Counters/
+	- L'approche serait générique
+	- Dispo ici : https://link.springer.com/article/10.1007%2Fs00446-017-0322-2
+      - *Causality Tracking Trade-offs for Distributed Storage*
+	- Par Hugo Guerreiro, Luis Rodigues, Nuno Preguiça et Nivia Quental en 2020
+	- A plutôt l'air de comparer les avantages et inconvénients, en fonction de la situation, des différentes approches possibles pour capturer la causalité entre évènements
+	- Dispo ici : https://ieeexplore.ieee.org/document/9306734
+    - Les modifs ont l'air de porter sur le mécanisme de /causality tracking/, pas sur le mécanisme d'anti-entropie en soi
+    - À creuser
+- Cours : Préparer slides sur UML et les diagrammes de classe
+  - Plan
+    - Conception Orientée Objet dans le cadre du Projet informatique
+      - N'évalue pas uniquement votre code en tant que tel dans le cadre de ce projet
+      - Mais allons aussi évaluer l'architecture logicielle de votre projet
+      - Concrètement, comment votre programme est construit ?
+    - Intuition
+      - Il a plusieurs façons d'écrire/de construire un programme donné
+      - Certaines sont meilleures que d'autres
+	- Décomposer votre programme en objets qui interagissent entre eux >>> une seule classe
+      - On appelle cet art la Conception Orientée Objet
+    - Qu'est-ce que la Conception Orientée Objet ?
+      - Ensemble de bonnes pratiques sur comment construire une application
+      - Repose notamment sur des principes de la Programmation Orientée Objet (polymorphisme, encapsulation)
+    - But de la Conception Orientée Objet
+      - Rendre le code plus compréhensible (séparation des responsabilités)
+      - Permettre de le rendre plus maintenable (factorisation du code)
+      - Permettre de le rendre plus évolutif (minimisation des dépendances)
+    - Outil
+      - Idée est de réfléchir au code avant de l'écrire
+      - Pour appuyer cette réflexion, des outils existent
+      - Y en a qu'on connaît déjà et qu'on a déjà utilisé ensemble
+    - Diagrammes de classe UML
+      - Utilisés en cours de BD pour la conception de bases de données
+      - Nous permettait de représenter les différentes entités de notre système et les associations entre ces dernières
+      - De là, on proposait un schéma relationnel de notre BD
+      - Mais à la base, designé pour la conception orientée objet
+    - Rappel Diagrammes UML
+      - Classe
+      - Attributs
+      - Opérations
+      - Exemple avec Point
+      - Correspondance avec du code
+      - Associations
+    - Quelques différences par rapport au cours de BD
+      - Ici, les opérations (méthodes) nous intéressent
+      - Les associations ne vont pas se traduire en de nouvelles classes
+	- Exemple avec Rectangle
+	- Mais en des attributs
+	- À vous de déterminer quel objet doit référencer/connaître l'autre
+	- S'indique à l'aide du sens de la flèche
+      - Visibilité des attributs et méthodes est importante
+    - Rappel héritage
+      - Exemple avec Animal, Chien et Poisson
+	- Ajouter Nourriture, Croquette et Granulé ?
+      - Classes filles sont des spécialisations, classe mère une généralisation
+      - Puis mettre Animal en abstract
+    - Présentation interface
+      - Exemple avec Iterable, List, SuiteFibonacci
+    - Notion de dépendance
+      - Les différents types d'associations (simple, héritage, implémentation) traduisent une dépendance entre les objets
+      - La dépendance a une conséquence concrète
+	- Si A dépend de B
+	- Si je modifie B
+	- A peut être cassé
+    - Exemple avec Point et Rectangle
+      - Dépendance correspond au sens de la flèche
+      - Si modifie Point
+	- Je modifie la signature du constructeur de Point (besoin de fournir un z dorénavant)
+      - Alors Rectangle est cassé
+      - Pareil pour seTranslater()
+      - Si par contre je modifie Rectangle
+      - Aucun impact sur Point
+    - Dépendance et encapsulation
+      - Un de nos objectifs est de maîtriser et de limiter ces dépendances
+      - Un moyen d'y parvenir est d'utiliser l'encapsulation
+	- Rendre privé les attributs et méthodes
+	- Si les autres classes ne connaissent pas/n'ont pas accès aux attributs et méthodes, alors peuvent être modifiés sans risques
+	- Réduit pas le nombre d'associations dans notre diagramme de classe
+	- Mais réduit la surface du code concerné par la relation de dépendance
+    - Conclusion sur dépendance
+      - Utile aussi pour déterminer ordre d'écriture des classes
+	- Ne peut pas écrire Rectangle tant que je n'ai pas Point
+	- Les classes sans dépendances doivent être les 1ères écrites
+      - Utile pour répartir le travail
+	- Permet de décomposer notre programme en groupes de classes, sans dépendances (ou peu) entre ces groupes
+	- Peut répartir ces groupes de classes entre les membres du projet pour travailler sans se marcher dessus
+    - Diagrammes de classe en pratique
+      - Pour démarrer, faire diagrammes sur papier
+      - Une fois que diagramme stable, pourra utiliser un logiciel pour le dessiner
+	- PlantUML
+    - Questions ?
+- Meeting
+  - A cours à 14h, donc je m'eclipserai probablement vers 50
+  - Globalement, ça va
+    - J'avais une surveillance d'examen, donc ça m'a donné une occasion de sortir de chez moi et de croiser mes étudiants, ce qui a fait un peu de bien
+  - Concernant mon travail de cette semaine
+    - J'en parlais la semaine dernière, vu que ICDCS n'a pas repoussé sa deadline, on a décidé de retravailler notre article sur RenamableLogootSplit pour le soumettre à TPDS
+    - Cette semaine, j'ai (re-)jeté un oeil à différents articles publiés à TPDS (Logoot-Undo notamment)
+      - Histoire d'essayer de voir sur quels aspects mon article pourrait pécher actuellement
+    - Sinon j'ai pris en compte les corrections que m'a suggéré Olivier
+    - Là je suis en train de fusionner le papier pour PaPoC et le draft pour ICDCS au format du journal et de poursuivre sa rédaction
+  - Je profite de ce message pour me renseigner, est-ce qu'il y a la possibilité de pouvoir aller de manière régulière au labo pour bosser ?
+    - Si j'ai bien compris, y a moyen de retourner sur place par exemple pour des réunions
+    - Mais est-ce possible par exemple de pouvoir travailler au labo 1 jour par semaine ?
+    - Histoire de casser un peu ma routine
+    - Et de baisser ma facture de chauffage
+  - Réunion
+    - François
+      - 2 nouveaux docteurs dans l'équipe /o/
+      - Oui y a moyen d'aller au labo
+	- Pas besoin de prendre RDV
+	- Mais faut se concerter avec ses collègues de bureau
+    - Abir
+      - Occupée avec les cours
+    - Alexandre
+      - Essaie d'obtenir les dumps de Wikipedia via l'API ou le code d'Abdul
+    - Anis
+      - Effectue les corrections proposées par Olivier et François
+      - Avance sur l'implem (composition de services si je me souviens bien)
+      - Doit fournir une preuve de sa participation en entreprise pour "échapper" au reste des formations
+    - Claudia
+      - Soutenance Le s'est bien passée
+      - Assisté à la soutenance de Quentin
+	- Bien passé selon elle
+      - A commencé modifs sur HDR pour pouvoir l'envoyer aux rapporteurs
+      - Pense l'envoyer prochainement
+    - Gérald
+      - Content des soutenances de thèse
+      - Doit toujours envoyer ses commentaires sur le drafts
+    - Clélie
+      - A enfin récupéré les 2 derniers participants dont elle avait besoin
+      - Mis en place logiciel et définit table de codage pour expériences
+    - Le
+      - Now a Dr !
+      - No plans for now
+    - Matthieu
+    - Olivier
+      - Rien de particulier
+    - Pierre-Antoine
+      - Continue sur Proxy-Encryption
+      - Elargit champ de recherche sur les conférences/domaines à explorer
+    - Quentin
+      - Now a Dr !
+      - Soutenance mardi
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
@@ -13392,7 +13975,7 @@ to be too obscure to justify that level of extra complexity and memory use.
 - Lors d'un split, un bloc est coupé en deux et un nouveau bloc est inséré au milieu
 - Après la suppression du bloc inséré, on pourrait fusionner les deux parties du bloc initial pour le recréer
 - Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
-** TODO [#B] CRDT : Lire *Kaleido*
+** TODO CRDT : Lire *Kaleido*
 * Commandes utiles
 - Obtenir la taille d'un dossier
   - /du -h -d 0 <path>/
