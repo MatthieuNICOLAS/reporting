@@ -13386,96 +13386,6 @@ to be too obscure to justify that level of extra complexity and memory use.
 **** DONE Papier : Prendre en compte remarques d'Olivier
 - Olivier m'a envoyé ses remarques/notes
 - Faire les modifs en conséquences
-**** TODO Papier : Fusionner le papier de PaPoC et le draft pour la version distribuée
-- ICDCS n'a pas reporté sa deadline
-  - C'est donc mort pour ça
-- Du coup, vise maintenant le journal TPDS
-- Doit donc remanier le format du papier en conséquence
-- Idée est d'avoir un papier global avec une présentation de la version centralisée (PaPoC) puis distribuée (draft)
-**** TODO Papier : Relire *A Conflict-Free Replicated JSON Datatype* de Kleppmann
-- A été publié dans TPDS
-- Permettra de voir le format/les termes employés
-- Dispo ici : https://arxiv.org/abs/1608.03960
-**** TODO Papier : Relire *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
-- A été publié dans TPDS
-- Permettra de voir le format/les termes employés
-- Dispo ici : https://ieeexplore.ieee.org/document/4668339
-**** TODO BD2 : Préparer et tourner CM6
-- Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
-  - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
-- Histoire qu'iels puissent tout de même découvrir ces sujets, je vais faire une VOD
-**** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
-- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
-- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
-- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
-- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
-- /reverseRenameId(newId)/ renvoie /newId/
-- On a donc /reverseRenameId(renameId(id)) != id/
-- Détecter et gérer ce cas
-**** TODO CRDT : Lire *Merging OT and CRDT Algorithms*
-- Par Mehdi Ahmed-Nacer, Pascal Urso, Valter Balegas et Nuno Preguiça
-- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
-- Suis curieux de voir s'il s'agit d'une architecture à la Legion ou d'une intégration de OT dans un CRDT
-  - Ce qui se rapprocherait plus de ce que j'ai pu faire
-- Dispo ici : https://hal.inria.fr/hal-00957167
-**** TODO CRDT : Lire *Chronofold: a data structure for versioned text*
-- Par Victor Grishchenko et Mikhail Patrakeev
-- Présenté à PaPoC'20
-- De mémoire, s'agissait d'une séquence répliquée construite à partir du log ordonné des opérations
-- À 1ère vue, ne rentre pas dans une des approches habituelles pour concevoir les Sequence CRDTs
-- À creuser
-- Dispo ici : https://dl.acm.org/doi/10.1145/3380787.3393680
-**** TODO CRDT : Lire *Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types*
-- Par Petru Nicolaescu, Kevin Jahns, Michael Derntl, Ralf Klamma
-- S'agit du CRDT implémenté par Yjs (https://github.com/yjs/yjs), qui est développé par Kevin Jahns
-  - Qui est le framework présenté et évalué dans le blogpost *Are CRDTs suitable for shared editing?* (https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/)
-  - Par Kevin Jahns justement
-- Me semble qu'on retrouve une structure similaire à WOOT/RGA pour représenter les Séquences
-- Dispo ici : https://www.researchgate.net/publication/310212186_Near_Real-Time_Peer-to-Peer_Shared_Editing_on_Extensible_Data_Types
-**** TODO CRDT : Lire *A string-wise CRDT algorithm for smart and large-scale collaborative editing systems*
-- Par Xiao Lv, Fazhi He, Weiwei Cai, Yan Cheng
-- A inspiré la notion d'item, l'équivalent des blocs, dans Yjs
-- À lire
-- Dispo ici : https://coek.info/pdf-a-string-wise-crdt-algorithm-for-smart-and-large-scale-collaborative-editing-sys.html
-**** TODO CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
-- A remarqué ce /draft/ sur la page de Kleppmann
-- Peut être intéressant de voir comment leurs travaux ont avancé depuis PaPoC
-- Disponible ici : https://martin.kleppmann.com/papers/move-op.pdf
-**** TODO CRDT : Lire *File system on CRDT*
-- Par Mehdi Ahmed-Nacer, Stéphane Martin, Pascal Urso
-- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
-- Vu que c'est une direction possible de mes travaux (utilisation de CRDT + OT pour concevoir une structure répliquée représentant un système de fichiers distribué), suis curieux
-- N'a pas contre pas été publié/peer-reviewé
-- Dispo ici : https://hal.inria.fr/hal-00720681
-**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
-- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
-- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
-  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
-  - Leur approche est du coup probablement générique
-  - À vérifier
-  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
-**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
-- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
-- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
-  - Ou les pistes de réflexions que cela dessine
-**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
-- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
-- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
-- Version courte du papier avait été présenté à PaPoC'20
-  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
-  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
-- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
-- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
-- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
-  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
-  - Mais qui possèdent des opérations différentes
-  - Chacune de ces opérations est commutative avec elle-même
-  - Mais elles ne sont pas commutatives entre elles
-    - L'exemple de l'addition et de la multiplication
-  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
-  - Moi l'opération de renommage n'est pas commutative avec elle-même
-  - Je ne peux donc pas utiliser la même technique
-- À valider au cours d'une nouvelle lecture
 *** Done
 - Cours : Contacter Vincent pour infos supplémentaires sur le projet Informatique
   - Il s'agit du projet dispo à l'adresse suivante : http://vdespre.free.fr/Downloads/Java2A/Projet.pdf
@@ -13846,6 +13756,238 @@ to be too obscure to justify that level of extra complexity and memory use.
     - Quentin
       - Now a Dr !
       - Soutenance mardi
+** Semaine du <2021-01-18 Mon> au <2021-01-22 Fri>
+*** Planned
+**** IN-PROGRESS Papier : Fusionner le papier de PaPoC et le draft pour la version distribuée
+- ICDCS n'a pas reporté sa deadline
+  - C'est donc mort pour ça
+- Du coup, vise maintenant le journal TPDS
+- Doit donc remanier le format du papier en conséquence
+- Idée est d'avoir un papier global avec une présentation de la version centralisée (PaPoC) puis distribuée (draft)
+**** TODO Papier : Réserver salle pour réunion <2021-01-29 Fri> à 14h
+**** TODO Algo : Noter les DM3
+**** TODO BD2 : Noter les projets
+**** TODO Papier : Relire *A Conflict-Free Replicated JSON Datatype* de Kleppmann
+- A été publié dans TPDS
+- Permettra de voir le format/les termes employés
+- Dispo ici : https://arxiv.org/abs/1608.03960
+**** TODO Papier : Relire *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
+- A été publié dans TPDS
+- Permettra de voir le format/les termes employés
+- Dispo ici : https://ieeexplore.ieee.org/document/4668339
+**** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
+- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
+- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
+- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
+- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
+- /reverseRenameId(newId)/ renvoie /newId/
+- On a donc /reverseRenameId(renameId(id)) != id/
+- Détecter et gérer ce cas
+**** TODO BD2 : Préparer et tourner CM6
+- Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
+  - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
+- Histoire qu'iels puissent tout de même découvrir ces sujets, je vais faire une VOD
+**** TODO CRDT : Lire *Merging OT and CRDT Algorithms*
+- Par Mehdi Ahmed-Nacer, Pascal Urso, Valter Balegas et Nuno Preguiça
+- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
+- Suis curieux de voir s'il s'agit d'une architecture à la Legion ou d'une intégration de OT dans un CRDT
+  - Ce qui se rapprocherait plus de ce que j'ai pu faire
+- Dispo ici : https://hal.inria.fr/hal-00957167
+**** TODO CRDT : Lire *Chronofold: a data structure for versioned text*
+- Par Victor Grishchenko et Mikhail Patrakeev
+- Présenté à PaPoC'20
+- De mémoire, s'agissait d'une séquence répliquée construite à partir du log ordonné des opérations
+- À 1ère vue, ne rentre pas dans une des approches habituelles pour concevoir les Sequence CRDTs
+- À creuser
+- Dispo ici : https://dl.acm.org/doi/10.1145/3380787.3393680
+**** TODO CRDT : Lire *Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types*
+- Par Petru Nicolaescu, Kevin Jahns, Michael Derntl, Ralf Klamma
+- S'agit du CRDT implémenté par Yjs (https://github.com/yjs/yjs), qui est développé par Kevin Jahns
+  - Qui est le framework présenté et évalué dans le blogpost *Are CRDTs suitable for shared editing?* (https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/)
+  - Par Kevin Jahns justement
+- Me semble qu'on retrouve une structure similaire à WOOT/RGA pour représenter les Séquences
+- Dispo ici : https://www.researchgate.net/publication/310212186_Near_Real-Time_Peer-to-Peer_Shared_Editing_on_Extensible_Data_Types
+**** TODO CRDT : Lire *A string-wise CRDT algorithm for smart and large-scale collaborative editing systems*
+- Par Xiao Lv, Fazhi He, Weiwei Cai, Yan Cheng
+- A inspiré la notion d'item, l'équivalent des blocs, dans Yjs
+- À lire
+- Dispo ici : https://coek.info/pdf-a-string-wise-crdt-algorithm-for-smart-and-large-scale-collaborative-editing-sys.html
+**** TODO CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
+- A remarqué ce /draft/ sur la page de Kleppmann
+- Peut être intéressant de voir comment leurs travaux ont avancé depuis PaPoC
+- Disponible ici : https://martin.kleppmann.com/papers/move-op.pdf
+**** TODO CRDT : Lire *File system on CRDT*
+- Par Mehdi Ahmed-Nacer, Stéphane Martin, Pascal Urso
+- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
+- Vu que c'est une direction possible de mes travaux (utilisation de CRDT + OT pour concevoir une structure répliquée représentant un système de fichiers distribué), suis curieux
+- N'a pas contre pas été publié/peer-reviewé
+- Dispo ici : https://hal.inria.fr/hal-00720681
+**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
+- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
+- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
+  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
+  - Leur approche est du coup probablement générique
+  - À vérifier
+  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
+**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
+- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
+- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
+  - Ou les pistes de réflexions que cela dessine
+**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
+- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
+- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
+- Version courte du papier avait été présenté à PaPoC'20
+  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
+  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
+- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
+- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
+- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
+  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
+  - Mais qui possèdent des opérations différentes
+  - Chacune de ces opérations est commutative avec elle-même
+  - Mais elles ne sont pas commutatives entre elles
+    - L'exemple de l'addition et de la multiplication
+  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
+  - Moi l'opération de renommage n'est pas commutative avec elle-même
+  - Je ne peux donc pas utiliser la même technique
+- À valider au cours d'une nouvelle lecture
+*** Done
+- Papier : Fusionner le papier de PaPoC et le draft pour la version distribuée
+  - A commencé à fusionner les papiers
+    - Encore quelques raccords à faire avec le nouveau template
+      - Pas encore regardé/compris comment fonctionne ce qu'ils recommandent pour les sous-figures
+	- Ça donne encore quelques ratés au niveau de la mise en forme, notamment des captions
+      - Pas convaincu du résultat avec le package /algorithmic/ recommandé
+	- Essayer /algorithmicx/
+      - Reste à configurer /hyperref/
+      - Le style de \paragraph diffère par rapport au template précédent
+	- Retravailler les différentes sous-parties de *Results*
+  - Modifications à apporter suite au changement de scope et de plan du papier
+    - *Overview*
+      - Repars sur le plan RLS en centralisé puis RLS en distribué
+      - Ajouter une note à ce sujet dans *Proposed approach* ?
+    - *RLS in centralised settings*
+      - Mettre à jour le formalisme des figures avec /epochs/
+    - *RLS in distributed settings*
+      - Ré-écrire début de cette section
+	- Plus besoin d'introduire l'opération de renommage
+	- Doit juste se concentrer sur l'explication du conflit et comment on peut le résoudre en ne "choisissant" qu'une opération de renommage
+      - Doit retravailler l'introduction de /revertRenameId()/
+	- Doit définir les propriétés que doivent respecter /renameId()/ et /revertRenameId()/
+	- Et doit donc présenter /renameId()/ et /revertRenameId()/ comme un couple de fonctions
+  - Contenu supplémentaire
+    - À l'heure actuelle, le papier fait 9 pages complètes
+    - Manque encore
+      - Abstract
+      - Intro
+      - 2nde version de l'algo de /renameId()/
+      - Algo de /revertRenameId()/
+      - Conclusion
+      - Appendices
+    - Si ça prend 1.5 - 2 pages, ça sera déjà pas mal
+    - Le papier doit faire 12 pages
+      - Jusqu'à 18 possible, mais faut payer
+    - Reste donc grosso-modo 1 page de contenu de "libre"
+    - Pistes possibles
+      - Stratégies de renommage
+	- Peut ajouter une sous-section à la fois dans *RLS in centralised settings* et dans *RLS in distributed settings* à ce sujet
+	- *RLS in centralised settings*
+	  - Servirait à introduire le requirement de performance
+	  - Porte sur plusieurs aspects :
+	    - Taille de la structure
+	    - Consommation en bande-passante de l'opé de renommage
+	    - Temps d'inté de l'opé de renommage sur les différents noeuds
+	  - En fonction du système et des contraintes physiques/matérielles des différents noeuds, peut avoir différentes priorités
+	  - Se traduit dans tous les cas par la nécessité de déclencher un renommage en fonction de la taille de la séquence
+	    - Taille de la structure dépend du nombre de blocs
+	    - Consommation en bande-passante de l'opé de renommage dépend du nombre de blocs
+	    - Temps d'inté de l'opé de renommage dépend du nombre d'éléments à renommer
+	      - Ce dernier cas de figure ne scale pas
+	  - Poser la question de quand ça devient worth it ?
+	    - D'un aspect gain de temps
+	      - Car le renommage réduit le temps d'inté des prochaines opérations
+	    - D'un aspect metadonnées
+	- *RLS in distributed settings*
+	  - Servirait à introduire le requirement de minimalisation des opérations concurrentes
+	  - Et montrer son aspect contradictoire avec le requirement de performance
+	  - Existe un état optimum sur lequel déclencher un renommage
+	  - Mais doit empêcher tous les noeuds de déclencher un renommage dès qu'ils observent de manière indépendante cet état
+	  - Donc nécessiter de se coordonner
+	  - Mais pas trop, car veut pas retomber sur les algos de consensus qui ne scalent pas
+      - Modèle de cohérence
+	- Que ça soit dans le papier pour PaPoC ou le draft, je ne parle jamais du modèle de cohérence que doit respecter RLS
+	- Juste dans la sous-section *System Model*, explique que RLS partage les mêmes /requirements/ que LS
+	  - Livraison des suppressions après insertions correspondantes
+	- Mais l'introduction de l'opération de renommage et des epochs change ça
+	- RLS nécessite en plus une livraison des opérations /epoch-based/ pour ses /insert/ et /remove/
+	- Faudrait que je revois pour /rename/ elle-même
+	  - Dans l'implem, a mis en place une livraison causale
+	  - Mais me semble que /epoch-based/ convient aussi
+	  - À confirmer
+	- En parler après avoir introduit ces 2 concepts, donc en fin de section *RLS in centralised settings*
+      - Complexité en temps
+	- Pourrait fournir une analyse de la complexité en temps des différents algos proposés
+	- /renameId()/ a une complexité de /O(log(m))/
+	  - Consiste à rechercher le précédesseur de l'identifiant à renommer dans une liste triée
+	  - Où /m/ est le nombre d'identifiants est le nombre d'identifiants du /former state/
+	  - Par contre, comment faire apparaître la taille des identifiants ?
+	  - Après peut argumenter que le nombre d'éléments >> taille des identifiants
+	    - Donc pas vraiment le plus important à faire apparaître dans l'analyse
+	- /rename()/ a donc une complexité de /O(n * log(m))/
+	  - Puisque consiste à renommer chacun des /n/ identifiants courant par rapport au /former state/ fourni composé de /m/ identifiants
+	- /revertRenameId()/ a une complexité de /O(1)/
+	  - Consiste à faire du /pattern matching/ pour identifier le renommage qui a été appliqué précédemment
+	  - Pas besoin de boucle pour retrouver le prédecesseur si besoin
+	    - Car information déjà présente /offset/
+	- /revertRename()/ a donc une complexité de /O(n)/
+	- Reste juste à faire apparaître la distance entre les epochs
+	- Si on considère que /k/ représente le nombre de /rename/ à inverser et /l/ le nombre de /rename/ à appliquer successivement ensuite
+	- On obtient que /fullRename()/ a une complexité de /O(k * n + l * (n + m))/
+	  - Avec par contre les /m/ qui changent en fonction du renommage
+	  - Mais devrait avoir un ordre de grandeur similaire tant que /l/ petit
+	- Faudrait aussi mettre à jour les complexités de /insert()/ et /remove()/
+	- /insert()/ et /remove/ ont une complexité de /O(k + l * log(m) + log(n))/
+	  - Si on considère que l'insertion/suppression dans la liste triée a une complexité de /O(log(n))/
+      - Preuve de la correction
+	- Alors pas de la version distribuée
+	- Mais la version centralisée, je pense que c'est jouable de manière "logique"
+	- Nécessiterait d'introduire les propriétés que doit respecter l'algo de renommage
+	  - Cohérence forte à terme
+	    - Montrer le déterminisme de l'opération de renommage
+	    - Et que /rename/ est commutative avec /insert/ et /remove/
+	  - Conservation de l'intention
+	    - Le renommage en soi n'a pas d'intention
+	    - Ne doit pas interférer avec les autres opérations, /insert/ et /remove/
+	    - Ça veut dire quoi ça ?
+	      1. Un élément supprimé ne doit pas être "rappelé" par un renommage
+	      2. Un élément inséré ne doit pas être supprimé par un renommage
+	      3. Un élément ne doit pas être déplacé par un renommage
+	    - Les 2 premiers points me paraissent triviaux
+	      - Un noeud applique le renommage sur son état
+	      - Plus précisément, le renommage va uniquement modifier l'identifiant de chaque élément
+	      - Donc pas de risque de résurrection ou disparition d'un élément suite à l'application du renommage
+	  - Conservation de l'ordre
+	    - Montrer que si /id1 < id2/, /renameId(id1) < renameId(id2)/ dans tous les cas
+	    - Ça me paraît faisable
+	    - Juste que je ne sais pas écrire de preuves
+	    - Donc besoin d'un coup de main
+      - Implémentation alternative possible
+	- Une autre façon de faire est de se baser sur le log des opés
+	- Renommer consiste à repartir de l'état résultat du renommage primaire, et d'appliquer dessus les opés concurrentes
+	- Remplace le facteur /n/ de la complexité de /fullRename()/ par un facteur /x/ qui correspond au nombre d'opés concurrentes
+	- IMO /x << n/
+	- Mais nécessite de conserver le log des opés
+	  - Nécessaire par ailleurs pour la sync entre pairs ainsi que mécanisme d'anti-entropie
+	  - Donc pas un si gros problème en soi
+	- Mais nécessite de parcourir ce log pour en sortir les opés concurrentes
+	  - Nécessite de pouvoir identifier les opés concurrentes à l'opé /rename/
+	  - Donc un /vector clock/, ce qui n'est pas terrible dans un système dynamique
+	- Faudrait voir la complexité en temps de cette étape là
+  - Réunion
+    - Faudrait trouver un meilleur nom pour la 2nde version de /renameId()/
+      - Olivier proposait /renameIdDis()/
+    - Concernant le contenu, vaudrait mieux améliorer/détailler le contenu existant
+    - Puis ensuite, en fonction des reviews, compléter/ajouter ce qui est demandé
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
