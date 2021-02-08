@@ -13758,99 +13758,35 @@ to be too obscure to justify that level of extra complexity and memory use.
       - Soutenance mardi
 ** Semaine du <2021-01-18 Mon> au <2021-01-22 Fri>
 *** Planned
-**** IN-PROGRESS Papier : Fusionner le papier de PaPoC et le draft pour la version distribuée
+**** DONE Papier : Fusionner le papier de PaPoC et le draft pour la version distribuée
 - ICDCS n'a pas reporté sa deadline
   - C'est donc mort pour ça
 - Du coup, vise maintenant le journal TPDS
 - Doit donc remanier le format du papier en conséquence
 - Idée est d'avoir un papier global avec une présentation de la version centralisée (PaPoC) puis distribuée (draft)
-**** TODO Papier : Réserver salle pour réunion <2021-01-29 Fri> à 14h
-**** TODO Algo : Noter les DM3
-**** TODO BD2 : Noter les projets
-**** TODO Papier : Relire *A Conflict-Free Replicated JSON Datatype* de Kleppmann
-- A été publié dans TPDS
-- Permettra de voir le format/les termes employés
-- Dispo ici : https://arxiv.org/abs/1608.03960
-**** TODO Papier : Relire *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
-- A été publié dans TPDS
-- Permettra de voir le format/les termes employés
-- Dispo ici : https://ieeexplore.ieee.org/document/4668339
-**** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
-- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
-- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
-- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
-- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
-- /reverseRenameId(newId)/ renvoie /newId/
-- On a donc /reverseRenameId(renameId(id)) != id/
-- Détecter et gérer ce cas
-**** TODO BD2 : Préparer et tourner CM6
-- Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
-  - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
-- Histoire qu'iels puissent tout de même découvrir ces sujets, je vais faire une VOD
-**** TODO CRDT : Lire *Merging OT and CRDT Algorithms*
-- Par Mehdi Ahmed-Nacer, Pascal Urso, Valter Balegas et Nuno Preguiça
-- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
-- Suis curieux de voir s'il s'agit d'une architecture à la Legion ou d'une intégration de OT dans un CRDT
-  - Ce qui se rapprocherait plus de ce que j'ai pu faire
-- Dispo ici : https://hal.inria.fr/hal-00957167
-**** TODO CRDT : Lire *Chronofold: a data structure for versioned text*
-- Par Victor Grishchenko et Mikhail Patrakeev
-- Présenté à PaPoC'20
-- De mémoire, s'agissait d'une séquence répliquée construite à partir du log ordonné des opérations
-- À 1ère vue, ne rentre pas dans une des approches habituelles pour concevoir les Sequence CRDTs
-- À creuser
-- Dispo ici : https://dl.acm.org/doi/10.1145/3380787.3393680
-**** TODO CRDT : Lire *Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types*
-- Par Petru Nicolaescu, Kevin Jahns, Michael Derntl, Ralf Klamma
-- S'agit du CRDT implémenté par Yjs (https://github.com/yjs/yjs), qui est développé par Kevin Jahns
-  - Qui est le framework présenté et évalué dans le blogpost *Are CRDTs suitable for shared editing?* (https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/)
-  - Par Kevin Jahns justement
-- Me semble qu'on retrouve une structure similaire à WOOT/RGA pour représenter les Séquences
-- Dispo ici : https://www.researchgate.net/publication/310212186_Near_Real-Time_Peer-to-Peer_Shared_Editing_on_Extensible_Data_Types
-**** TODO CRDT : Lire *A string-wise CRDT algorithm for smart and large-scale collaborative editing systems*
-- Par Xiao Lv, Fazhi He, Weiwei Cai, Yan Cheng
-- A inspiré la notion d'item, l'équivalent des blocs, dans Yjs
-- À lire
-- Dispo ici : https://coek.info/pdf-a-string-wise-crdt-algorithm-for-smart-and-large-scale-collaborative-editing-sys.html
-**** TODO CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
-- A remarqué ce /draft/ sur la page de Kleppmann
-- Peut être intéressant de voir comment leurs travaux ont avancé depuis PaPoC
-- Disponible ici : https://martin.kleppmann.com/papers/move-op.pdf
-**** TODO CRDT : Lire *File system on CRDT*
-- Par Mehdi Ahmed-Nacer, Stéphane Martin, Pascal Urso
-- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
-- Vu que c'est une direction possible de mes travaux (utilisation de CRDT + OT pour concevoir une structure répliquée représentant un système de fichiers distribué), suis curieux
-- N'a pas contre pas été publié/peer-reviewé
-- Dispo ici : https://hal.inria.fr/hal-00720681
-**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
-- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
-- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
-  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
-  - Leur approche est du coup probablement générique
-  - À vérifier
-  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
-**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
-- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
-- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
-  - Ou les pistes de réflexions que cela dessine
-**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
-- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
-- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
-- Version courte du papier avait été présenté à PaPoC'20
-  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
-  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
-- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
-- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
-- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
-  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
-  - Mais qui possèdent des opérations différentes
-  - Chacune de ces opérations est commutative avec elle-même
-  - Mais elles ne sont pas commutatives entre elles
-    - L'exemple de l'addition et de la multiplication
-  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
-  - Moi l'opération de renommage n'est pas commutative avec elle-même
-  - Je ne peux donc pas utiliser la même technique
-- À valider au cours d'une nouvelle lecture
+**** DONE Papier : Rédiger début de la section *RLS in distributed settings*
+- Devait remanier de base cette section suite aux retours d'Olivier
+- Le fait d'avoir fusionner les papiers accentue le besoin de la retravailler
+  - Avant, présentait le mécanisme de renommage
+  - Montrait la non-commutativité de l'opération de renommage avec elle-même
+  - Et présentait l'intuition de comment résoudre le conflit produit par des opérations de renommage concurrentes
+  - Vu qu'on présente dorénavant le mécanisme de renommage dans la section précédente, le rôle de cette section doit changer
+- Définir le nouveau plan de cette sous-section
+- La rédiger
+**** DONE Papier : Retravailler l'introduction de la notion d'epochs
+- Dans PaPoC, parlait des epochs mais ne les représentaient jamais
+- C'était adapté à nos besoins vu qu'on avait juste un avant/après l'opération /rename/
+- Je rentre dans plus de détails dorénavant car j'en ai besoin pour définir la relation /priority/ entre les epochs/opérations /rename/
+- Les fait aussi apparaître dans mes schémas
+- Retravailler l'introduction de la notion d'epochs pour rendre le papier plus cohérent
+  - Autant d'un point de vue déroulé que formalisme des figures
+- J'étais plutôt satisfait de ce que j'avais écrit dans le draft à ce sujet
+- Voir si je peux reprendre et adapter ce contenu
+**** DONE Papier : Retravailler l'introduction de la notion d'epoch tree
+- Dans le draft, j'introduisais l'epoch tree afin de pouvoir expliquer comment déterminer les opérations /rename/ à inverser
+- Ici, j'introduis déjà l'epoch chain dans *RLS in centralised settings*
+- Pourrait "remonter" l'introduction de l'epoch tree pour pouvoir l'utiliser dans la définition de /priority/
+- Pourrait même déjà avoir besoin d'en parler dans à la présentation du conflit en cas de renommages concurrents
 *** Done
 - Papier : Fusionner le papier de PaPoC et le draft pour la version distribuée
   - A commencé à fusionner les papiers
@@ -13988,6 +13924,616 @@ to be too obscure to justify that level of extra complexity and memory use.
       - Olivier proposait /renameIdDis()/
     - Concernant le contenu, vaudrait mieux améliorer/détailler le contenu existant
     - Puis ensuite, en fonction des reviews, compléter/ajouter ce qui est demandé
+- Papier : Rédiger début de la section *RLS in distributed settings*
+  - Ce qui a été présenté jusque là
+    - Présente le mécanisme de renommage dans section *RLS in centralised settings*
+    - Introduit et explique le fonctionnement de l'opération de renommage
+    - Justifie et présente les transformations des opérations /insert/ et /remove/ concurrentes
+  - Ce que doit faire cette sous-section
+    - Illustrer que des opérations /rename/ concurrentes produisent un conflit
+    - Justifier que pour assurer convergence des copies, doit le résoudre
+    - Introduire approche proposée pour résoudre ce conflit
+      - Absence d'intention de l'utilisateur liée aux opérations /rename/
+      - Libre de résoudre le conflit comme on l'entend
+      - Propose d'appliquer effectivement qu'une opération /rename/ parmi l'ensemble des opérations /rename/ concurrentes
+      - Doit alors fournir aux noeuds un moyen pour qu'ils appliquent tous à terme la même opération /rename/
+      - Comme ne maîtrise pas l'ordre de livraison des opérations, doit aussi fournir aux noeuds un moyen d'annuler l'effet d'une opération /rename/
+	- Comme ils n'ont qu'une connaissance partielle du système et des opérations effectuées, peuvent avoir appliqué une opération /rename/ secondaire avant de recevoir la principale
+	- Un mécanisme d'annulation de l'opération /rename/ permettrait de gérer ce cas de figure
+- Papier : Remarques diverses
+  - Titres des sections *RLS in centralised/distributed settings* pas terrible
+    - Correspond plutôt à avec/sans opérations /rename/ concurrentes
+    - Faudrait trouver des titres qui reflètent mieux cette idée
+  - Epochs pas assez expliquées dans *RLS in centralised settings*
+    - J'introduis le concept des /epochs/ brièvement dans *Dealing with concurrent updates*
+    - Mais ne prend pas la peine de décrire leur structure et de les représenter
+    - Pourrait déjà faire une description plus complète et présenter la relation /parent/ qui les lie
+    - Permettrait alors d'introduire déjà la /GC rule 2/ dans cette section
+  - L'algo de /rename()/ n'est jamais décrit
+    - On présente /renameId()/ et /revertRenameId()/
+    - Mais on ne présente l'algo permettant d'appliquer ces fonctions sur l'ensemble de la liste
+    - Est-ce un problème ?
+    - Pas évident de présenter sa complexité en temps si on ne l'a jamais montré
+    - Mais en soit, algo plutôt simple
+    - La difficulté réside dans comment l'implémenter de manière efficace
+  - Où parler de la compression de l'opération /rename/ ?
+    - Actuellement, a un paragraphe à la fin de la sous-section */rename/ operation*
+    - Explique qu'on peut compresser l'opé pour n'envoyer que les éléments qui identifient de manière unique les blocs
+    - Mais n'explique pas par exemple comment la décompresser
+      - Repose sur une livraison causale de l'opération /rename/ dans ce cas
+      - Parcours de la structure pour retrouver identifiants correspondants
+      - Si identifiant manquant, a été supprimé en concurrence
+      - Se trouve donc dans le log des opérations concurrentes à l'opération /rename/
+    - Pourrait donc développer ce point
+    - En faire une sous-section ?
+      - Dans *Discussion* par exemple ?
+- Papier : Retravailler l'introduction de la notion d'epochs
+  - Ce qui été présenté jusque là
+    - Le renommage local
+    - Que d'autres opérations peuvent être générées en concurrence
+    - Qu'appliquer "bêtement" ces opérations donnent un résultat incohérent
+  - Ce que doit faire ces paragraphes
+    - Expliquer qu'on doit détecter ces opérations concurrentes
+    - Introduire la notion d'epoch
+    - Expliquer l'intuition derrière
+    - Expliquer comment les epochs sont construites
+    - Expliquer que chaque opération est taggée avec son epoch d'origine
+    - Introduire la notion de chaîne d'epochs ?
+- Papier : Retravailler l'introduction de la notion d'epoch tree
+  - La sous-section sur le conflit entre renommages concurrents me paraît déjà bien chargée
+  - J'aurais tendance à introduire ça juste avant /priority/
+- Réunion Projet Informatique
+  - Points à aborder
+    - Choix du thème
+    - Choix du principe du jeu
+    - Influences
+    - Choix des fonctionnalités
+    - Rappel nécessité BD
+    - Choix de l'ordre de dev des fonctionnalités
+    - Mise en place du repo git
+    - Choix du langage de programmation
+  - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
+  - Groupe Thomas Champseix - Gabriel Masschelein
+    - Thème
+      - Post World-War, mais post-apo
+    - Influences
+      - Darkest Dungeon
+      - Thea 2, un 4X
+    - Décompose leur jeu en 2 phases principales
+      - Gestion
+	- Correspond au hameau de Darkest Dungeon
+	- Affectation des personnages à différentes tâches/missions
+	  - Correspond aux batîments de DD
+	- Gère l'inventaire des personnages
+      - Exploration
+	- Correspond à la phase de jeu de Thea 2
+	- Map hexagonale qu'on explore librement
+	- Cases peuvent déclencher évènement
+    - Avait réalisé un diagramme de classes plutôt complet
+      - Manque pour le moment surtout des classes "intermédiaires" genre *Jeu*, *Gestion*
+      - Et les méthodes de pas mal de classes
+    - Avait commencé à réflechir aux fonctionnalités
+      - Mais pas l'air super documenté
+      - Pour certaines, avait un déroulé de la fonctionnalité
+	- Clic de l'utilisateur, réponse de l'interface, nouvelle action proposée
+    - Catégorisation des fonctionnalités
+      - Catégorie 1
+	- Chemin critique, ce que le jeu doit proposer
+      - Catégorie 2
+	- Sympa, ce qu'il faudrait ajouter au jeu une fois le chemin critique
+      - Catégorie 3
+	- Dispensable, ce qu'il faudrait ajouter
+    - Librairies
+      - Utilise Slick2D
+	- Librairie qui met en place la boucle de jeu
+	- Déjà utilisé dans le cadre d'un projet à l'IUT Nancy-Brabois
+    - Leur ait demandé pour la prochaine fois
+      - Une liste des fonctionnalités, catégorisées par priorité
+      - Diagramme de classes MàJ en correspondance
+      - Mise en place du repo git
+      - Réflexion sur la DB
+- Meeting
+  - J'étais au labo mardi
+    - Calme, paisible
+  - coedit.re est down
+    - Faudra enquêter là-dessus
+  - Travaille sur l'article de journal pour TPDS sur *RenamableLogootSplit*
+    - Ré-écrit le début de la partie sur le renommage en concurrence du draft
+      - Avait eu plusieurs remarques d'Olivier sur ce qui n'était pas clair dans cette partie
+      - Puis avec le changement de scope du papier, la majorité du contenu de cette sous-section était déjà présenté dans la partie précédente
+      - Donc j'ai ré-écrit ça pour développer le problème des renommages concurrents et l'approche proposée
+    - Effectué des modifs dans le contenu de PaPoC
+      - Pour des raisons de place, avait survolé certains points comme les epochs
+      - J'ai retravaillé ces parties pour rendre les explications et les figures plus claires
+    - Mais doit modifier les sections du draft en conséquence
+      - Pour éviter les répétitions et pour garder une cohérence tout au long du papier
+    - Reste à voir taille du papier une fois que j'aurai fini cette passe sur le contenu et ajouter ce qu'il manque
+      - Abstract, intro, conclusion, annexes
+      - Voir si peut ajouter du contenu
+  - A vu que Kleppmann et al. ont un draft sur *A highly-available move operation for replicated trees and distributed filesystems*
+    - La suite de leurs travaux publiés à PaPoC
+    - A l'air de viser TPDS
+    - Faudra que j'y jette un oeil
+  - Réunion
+    - François
+      - Fini ses corrections
+      - Réunion avec Arial (?) avec Gérald et Victorien
+	- Problématique d'édition de fichiers de configuration Scada (?)
+      - Reçu 2nd rapport positif pour Béatrice
+	- Devrait soutenir le 3 février
+    - Alexandre
+      - Occupé avec le projet de compil
+      - Continue recherche de librairies pour récupérer données de Wikipedia
+    - Anis
+      - A effectué corrections chapitre 4 et 5 suggérées par Olivier
+      - En train de voir pour faire valider les formations pro de la thèse grâce à Open
+    - Claudia
+      - A été aux voeux de Bruno
+	- Étudiants doivent pas hésiter à aller au labo
+	- Observe les flux, si dépasse seuil, mettront en place contrôle
+      - Sera Chair pour workshop à ECSCW'21
+	- Ont prévu une conf' hybride
+	- À voir comment la situation évolue
+      - Pas mal occupée avec les cours
+    - Gérald
+      - Réunion avec Matthieu et Olivier en début de semaine
+      - Réunion avec Arial (?)
+    - Le
+      - Need to prepare 5-10 pages in French of the manuscript
+      - Took his introduction, translated it using Google Trad
+      - Asked to Quentin and Matthieu to help
+    - Matthieu
+    - Olivier
+      - Réunion avec Matthieu et Gérald
+      - Réunion avec JP
+	- Travaille actuellement sur un poster
+    - Pierre-Antoine
+      - Continue recherches sur Proxy Encryption
+      - Implémentation en TypeScript
+	- S'inspire de son implem précédente en Python
+      - Doit envoyer lien vers biblio avec résumés et annotations
+    - Quentin
+      - Effectue corrections pour le manuscrit
+	- A eu une rapportrice au tel lundi pour voir tout ça
+      - Attend des nouvelles de l'école doctorale pour le dépôt de son manuscrit
+** Semaine du <2021-01-25 Mon> au <2021-01-29 Fri>
+*** Planned
+**** DONE Papier : Ajouter exemple pour l'utilisation de /priority/
+**** DONE Papier : Réserver salle pour réunion <2021-01-29 Fri> à 14h
+**** DONE Papier : Ajouter la relation /priority/ et l'epoch courante à la figure de *Breaking tie between concurrent rename operations*
+- Permettrait de compléter cette figure et d'introduire le formalisme pour /priority/ et l'epoch courante
+- Simplifiera la compréhension des figures pour la GC
+**** DONE Papier : Envoyer cette version à Olivier et Gérald pour préparer la réunion de <2021-01-29 Fri>
+*** Done
+- Réunion Projet Informatique
+  - Points à aborder
+    - Choix du thème
+    - Choix du principe du jeu
+    - Influences
+    - Choix des fonctionnalités
+    - Rappel nécessité BD
+    - Choix de l'ordre de dev des fonctionnalités
+    - Mise en place du repo git
+    - Choix du langage de programmation
+  - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
+    - Boss Hunter RPG tour par tour
+    - Thème : MedFan
+    - Principe du jeu
+      - Choix du compte
+      - Création du personnage
+      - Combat de boss
+      - Menu sélection
+	- Permet de refarmer un boss précédent
+	- Passer au boss suivant
+    - Influence
+      - Pokemon
+      - Monster Hunter
+      - Sword & Sandals
+    - Absence d'évènements
+    - Fonctionnalité
+      - PVP en ligne :o
+      - Mode co-op
+      - Inventaire
+      - Sauvegarde progression personnelle
+	- Mon personnage, son niveau, son build
+	- L'état de la partie, quels boss vaincus et leur niveau
+    - Choix du langage
+      - Java
+    - Warning
+      - Arbres de compétences
+- Ajouter exemple pour l'utilisation de /priority/
+  - Ajout d'une figure représentant les /epoch trees/ de A et de B au cours de l'exécution du scénario utilisé dans le papier
+  - Ajout d'un paragraphe expliquant comment en utilisant /priority/ on détermine que /eA1/ et /eB2/ sont prioritaires par rapport à /e0/
+  - Ajout d'un paragraphe expliquant comment en utilisant /priority/ on détermine que /eB2/ est prioritaire par rapport à /eA1/
+  - Ajout d'une précision que comme /eB2/ était déjà l'epoch courante de B, celui-ci n'a rien à faire à la réception de /eA1/
+  - Mais qu'à l'inverse, A doit renommer son état de /eA1/ à /eB2/ lui
+    - Ce qui m'offre la transition pour la prochaine section
+- Papier : Retravailler section *Applying primary rename operations*
+  - Ce qui a été présenté jusque là
+    - Appliquer des renommages concurrents naïvement provoque une divergence
+    - Peut résoudre ce problème en se contenant de "jouer" qu'un renommage de l'ensemble des renommages concurrents
+    - Pour déterminer quel renommage choisir, "suffit" de définir une relation /priority/ définissant un ordre total sur les epochs
+    - Les noeuds ayant appliqués un ou des renommages concurrents doivent renommer leur état vers la nouvelle epoch courante
+  - Ce que doit faire cette sous-section
+    - Montrer qu'appliquer directement le /primary/ renommage ne mène pas au bon état
+      - L'état final de A dans l'exemple illustre cela
+    - Les noeuds ayant appliqués des renommages concurrents doivent revenir à l'epoch sur lequel le renommage est définit
+    - Pour ça, les noeuds doivent potentiellement annuler des renommages
+    - Introduire /revertRenameId()/
+      - But
+	- Annuler l'effet d'un renommage
+	- Retrouver l'id correspondant à chaque id qui a été renommé
+	- Fournir un id à tous les ids qui ont été générés après ce renommage
+      - Propriétés à respecter
+	- Déterminisme
+	- Réciprocité avec /renameId()/
+	- Préservation de l'ordre entre ids
+      - Algo de /revertRenameId()/
+      - Algo de /renameId()/ mis à jour
+    - Pour déterminer les renommages à annuler, utilise l'arbre des epochs
+      - En calculant le Lowest Common Ancestor entre l'epoch courante et l'epoch visée
+      - Le chemin inverse entre le LCA et l'epoch courante correspond aux renommages concurrents appliqués qu'il faut annuler
+    - Puis reste simplement à appliquer les renommages entre le LCA et l'epoch visée
+    - Illustrer cela à l'aide d'un exemple
+      - Peut reprendre l'exemple fil rouge du papier, en faisant converger ce coup-ci
+      - Montrer qu'appliquer /rename to eB2/ sur A consiste à /revert to e0/ puis /rename to eB2/
+      - Montrer qu'appliquer /rename to eA1/ sur B consiste à rien faire
+- Meeting
+  - J'étais au labo mardi
+    - Bien sympa
+    - Mais problèmes d'internet j'ai l'impression
+    - Ce qui m'a été confirmé par le mail de ce matin
+  - Continue sur l'article sur RLS
+    - J'ai fini en début de semaine mes modifs par rapport à la notion d'epochs
+      - Introduction plus tôt
+      - Introduction plus tôt de l'arbre des epochs, la structure que maintienne les noeuds pour suivre où ils en sont dans les renommages
+    - J'ai envoyé cette version "qui se tient" à Gérald et Olivier pour qu'on fasse une passe sur mes modifs au cours de notre prochaine réunion
+      - Prévue aujourd'hui mais décalée à lundi
+    - Faut maintenant que je vois pour retravailler ma sous-section portant sur l'algo d'inversion du renommage
+  - Mais avant de me lancer dans ces modifs, me suis mis sur mes corrections qui traînent depuis 2-3 semaines
+    - DMs d'Algo, Projet de BD2
+  - Assisté à la fin de la défense de Théo Biasutto-Lervat
+    - Il est Dr. depuis 13h
+  - Réunion
+    - François
+      - Soutenance de Béatrice <2021-01-27 Wed> à 14h
+      - Entretien annuel avec Jean-Yves Marion
+	- Evaluation HCERES repoussé d'1 an
+      - Réunion des permanents
+	- Pour décider prochaines directions de l'équipe
+	- Samir cherche à partir à Paris
+	- Pascal Urso a fait un échange de poste avec quelqu'un de Nice
+      - Réunion responsables d'équipe
+	- Tout le monde est moins productif
+	- Moins de dynamisme
+    - Alexandre
+      - Soutenance avec apprentis TN
+      - Réunion avec Claudia
+      - Travaille sur l'import de dump de BD de wikipedia
+	- Y en a pour 60 jours avec son utilitaire
+	- À la recherche d'autres utilitaires du coup
+    - Anis
+      - Accaparé par des corrections et problèmes techniques
+    - Claudia
+      - A fini les cours de réplication
+      - Finit de préparer l'examen
+      - Utilise Arche pour son partiel
+      - A eu réunion avec Thomas Lambert avec François
+	- Candidat Maitre Conf dans notre équipe pour la FST
+	- Postule aussi sur un poste Inria
+	- Travaille sur des algorithmes de placement de répliques (?)
+    - Olivier
+      - Plutôt orienté cours en ce moment
+      - Avec JP et Thibault, a envoyé poster à conf réseau
+      - A vu passer un article sur un protocole à base d'epochs
+    - Pierre-Antoine
+      - Continue son implémentation
+      - Essaie de faire le rapprochement entre les applications collaboratives et les problématiques de contrôle d'accès
+	- Tracer des liens entre les différents thèmes
+      - A repris contact avec Jérôme Blanchard pour bosser sur Fair & Smart
+    - Quentin
+      - Réunion avec François
+	- À propos de la suite
+	- Réfléchit à quelques possibilités de post-doc
+** Semaine du <2021-02-01 Mon> au <2021-02-05 Fri>
+*** Planned
+**** DONE Algo : Noter les DM3
+*** Done
+- Réunion Projet Informatique
+  - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
+    - Ce qui était demandé
+      - Une liste des fonctionnalités, catégorisées par priorité
+      - Diagramme de classes MàJ en correspondance
+      - Ajout des fichiers sur le repo sur GitHub
+      - Début de réflexion sur la BD
+    - Réunion
+      - Remarques sur fonctionnalités
+	- Pas sûr de comprendre comment les évènements s'intégrent dans votre jeu d'après votre diagramme
+	- Beaucoup de fonctionnalités en priorité forte
+	  - Comment vous voyez cette catégorie ?
+	  - Est-ce qu'il s'agit de la v1 ou vous avez en tête une version allégée en prototype ?
+      - Pour la prochaine fois
+	- Mettre le diagramme de fonctionnalités sur Git
+	- Réalisation/Complétion du diagramme de classes
+	  - Avec les fonctionnalités prioritaires au moins (Combat, Personnage, Boss, Carte)
+	- Commencer à réfléchir au schéma relationnel de la BD
+      - Prochaine réunion <2021-02-10 Wed> à 11h
+  - Groupe Thomas Champseix - Gabriel Masschelein
+    - Ce qui était demandé
+      - Une liste des fonctionnalités, catégorisées par priorité
+      - Diagramme de classes MàJ en correspondance
+      - Mise en place du repo git
+      - Réflexion sur la DB
+    - Réunion
+      - Pas de but
+      - Priorité
+	- 1ère version : Exploration
+	  - Personnage, Carte, Evènements, Combat (résolution automatique)
+	- 2nd version : Inventaire codé en dur
+	  - Equipement, consommables, mais pas de gestion
+	- 3ème version : Gestion
+	  - Ajout de missions, gestion des missions, gestion de l'inventaire
+      - Pour la prochaine fois
+	- Mettre le diagramme des fonctionnalités sur Git
+	- Mettre le diagramme de classes sur Git
+	- Mettre feuille de route sur Git
+	- Mettre en place le squelette de la 1ère version
+	  - Classes, les différentes méthodes
+      - Prochaine réunion <2021-02-11 Thu> à 14h
+- Réunion papier
+  - Modifications
+    - Introduction des epochs et de l'epoch chain dans 4.2
+    - Ré-écriture de la 5.1
+    - Introduction de l'epoch tree dans la 5.2 et ré-écriture
+      - Avant, le présentais dans la section 5.3 pour introduire la notion de Lowest Common Ancestor entre 2 epochs
+      - Là l'utilise pour définir notre relation /priority/ du papier
+    - Disparition/Fusion de 5.3 avec la sous-section suivante
+  - À faire
+    - Re-travailler 5.3
+      - Poser sous la forme de propriétés les contraintes que doit respecter /revertRenameId()/ ?
+      - Dans le draft, la version de /renameId()/ présentée prenait déjà en compte /revertRenameId()/
+      - Là on présente la version simple de /renameId()/ en 4.2
+      - Faut introduire la nouvelle version
+    - Conclusion
+    - Intro
+    - Abstract
+    - Correction de la réciprocité de /renameId() v2/ avec /revertRenameId()/
+  - Pistes
+    - Où parler de la GC ?
+      - Actuellement, aborde le sujet à la fin de la partie sur le mode distribué
+      - Rule 2 est déjà valide/nécessaire pour la GC des formers states dans le mode centralisé
+      - Pourrait déjà la présenter à la fin de la partie sur le mode centralisé
+      - Et illustrer pourquoi elle n'est plus suffisante et la compléter dans la 5.4
+    - Où parler de la compression de l'opération /rename/ ?
+      - Actuellement, a un paragraphe à la fin de la sous-section */rename/ operation*
+      - Explique qu'on peut compresser l'opé pour n'envoyer que les éléments qui identifient de manière unique les blocs
+      - Mais n'explique pas par exemple comment la décompresser
+	- Repose sur une livraison causale de l'opération /rename/ dans ce cas
+	- Parcours de la structure pour retrouver identifiants correspondants
+	- Si identifiant manquant, a été supprimé en concurrence
+	- Se trouve donc dans le log des opérations concurrentes à l'opération /rename/
+      - Pourrait donc développer ce point
+      - En faire une sous-section ?
+	- Dans *Discussion* par exemple ?
+  - Réunion
+    - Gérald lit ça cette semaine
+    - Olivier lit dès que possible
+      - Difficile cette semaine
+      - Envoyer nouvelle version vendredi/lundi
+    - Pour l'instant, remplir
+      - Ajouter contenu sans tenir compte de limite de pages
+      - On verra ensuite pour faire le ménage
+    - Pour GC
+      - Garder la sous-section à la fin de la partie distribuée
+      - Peut faire référence en avant à la fin de la partie centralisée pour pointer vers règle pertinente
+    - Plan
+      - Finir rework de la section 5
+      - Ajouter conclusion, intro et abstract
+      - Puis compléter les TODO? restants
+      - On voit au fur et à mesure que j'obtiens les retours pour les intégrer
+- Meeting
+  - Rien de particulier cette semaine
+  - Une réunion lundi avec Olivier et Gérald pour faire le point rapidement
+    - Et discuter du planning à court terme
+    - Vise l'envoi fin février
+    - Ça continue son bonhomme de chemin
+  - Occupé par des corrections le reste de la semaine
+  - Réunion
+    - François
+      - Béatrice a soutenu et obtenu le titre de Docteur mercredi aprem
+      - Réunion avec Areal
+	- Projet de redévelopper tout leur système de fichiers de config pour faire de l'édition collaborative
+      - Bientôt responsable de la Commission Info pour l'école doctorale
+      - Réunion avec ??? pour de la communication autour de l'équipe Coast
+      - Présentation la semaine pro par Thomas LAMBERT
+	- Candidat comme Mcf ou CR dans l'équipe
+      - A reçu attestations de réussite de Quentin et Le
+    - Abir
+      - Reprise des cours en présentiel
+      - Rédaction du rapport
+	- Rédige en anglais
+	- Blocage en français, a décidé de switch en anglais
+	- A permis de débloquer
+	- À voir pour la dérogation
+    - Alexandre
+      - Continue de regarder les technos pour pré-traiter les dumps de Wikipedia
+	- A fait une short-list
+      - Réunion avec Claudia cet aprem pour en discuter
+    - Anis
+      - Réunion avec François et Olivier
+	- Parler de la dernière solution de composition de services
+	- Part sur 2 articles
+	  - Un sur la sélection de services
+	  - L'autre sur la composition
+    - Claudia
+      - Examen en distanciel du module de réplication de données sur Arche
+	- Bien passé
+      - Réunion commission d'évaluation inria
+	- Équipe devrait être évalué en octobre avec nouveau format
+	- Mais nouveau format non-validé par HCERES
+	- Si nouveau format pas approuvé dans les prochaines semaines, sera évalué avec l'ancien
+      - Réunion avec Pierre-Antoine
+    - Khalid
+      - Rien de spé
+    - Moi
+    - Pierre-Antoine
+      - Préparé réunion avec Claudia et Olivier
+      - A présenté les pistes explorées
+      - Quelques scénarios manquants
+      - Explore capacity base access control
+    - Quentin
+      - S'est intéressé à l'après-thèse
+      - A fait un research statement
+      - Discussion avec François sur un des travaux non-publié
+	- Interactions dans les écoles primaires
+	- Discuter pour voir quelles conférences viser
+	- Vise CSCW pour le moment
+** Semaine du <2021-02-08 Mon> au <2021-02-12 Fri>
+*** Planned
+**** DONE Papier : Retravailler section *Applying primary rename operations*
+- Ayant fait pas mal de modifs sur les sections précédentes, cette section ne doit plus être vraiment raccord
+- Le format ayant aussi changé, j'ai p-e des éléments à développer dans cette section
+- Refaire une passe dessus et la retravailler en conséquence
+**** DONE Papier : Retravailler section *Garbage collection of former states*
+- Pareil, voir si cette section est toujours raccord
+- En profiter pour mettre à jour les figures
+  - En rouge l'epoch prioritaire
+- Expliquer aussi la représentation des epochs causalement stables
+**** DONE Papier : Envoyer nouvelle version à Gérald et Olivier
+- La nouvelle version de la section *Applying primary rename operations* me paraît bonne
+- Celle de *Garbage collection of former states* moins
+  - Mais je vois moins comment l'améliorer
+- Dans le doute, envoyer la version actuelle
+- Ça fera une base plus récente pour qu'ils fassent leurs retours
+**** IN-PROGRESS BD2 : Noter les projets
+- Peut décomposer le projet en 2 notes
+  - Conception et SQL
+    - Juste évaluer si la schéma relationnel proposée est correct, permet de répondre aux requêtes indiquées
+    - Et vérifier que les requêtes sont valides
+  - Mise en pratique
+    - Évaluer que le script SQL construit une BDD correspondante au schéma relationnel
+    - Évaluer le code et les interactions avec la BDD
+**** TODO Papier : Revamp algo de /renameId()/ dans la section *RLS in centralised settings*
+- Pour le moment, j'ai copy/paste l'algo de PaPoC
+- Mais j'avais retravaillé cet algo depuis pour le décomposer en plusieurs cas
+- On trouve la nouvelle  version dans le draft
+- Mais elle inclut aussi des changements pour rendre réciproques /renameId()/ et /revertRenameId()/
+- Faire un mix entre ces 2 versions
+  - Décomposé en plusieurs cas
+  - Mais sans les ajouts requis par la version distribuée
+**** TODO Papier : Relire *A Conflict-Free Replicated JSON Datatype* de Kleppmann
+- A été publié dans TPDS
+- Permettra de voir le format/les termes employés
+- Dispo ici : https://arxiv.org/abs/1608.03960
+**** TODO Papier : Relire *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
+- A été publié dans TPDS
+- Permettra de voir le format/les termes employés
+- Dispo ici : https://ieeexplore.ieee.org/document/4668339
+**** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
+- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
+- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
+- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
+- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
+- /reverseRenameId(newId)/ renvoie /newId/
+- On a donc /reverseRenameId(renameId(id)) != id/
+- Détecter et gérer ce cas
+**** TODO BD2 : Préparer et tourner CM6
+- Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
+  - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
+- Histoire qu'iels puissent tout de même découvrir ces sujets, je vais faire une VOD
+**** TODO CRDT : Lire *Merging OT and CRDT Algorithms*
+- Par Mehdi Ahmed-Nacer, Pascal Urso, Valter Balegas et Nuno Preguiça
+- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
+- Suis curieux de voir s'il s'agit d'une architecture à la Legion ou d'une intégration de OT dans un CRDT
+  - Ce qui se rapprocherait plus de ce que j'ai pu faire
+- Dispo ici : https://hal.inria.fr/hal-00957167
+**** TODO CRDT : Lire *Chronofold: a data structure for versioned text*
+- Par Victor Grishchenko et Mikhail Patrakeev
+- Présenté à PaPoC'20
+- De mémoire, s'agissait d'une séquence répliquée construite à partir du log ordonné des opérations
+- À 1ère vue, ne rentre pas dans une des approches habituelles pour concevoir les Sequence CRDTs
+- À creuser
+- Dispo ici : https://dl.acm.org/doi/10.1145/3380787.3393680
+**** TODO CRDT : Lire *Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types*
+- Par Petru Nicolaescu, Kevin Jahns, Michael Derntl, Ralf Klamma
+- S'agit du CRDT implémenté par Yjs (https://github.com/yjs/yjs), qui est développé par Kevin Jahns
+  - Qui est le framework présenté et évalué dans le blogpost *Are CRDTs suitable for shared editing?* (https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/)
+  - Par Kevin Jahns justement
+- Me semble qu'on retrouve une structure similaire à WOOT/RGA pour représenter les Séquences
+- Dispo ici : https://www.researchgate.net/publication/310212186_Near_Real-Time_Peer-to-Peer_Shared_Editing_on_Extensible_Data_Types
+**** TODO CRDT : Lire *A string-wise CRDT algorithm for smart and large-scale collaborative editing systems*
+- Par Xiao Lv, Fazhi He, Weiwei Cai, Yan Cheng
+- A inspiré la notion d'item, l'équivalent des blocs, dans Yjs
+- À lire
+- Dispo ici : https://coek.info/pdf-a-string-wise-crdt-algorithm-for-smart-and-large-scale-collaborative-editing-sys.html
+**** TODO CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
+- A remarqué ce /draft/ sur la page de Kleppmann
+- Peut être intéressant de voir comment leurs travaux ont avancé depuis PaPoC
+- Disponible ici : https://martin.kleppmann.com/papers/move-op.pdf
+**** TODO CRDT : Lire *File system on CRDT*
+- Par Mehdi Ahmed-Nacer, Stéphane Martin, Pascal Urso
+- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
+- Vu que c'est une direction possible de mes travaux (utilisation de CRDT + OT pour concevoir une structure répliquée représentant un système de fichiers distribué), suis curieux
+- N'a pas contre pas été publié/peer-reviewé
+- Dispo ici : https://hal.inria.fr/hal-00720681
+**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
+- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
+- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
+  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
+  - Leur approche est du coup probablement générique
+  - À vérifier
+  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
+**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
+- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
+- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
+  - Ou les pistes de réflexions que cela dessine
+**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
+- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
+- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
+- Version courte du papier avait été présenté à PaPoC'20
+  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
+  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
+- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
+- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
+- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
+  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
+  - Mais qui possèdent des opérations différentes
+  - Chacune de ces opérations est commutative avec elle-même
+  - Mais elles ne sont pas commutatives entre elles
+    - L'exemple de l'addition et de la multiplication
+  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
+  - Moi l'opération de renommage n'est pas commutative avec elle-même
+  - Je ne peux donc pas utiliser la même technique
+- À valider au cours d'une nouvelle lecture
+**** TODO Distributed Systems : Lire *Epoch-based Commit and Replication in Distributed OLTP Databases*
+- Par Yi Lu, Lei Cao, Xiangyao Yu, Samuel Madden
+- Si je pige bien, dans le contexte des transactions distribuées
+- Propose d'aggréger des groupes de transactions dans des epochs
+- Et d'utiliser les epochs comme unité de commit
+- De façon à limiter le nombre d'exécutions du 2PC
+- Dispo ici : http://www.vldb.org/pvldb/vol14/p743-lu.pdf
+*** Done
+- BD2 : Noter les projets
+  - A fini de les corriger
+  - Reste plus qu'à donner une note à tout ça
+- Papier : Retravailler section *Applying primary rename operations*
+  - Rework de l'intro de cette sous-section pour justifier et introduire l'inversion du renommage
+  - Présente l'objectif de /revertRenameId()/
+  - Illustre son utilisation
+  - Insiste sur le fait que /renameId()/ et /revertRenameId()/ doivent être des fonctions inverses
+  - Mentionne la mise à jour de /renameId()/ pour prendre en compte les identifiants ayant été insérés causalement après ce renommage
+  - Ajoute la nouvelle version de /renameId()/ en annexe
+- Papier : Retravailler section *Garbage collection of former states*
+  - Je ne vois pas de grosse modifs à faire en vrai
+  - Ajout d'une phrase pour insister sur le fait que la stabilité causale seule n'est pas suffisante pour déterminer quelles opérations sont GC-ables
+  - Complétion de la figure pour faire apparaître quelles epochs sont GC-ables et par quelle règle
+    - J'ai tenté en dessinant une croix dessus
+    - Résultat pas ouf
+    - Pars plutôt sur une représentation dotted ou dashed en couleur
+    - Pas ouf non plus, mais j'ai pas mieux comme idée
+  - Modification du texte pour expliquer un peu mieux les figures
+    - Formalisme des epochs causalement stables
+    - Formalisme des epochs GC-ables
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
