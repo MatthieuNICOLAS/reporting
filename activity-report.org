@@ -14405,7 +14405,7 @@ to be too obscure to justify that level of extra complexity and memory use.
   - Mais je vois moins comment l'améliorer
 - Dans le doute, envoyer la version actuelle
 - Ça fera une base plus récente pour qu'ils fassent leurs retours
-**** IN-PROGRESS BD2 : Noter les projets
+**** DONE BD2 : Noter les projets
 - Peut décomposer le projet en 2 notes
   - Conception et SQL
     - Juste évaluer si la schéma relationnel proposée est correct, permet de répondre aux requêtes indiquées
@@ -14413,6 +14413,26 @@ to be too obscure to justify that level of extra complexity and memory use.
   - Mise en pratique
     - Évaluer que le script SQL construit une BDD correspondante au schéma relationnel
     - Évaluer le code et les interactions avec la BDD
+**** DONE Papier : Ajouter conclusion
+- La partie contenu du papier a l'air globalement complète
+  - Reste des points à développer, mais le gros est déjà présent
+  - Ne devrait plus trop évoluer
+- Peut donc passer aux différents parties restantes
+- Commencer par la conclusion me paraît le plus indiqué
+- Avait commencé à rédiger celle du draft
+- Doit donc voir pour la reprendre, l'adapter et la développer
+**** DONE Papier : Compléter sous-section *Proposed approach*
+- Ajouter quelques lignes pour indiquer que RLS est un Op-based CRDT
+**** DONE BD2 : Envoyer les notes à Polytech
+- J'ai envoyé les notes aux étudiants
+- J'attend de voir 1-2 jours si certains se manifestent pour discuter de leur note et si ça me conduit à ré-évaluer certains projets
+- Envoyer les notes à Polytech <2021-02-11 Thu> grand max
+**** DONE Papier : Ajouter sous-section *Definition of rename operation*
+- Ajouter quelques lignes présentant le but de l'opération et les propriétés qu'elle doit respecter pour être valide
+**** IN-PROGRESS CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
+- A remarqué ce /draft/ sur la page de Kleppmann
+- Peut être intéressant de voir comment leurs travaux ont avancé depuis PaPoC
+- Disponible ici : https://martin.kleppmann.com/papers/move-op.pdf
 **** TODO Papier : Revamp algo de /renameId()/ dans la section *RLS in centralised settings*
 - Pour le moment, j'ai copy/paste l'algo de PaPoC
 - Mais j'avais retravaillé cet algo depuis pour le décomposer en plusieurs cas
@@ -14466,10 +14486,6 @@ to be too obscure to justify that level of extra complexity and memory use.
 - A inspiré la notion d'item, l'équivalent des blocs, dans Yjs
 - À lire
 - Dispo ici : https://coek.info/pdf-a-string-wise-crdt-algorithm-for-smart-and-large-scale-collaborative-editing-sys.html
-**** TODO CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
-- A remarqué ce /draft/ sur la page de Kleppmann
-- Peut être intéressant de voir comment leurs travaux ont avancé depuis PaPoC
-- Disponible ici : https://martin.kleppmann.com/papers/move-op.pdf
 **** TODO CRDT : Lire *File system on CRDT*
 - Par Mehdi Ahmed-Nacer, Stéphane Martin, Pascal Urso
 - En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
@@ -14534,6 +14550,211 @@ to be too obscure to justify that level of extra complexity and memory use.
   - Modification du texte pour expliquer un peu mieux les figures
     - Formalisme des epochs causalement stables
     - Formalisme des epochs GC-ables
+- Papier : Ajouter conclusion
+  - Qu'est-ce qu'on a fait ?
+    - Présenter un nouveau CRDT : RenamableLogootSplit
+  - En quoi il diffère de l'existant ?
+    - Embarque un mécanisme de renommage
+  - Pourquoi ?
+    - Permet de réduire la quantité de métadonnées consommée par la structure
+  - Ça consiste en quoi ?
+    - Un nouveau type d'opération, les opérations de renommage
+    - Opérations systèmes déclenchées automatiquement par les noeuds lorsque les conditions sont remplies
+    - Mais comme opé de renommage pas commutative avec le reste (insert, remove, rename), des conflits se produisent en cas d'opérations concurrentes
+    - RLS applique des techniques OT pour résoudre ces conflits
+  - Qu'est-ce qu'on a fait ensuite ?
+    - Procédé à une validation expérimentale de RLS et avons validé sa correction et évalué ses performances
+    - Constaté que permet de diviser par centaines les métadonnées de la structure à terme
+    - Mais que peut provoquer une inflation des métadonnées en attendant, notamment en cas d'opérations de renommage concurrentes
+  - Ok, c'est quoi la suite ?
+    - Déterminer quand déclencher un renommage
+      - 2 contraintes à gérer : garder temps d'intégration en-dessous d'un seuil et minimiser le nombre d'opérations de renommmage
+    - Preuve formelle de la correction des algos de RLS
+    - Étudier si d'autres types de données répliqués gagnerait à combiner les approches CRDT et OT pour leur design
+- Papier : Ajouter sous-section *Definition of rename operation*
+  - Principe et but de l'opération
+    - Doit réattribuer de nouveaux identifiants à l'ensemble des éléments de la séquence
+    - Ne doit en aucun cas altérer le contenu de la séquence
+    - Comme les identifiants sont des métadonnées utilisées par la structure de données uniquement pour la résolution de conflits
+    - S'agit d'une opération système réalisée en coulisses, sans intervention de l'utilisateur
+  - Propriétés que l'opération doit respecter
+    - Déterminisme
+    - Préservation de l'intention utilisateur
+      - Ne peut pas ignorer ou altérer une opération de l'utilisateur, /insert/ ou /remove/, à cause d'une opération /rename/
+    - Préservation de la relation d'ordre existante
+    - Commutativité avec autres opérations
+      - Puisque les noeuds peuvent recevoir les opérations dans des ordres différents
+  - Commutativité difficile à obtenir
+    - Puisque l'opération /rename/ modifie les identifiants de la structure
+    - Mais que les autres opérations reposent sur les identifiants pour indiquer la position où insérer un élément ou quel élément supprimer
+    - /rename/ est par définition incompatible avec les opérations /insert/ et /remove/
+    - De la même manière, deux opérations /rename/ peuvent attribuer des identifiants différents à un même élément
+    - /rename/ est donc aussi non-commutative avec elle-même
+    - Il est donc nécessaire de mettre en place des mécanismes de résolution de conflits en cas d'opération concurrente à l'opération /rename/
+    - Pour des raisons de simplicité
+      - Présentons dans un 1er temps l'opération /rename/ avec pour hypothèse l'impossibilité d'émettre des opérations /rename/ concurrentes
+	- Correspond à des systèmes où les noeuds se coordonnent pour déclencher un renommage
+	- Nous permettra de présenter le fonctionnement de l'opération /rename/ et comment la rendre commutative avec les opérations /insert/ et /remove/
+      - Puis dans un 2nd temps l'opération /rename/ dans le cadre de systèmes permettant les opérations /rename/ concurrentes
+	- Donc sans aucune coordination entre noeuds pour déclencher un renommage
+	- Nous permettra de présenter les techniques à mettre en oeuvre pour rendre l'opération /rename/ commutative avec elle-même
+- CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
+  - Propose un Tree CRDT permettant 3 types d'opérations
+    - insert, remove et move
+  - En fait, exprime toutes ces opérations sous la forme de move
+    - /move t p m c/
+    - Où /t/ est un timestamp, /c/ l'identifiant du noeud déplacé, /m/ ses métadonnées (nom du fichier par ex.) et /p/ son nouveau parent une fois le move effectué
+    - insert est géré en créant /c/ si celui-ci n'est pas déjà présent dans l'arbre
+    - remove est géré en définissant un /p/ arbitrairement qui correspond à la poubelle
+  - Sauf que deux moves concurrents peuvent introduire différents problèmes
+    - Divergence en fonction de l'ordre d'application des moves déjà
+    - Création de cycle si le 1er move fait de /c/ un ancêtre de /p/
+  - Pour éviter tout ça, utilise un log des opérations /move/
+  - Les opérations y sont ordonnées à l'aide de leur timestamp
+  - Les opérations de ce logs sont augmentées avec le couple (oldParent, oldMetadata) calculé lors de l'application du move
+  - À la réception d'une nouvelle opération, undo toutes les opérations avec un timestamp supérieur
+  - Applique l'opération
+  - Puis redo le reste des opés
+    - Potentiellement met à jour l'opération enrichie du coup si je pige bien
+  - Effectue juste une vérification à base de "Est c ancêtre de p" avant d'appliquer un move pour empêcher l'introduction de cycle
+  - Comme ordre effectif d'application identiques pour tous les noeuds, converge
+  - Remarques
+    - Le mécanisme de résolution de conflits se base finalement uniquement sur le timestamp
+      - Entre 2 opérations, c'est l'ordre de leur timestamp qui va déterminer le résultat
+      - Par exemple si move et remove concurrents, 2 résultats possibles
+	- Soit le move est appliqué en 1er, puis le remove
+	- Dans ce cas, le noeud est supprimé
+	- Soit le remove est appliqué en 1er, puis le move
+	- Dans ce cas, le noeud "ré-apparaît" à sa nouvelle position
+      - D'un point de vue expérience utilisateur, est-ce que ça a du sens ?
+- Réunion Projet Informatique
+  - Notes pré-réunion
+    - S'agit de la dernière réunion de la période
+      - Ensuite les étudiants seront en entreprises pour 3-4 semaines
+      - Reviennent donc pour la semaine du <2021-03-15 Mon>
+      - À confirmer
+      - C'est bien ça
+    - À faire pour la prochaine fois
+      - Compléter diagramme de classes si besoin et l'uploader sur Git
+      - Définir les objectifs d'une 1ère version du jeu
+	- Sélectionner et lister les différentes fonctionnalités du jeu que vous souhaitez implémenter pour un 1er prototype
+      - Décider de la répartition des tâches
+	- À partir du diagramme de classes et des dépendances qu'il met en évidence
+	- Vous répartir le développement des composants du jeu
+      - Démarrer développement du jeu
+	- Un de vous créé le projet Java
+	  - Un simple Hello World au début
+	- Le push sur le repo Git
+	- Les autres le récupère et vérifie qu'ils arrivent à le lancer
+	- À partir de là, chacun commence à réaliser ses tâches
+  - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
+    - Ce qui était demandé
+      - Mettre le diagramme de fonctionnalités sur Git
+	- Ça a été fait
+	- Pas l'impression qu'il ait été modifié depuis la dernière réunion
+	- On retrouve les principales fonctionnalités
+      - Réalisation/Complétion du diagramme de classes avec les fonctionnalités prioritaires (Combat, Personnage, Boss, Carte)
+      - Commencer à réfléchir au schéma relationnel de la BD
+    - Réunion
+      - Remarques sur *Evenement*
+	- Manque l'effet des évènements
+	  - Je leur ai suggéré de faire une hierarchie de classes
+	  - Avec des évènements qui déclenchent combats, des évènements qui appliquent buff/debuf
+      - *Personnage*
+	- Juste un recueil de statistiques
+	- Aucune méthode à soi
+      - *Joueur*
+	- Correspond à l'avatar du personnage
+	- Pour le moment, des méthodes pour se créer/charger/supprimer
+	- A indiqué que c'était un peu étrange
+	  - Un peu le paradoxe de l'oeuf et la poule
+	- Ont remonté ces méthodes dans *Partie*
+	- Ont commencé à ajouter des méthodes au *Joueur*
+      - On avait commencé à parler de la BD, mais j'avais préféré mettre ça de côté en attendant de voir le reste du diagramme de classe
+      - Vu qu'on a dû mettre fin à la réunion vu l'heure qui avançait, on est pas revenu là dessus
+      - Faudra en rediscuter avec eux la prochaine fois
+      - Note : Gaston est globalement celui qui anime le plus les réunions
+	- À voir si ça se confirme lors des prochaines
+    - À faire d'ici la fin de la semaine
+      - Ajouter les associations manquantes dans le diagramme
+	- Les associations de base, mais aussi celle d'héritage
+      - Ajouter les différentes méthodes de chaque classe
+      - Upload du diagramme de classes sur Git
+	- J'ai dit impérativement d'ici la fin de semaine
+    - C'est quand la prochaine réunion ?
+      - Je leur ai dit que je les recontactais à leur retour le <2021-03-15 Mon>
+      - Histoire de convenir d'une date pour un prochain point
+  - Groupe Thomas Champseix - Gabriel Masschelein
+    - M'ont envoyé un mail à propos d'utiliser Python plutôt que Java comme techno
+      - Ils rencontrent des problèmes pour configurer Java semblerait
+      - Voir avec quels sont ces problèmes
+      - Mais ne voit pas d'objection à ce qu'ils utilisent Python perso
+    - Ce qui était demandé
+      - DONE : Mettre le diagramme des fonctionnalités sur Git
+	- Fichier excel disponible sur le repo qui liste les différentes fonctionnalités avec un score de priorité
+	- Le score ne correspond pas forcément aux versions que j'ai noté lors de la dernière réunion
+      - TODO : Mettre le diagramme de classes sur Git
+      - TODO : Mettre feuille de route sur Git
+      - IN-PROGRESS : Mettre en place le squelette de la 1ère version
+	- Seulement un main() pour le moment
+	- Ont ajouté la librairie Slick2D à leur projet
+    - Réunion
+      - À faire d'ici la fin de la semaine
+	- Compléter diagramme de classes si besoin et l'uploader sur Git
+	- Décider de la répartition des tâches
+      - Versions
+	- Un peu mis à jour la feuille route
+	- 1ère version : exploration
+	  - On dirige une équipe de personnage (mais sans que Personnage existe réellement) sur une carte et on déclenche des events
+	- 2nde version : personnage et combat et objets
+	  - Possibilité de déclencher un combat lors de l'exploration, les personnages de l'équipe y prennent part
+	  - Les personnages ont un inventaire qui contient leur équipement
+	- 3ème version : gestion
+	  - Ce qui était noté précédemment
+      - Les maps hexagonales, finalement c'est plus compliqué qu'on dirait
+	- Faut trouver des ressources sur comment représenter facilement une map hexagonale
+    - À faire d'ici la fin de semaine
+      - Mettre la dernière du diagramme au classe au format xml et png
+      - Nettoyer le repo
+	- Virer le code la version java
+	- Diagramme de classe au format de PDF
+	- Fichier notes.txt
+    - À la rentrée
+      - Me recontacter pour fixer une réunion
+      - Finir le diagramme de classes si besoin par rapport aux derniers points qu'on a abordé
+      - Démarrer l'implémentation du jeu en Python
+- Meeting
+  - Principalement bossé sur le papier
+    - Complété en début de semaine mes modifs de la partie contribution
+      - Gestion des renommages concurrents et le mécanisme de GC
+    - J'ai envoyé cette version à Gérald et Olivier lundi
+    - Ajout de la conclusion
+    - Là en train d'effectuer quelques modifs sur la section *Overview*
+      - Histoire d'être un peu plus exhaustif et précis sur ce qu'est RenamableLogootSplit
+      - Ajoute une nouvelle sous-section pour présenter les /safety properties/ que doit respecter l'opération /rename/
+  - Commencé à lire *A higly-available move operation for replicated trees and distributed filesystems*
+    - Intéressant
+    - Proposent une structure d'arbre répliquée permettant d'ajouter, supprimer et déplacer un noeud
+    - Finalement redéfinit toutes les modifications sous forme de /move/
+    - Pour gérer les opérations concurrentes, se base sur un log des opés
+    - Ordonnent les opérations de manière totale à l'aide de timestamp
+    - Puis l'état de l'arbre est calculé en jouant les opérations dans l'ordre
+    - Donc si reçoit une opération antérieure
+      - Undo les opérations "suivantes" déjà appliquées
+      - Applique l'opération reçue
+      - Puis ré-applique les opérations "suivantes"
+    - Vérifie avant d'appliquer une opé si elle n'introduirait pas un cycle
+    - Paraît straightforward et correct
+    - Par contre, la gestion de conflits me paraît obscure pour un utilisateur
+      - Seul le timestamp compte, pas la sémantique des opérations
+      - Donc un /delete/ peut perdre contre un /move/ ou gagner en fonction des cas
+    - J'ai pas encore lu la partie évaluation, mais ont mentionné avoir des bonnes perfs
+      - À voir le scénario évalué
+      - Mais à voir comment ils font pour ne pas faire exploser le temps d'intégration en cas de "retard" d'une opération
+      - Quid des métadonnées ?
+    - À comparer à des algos d'OT
+      - Mais est-ce que le principe est différent ou juste la formalisation l'est ?
+    - À suivre
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
