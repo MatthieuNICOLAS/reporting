@@ -14429,105 +14429,6 @@ to be too obscure to justify that level of extra complexity and memory use.
 - Envoyer les notes à Polytech <2021-02-11 Thu> grand max
 **** DONE Papier : Ajouter sous-section *Definition of rename operation*
 - Ajouter quelques lignes présentant le but de l'opération et les propriétés qu'elle doit respecter pour être valide
-**** IN-PROGRESS CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
-- A remarqué ce /draft/ sur la page de Kleppmann
-- Peut être intéressant de voir comment leurs travaux ont avancé depuis PaPoC
-- Disponible ici : https://martin.kleppmann.com/papers/move-op.pdf
-**** TODO Papier : Revamp algo de /renameId()/ dans la section *RLS in centralised settings*
-- Pour le moment, j'ai copy/paste l'algo de PaPoC
-- Mais j'avais retravaillé cet algo depuis pour le décomposer en plusieurs cas
-- On trouve la nouvelle  version dans le draft
-- Mais elle inclut aussi des changements pour rendre réciproques /renameId()/ et /revertRenameId()/
-- Faire un mix entre ces 2 versions
-  - Décomposé en plusieurs cas
-  - Mais sans les ajouts requis par la version distribuée
-**** TODO Papier : Relire *A Conflict-Free Replicated JSON Datatype* de Kleppmann
-- A été publié dans TPDS
-- Permettra de voir le format/les termes employés
-- Dispo ici : https://arxiv.org/abs/1608.03960
-**** TODO Papier : Relire *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
-- A été publié dans TPDS
-- Permettra de voir le format/les termes employés
-- Dispo ici : https://ieeexplore.ieee.org/document/4668339
-**** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
-- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
-- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
-- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
-- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
-- /reverseRenameId(newId)/ renvoie /newId/
-- On a donc /reverseRenameId(renameId(id)) != id/
-- Détecter et gérer ce cas
-**** TODO BD2 : Préparer et tourner CM6
-- Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
-  - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
-- Histoire qu'iels puissent tout de même découvrir ces sujets, je vais faire une VOD
-**** TODO CRDT : Lire *Merging OT and CRDT Algorithms*
-- Par Mehdi Ahmed-Nacer, Pascal Urso, Valter Balegas et Nuno Preguiça
-- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
-- Suis curieux de voir s'il s'agit d'une architecture à la Legion ou d'une intégration de OT dans un CRDT
-  - Ce qui se rapprocherait plus de ce que j'ai pu faire
-- Dispo ici : https://hal.inria.fr/hal-00957167
-**** TODO CRDT : Lire *Chronofold: a data structure for versioned text*
-- Par Victor Grishchenko et Mikhail Patrakeev
-- Présenté à PaPoC'20
-- De mémoire, s'agissait d'une séquence répliquée construite à partir du log ordonné des opérations
-- À 1ère vue, ne rentre pas dans une des approches habituelles pour concevoir les Sequence CRDTs
-- À creuser
-- Dispo ici : https://dl.acm.org/doi/10.1145/3380787.3393680
-**** TODO CRDT : Lire *Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types*
-- Par Petru Nicolaescu, Kevin Jahns, Michael Derntl, Ralf Klamma
-- S'agit du CRDT implémenté par Yjs (https://github.com/yjs/yjs), qui est développé par Kevin Jahns
-  - Qui est le framework présenté et évalué dans le blogpost *Are CRDTs suitable for shared editing?* (https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/)
-  - Par Kevin Jahns justement
-- Me semble qu'on retrouve une structure similaire à WOOT/RGA pour représenter les Séquences
-- Dispo ici : https://www.researchgate.net/publication/310212186_Near_Real-Time_Peer-to-Peer_Shared_Editing_on_Extensible_Data_Types
-**** TODO CRDT : Lire *A string-wise CRDT algorithm for smart and large-scale collaborative editing systems*
-- Par Xiao Lv, Fazhi He, Weiwei Cai, Yan Cheng
-- A inspiré la notion d'item, l'équivalent des blocs, dans Yjs
-- À lire
-- Dispo ici : https://coek.info/pdf-a-string-wise-crdt-algorithm-for-smart-and-large-scale-collaborative-editing-sys.html
-**** TODO CRDT : Lire *File system on CRDT*
-- Par Mehdi Ahmed-Nacer, Stéphane Martin, Pascal Urso
-- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
-- Vu que c'est une direction possible de mes travaux (utilisation de CRDT + OT pour concevoir une structure répliquée représentant un système de fichiers distribué), suis curieux
-- N'a pas contre pas été publié/peer-reviewé
-- Dispo ici : https://hal.inria.fr/hal-00720681
-**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
-- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
-- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
-  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
-  - Leur approche est du coup probablement générique
-  - À vérifier
-  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
-**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
-- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
-- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
-  - Ou les pistes de réflexions que cela dessine
-**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
-- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
-- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
-- Version courte du papier avait été présenté à PaPoC'20
-  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
-  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
-- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
-- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
-- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
-  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
-  - Mais qui possèdent des opérations différentes
-  - Chacune de ces opérations est commutative avec elle-même
-  - Mais elles ne sont pas commutatives entre elles
-    - L'exemple de l'addition et de la multiplication
-  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
-  - Moi l'opération de renommage n'est pas commutative avec elle-même
-  - Je ne peux donc pas utiliser la même technique
-- À valider au cours d'une nouvelle lecture
-**** TODO Distributed Systems : Lire *Epoch-based Commit and Replication in Distributed OLTP Databases*
-- Par Yi Lu, Lei Cao, Xiangyao Yu, Samuel Madden
-- Si je pige bien, dans le contexte des transactions distribuées
-- Propose d'aggréger des groupes de transactions dans des epochs
-- Et d'utiliser les epochs comme unité de commit
-- De façon à limiter le nombre d'exécutions du 2PC
-- Dispo ici : http://www.vldb.org/pvldb/vol14/p743-lu.pdf
 *** Done
 - BD2 : Noter les projets
   - A fini de les corriger
@@ -14729,9 +14630,9 @@ to be too obscure to justify that level of extra complexity and memory use.
       - Gestion des renommages concurrents et le mécanisme de GC
     - J'ai envoyé cette version à Gérald et Olivier lundi
     - Ajout de la conclusion
-    - Là en train d'effectuer quelques modifs sur la section *Overview*
+    - Ajout de quelques modifs sur la section *Overview*
       - Histoire d'être un peu plus exhaustif et précis sur ce qu'est RenamableLogootSplit
-      - Ajoute une nouvelle sous-section pour présenter les /safety properties/ que doit respecter l'opération /rename/
+      - Ajoute une nouvelle sous-section pour présenter les propriétés que doit respecter l'opération /rename/
   - Commencé à lire *A higly-available move operation for replicated trees and distributed filesystems*
     - Intéressant
     - Proposent une structure d'arbre répliquée permettant d'ajouter, supprimer et déplacer un noeud
@@ -14755,6 +14656,239 @@ to be too obscure to justify that level of extra complexity and memory use.
     - À comparer à des algos d'OT
       - Mais est-ce que le principe est différent ou juste la formalisation l'est ?
     - À suivre
+  - Réunion
+    - François
+      - Rien de spé
+      - Soutenance de Vic probablement reportée
+      - Travaille sur le rapport d'activité
+      - Réunion avec Quentin à propos de sa recherche de post-doc
+      - Réunion avec Areal
+      - Pas dispo <2021-02-19 Fri> prochain
+    - Abir
+      - Poursuit la rédaction de sa thèse
+    - Alexandre
+      - Travaille sur un parser pour transformer un dump Wikipédia en BD relationnel
+      - Presque fini
+      - Doit juste en discuter avec Gérald
+    - Anis
+      - Réunion avec François et Olivier
+      - En train de terminer les corrections du chap 5 de sa thèse pour en faire un article
+      - Travaille sur un algo génétique (?)
+	- Trop lent, à optimiser
+    - Claudia
+      - Chair de workshop et master classes à ECSCW 2021
+      - Ont fait la review cette semaine
+	- A l'air de mettre l'accent sur la résilience des plateformes de CSCW en situation de crise
+      - A travaillé sur le rapport d'activité
+	- Quelques difficultés avec la plateforme
+      - Contactée par Justine Gallet pour faire un portrait-vidéo pour le 8 mars
+    - Clélie
+      - Analyse ses données d'expériences
+      - Quelques résultats rigolos
+      - Commence à rédiger là-dessus
+      - Commence aussi à préparer la 2nde XP
+    - Olivier
+      - Réunion avec Anis
+      - Commencé à lire l'article de Matthieu
+    - Pierre-Antoine
+      - Continue de lire sur Capability-based Access Controls
+** Semaine du <2021-02-15 Mon> au <2021-02-19 Fri>
+*** Planned
+**** DONE Papier : Rédiger paragraphe sur le modèle de livraison des opérations dans sous-section *Dealing with concurrent updates*
+**** DONE Papier : Ajouter une phrase indiquant qu'on a utilisé que des opérations /insert/ dans notre évaluation
+- Vérifier que la complexité est la même dans le papier LogootSplit
+- Justifier grâce à ça
+**** DONE Papier : Rédiger abstract
+**** DONE Papier : Revamp algo de /renameId()/ dans la section *RLS in centralised settings*
+- Pour le moment, j'ai copy/paste l'algo de PaPoC
+- Mais j'avais retravaillé cet algo depuis pour le décomposer en plusieurs cas
+- On trouve la nouvelle  version dans le draft
+- Mais elle inclut aussi des changements pour rendre réciproques /renameId()/ et /revertRenameId()/
+- Faire un mix entre ces 2 versions
+  - Décomposé en plusieurs cas
+  - Mais sans les ajouts requis par la version distribuée
+**** DONE Papier : Compléter bibliographie
+**** IN-PROGRESS Papier : Rédiger intro
+**** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
+- J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
+- /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
+- Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
+- /renameId(id)/ avec /lastId < id < newLastId/ renvoie /newId = newLastId + id/
+- /reverseRenameId(newId)/ renvoie /newId/
+- On a donc /reverseRenameId(renameId(id)) != id/
+- Détecter et gérer ce cas
+**** IN-PROGRESS CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
+- A remarqué ce /draft/ sur la page de Kleppmann
+- Peut être intéressant de voir comment leurs travaux ont avancé depuis PaPoC
+- Disponible ici : https://martin.kleppmann.com/papers/move-op.pdf
+**** TODO Papier : Relire *A Conflict-Free Replicated JSON Datatype* de Kleppmann
+- A été publié dans TPDS
+- Permettra de voir le format/les termes employés
+- Dispo ici : https://arxiv.org/abs/1608.03960
+**** TODO Papier : Relire *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
+- A été publié dans TPDS
+- Permettra de voir le format/les termes employés
+- Dispo ici : https://ieeexplore.ieee.org/document/4668339
+**** TODO BD2 : Préparer et tourner CM6
+- Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
+  - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
+- Histoire qu'iels puissent tout de même découvrir ces sujets, je vais faire une VOD
+**** TODO CRDT : Lire *Merging OT and CRDT Algorithms*
+- Par Mehdi Ahmed-Nacer, Pascal Urso, Valter Balegas et Nuno Preguiça
+- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
+- Suis curieux de voir s'il s'agit d'une architecture à la Legion ou d'une intégration de OT dans un CRDT
+  - Ce qui se rapprocherait plus de ce que j'ai pu faire
+- Dispo ici : https://hal.inria.fr/hal-00957167
+**** TODO CRDT : Lire *Chronofold: a data structure for versioned text*
+- Par Victor Grishchenko et Mikhail Patrakeev
+- Présenté à PaPoC'20
+- De mémoire, s'agissait d'une séquence répliquée construite à partir du log ordonné des opérations
+- À 1ère vue, ne rentre pas dans une des approches habituelles pour concevoir les Sequence CRDTs
+- À creuser
+- Dispo ici : https://dl.acm.org/doi/10.1145/3380787.3393680
+**** TODO CRDT : Lire *Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types*
+- Par Petru Nicolaescu, Kevin Jahns, Michael Derntl, Ralf Klamma
+- S'agit du CRDT implémenté par Yjs (https://github.com/yjs/yjs), qui est développé par Kevin Jahns
+  - Qui est le framework présenté et évalué dans le blogpost *Are CRDTs suitable for shared editing?* (https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/)
+  - Par Kevin Jahns justement
+- Me semble qu'on retrouve une structure similaire à WOOT/RGA pour représenter les Séquences
+- Dispo ici : https://www.researchgate.net/publication/310212186_Near_Real-Time_Peer-to-Peer_Shared_Editing_on_Extensible_Data_Types
+**** TODO CRDT : Lire *A string-wise CRDT algorithm for smart and large-scale collaborative editing systems*
+- Par Xiao Lv, Fazhi He, Weiwei Cai, Yan Cheng
+- A inspiré la notion d'item, l'équivalent des blocs, dans Yjs
+- À lire
+- Dispo ici : https://coek.info/pdf-a-string-wise-crdt-algorithm-for-smart-and-large-scale-collaborative-editing-sys.html
+**** TODO CRDT : Lire *File system on CRDT*
+- Par Mehdi Ahmed-Nacer, Stéphane Martin, Pascal Urso
+- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
+- Vu que c'est une direction possible de mes travaux (utilisation de CRDT + OT pour concevoir une structure répliquée représentant un système de fichiers distribué), suis curieux
+- N'a pas contre pas été publié/peer-reviewé
+- Dispo ici : https://hal.inria.fr/hal-00720681
+**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
+- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
+- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
+  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
+  - Leur approche est du coup probablement générique
+  - À vérifier
+  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
+**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
+- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
+- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
+  - Ou les pistes de réflexions que cela dessine
+**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
+- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
+- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
+- Version courte du papier avait été présenté à PaPoC'20
+  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
+  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
+- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
+- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
+- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
+  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
+  - Mais qui possèdent des opérations différentes
+  - Chacune de ces opérations est commutative avec elle-même
+  - Mais elles ne sont pas commutatives entre elles
+    - L'exemple de l'addition et de la multiplication
+  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
+  - Moi l'opération de renommage n'est pas commutative avec elle-même
+  - Je ne peux donc pas utiliser la même technique
+- À valider au cours d'une nouvelle lecture
+**** TODO Distributed Systems : Lire *Epoch-based Commit and Replication in Distributed OLTP Databases*
+- Par Yi Lu, Lei Cao, Xiangyao Yu, Samuel Madden
+- Si je pige bien, dans le contexte des transactions distribuées
+- Propose d'aggréger des groupes de transactions dans des epochs
+- Et d'utiliser les epochs comme unité de commit
+- De façon à limiter le nombre d'exécutions du 2PC
+- Dispo ici : http://www.vldb.org/pvldb/vol14/p743-lu.pdf
+*** Done
+- Papier : Rédiger paragraphe sur le modèle de livraison des opérations dans sous-section *Dealing with concurrent updates*
+  - Finalement, 1 phrase me paraît suffisante
+- Papier : Compléter la bibliographie
+  - Dans l'intro de l'article pour PaPoC, je mentionnais en Local-First Software et l'édition collaborative comme exemple d'utilisation des CRDTs
+    - D'ailleurs pourrait citer les travaux de Claudia et Mehdi en plus pour l'édition collaborative
+  - Mais existe d'autres exemples d'utilisation des CRDTs que je pourrais citer dans la nouvelle intro
+  - Je pense notamment à Riak, Redis, Anna et AntidoteDB
+  - Faudrait que je trouve des références pour
+  - Dans le doute, ça me sera utile tôt ou tard dans ma rédaction
+  - [X] Pour Riak
+    - *Riak core: building distributed applications without shared state*
+      - Par Rusty Klophaus en 2010
+      - Dispo ici : https://www.researchgate.net/publication/261850079_Riak_Core_building_distributed_applications_without_shared_state
+    - Faudrait juste que j'arrive à accéder à l'article pour vérifier
+    - Sinon il y a l'article suivant qui a l'air d'être celui généralement cité
+    - *Riak DT Map: A Composable,Convergent Replicated Dictionary*
+      - Par Russel Brown, Sean Cribbs, Sam Elliott et Christopher Meiklejohn
+      - Présenté à PaPEC'14
+      - Dispo ici : https://pages.lip6.fr/syncfree/attachments/article/46/WP3-report.pdf#page=31
+  - De ce que je comprends, existe aussi SwiftCloud qui est construit au-dessus de Riak
+  - [X] Pour SwiftCloud
+    - Plusieurs références disponibles
+    - *Key-CRDT Stores*
+      - Par Valter Balegas en 2012
+      - Dispo ici : https://run.unl.pt/bitstream/10362/7802/1/Sousa_2012.pdf
+      - Du mal à piger ce que c'est comme document
+      - Un article de blog de Murat Buffalo mentionne que c'est une /master thesis/
+	- https://muratbuffalo.blogspot.com/2013/04/key-crdt-stores.html
+    - *SwiftCloud: Fault-Tolerant Geo-Replication Integrated all the Way to the Client Machine*
+      - Par Marek Zawirski, Annette Bieniusa, Valter Balegas, Sérgio Duarte, Carlos Baquero, Marc Shapiro et Nuno Preguiça en 2013
+      - Dispo ici : https://arxiv.org/abs/1310.3107
+      - Un rapport de recherche
+    - *SwiftCloud: Fault-Tolerant Geo-Replication Integrated all the Way to the Client Machine*
+      - Par Nuno Preguiça, Marek Zawirski, Annette Bieniusa, Valter Balegas, Sérgio Duarte, Carlos Baquero et Marc Shapiro en 2014
+      - Dispo ici : https://ieeexplore.ieee.org/abstract/document/7000132
+      - Un article de workshop si je pige bien
+  - [X] Pour Redis
+    - S'agit de la version Redis Enterprise qui propose un système de géo-réplication basé sur des CRDTs
+    - Il n'y a pas l'air d'y avoir de papiers à ce sujet
+    - Mais les pages webs suivantes :
+      - https://redislabs.com/redis-enterprise/advantages/
+      - https://www.redislabs.com/redis-enterprise/technology/active-active-geo-distribution/
+  - [X] Pour Anna
+    - Existe dorénavant 2 papiers sur Anna
+    - *Anna: A KVS for Any Scale*
+      - Par Chenggang Wu, Jose Faleiro, Yihan Lin et Joseph Hellerstein en 2018
+      - Publié dans 2018 IEEE 34th International Conference on Data Engineering (ICDE)
+      - Dispo ici : https://ieeexplore.ieee.org/document/8509265/
+    - *Anna: A KVS for Any Scale*
+      - Par Chenggang Wu, Jose Faleiro, Yihan Lin et Joseph Hellerstein en 2018
+      - Publié dans IEEE Transactions on Knowledge and Data Engineering (Volume: 33, Issue: 2, Feb. 1 2021)
+      - Dispo ici : https://ieeexplore.ieee.org/document/8640246
+  - [X] Pour AntidoteDB
+    - Y a pas l'air d'y avoir un papier directement sur AntidoteDB
+    - Plusieurs papiers par contre se basent dessus
+    - *Cure: Strong Semantics Meets High Availability and Low Latency*
+      - Deepthi Devaki Akkoorath, Alejandro Z. Tomsic, , Manuel Bravo, Zhongmiao Li, Tyler Crain, Annette Bieniusa, Nuno Preguiça et Marc Shapiro
+      - Publié à ICDCS'16
+      - Dispo ici : https://ieeexplore.ieee.org/document/7536539
+    - *Antidote SQL: Relaxed When Possible, Strict When Necessary*
+      - Par Pedro Lopes, João Sousa, Valter Balegas, Carla Ferreira, Ségio Duarte, Annette Bieniusa, Rodrigo Rodrigues et Nuno Preguiça
+      - Jamais publié ?
+      - Dispo ici : https://arxiv.org/abs/1902.03576
+  - Par contre, j'ai comme un doute, Shapiro recrutait pour AntidoteDB ou pour un autre projet ?
+  - À re-vérifier
+    - J'ai rien trouvé en cherchant rapidement
+    - Faudrait que je demande à Claudia ou Gérald
+  - Ah si c'est bien ça, il s'agissait du projet/de la start-up Concordant
+    - https://www.concordant.io/
+  - C'est vrai qu'il y a aussi Lasp
+  - [X] Pour Lasp
+    - *Lasp: a language for distributed, eventually consistent computations with CRDTs*
+      - Par Christopher Meiklejohn et Peter Van Roy
+      - Article de workshop publié à PaPoC'15
+      - Dispo ici : https://dl.acm.org/doi/abs/10.1145/2745947.2745954
+    - *Lasp: a language for distributed, coordination-free programming*
+      - Par Christopher Meiklejohn et Peter Van Roy
+      - Article de conf publié à PPDP'15
+      - Dispo ici : https://dl.acm.org/doi/abs/10.1145/2790449.2790525
+  - Et que Legion existe aussi !
+  - [X] Pour Legion
+    - *Legion: Enriching Internet Services with Peer-to-Peer Interactions*
+    - Par Albert van der Linde, Pedro Fouto, João Leitão, Nuno Preguiça, Santiago Castiñeira, Annette Bieniusa
+    - Article de conf publié à WWW'17
+    - Dispo ici : https://dl.acm.org/doi/abs/10.1145/3038912.3052673
+- Papier : Rédiger intro
+  - Pourrait profiter de l'introduction des CRDTs pour expliquer qu'ils implémentent le modèle de cohérence SEC
+    - Me permettrait de le retirer de *Proposed approach*
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
