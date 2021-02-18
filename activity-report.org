@@ -14708,6 +14708,12 @@ to be too obscure to justify that level of extra complexity and memory use.
   - Décomposé en plusieurs cas
   - Mais sans les ajouts requis par la version distribuée
 **** DONE Papier : Compléter bibliographie
+- Dans l'intro de l'article pour PaPoC, je mentionnais en Local-First Software et l'édition collaborative comme exemple d'utilisation des CRDTs
+  - D'ailleurs pourrait citer les travaux de Claudia et Mehdi en plus pour l'édition collaborative
+- Mais existe d'autres exemples d'utilisation des CRDTs que je pourrais citer dans la nouvelle intro
+- Je pense notamment à Riak, Redis, Anna et AntidoteDB
+- Faudrait que je trouve des références pour
+- Dans le doute, ça me sera utile tôt ou tard dans ma rédaction
 **** IN-PROGRESS Papier : Rédiger intro
 **** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
 - J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
@@ -14804,12 +14810,6 @@ to be too obscure to justify that level of extra complexity and memory use.
 - Papier : Rédiger paragraphe sur le modèle de livraison des opérations dans sous-section *Dealing with concurrent updates*
   - Finalement, 1 phrase me paraît suffisante
 - Papier : Compléter la bibliographie
-  - Dans l'intro de l'article pour PaPoC, je mentionnais en Local-First Software et l'édition collaborative comme exemple d'utilisation des CRDTs
-    - D'ailleurs pourrait citer les travaux de Claudia et Mehdi en plus pour l'édition collaborative
-  - Mais existe d'autres exemples d'utilisation des CRDTs que je pourrais citer dans la nouvelle intro
-  - Je pense notamment à Riak, Redis, Anna et AntidoteDB
-  - Faudrait que je trouve des références pour
-  - Dans le doute, ça me sera utile tôt ou tard dans ma rédaction
   - [X] Pour Riak
     - *Riak core: building distributed applications without shared state*
       - Par Rusty Klophaus en 2010
@@ -14889,6 +14889,114 @@ to be too obscure to justify that level of extra complexity and memory use.
 - Papier : Rédiger intro
   - Pourrait profiter de l'introduction des CRDTs pour expliquer qu'ils implémentent le modèle de cohérence SEC
     - Me permettrait de le retirer de *Proposed approach*
+  - Plan
+    - Systèmes distribués et réplication
+      - Systèmes doivent répliquer les données afin d'assurer leur scalability, disponibilité, robustesse
+      - Dans le cas de données mutables, la modification de ces données
+      - Systèmes adoptent la stratégie de la réplication optimiste et du modèle de cohérence eventual consistency pour s'affranchir de ces coordinations synchrones
+      - Mais nécessite un mécanisme de résolution de conflits pour gérer modifications concurrentes
+    - CRDTs
+      - Nouvelles spécifications des types de données abstraits
+      - Conçus pour l'utilisation dans les systèmes distribués
+      - Offrent une interface et sémantique similaire aux spécifications existantes pour les exécutions séquentielles
+      - Mais définissent une nouvelle sémantique pour les nouveaux cas de figures issus d'exécutions parallèles
+      - Respectent le modèle de cohérence SEC qui définit que l'ensemble des replicas convergent au même état lorsqu'ils reçoivent un même ensemble de modifications
+	- Et ce sans communication supplémentaire requise
+	- Peu importe leur ordre de réception
+      - Intègrent un mécanisme de résolution de conflits
+    - Utilisation des CRDTs
+      - Depuis leur définition, les CRDTs ont été rapidement adopté par la littérature et l'industrie
+      - De nos jours, on les retrouve
+	- Des structures de données complexes pouvant servir de brique pour une variété d'applications (Yjs, JSON CRDT)
+	- Utilisés dans les BDs distribuées (Riak, Redis, Anna, AntidoteDB)
+	- Intégrés dans des langages de programmation (Lasp, CScript)
+	- Keystone des Local-First Softwares (Local-First Software, PushPin)
+    - CRDTs dans l'édition collaborative
+      - Ont aussi été un centre d'intérêt et particulièrement étudié dans le cadre de l'édition collaborative
+      - Dans ce domaine, le texte est représenté sous la forme d'une Sequence
+      - Plusieurs travaux ont montré la pertinence de cette approche et des Sequence CRDTs pour ce domaine (Evaluating CRDTs for Real-time Document Editing, LSEQ)
+      - Plusieurs éditeurs collaboratifs sont issus de ces travaux (Crate, MUTE)
+      - Cependant, les structures données existantes souffrent d'un problème de croissance continue des métadonnées
+    - Contribution
+    - Déroulé du papier
+- Papier : Réunion avec Olivier
+  - Où j'en suis
+    - A rédigé
+      - Conclusion
+      - Quelques lignes sur les Op-based CRDTs
+      - Distinction entre modifications locales et distantes dans le cadre de l'évaluation
+      - La mise à jour du modèle de livraison des opés pour de l'epoch-based
+      - Abstract
+    - Travaille actuellement sur l'intro
+  - Ce qu'il reste à faire
+    - J'avais noté quelques TODO?
+    - Vu la longueur du document, je pense pas que ça soit intéressant de développer ces idées
+      - Bon d'après la discussion avec Olivier, au moins rédigé celui sur la stratégie de renommage
+    - Sinon, me reste le cas non-réciproque entre renameIdv2() et revertRenameId() à corriger
+      - J'y avais déjà jeté un oeil lorsque je l'avais remarqué, sans succès
+      - À voir si maintenant, en me replongeant dedans, j'arrive
+  - Autres points
+    - Souhaiterais prendre 2 semaines de vacs avant le <2021-03-15 Mon>
+      - Donc le <2021-03-01 Mon> au plus tard
+    - Mais souhaiterais finir l'article au préalable
+      - Histoire d'avoir l'esprit tranquille
+    - Permettrait de faire un break avant de se lancer dans la rédaction
+  - Notes de réunion
+    - Pas clair que l'arbre des epochs est une construction locale et indépendante
+      - Peut comprendre qu'ils sont transmis/échangés entre les noeuds
+      - Faudrait lever cette ambiguité
+    - Ordre lexicographique
+      - Est-ce que cet ordre peut poser problème ?
+      - Donc non pour la convergence
+      - Mais oui pour les performances pour converger
+      - En parle dans discussion
+    - Page 1 : Overhead
+      - Préciser qu'il s'agit de l'overhead en mémoire, computation et bande-passante
+    - Limites de LogootSplit
+      - Expliciter qu'on peut se retrouver avec une séquence framgentée en blocs de 2-3 éléments et donc inefficace
+      - Guider le lecteur vers la figure 12 pour appuyer la claim que 1% du doc est du contenu, 99% des métadonnées
+    - Overview
+      - P-e un peu trop expéditif, manque de liant entre les différents aspects abordés
+      - Voir si peut retravailler ces différents paragraphes
+    - Mécanisme de compression
+      - Bien affirmer que cela ne modifie pas l'exécution de l'opération de rename
+    - Figures des algorithmes
+      - Dans le papier quand je fais référence à ces figures, devrait ajouter la mention que c'est un algo
+	- "The algorithm of Figure..."
+    - Algorithme
+      - Pour le moment, les algos sont donnés et c'est au lecteur de se démerder avec
+      - Ça serait cool d'avoir une explication qui accompagne l'algo pour bien montrer que l'on traite les différents cas possibles
+      - En annexe ?
+    - *As nodes have only a partial knowledge of the system and of the issued operations, they may.*
+      - P-e un peu longue et incompréhensible comme phrase
+      - Voir pour reformuler, décomposer et améliorer ce passage
+    - Results
+      - Mettre une intro à cette section plutôt que de démarrer direct
+    - Sous-section sur la stratégie de renommage
+      - Rédiger
+  - Organisation
+    - Je finis le papier comme je l'imagine
+    - Envois cette version à Olivier une fois qu'elle est prête
+    - En parallèle, j'essaie d'avoir les retours de Gérald
+    - Pour les vacs, à voir comment ça avance sur ces 2 aspects
+- À imprimer
+  - Tant que je suis au LORIA, autant en profiter pour faire le plein de papiers
+  - [X] *Optimistic replication*
+    - https://dl.acm.org/doi/10.1145/1057977.1057980
+  - [X] *Consistency Tradeoffs in Modern Distributed Database System Design: CAP is Only Part of the Story*
+    - https://ieeexplore.ieee.org/abstract/document/6127847
+  - [X] *A Critique of the CAP Theorem*
+    - https://arxiv.org/abs/1509.05393
+  - [X] *CScript: A distributed programming language for building mixed-consistency applications*
+    - https://www.sciencedirect.com/science/article/abs/pii/S0743731520302896
+  - [X] *Keeping CALM: When Distributed Consistency is Easy*
+    - https://arxiv.org/abs/1901.01930
+  - [X] *Local-first software: you own your data, in spite of the cloud*
+    - https://dl.acm.org/doi/10.1145/3359591.3359737
+  - [X] *PushPin: towards production-quality peer-to-peer collaboration*
+    - https://dl.acm.org/doi/10.1145/3380787.3393683
+  - [X] *Secure Conflict-free Replicated Data Types*
+    - https://dl.acm.org/doi/abs/10.1145/3427796.3427831
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
