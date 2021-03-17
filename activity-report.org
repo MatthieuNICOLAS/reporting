@@ -14966,17 +14966,68 @@ to be too obscure to justify that level of extra complexity and memory use.
 	- Au sujet des propriétés que l'on souhaite dans les éditeurs collaboratifs
 ** Semaine du <2021-02-22 Mon> au <2021-02-26 Fri>
 *** Planned
-**** IN-PROGRESS Papier : Rédiger intro
-**** TODO Papier : Rédiger sous-section sur stratégie de renommage
-- Olivier juge intéressant/nécessaire la sous-section abordant la question de quand renommer
-- La rédiger
-**** TODO Papier : Intégrer corrections et remarques proposées par Olivier
+**** DONE Papier : Rédiger intro
+**** DONE Papier : Intégrer corrections et remarques proposées par Olivier
 - Olivier m'a fait part de ses remarques et m'a listé des corrections à effectuer
 - Modifier le papier en conséquence
-**** TODO Papier : Envoyer cette version complète à Olivier et Gérald
+**** DONE Papier : Rédiger sous-section sur stratégie de renommage
+- Olivier juge intéressant/nécessaire la sous-section abordant la question de quand renommer
+- La rédiger
+**** DONE Papier : Envoyer cette version complète à Olivier et Gérald
 - Une fois les tâches précédentes réalisées, on devrait obtenir une 1ère version complète de l'article
 - La partager avec Olivier et Gérald pour obtenir des retours sur les nouvelles sections et sur l'article globalement
-**** TODO Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
+*** Done
+- Papier : Intégrer corrections et remarques proposées par Olivier
+  - [X] Pas clair que l'arbre des epochs est une construction locale et indépendante
+    - Reformulation de la phrase pour mettre l'accent sur la construction de l'arbre à partir des opérations
+  - [X] Overhead
+    - Mention des différents types d'overhead dans l'intro
+  - [X] Limites de LogootSplit
+    - Modification du paragraphe de fin pour baser l'affirmation des metadonnées sur nos benchmarks
+  - [-] Overview
+  - [X] Mécanisme de compression
+  - [X] Figures des algorithmes
+    - Définition d'un environnement /myalgorithm/
+  - [-] Algorithme
+  - [X] *As nodes have only a partial knowledge of the system and of the issued operations, they may.*
+    - Décomposition de la phrase en plusieurs pour guider pas-à-pas le lecteur
+  - [X] Results
+  - Me paraît pas trop mal comme ça
+  - La description des algos me paraîtrait intéressant à ajouter, mais nécessite un peu de trop travail pour que je finisse ça cette semaine
+  - Augmenterait aussi la taille de l'article qui me paraît déjà bien conséquent
+  - Je préfère laisser ça en suspens pour le moment
+- Papier : Rédiger sous-section sur stratégie de renommage
+  - Je ne sais pas où mettre cette sous-section par contre
+    - Pour le moment, l'avait mis à la fin de la *RLS without concurrent /rename/ operations*
+    - Car il s'agissait du plus tôt auquel je pouvais aborder le sujet
+    - Mais peut en fait garder cette discussion pour plus tard
+    - Justement, peut ajouter cette sous-section à *Discussion*
+    - Comme se place après la présentation de la gestion de conflits entre renommages concurrents et après évaluation
+    - Permettrait d'avoir la discussion la plus complète sur le sujet
+    - Et pouvoir explorer aussi l'objectif minimisation des renommages concurrents
+    - Me parait plus adapté
+    - Mais dans ce cas, nécessite de retravailler la conclusion lorsque j'aborde ce sujet
+  - Plan
+    - Insister sur le fait qu'il s'agit d'une opération système
+    - Il s'agit donc aux designers du système de décider quand les noeuds doivent effectuer un renommage
+    - Mais qu'il n'y a pas une solution unique
+    - La solution dépend des contraintes du système et de ses noeuds
+    - Pour prendre cette décision, plusieurs aspects à prendre en compte
+    - L'aspect mémoire : quand devient-il intéressant de renommer ?
+    - L'aspect computationel : quand renommer devient trop coûteux et peut impacter négativement l'expérience utilisateur ?
+    - L'aspect réseau : quand l'opération de renommage deviendrait trop coûteuse à propager ?
+    - Les résultats de notre évaluation présentés dans la section évaluation donnent une idée de l'évolution de chacune de ces métriques
+** Semaine du <2021-03-15 Mon> au <2021-03-19 Fri>
+*** Planned
+**** DONE Projet Informatique : Préparer les réunions avec les différents groupes
+- On avait fini la 1ère période du projet début février
+- Celle-ci devait aboutir sur la réalisation du diagramme de classes et la définition de la liste des priorités des fonctionnalités
+- Voir les repos de chaque groupe si à jour par rapport aux remarques de la dernière réunion
+**** DONE CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
+- A remarqué ce /draft/ sur la page de Kleppmann
+- Peut être intéressant de voir comment leurs travaux ont avancé depuis PaPoC
+- Disponible ici : https://martin.kleppmann.com/papers/move-op.pdf
+**** IN-PROGRESS Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
 - J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
 - /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
 - Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
@@ -14984,10 +15035,11 @@ to be too obscure to justify that level of extra complexity and memory use.
 - /reverseRenameId(newId)/ renvoie /newId/
 - On a donc /reverseRenameId(renameId(id)) != id/
 - Détecter et gérer ce cas
-**** IN-PROGRESS CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
-- A remarqué ce /draft/ sur la page de Kleppmann
-- Peut être intéressant de voir comment leurs travaux ont avancé depuis PaPoC
-- Disponible ici : https://martin.kleppmann.com/papers/move-op.pdf
+**** TODO Papier : Introduire la notion de membership
+- La stabilité causale requiert un protocole de membership pour pouvoir être déterminée
+- Pour le moment, ne mentionne pas ce requirement
+- Peut me l'être reproché et consiste en un angle d'attaque de mon approche
+- Mettre les pieds dans le plat en référençant SWIM et Lifeguard comme protocole de membership scalable me paraît donc une meilleure option
 **** TODO Papier : Relire *A Conflict-Free Replicated JSON Datatype* de Kleppmann
 - A été publié dans TPDS
 - Permettra de voir le format/les termes employés
@@ -15012,6 +15064,28 @@ to be too obscure to justify that level of extra complexity and memory use.
   - Et si c'est le cas, si on peut relaxer les contraintes
 - J'avais creusé cette question à un moment, mais me souviens plus des conclusions auxquelles j'étais arrivé
 - Dans le doute, ça peut être intéressant de se repencher dessus
+**** TODO RLS : Étudier une implémentation du mécanisme de renommage basée sur un operation log
+- Je galère à l'heure actuelle à définir des fonctions de renommage et d'inversion du renommage réciproques
+  - J'ai ma fonction d'inversion du renommage qui annule correctement l'effet du renommage
+  - Mais ma fonction de renommage ne renvoie pas forcément à l'identique un identifiant inséré après le renommage qui a ensuite été affecté par le undo
+    - Lors d'un redo donc
+- Cela ne pose pas de problème à l'heure actuelle avec ma relation /priority/ qui par définition empêche un redo
+- Mais ça m'empêche de proposer une relation /priority/ plus efficace tant que je ne résous pas ce problème
+- De plus, la complexité de mon mécanisme de renommage s'accroît avec le nombre d'éléments présents dans la séquence
+  - Devrait pouvoir proposer une amélioration à une complexité en fonction du nombre de blocs
+  - Mais ça rendrait encore l'algo plus imbitable qu'il ne l'est déjà actuellement
+- Le papier de Kleppmann et al. sur une opération /move/ dans un arbre montre qu'un operation log est une solution viable
+  - Le papier *A higly-available move operation for replicated trees and distributed filesystems*
+- L'operation log aurait pour avantage de limiter les transformations effectuées qu'à des do et undo
+  - On pourrait partir de l'état résultant du renommage prioritaire
+    - Ce qui a l'avantage de bypasser les différents renommages intermédiaires entre l'epoch courante et la nouvelle epoch
+  - Puis appliquer les opérations concurrentes présentes dans le log pour obtenir le nouvel état
+  - Les opérations concurrentes proviendraient donc d'epochs antérieures ou concurrentes
+    - À moins que je loupe quelque chose
+  - Et comme on conserve l'opération initiale dans l'operation log, on peut repartir de celle-ci plutôt que de l'identifiant transformé présent dans l'état
+- La complexité deviendrait donc fonction des opérations concurrentes
+- Considérer et étudier plus en détail cette implémentation alternative
+  - Notamment l'overhead spatial et temporel introduit par l'operation log
 **** TODO BD2 : Préparer et tourner CM6
 - Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
   - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
@@ -15084,6 +15158,139 @@ to be too obscure to justify that level of extra complexity and memory use.
 - De façon à limiter le nombre d'exécutions du 2PC
 - Dispo ici : http://www.vldb.org/pvldb/vol14/p743-lu.pdf
 *** Done
+- Projet Informatique : Préparer les réunions avec les différents groupes
+  - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
+    - Ci-dessous, les notes que j'avais prises concernant le travail demandé à l'issue de la dernière réunion
+      - À faire d'ici la fin de la semaine
+	- Ajouter les associations manquantes dans le diagramme
+	  - Les associations de base, mais aussi celle d'héritage
+	- Ajouter les différentes méthodes de chaque classe
+	- Upload du diagramme de classes sur Git
+	  - J'ai dit impérativement d'ici la fin de semaine
+    - <2021-03-15 Mon> à 17h00, le diagramme de classes n'était toujours pas disponible sur leur repo Git
+    - [X] Leur demander de l'uploader
+    - Remarques
+      - Gaston était celui qui animait le plus la dernière réunion
+      - Garder ça en tête lors de la prochaine
+    - [X] Les recontacter pour fixer la prochaine réunion
+    - Pistes de travail pour cette semaine
+      - Reviewer leur diagramme de classes une fois celui-ci disponible
+      - Revoir avec eux l'objectif de la v1
+      - Voir avec eux la répartition du travail
+      - Reste la question de la BD en suspens
+  - Groupe Thomas Champseix - Gabriel Masschelein
+    - Ci-dessous, les notes que j'avais prises concernant le travail demandé à l'issue de la dernière réunion
+      - À faire d'ici la fin de semaine
+	- Mettre la dernière du diagramme au classe au format xml et png
+	- Nettoyer le repo
+	  - Virer le code la version java
+	  - Diagramme de classe au format de PDF
+	  - Fichier notes.txt
+    - <2021-03-15 Mon> à 17h30, le diagramme de classes vient d'être uploadé
+    - Pistes de travail pour cette semaine
+      - Démarrer l'implémentation du jeu en Python
+      - Mettre à jour le diagramme de classes en fonction des problèmes rencontrés
+    - Remarques
+      - Diagramme de classes
+	- Où/Par quel composant l'équipe de personnage est-elle créée et gérée ?
+      - Code
+	- Utilisent la librairie pygame
+	  - Quelle version ?
+	  - Serait intéressant si vous utilisez plusieurs librairies d'utiliser un gestionnaire de dépendance
+	  - Poetry a l'air de faire le taf en Python
+	    - https://python-poetry.org/
+- Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
+  - Peut gérer ce cas en ajoutant la condition suivante
+    #+BEGIN_BLOCK
+Si lastId < newLastId      et
+   id.length < 1           et
+   newLastId.isPrefix(id)  et
+   lastId < tail(id, 1)    et
+   tail(id, 1) < newLastId
+    #+END_BLOCK
+  - Dans ce cas, on peut retourner /tail(id, 1)/
+  - Reste à gérer les autres cas possibles
+  - Puisqu'à l'epoch /e1/, /newLastId/ et /newId/ existent, il est possible d'insérer et générer un nouvel identifiant entre ces 2 là
+  - En résulte un nouveau identifiant /newId2/ de la forme /newLastId + tail2/
+    - Puisque généré entre /newLastId/ et /newLastId + id/ (newId)
+  - /id ∈ ]lastId, newLastId[/
+  - Donc /tail2 ∈ ]MIN_TUPLE, lastId[/
+  - Peut gérer ce cas en ajoutant la condition suivante
+    #+BEGIN_BLOCK
+Si lastId < newLastId     et
+   id.length < 1          et
+   newLastId.isPrefix(id) et
+   tail(id, 1) < lastId
+    #+END_BLOCK
+  - Dans ce cas, on peut retourner /lastId + MIN_TUPLE + tail(id, 1)/
+  - Doit donc s'assurer à tester et gérer ces valeurs dans /renIdGreaterThanLastId()/
+  - ~Par contre, me paraît pas possible de générer un identifiant /newId3/ de la forme suivante~
+    - /id = newLastId + tail3/
+    - Avec /tail3 ∈ ]newLastId, MAX_TUPLE[/
+  - ~Si insère après /newId/, est censé générer un /newId3/ avec une base différente de /newLastId/~
+  - Sauf si existe un identifiant qui a pour position la valeur suivante de celle de /newLastId/ et qu'on insère entre les deux
+    - Possible ça ?
+    - Si quelqu'un insère en concurrence au renommage à la toute fin du document, peut générer un tel identifiant
+    - Peu probable, mais possible
+  - J'ai l'impression que ce cas de figure finalement correspond au même cas que le cas habituel de /renIdFromPredId()/
+- CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
+  - Présente une validation formelle de leur algorithme
+    - Réalisée en Isabelle/HOL
+    - Valide que leur algo génère des arbres bien formés
+      - Absence de cycle, une seule racine
+    - Et que les replicas convergent
+  - En dérive une implémentation Scala de leur Tree CRDT supportant insert/remove/move
+    - Basée sur une Hash Table
+    - Avec pour clé le noeud enfant
+    - Et pour valeur le couple (noeud parent, metadonnées)
+  - Effectue deux évaluations expérimentales de cette implémentation
+  - La 1ère suit le scénario suivant
+    - 3 pairs
+    - Réplique chacun un arbre à l'aide d'un Tree CRDT
+    - Initialement vide
+    - Effectuent des opérations /move/ en utilisant des noeuds provenant d'un set de 1000 noeuds
+      - Donc taille max de l'arbre est de 1k noeuds
+    - Fait tourner l'expérience 10min
+    - Mesure le temps d'intégration median de l'opération /move/ en local et remote
+    - Fait varier le nombre d'opérations /move/ pour voir l'impact sur les perfs de 30 à 600 opés/s
+      - À 600 opés/s, atteint 100% d'utilisation du CPU
+      - Donc n'augmente pas le nombre d'opés par seconde au-delà de ce point
+    - Temps d'insertion local constant aux alentours de 50-70us
+    - Temps d'insertion remote croissant linéairement de 140us à 1.5ms
+      - Augmente car de plus en plus d'opérations concurrentes introduisant un conflit
+      - Donc nécessite de plus en plus d'undo et de redo
+      - Précise pas par contre l'ordre de grandeur du nombre d'opés à undo/redo
+  - La 2nde suit le scénario suivant
+    - 3 pairs
+    - 1 pair est désigné leader et se contente d'ordonner totalement les opérations qu'il reçoit et de les retransmettre aux autres
+    - 2 pairs qui génèrent les opérations
+    - Avec cette approche, application d'une opération est plus simple/efficace car pas de undo/redo
+    - Permet au leader de dépasser le seuil de 600 opés/s
+    - Traite jusqu'à 14k opés/s
+    - Mais du point de vue des autres pairs, observe la latence des opérations car round-trip avec le leader
+    - Plusieurs centaines de ms donc pour qu'une opération soit effectivement appliquée de leur point de vue
+    - Rappelle aussi que l'approche CRDT se montre toujours /available/ même en cas de partition réseau
+      - Contrairement à l'approche SMR qui bloquerait
+    - Le leader se révèle être un SPOF aussi dans l'approche SMR
+  - Remarques
+    - Un peu de mal à déchiffrer l'évaluation comparative
+      - Les mesures des temps d'intégration des CRDT local/remote operations ne prennent en compte que le temps d'execution de ces opérations
+      - Alors que les mesures de temps d'intégration des operations dans l'approche State Machine Replication tiennent compte de la latence
+	- Aussi de la partie sérialisation/désérialisation des messages non ?
+      - Je comprends la comparaison, mais ça me paraît pas forcément cohérent
+      - Notamment dans ce cas, pourquoi les mesures concernant les CRDT remote operations ne prennent pas en compte la latence ?
+    - Dommage qu'il n'y ait pas de comparaison avec un autre Tree CRDT
+      - Pour un peu comparer les overheads de différentes approches
+    - Un peu curieux de l'évolution des perfs de la Hash Table avec un nombre plus important d'éléments
+      - Mentionne notamment leur volonté de proposer un DFS
+      - J'ai du mal à estimer le nombre d'éléments gérer généralement par ces applications
+      - Et donc l'objectif de performance à atteindre
+    - L'évaluation de l'approche CRDT ne se base que sur 3 pairs
+      - Quid d'un plus grand nombre de pairs ?
+      - Et donc d'un nombre plus grand d'opérations concurrentes ?
+  - Réflexions
+    - Ce travail légitime l'utilisation d'un operation log pour l'implémentation d'un mécanisme de résolution de conflits
+    - Je pourrais proposer une telle approche pour RLS pour simplifier son fonctionnement et potentiellement améliorer ses perfs
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
