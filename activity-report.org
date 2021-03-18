@@ -15027,7 +15027,7 @@ to be too obscure to justify that level of extra complexity and memory use.
 - A remarqué ce /draft/ sur la page de Kleppmann
 - Peut être intéressant de voir comment leurs travaux ont avancé depuis PaPoC
 - Disponible ici : https://martin.kleppmann.com/papers/move-op.pdf
-**** IN-PROGRESS Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
+**** CANCELLED Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
 - J'ai détecté une incohérence en relisant le pseudo-code écrit pour le papier
 - /reverseRenameIdGreaterThanNewLastId()/ ne gère pas de manière réciproque tous les cas de /renameIdGreatherThanLastId()/
 - Plus précisément, le cas où on a /lastId < id < newLastId/ dans /renameId()/ n'est pas /reverse/ correctement
@@ -15035,6 +15035,15 @@ to be too obscure to justify that level of extra complexity and memory use.
 - /reverseRenameId(newId)/ renvoie /newId/
 - On a donc /reverseRenameId(renameId(id)) != id/
 - Détecter et gérer ce cas
+**** TODO Papier : Revenir à une version non-réciproque des fonctions de renommage
+- J'ai décidé d'abandonner la conception de fonctions de renommage et d'inversion du renommage réciproques
+  - Puisque je n'y arrive pas
+  - Et que j'en ai pas besoin tant que j'ai une relation /priority/ qui me prémunit de /redo/
+- J'avais cependant rédigé l'article dans l'optique de proposer de telles fonctions
+- Modifier le contenu concerné en conséquence
+  - La section 5.3 doit aborder ce sujet
+  - La section 7.3 doit dorénavant rappeler qu'il est nécessaire d'empêcher les /redo/ ou alors il est nécessaire de proposer des fonctions de renommage réciproques au préalable
+  - Algo 4 du papier devrait sauter
 **** TODO Papier : Introduire la notion de membership
 - La stabilité causale requiert un protocole de membership pour pouvoir être déterminée
 - Pour le moment, ne mentionne pas ce requirement
@@ -15233,6 +15242,18 @@ Si lastId < newLastId     et
     - Si quelqu'un insère en concurrence au renommage à la toute fin du document, peut générer un tel identifiant
     - Peu probable, mais possible
   - J'ai l'impression que ce cas de figure finalement correspond au même cas que le cas habituel de /renIdFromPredId()/
+  - Bon, perso je trouve que vouloir rendre ces fonctions réciproques est casse-gueule
+    - Rend notamment la fonction /renameId()/ trop complexe pour gérer les /do/ et surtout /redo/
+    - J'ai pas confiance en cette version de /renameId()/
+    - Et en arrive à un niveau de complexité où je n'arrive plus à raisonner
+  - Me paraît pas raisonnable de proposer cette version dans l'article
+  - Je préfère rollback et assumer de fournir des fonctions non-réciproques
+  - Et expliciter que cela ne pose pas de problème car la relation /priority/ définie prémunit des /redo/
+  - Ce qui par contre me cloue sur place avec ma relation /priority/
+  - Tant que je dois éviter les /redo/, je ne peux pas proposer une autre relation /priority/ minimisant les calculs à l'échelle du système
+  - Une implémentation à base d'operation log permettrait par contre de contourner les /redo/
+    - Puisque on utiliserait à chaque fois les infos des opérations initiales, et non plus l'état courant
+  - Cela retirerait la contrainte actuelle bloquant le choix de la relation /priority/
 - CRDT : Lire *A higly-available move operation for replicated trees and distributed filesystems*
   - Présente une validation formelle de leur algorithme
     - Réalisée en Isabelle/HOL
@@ -15291,6 +15312,42 @@ Si lastId < newLastId     et
   - Réflexions
     - Ce travail légitime l'utilisation d'un operation log pour l'implémentation d'un mécanisme de résolution de conflits
     - Je pourrais proposer une telle approche pour RLS pour simplifier son fonctionnement et potentiellement améliorer ses perfs
+- Meeting
+  - Reviens de 2 semaines de vacs, donc la forme
+  - Avant de partir, j'avais rédigé et envoyé une version complète de notre draft pour TPDS à Olivier et Gérald
+  - J'attend dorénavant les retours là-dessus
+  - En attendant, je me suis repenché sur mes fonctions de renommage
+    - Pour rappel, je possède une fonction qui permet de mapper des identifiants d'une epoch à une suivante et une fonction qui permet d'annuler l'effet du renommage
+    - Une propriété intéressante à avoir serait que ces 2 fonctions soient réciproques
+      - Permettrait de me "balader" entre les epochs sans soucis
+    - J'avais travaillé sur ce sujet le printemps/été dernier
+    - Il y a de ça un petit moment, je me suis rendu compte que ce n'était pas le cas
+    - Rencontre un problème pour des identifiants insérés après le renommage qui se trouvent dans une range donnée
+    - Que le renommage est /undo/
+      - Dans ce cas, je map l'identifiant vers un nouvel identifiant dans l'epoch précédente qui remplit les contraintes du mécanisme
+    - Mais lorsque le renommage est /redo/, ne retombe pas sur les identifiants originels
+    - J'avais déjà essayé de résoudre ce problème y a quelques mois : sans succès
+    - Cette semaine, j'ai ré-essayé : sans succès de nouveau
+    - Je raisonne dessus à la main, en écrivant des tests pour m'aider
+    - Mais trop de cas et cas trop complexes
+    - Autant mes versions initiales de mes fonctions qui se contentent de gérer le /do/ et le /undo/, j'ai à peu près confiance et je comprends encore ce que je fais
+    - Autant les versions tentant de supporter le /redo/, je sais que c'est incomplet et j'ai peur d'avoir louper des trucs
+    - Et le truc, c'est que j'ai pas forcément besoin de pouvoir /redo/
+    - J'ai une relation, /priority/, qui définit comment je me déplace entre les epochs
+    - Et la relation /priority/ que je propose actuellement, par nature, empêche de revenir sur une epoch
+    - Donc je pense abandonner l'idée de définir des fonctions de renommage et d'inversion du renommage réciproques
+    - Dans mon implem actuelle, ça me force à utiliser une relation /priority/ qui prémunit des /redo/
+    - Mais au moins ça me paraît correct et permet d'avoir confiance en ce que je propose
+    - Donc je vais retravailler les parties correspondantes du papier
+      - Permettra de simplifier les algos présentés notamment et de gagner un peu de place là-dessus
+    - Et ça me fait repenser à une autre implémentation du mécanisme de renommage que je considérais à un moment
+      - Se basant sur un operation log
+      - Cette implémentation a le mérite d'éviter l'écueil du /redo/, car utilise les opérations originelles pour calculer l'état après un renommage
+	- Comparé à l'implem actuelle qui utilise l'état courant, avec des identifiants ayant déjà subies des transformations
+      - A aussi le mérite de changer la complexité de l'algo
+	- Au lieu de dépendre du nombre d'éléments présents dans la liste comme actuellement
+	- Dépendrait du nombre d'opérations concurrentes
+	- Peut arguer que bien plus petit, surtout si je déclenche un renommage tous les 30k opérations
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
