@@ -15035,137 +15035,6 @@ to be too obscure to justify that level of extra complexity and memory use.
 - /reverseRenameId(newId)/ renvoie /newId/
 - On a donc /reverseRenameId(renameId(id)) != id/
 - Détecter et gérer ce cas
-**** TODO Papier : Revenir à une version non-réciproque des fonctions de renommage
-- J'ai décidé d'abandonner la conception de fonctions de renommage et d'inversion du renommage réciproques
-  - Puisque je n'y arrive pas
-  - Et que j'en ai pas besoin tant que j'ai une relation /priority/ qui me prémunit de /redo/
-- J'avais cependant rédigé l'article dans l'optique de proposer de telles fonctions
-- Modifier le contenu concerné en conséquence
-  - La section 5.3 doit aborder ce sujet
-  - La section 7.3 doit dorénavant rappeler qu'il est nécessaire d'empêcher les /redo/ ou alors il est nécessaire de proposer des fonctions de renommage réciproques au préalable
-  - Algo 4 du papier devrait sauter
-**** TODO Papier : Introduire la notion de membership
-- La stabilité causale requiert un protocole de membership pour pouvoir être déterminée
-- Pour le moment, ne mentionne pas ce requirement
-- Peut me l'être reproché et consiste en un angle d'attaque de mon approche
-- Mettre les pieds dans le plat en référençant SWIM et Lifeguard comme protocole de membership scalable me paraît donc une meilleure option
-**** TODO Papier : Relire *A Conflict-Free Replicated JSON Datatype* de Kleppmann
-- A été publié dans TPDS
-- Permettra de voir le format/les termes employés
-- Dispo ici : https://arxiv.org/abs/1608.03960
-**** TODO Papier : Relire *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
-- A été publié dans TPDS
-- Permettra de voir le format/les termes employés
-- Dispo ici : https://ieeexplore.ieee.org/document/4668339
-**** TODO RLS : Étudier le déclenchement de renommages identiques par les noeuds de manière non-coordonnée
-- Pour le moment, adopte une stratégie "aggressive" pour renommer
-- L'idée est que les noeuds génèrent une opération de renommage lorsqu'ils estiment cela nécessaire
-- On espère que le nombre d'opés de renommage concurrentes restent minimes
-- Et on gère ce cas de figure grâce aux mécanismes de résolution de conflits
-- Une autre stratégie possible, que je souhaiterais étudier ici, est la stratégie "conservatrice"
-- L'idée serait d'éliminer le risque de renommages concurrents
-- Une piste évidente est l'utilisation d'un consensus synchrone
-- Mais est-ce qu'il serait possible pour les noeuds de tous effectuer le même renommage, sans coordination synchrone ?
-- L'idée serait qu'ils effectuent de manière indépendante un renommage sur le même set d'opérations, sur un même préfixe commun
-- En ordonnant les opérations et en utilisant un mécanisme de stabilité, devrait être possible de définir ce préfixe
-  - Intuitivement, je pense que PCS est requis
-  - À vérifier si cela suffit réellement
-  - Et si c'est le cas, si on peut relaxer les contraintes
-- J'avais creusé cette question à un moment, mais me souviens plus des conclusions auxquelles j'étais arrivé
-- Dans le doute, ça peut être intéressant de se repencher dessus
-**** TODO RLS : Étudier une implémentation du mécanisme de renommage basée sur un operation log
-- Je galère à l'heure actuelle à définir des fonctions de renommage et d'inversion du renommage réciproques
-  - J'ai ma fonction d'inversion du renommage qui annule correctement l'effet du renommage
-  - Mais ma fonction de renommage ne renvoie pas forcément à l'identique un identifiant inséré après le renommage qui a ensuite été affecté par le undo
-    - Lors d'un redo donc
-- Cela ne pose pas de problème à l'heure actuelle avec ma relation /priority/ qui par définition empêche un redo
-- Mais ça m'empêche de proposer une relation /priority/ plus efficace tant que je ne résous pas ce problème
-- De plus, la complexité de mon mécanisme de renommage s'accroît avec le nombre d'éléments présents dans la séquence
-  - Devrait pouvoir proposer une amélioration à une complexité en fonction du nombre de blocs
-  - Mais ça rendrait encore l'algo plus imbitable qu'il ne l'est déjà actuellement
-- Le papier de Kleppmann et al. sur une opération /move/ dans un arbre montre qu'un operation log est une solution viable
-  - Le papier *A higly-available move operation for replicated trees and distributed filesystems*
-- L'operation log aurait pour avantage de limiter les transformations effectuées qu'à des do et undo
-  - On pourrait partir de l'état résultant du renommage prioritaire
-    - Ce qui a l'avantage de bypasser les différents renommages intermédiaires entre l'epoch courante et la nouvelle epoch
-  - Puis appliquer les opérations concurrentes présentes dans le log pour obtenir le nouvel état
-  - Les opérations concurrentes proviendraient donc d'epochs antérieures ou concurrentes
-    - À moins que je loupe quelque chose
-  - Et comme on conserve l'opération initiale dans l'operation log, on peut repartir de celle-ci plutôt que de l'identifiant transformé présent dans l'état
-- La complexité deviendrait donc fonction des opérations concurrentes
-- Considérer et étudier plus en détail cette implémentation alternative
-  - Notamment l'overhead spatial et temporel introduit par l'operation log
-**** TODO BD2 : Préparer et tourner CM6
-- Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
-  - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
-- Histoire qu'iels puissent tout de même découvrir ces sujets, je vais faire une VOD
-**** TODO CRDT : Lire *Merging OT and CRDT Algorithms*
-- Par Mehdi Ahmed-Nacer, Pascal Urso, Valter Balegas et Nuno Preguiça
-- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
-- Suis curieux de voir s'il s'agit d'une architecture à la Legion ou d'une intégration de OT dans un CRDT
-  - Ce qui se rapprocherait plus de ce que j'ai pu faire
-- Dispo ici : https://hal.inria.fr/hal-00957167
-**** TODO CRDT : Lire *Chronofold: a data structure for versioned text*
-- Par Victor Grishchenko et Mikhail Patrakeev
-- Présenté à PaPoC'20
-- De mémoire, s'agissait d'une séquence répliquée construite à partir du log ordonné des opérations
-- À 1ère vue, ne rentre pas dans une des approches habituelles pour concevoir les Sequence CRDTs
-- À creuser
-- Dispo ici : https://dl.acm.org/doi/10.1145/3380787.3393680
-**** TODO CRDT : Lire *Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types*
-- Par Petru Nicolaescu, Kevin Jahns, Michael Derntl, Ralf Klamma
-- S'agit du CRDT implémenté par Yjs (https://github.com/yjs/yjs), qui est développé par Kevin Jahns
-  - Qui est le framework présenté et évalué dans le blogpost *Are CRDTs suitable for shared editing?* (https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/)
-  - Par Kevin Jahns justement
-- Me semble qu'on retrouve une structure similaire à WOOT/RGA pour représenter les Séquences
-- Dispo ici : https://www.researchgate.net/publication/310212186_Near_Real-Time_Peer-to-Peer_Shared_Editing_on_Extensible_Data_Types
-**** TODO CRDT : Lire *A string-wise CRDT algorithm for smart and large-scale collaborative editing systems*
-- Par Xiao Lv, Fazhi He, Weiwei Cai, Yan Cheng
-- A inspiré la notion d'item, l'équivalent des blocs, dans Yjs
-- À lire
-- Dispo ici : https://coek.info/pdf-a-string-wise-crdt-algorithm-for-smart-and-large-scale-collaborative-editing-sys.html
-**** TODO CRDT : Lire *File system on CRDT*
-- Par Mehdi Ahmed-Nacer, Stéphane Martin, Pascal Urso
-- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
-- Vu que c'est une direction possible de mes travaux (utilisation de CRDT + OT pour concevoir une structure répliquée représentant un système de fichiers distribué), suis curieux
-- N'a pas contre pas été publié/peer-reviewé
-- Dispo ici : https://hal.inria.fr/hal-00720681
-**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
-- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
-- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
-  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
-  - Leur approche est du coup probablement générique
-  - À vérifier
-  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
-**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
-- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
-- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
-  - Ou les pistes de réflexions que cela dessine
-**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
-- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
-- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
-- Version courte du papier avait été présenté à PaPoC'20
-  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
-  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
-- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
-- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
-- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
-  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
-  - Mais qui possèdent des opérations différentes
-  - Chacune de ces opérations est commutative avec elle-même
-  - Mais elles ne sont pas commutatives entre elles
-    - L'exemple de l'addition et de la multiplication
-  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
-  - Moi l'opération de renommage n'est pas commutative avec elle-même
-  - Je ne peux donc pas utiliser la même technique
-- À valider au cours d'une nouvelle lecture
-**** TODO Distributed Systems : Lire *Epoch-based Commit and Replication in Distributed OLTP Databases*
-- Par Yi Lu, Lei Cao, Xiangyao Yu, Samuel Madden
-- Si je pige bien, dans le contexte des transactions distribuées
-- Propose d'aggréger des groupes de transactions dans des epochs
-- Et d'utiliser les epochs comme unité de commit
-- De façon à limiter le nombre d'exécutions du 2PC
-- Dispo ici : http://www.vldb.org/pvldb/vol14/p743-lu.pdf
 *** Done
 - Projet Informatique : Préparer les réunions avec les différents groupes
   - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
@@ -15184,6 +15053,36 @@ to be too obscure to justify that level of extra complexity and memory use.
     - [X] Les recontacter pour fixer la prochaine réunion
     - Pistes de travail pour cette semaine
       - Reviewer leur diagramme de classes une fois celui-ci disponible
+	- Plutôt content de ce diagramme de classe
+	- Il est plutôt propre, assez complet et donne matière à réflexion
+	- Si j'ai un reproche à faire, c'est qu'il manque les paramètres des constructeurs et autres méthodes
+	- La partie supérieure regroupent les classes ayant attrait aux personnages
+	  - Me paraît bonne
+	- La partie inférieure regroupent les classes ayant attrait au déroulement du jeu
+	  - Me paraît plutôt bonne aussi
+	- Quelques remarques
+	  - *Partie* n'a pas de *Joueur*, ni de *Boss*
+	  - Comment on détermine si un *Boss* est sur une case ?
+	    - Information présente à la fois dans *Case* et dans *Boss*
+	    - À laquelle se fier ?
+	    - Si c'est les mêmes données, pourquoi dupliquer ?
+	  - Comment est géré le déplacement du *Joueur* ?
+	    - Pour le moment, /seDeplacer()/ dans *Joueur*
+	    - Pas de notion de position, que ce soit dans *Joueur* et dans *Plateau*
+	    - Je suppose qu'un *Joueur* ne peut pas de déplacer n'importe où
+	      - Peut pas aller à la dernière case directement ou sortir de la map
+	    - Doit donc y avoir une vérification à un moment donné du mouvement demandé
+	    - Qui se charge de ça ?
+	  - Un peu de mal à piger le fonctionnement de *Combat*
+	    - Les méthodes /attaqueBasique()/, /attaqueSpe()/, c'est de qui ?
+	      - *Joueur*, *Boss* ou les deux ?
+	    - Qui se charge par exemple du calcul de dégâts infligé par l'attaque basique du *Joueur* ?
+	    - Quelle différence entre l'attribut /mana/ de *Personnage* et les attributs /mana_joueur/ et /mana_ennemi/ présents dans *Combat* ?
+	  - Les méthodes de *Recompense* me paraîssent étranges et pas forcément intuitives
+	    - Quand on me parle de récompense, je pense à un composant passif
+	    - Les méthodes /annoncer_XXX()/ me paraissent plus tenir de la responsabilité de *Partie*
+          - Me pose la question si c'est *Plateau* qui doit gérer les combats et évènements
+	    - Si par exemple c'est *Partie* qui doit déclarer la fin de la partie à l'issue d'un combat
       - Revoir avec eux l'objectif de la v1
       - Voir avec eux la répartition du travail
       - Reste la question de la BD en suspens
@@ -15202,12 +15101,27 @@ to be too obscure to justify that level of extra complexity and memory use.
     - Remarques
       - Diagramme de classes
 	- Où/Par quel composant l'équipe de personnage est-elle créée et gérée ?
+	- Même question pour le *Plateau de Jeu*
+	- Un *Combat* n'offre pas de *Récompense* ?
+	  - P-e simplement un choix douteux de noms de classe
+        - Comment *Combat* connaît le *EquipeDePersonnages* qui affronte les ennemis ?
+	- Un peu de mal à voir ce qui se passe lorsqu'un *Combat* se déroule vu l'absence de méthodes
+	  - Tour du combat ?
+	  - Comment ça se passe à la fin d'un combat ?
+	  - Si l'équipe a perdu, que se passe-t-il ?
       - Code
 	- Utilisent la librairie pygame
 	  - Quelle version ?
 	  - Serait intéressant si vous utilisez plusieurs librairies d'utiliser un gestionnaire de dépendance
 	  - Poetry a l'air de faire le taf en Python
 	    - https://python-poetry.org/
+      - Mettre à jour README.md pour indiquer instructions sur comment installer et lancer le jeu
+      - Des idées sur comment gérer la carte hexagonale ?
+    - Notes dde réunion
+      - Lundi
+	- Remettre dans le bain
+	- Complété le diagramme de classes
+	- Démarré l'implémentation de votre jeu
 - Papier : Débugger /reverseRenameIdGreaterThanNewLastId()/
   - Peut gérer ce cas en ajoutant la condition suivante
     #+BEGIN_BLOCK
@@ -15341,13 +15255,383 @@ Si lastId < newLastId     et
     - Donc je vais retravailler les parties correspondantes du papier
       - Permettra de simplifier les algos présentés notamment et de gagner un peu de place là-dessus
     - Et ça me fait repenser à une autre implémentation du mécanisme de renommage que je considérais à un moment
+      - L'implem actuelle se base sur l'état des noeuds
+	- Un noeud applique un renommage sur son état courant
       - Se basant sur un operation log
+	- Un noeud part de l'état résultant d'un renommage et réapplique les opérations concurrentes pour obtenir l'état équivalent à son état courant à la nouvelle epoch
       - Cette implémentation a le mérite d'éviter l'écueil du /redo/, car utilise les opérations originelles pour calculer l'état après un renommage
 	- Comparé à l'implem actuelle qui utilise l'état courant, avec des identifiants ayant déjà subies des transformations
       - A aussi le mérite de changer la complexité de l'algo
 	- Au lieu de dépendre du nombre d'éléments présents dans la liste comme actuellement
 	- Dépendrait du nombre d'opérations concurrentes
 	- Peut arguer que bien plus petit, surtout si je déclenche un renommage tous les 30k opérations
+  - Réunion
+    - François
+      - Réunion avec Anis
+      - A participé à une soutenance de thèse
+      - Dispo toute la semaine pro sauf vendredi matin
+      - Une VM pour MUTE est en cours
+    - Abir
+      - Continue sur la rédaction de son manuscrit
+	- Plutôt bien semblerait
+    - Alex
+      - A terminé import XML
+      - Travaille sur l'implem pour utiliser le dump provenant de wikipedia
+	- Corrige des problèmes qui reste de l'implem
+    - Anis
+      - Réunion avec François
+      - Effectue quelques corrections sur son algo
+      - Corrige ses différents chapitres du manuscrit
+    - Claudia
+      - A eu réunion avec Alex
+	- Progrès sur l'implémentation
+	- Commence à appliquer les différentes métriques pour l'évaluation de la qualité
+	- Alex a proposé une métrique
+      - A rencontré Victorien ce matin avec Gérald
+	- Aujourd'hui il va bien
+	- Lui a proposé un CDD de 6 mois ou 1 an sur une approche que Claudia a commencé avec Weihai
+	  - Sur budget de Fair & Smart
+	  - Sur une BDD relationnelle distribuée utilisant des CRDTs en interne
+	  - Il est intéressé par la proposition
+	    - Semble pas chaud pour Areal par contre
+	  - Mais ne veut pas commencer tout de suite
+	    - Veut prendre 1 ou 2 mois pour lui
+	  - Va voir avec Sophie pour proposer un contrat
+      - A réunion semaine pro avec Jérôme Blanchard, PA, Olivier, Gérald et Alex
+	- Pour discuter de l'avancement (de Fair & Smart ?)
+      - Travaille pour des jurys de recrutement de CR
+    - Gérald
+    - Matthieu
+    - Pierre-Antoine
+      - A travaillé sur présentation pour réunion sur Fair & Smart
+      - Fait un état de l'art par thématique sur les différents sujets potentiellement explorables
+    - Quentin
+      - A trouvé un CDI de Enseignant-Formateur au CESI de Orléans
+      - Réunion avec Patricia Venturin
+	- Au sujet de la condition des doctorants
+** Semaine du <2021-03-22 Mon> au <2021-03-26 Fri>
+*** Planned
+**** DONE RLS : Étudier une implémentation du mécanisme de renommage basée sur un operation log
+- Je galère à l'heure actuelle à définir des fonctions de renommage et d'inversion du renommage réciproques
+  - J'ai ma fonction d'inversion du renommage qui annule correctement l'effet du renommage
+  - Mais ma fonction de renommage ne renvoie pas forcément à l'identique un identifiant inséré après le renommage qui a ensuite été affecté par le undo
+    - Lors d'un redo donc
+- Cela ne pose pas de problème à l'heure actuelle avec ma relation /priority/ qui par définition empêche un redo
+- Mais ça m'empêche de proposer une relation /priority/ plus efficace tant que je ne résous pas ce problème
+- De plus, la complexité de mon mécanisme de renommage s'accroît avec le nombre d'éléments présents dans la séquence
+  - Devrait pouvoir proposer une amélioration à une complexité en fonction du nombre de blocs
+  - Mais ça rendrait encore l'algo plus imbitable qu'il ne l'est déjà actuellement
+- Le papier de Kleppmann et al. sur une opération /move/ dans un arbre montre qu'un operation log est une solution viable
+  - Le papier *A higly-available move operation for replicated trees and distributed filesystems*
+- L'operation log aurait pour avantage de limiter les transformations effectuées qu'à des do et undo
+  - On pourrait partir de l'état résultant du renommage prioritaire
+    - Ce qui a l'avantage de bypasser les différents renommages intermédiaires entre l'epoch courante et la nouvelle epoch
+  - Puis appliquer les opérations concurrentes présentes dans le log pour obtenir le nouvel état
+  - Les opérations concurrentes proviendraient donc d'epochs antérieures ou concurrentes
+    - À moins que je loupe quelque chose
+  - Et comme on conserve l'opération initiale dans l'operation log, on peut repartir de celle-ci plutôt que de l'identifiant transformé présent dans l'état
+- La complexité deviendrait donc fonction des opérations concurrentes
+- Considérer et étudier plus en détail cette implémentation alternative
+  - Notamment l'overhead spatial et temporel introduit par l'operation log
+**** DONE CRDT : Lire *PushPin: Toward Production-Quality Peer-to-Peer Collaboration*
+- Par Peter van Hardenberg et Martin Kleppmann en 2020
+- Étudient et documentent leur développement d'une application Local-First
+- Avec cette appli, ils souhaitaient aller plus loin que le POC
+- Et donc rencontrer et évaluer toutes les difficultés que l'on peut rencontrer lors du dev de ce type d'applis
+- Je souhaite voir s'ils abordent les problématiques de membership, d'accumulation des métadonnées, de troncage des données stables et de churn
+- Dispo ici : https://martin.kleppmann.com/papers/pushpin-papoc20.pdf
+**** DONE Distributed Systems : Lire *Consistency Tradeoffs in Modern Distributed Database Systems Design*
+- Par Daniel J. Abadi en 2012
+- Papier qui introduit PACELC, une extension du CAP theorem
+- Je l'avais brièvement parcouru
+- Le relire plus en détails
+- Dispo ici : https://ieeexplore.ieee.org/abstract/document/6127847
+**** TODO Papier : Revenir à une version non-réciproque des fonctions de renommage
+- J'ai décidé d'abandonner la conception de fonctions de renommage et d'inversion du renommage réciproques
+  - Puisque je n'y arrive pas
+  - Et que j'en ai pas besoin tant que j'ai une relation /priority/ qui me prémunit de /redo/
+- J'avais cependant rédigé l'article dans l'optique de proposer de telles fonctions
+- Modifier le contenu concerné en conséquence
+  - La section 5.3 doit aborder ce sujet
+  - La section 7.3 doit dorénavant rappeler qu'il est nécessaire d'empêcher les /redo/ ou alors il est nécessaire de proposer des fonctions de renommage réciproques au préalable
+  - Algo 4 du papier devrait sauter
+**** TODO Papier : Introduire la notion de membership
+- La stabilité causale requiert un protocole de membership pour pouvoir être déterminée
+- Pour le moment, ne mentionne pas ce requirement
+- Peut me l'être reproché et consiste en un angle d'attaque de mon approche
+- Mettre les pieds dans le plat en référençant SWIM et Lifeguard comme protocole de membership scalable me paraît donc une meilleure option
+**** TODO Papier : Relire *A Conflict-Free Replicated JSON Datatype* de Kleppmann
+- A été publié dans TPDS
+- Permettra de voir le format/les termes employés
+- Dispo ici : https://arxiv.org/abs/1608.03960
+**** TODO Papier : Relire *Context-Based Operational Transformation in Distributed Collaborative Editing Systems*
+- A été publié dans TPDS
+- Permettra de voir le format/les termes employés
+- Dispo ici : https://ieeexplore.ieee.org/document/4668339
+**** TODO RLS : Étudier le déclenchement de renommages identiques par les noeuds de manière non-coordonnée
+- Pour le moment, adopte une stratégie "aggressive" pour renommer
+- L'idée est que les noeuds génèrent une opération de renommage lorsqu'ils estiment cela nécessaire
+- On espère que le nombre d'opés de renommage concurrentes restent minimes
+- Et on gère ce cas de figure grâce aux mécanismes de résolution de conflits
+- Une autre stratégie possible, que je souhaiterais étudier ici, est la stratégie "conservatrice"
+- L'idée serait d'éliminer le risque de renommages concurrents
+- Une piste évidente est l'utilisation d'un consensus synchrone
+- Mais est-ce qu'il serait possible pour les noeuds de tous effectuer le même renommage, sans coordination synchrone ?
+- L'idée serait qu'ils effectuent de manière indépendante un renommage sur le même set d'opérations, sur un même préfixe commun
+- En ordonnant les opérations et en utilisant un mécanisme de stabilité, devrait être possible de définir ce préfixe
+  - Intuitivement, je pense que PCS est requis
+  - À vérifier si cela suffit réellement
+  - Et si c'est le cas, si on peut relaxer les contraintes
+- J'avais creusé cette question à un moment, mais me souviens plus des conclusions auxquelles j'étais arrivé
+- Dans le doute, ça peut être intéressant de se repencher dessus
+**** TODO BD2 : Préparer et tourner CM6
+- Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
+  - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
+- Histoire qu'iels puissent tout de même découvrir ces sujets, je vais faire une VOD
+**** TODO P2P : Lire *Handling churn in a DHT*
+- Par Sean Rhea, Dennis Geels, Timothy Roscoe, et John Kubiatowicz en 2004
+- Une des faiblesses de RLS est la nécessité de stabilité causale pour pouvoir supprimer les métadonnées du renommage
+- La notion de churn dans les systèmes P2P détruit totalement cette perspective
+- Je cherche donc à me renseigner sur ce sujet pour notamment voir si des mécanismes ont été proposés pour atténuer ce problème
+- Ce papier fait partie de ceux les plus cités sur le sujet
+- Le modèle du système n'a pas l'air exactement de correspondre, mais peut toujours être intéressant
+- Dispo ici : https://www2.eecs.berkeley.edu/Pubs/TechRpts/2003/CSD-03-1299.pdf
+**** TODO P2P : Lire *Minimizing churn in distributed systems*
+- Par P. Brighten Godfrey, Scott Shenker, et Ion Stoica en 2006
+- Un autre papier sur le sujet du churn
+- D'après l'abstract, j'ai l'impression que le papier ne concerne pas les systèmes P2P
+  - Mais plutôt un système style Cloud
+- Pas sûr qu'il soit très pertinent par rapport à ce que je recherche
+- Dispo ici : https://dl.acm.org/doi/pdf/10.1145/1151659.1159931
+**** TODO P2P : Lire *Understanding churn in peer-to-peer networks*
+- Par Daniel Stutzbach et Reza Rejaie en 2006
+- S'agit d'un papier qui cite *Handling churn in a DHT*
+- Celui-ci a l'air de concerner les systèmes P2P
+- P-e le plus pertinent par rapport à mes interrogations
+- Dispo ici : https://dl.acm.org/doi/pdf/10.1145/1177080.1177105
+**** TODO CRDT : Lire *Merging OT and CRDT Algorithms*
+- Par Mehdi Ahmed-Nacer, Pascal Urso, Valter Balegas et Nuno Preguiça
+- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
+- Suis curieux de voir s'il s'agit d'une architecture à la Legion ou d'une intégration de OT dans un CRDT
+  - Ce qui se rapprocherait plus de ce que j'ai pu faire
+- Dispo ici : https://hal.inria.fr/hal-00957167
+**** TODO CRDT : Lire *Chronofold: a data structure for versioned text*
+- Par Victor Grishchenko et Mikhail Patrakeev
+- Présenté à PaPoC'20
+- De mémoire, s'agissait d'une séquence répliquée construite à partir du log ordonné des opérations
+- À 1ère vue, ne rentre pas dans une des approches habituelles pour concevoir les Sequence CRDTs
+- À creuser
+- Dispo ici : https://dl.acm.org/doi/10.1145/3380787.3393680
+**** TODO CRDT : Lire *Near Real-Time Peer-to-Peer Shared Editing on Extensible Data Types*
+- Par Petru Nicolaescu, Kevin Jahns, Michael Derntl, Ralf Klamma
+- S'agit du CRDT implémenté par Yjs (https://github.com/yjs/yjs), qui est développé par Kevin Jahns
+  - Qui est le framework présenté et évalué dans le blogpost *Are CRDTs suitable for shared editing?* (https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/)
+  - Par Kevin Jahns justement
+- Me semble qu'on retrouve une structure similaire à WOOT/RGA pour représenter les Séquences
+- Dispo ici : https://www.researchgate.net/publication/310212186_Near_Real-Time_Peer-to-Peer_Shared_Editing_on_Extensible_Data_Types
+**** TODO CRDT : Lire *A string-wise CRDT algorithm for smart and large-scale collaborative editing systems*
+- Par Xiao Lv, Fazhi He, Weiwei Cai, Yan Cheng
+- A inspiré la notion d'item, l'équivalent des blocs, dans Yjs
+- À lire
+- Dispo ici : https://coek.info/pdf-a-string-wise-crdt-algorithm-for-smart-and-large-scale-collaborative-editing-sys.html
+**** TODO CRDT : Lire *File system on CRDT*
+- Par Mehdi Ahmed-Nacer, Stéphane Martin, Pascal Urso
+- En reparcourant les différents papiers à la recherche de références à ajouter, je suis tombé sur celui-ci que j'avais loupé jusqu'à présent
+- Vu que c'est une direction possible de mes travaux (utilisation de CRDT + OT pour concevoir une structure répliquée représentant un système de fichiers distribué), suis curieux
+- N'a pas contre pas été publié/peer-reviewé
+- Dispo ici : https://hal.inria.fr/hal-00720681
+**** TODO CRDT : Lire *From Causality to Stability: Understanding and Reducing Meta-Data in CRDTs*
+- Papier dispo à cette adresse : https://soft.vub.ac.be/~jibauwen/publications/mplr20-from-causality-to-stability-jimbauwens.pdf
+- Voir l'approche choisie et en quoi elle diffère de la notre vis-à-vis de la GC de méta-données
+  - Vu le titre et l'abstract, je dirais que leur approche se base sur la stabilité causale pour GC
+  - Leur approche est du coup probablement générique
+  - À vérifier
+  - Et si c'est le cas, voir en quoi elle diffère de l'état de l'art
+**** TODO CRDT : Lire *I was wrong. CRDTs are the future*
+- Blogpost dispo à cette adresse : https://josephg.com/blog/crdts-are-the-future/
+- Voir les conclusions que tire l'auteur et comment elles sont liées à nos travaux
+  - Ou les pistes de réflexions que cela dessine
+**** TODO CRDT : Lire *Composing and decomposing op-based CRDTs with semidirect products*
+- Papier dispo à cette adresse : https://dl.acm.org/doi/10.1145/3408976
+- Version publiée de : https://arxiv.org/pdf/2004.04303.pdf
+- Version courte du papier avait été présenté à PaPoC'20
+  - Papier : https://dl.acm.org/doi/abs/10.1145/3380787.3393687
+  - Présentation : https://www.youtube.com/watch?v=jOGVp55VwO0
+- D'après mes notes, j'avais commencé à le lire lorsqu'on avait appris son existence avant PaPoC
+- Pas sûr d'avoir été au bout, faudra finir sa lecture pour mon état de l'art
+- La principale différence que j'avais noté par rapport à mon problème du renommage est la nature des opérations qu'ils composent avec leur technique
+  - Ils composent des Op-Based CRDTs partageant le même état initial, le même espace d'états et la même fonction d'évaluation
+  - Mais qui possèdent des opérations différentes
+  - Chacune de ces opérations est commutative avec elle-même
+  - Mais elles ne sont pas commutatives entre elles
+    - L'exemple de l'addition et de la multiplication
+  - Leur méthode de composition permet de définir des transformations pour les rendre commutatives
+  - Moi l'opération de renommage n'est pas commutative avec elle-même
+  - Je ne peux donc pas utiliser la même technique
+- À valider au cours d'une nouvelle lecture
+**** TODO Distributed Systems : Lire *Epoch-based Commit and Replication in Distributed OLTP Databases*
+- Par Yi Lu, Lei Cao, Xiangyao Yu, Samuel Madden
+- Si je pige bien, dans le contexte des transactions distribuées
+- Propose d'aggréger des groupes de transactions dans des epochs
+- Et d'utiliser les epochs comme unité de commit
+- De façon à limiter le nombre d'exécutions du 2PC
+- Dispo ici : http://www.vldb.org/pvldb/vol14/p743-lu.pdf
+*** Done
+- RLS : Étudier une implémentation du mécanisme de renommage basée sur un operation log
+  - Plusieurs questions à creuser
+  - Quel est le coût de l'algo pour identifier et récupérer les opérations concurrentes à une opération de renommage donnée présentes dans l'operation log ?
+    - Implique de parcourir l'operation log
+      - Complexité en fonction de sa taille
+      - Après le parcours peut être parallelisé
+      - Et le log tronqué au fur et à mesure pour garder une taille ok-ish
+	- Besoin de stabilité pour cela
+    - Pour chaque opération, comparer ses metadonnées à celles de l'opération de renommage
+      - Vérifier si opération est présente dans le Version Vector de l'opération de renommage
+      - Donc besoin d'un Version Vector pour l'opé de renommage
+	- Problème de scalabilité
+	- Ne porte cependant que sur l'opération de renommage qui est peu fréquente
+	- Mais souffre néanmois du churn
+	- Voir si des stratégies ont été proposées à ce sujet
+    - Est-ce que peut me permettre de rejouer une opération passée ?
+      - Je dirais que oui
+      - Rejouer une suppression ne pose pas de problème
+      - Rejouer une insertion en soi ne pose pas de problème
+      - Dois juste éviter de rejouer une insertion après sa suppression
+      - Les opérations sont délivrées dans un ordre valide d'application à la séquence répliquée
+      - Vois mal comment une insertion pourrait être rejouée sans que la suppression correspondante ne le soit aussi
+    - Est-ce que je peux réduire la précision de ma détection de concurrence et potentiellement rejouer des opérations en trop sans rendre incorrect l'état obtenu ?
+      - Par exemple, pourrais me baser uniquement sur l'epoch pour identifier quelles opés jouer ?
+	- Mouais
+	- Des opérations provenant d'epochs précédentes peuvent être concurrentes au renommage
+	- Des opérations provenant d'epochs d'une autre branche de l'epoch tree peuvent avoir été observé avant la génération du renommage
+	- Me permet pas d'identifier les opérations à jouer
+      - À creuser
+  - Quand et comment peut-on tronquer l'operation log ?
+    - Pourrais réutiliser les règles de GC introduites pour l'epoch tree
+    - ~Peut pas juste supprimer les opérations observées par une opé de renommage devenue stable~
+      - Vraiment ?
+      - À partir de là, toutes les opés de renommage que l'on va recevoir auront observé ces opés
+      - Donc plus besoin de les transformer par rapport à la nouvelle epoch pour les incorporer dans le nouvel état
+    - Donc si, peut supprimer ces opérations là
+    - Ne peut pas par contre supprimer l'opération de renommage elle-même
+    - Pour ces opérations, retombent sur les règles présentées dans le papier
+    - Comment déterminer qu'une opé de renommage est stable ?
+      - Plusieurs façons de faire
+      - Traquer en local l'epoch de la dernière opération reçue pour chaque noeud
+	- Nécessite donc un vecteur dont la taille dépend du nombre de noeuds
+	  - Mais uniquement local, jamais besoin de le partager
+	  - À la connexion d'un nouveau pair p-e ?
+	- À l'aide des Version Vectors associées aux epochs dans les opérations de renommage, peut générer un Version Vector minimal de stabilité
+      - Mécanisme usuel : avoir une matrice de Version Vectors maintenue en local
+	- Créée à partir des informations du mécanisme d'anti-entropie
+	- Peut ensuite calculer le Version Vector minimal indiquant les opérations stables
+- Réunion Papier <2021-03-23 Tue> avec Gérald
+  - C'est bien
+  - Pas de remarques en terme de contribution
+  - Notion de nodes
+    - Explicité dans le system model
+    - Mais avant, pas forcément clair
+  - Notion de total dense order
+    - Faudrait p-e l'expliciter
+  - *Intro*
+    - Présenter dans l'intro les résultats obtenus
+    - Pas besoin que ça soit chiffré
+  - *Background*
+    - Va un peu vite sur la notion de CRDT
+    - Expliciter cette notion au préalable ?
+  - *LogootSplit*
+    - Dernier paragraphe pas forcément évident
+    - Semble parler de la croissance des identifants alors que j'ai pas abordé le problème encore
+    - Veut en fait parler des metadonnées par blocs plutôt que par élément
+  - *Limits*
+    - Plutôt que de rentrer dans le détail de la figure 10, juste dire qu'on le verra à ce stade
+  - *Proposed approach*
+    - Le fusionner avec l'intro
+  - *Definition of the rename operation*
+    - Indiquer que l'on étend les propriétés que doivent respecter les Sequence Operation-based CRDTs
+    - Voir où est-ce qu'elles ont été définies
+    - Le papier de Logoot-Undo a l'air d'aborder la question
+  - Se voit <2021-03-25 Thu> 09:30 pour retravailler de l'intro jusqu'à la partie contribution
+  - En attendant
+    - Gérald relit le reste
+    - Moi je commence les modifs sur les fonctions qui deviennent non-réciproques
+- CRDT : Lire *PushPin: Toward Production-Quality Peer-to-Peer Collaboration* CRDT : Lire *PushPin: Toward Production-Quality Peer-to-Peer Collaboration*
+  - Re-explique le principe de Local-First Software
+  - Constate l'absence d'existence d'apps mainstream de ce type
+  - But de ce projet est d'explorer la faisabilité d'une telle appli
+    - Autant l'aspect technique (les problèmes rencontrés et comment les résoudre)
+    - que l'aspect développeur (quelles difficultés vont-iels rencontrer ?)
+  - Partent sur un projet simple
+    - Un tableau répliqué qui permet aux différents utilisateurs d'y coller des notes, images, liens vers d'autres tableaux
+    - De cette manière, l'absence de fonctionnalités comme l'access control ne pose pas trop de problèmes
+  - Plusieurs points intéressants
+  - Autorise la présence de serveurs dans l'infrastructure
+    - Notamment pour la synchro et le back-up
+    - Mais souhaite tout de même limiter leur rôle au maximum, pour les rendre les plus facilement remplaçables possible
+    - Va dans le sens de ce qu'on a pu faire avec Pulsar
+  - Considère les navigateurs pas prêts pour leur vision
+    - APIs de stockage (localStorage et IndexedDB) lentes et perdant silencieusement des données
+    - APIs réseau (WebRTC) reposant sur un serveur centralisé (signaling) et trop contraintes
+      - Pas moyen d'utiliser des sockets TCP/UDP pour implémenter autre protocole P2P
+    - Font donc le choix d'utiliser Electron
+    - Est-ce que Web Assembly serait une autre solution pour répondre à ces problèmes mis en lumière ?
+  - Considère Dat Protocol comme la stack réseau la plus adaptée à leurs besoins
+    - Utilise /hypercore/, un append-only log
+    - Nécessite un couple clé privée/publique
+    - Log identifié à l'aide du hash de la clé publique
+    - Clé privée nécessaire pour le modifier
+    - Utilise donc un /hypercore/ pour chaque device qui modifie le document
+    - Un document est donc mappé à un ensemble de /hypercore/
+    - Indique qu'on peut retrouver les replicas d'un /hypercore/ à l'aide du hash de sa clé publique
+    - Explique donc que l'url d'un document est construite en incorporant ce hash
+    - Et qu'il s'agit alors d'un identifiant stable pour le doc, puisque va continuer de référencer l'/hypercore/
+      - Même si son contenu a été modifié
+    - Mais si un document est composé de plusieurs /hypercores/, quelle(s) URL(s) broadcast pour trouver des pairs ?
+    - De ce que je comprends, broadcast toutes les URLs
+      - Ce qui flood le réseau assez rapidement, comme les objets d'un document sont eux-mêmes des documents
+    - Me paraît pas super intuitif pour les utilisateurs
+      - Plusieurs URLs vont donc correspondre à un même document
+      - Voir comment on partage un document
+  - Liste en conclusion plusieurs problèmes ouverts
+    - Comment faire cohabiter plusieurs versions différentes d'une même Local-First App ?
+    - Comment gérer les droits d'accès ?
+    - Comment montrer aux utilisateurs qu'iels possèdent des versions différentes d'un même document ?
+  - Pas d'infos par rapport à ce que je cherchais
+  - De ce que je comprends, le document ne peut que croître puisque construit à partir d'un ensemble de append-only log
+    - Peut p-e au fur et à mesure qu'un pair avance juste maintenir l'état courant en local, et laisser des machines dédiées conserver l'intégralité des logs
+  - N'aborde pas la question du churn
+    - Si utilise un device une fois pour accéder et modifier le document, ajoute un /hypercore/
+    - Celui-ci est ajouté à l'ensemble des /hypercores/ constituant le document
+    - Ce qui introduit une nouvelle URL à broadcast lors de la peer discovery
+- Distributed Systems : Lire *Consistency Tradeoffs in Modern Distributed Database Systems Design*
+  - Motive le nouveau théorème en présentant une mauvaise compréhension du CAP Theorem
+  - Argue que certains systèmes limitent notamment la Consistency même en cas de fonctionnement normal à cause de cela
+  - Alors que le CAP Theorem indique que seulement en cas de partition réseau un choix doit être fait entre Consistency et Availability
+  - Indique qu'un autre tradeoff est la véritable raison pour laquelle les systèmes diminuent les requirements niveau Consistency
+  - Le tradeoff Latency-Consistency
+  - Justifie cela en prenant pour exemples les différents Distributed Database Systems (DDBS) qui ont fait le choix de relaxer les contraintes sur la Consistency
+  - Ces systèmes ont tous des uses cases incorporant des utilisateurs dans la boucle
+  - La vitesse de réponse est donc essentielle pour ces derniers
+  - Présente différents techniques de réplications, chacune proposant son tradeoff Latency-Consistency en cas de fonctionnement normal
+    - Data updates sent to all replicas at the same time
+      - Nécessite mécanisme de résolution de conflits
+      - Protocoles de consensus maintiennent Consistency, mais au prix de Latency
+      - Ne mentionne pas les CRDTs, mais rentreraient dans cette case
+      - Minimise Latency, au prix de la Consistency
+    - Data updates sent to an agreed-upon location first
+      - Dépend de la technique de réplication
+      - Si synchrone, assure Consistency mais augmente Latency
+      - Si asynchrone, résultat dépend de comment le système traite les reads
+	- Si tous les reads passent par le master, pas de réduction de la Consistency mais augmentation de la Latency
+	- Si reads peuvent être répondus par tous les noeuds, privilégie Latency au prix de Consistency
+      - Possible de mélanger ces 2 techniques de réplication pour atténuer les cas limites
+    - Data updates sent to an arbitrary location first
+      - Là encore dépend de la technique de réplication
+      - Si synchrone, comme précédemment mais en plus de possible d'avoir de la latence supplémentaire en cas de conflits
+      - Si asy,chrone, comme précéddemment
+  - Afin de capturer les différents choix réalisés par les designers de DDBS, propose PACELC
+  - Permet de décrire ce que le système privilégie en cas de de partition réseau (P) : Availability ou Consistency
+  - Et de décrire ce que le système privilégie sinon (E) : Latency ou Consistency
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
