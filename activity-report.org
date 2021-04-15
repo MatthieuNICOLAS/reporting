@@ -16342,13 +16342,17 @@ print (r.geeks)
 	- A commencé à déployer les différents services composant MUTE
 ** Semaine du <2021-04-12 Mon> au <2021-04-16 Fri>
 *** Planned
-**** TODO ATER : Préparer slides audition
+**** DONE ATER : Préparer slides audition
 - J'ai une audition pour le poste d'ATER <2021-04-15 Thu> à 09h30
 - Il nous est demandé de préparer 3 slides qu'on présentera en 5min
   1. Mini-CV
   2. Sujet de thèse, équipe, publications, date de soutenance prévue
   3. Enseignements effectuées et/ou envisagés ainsi que composantes préférées
 - Préparer cela
+**** DONE These : Lire chapitre sur CRATE du manuscrit de Nédelec
+- Lorsque discutait du manuscrit avec Gérald, on se faisait la remarque qu'on avait pas prévu MUTE dans le plan
+- Pourrait cependant faire l'objet d'une partie
+- Voir comment Nédelec a fait apparaître CRATE dans sa thèse
 **** TODO Papier : Refaire figure 10 sur la taille du document
 - Regénérer l'image pour placer la légende en-dessous des graphes
 **** TODO Papier : Revoir les citations pour les propriétés de l'opération /rename/
@@ -16560,7 +16564,7 @@ print (r.geeks)
     - Vais vous présenter ma candidature pour les postes ATER de la rentrée prochaine
     - Concernant mon parcours
       - J'ai suivi une formation d'ingénieur en informatique à TELECOM Nancy, en spécialité Ingénierie du Logiciel
-      - J'ai eu l'opportunité d'effectuer mon stage de fin d'études au Loria, au sein de l'équipe Coast
+      - À l'issue de cette formation, j'ai eu l'opportunité d'effectuer mon stage de fin d'études au Loria, au sein de l'équipe Coast
       - Équipe que j'ai ensuite pu intégrer en tant qu'ingénieur R&D pendant 3 ans
       - Au cours de ces années, j'ai notamment pu participer au développement de MUTE, l'éditeur de texte collaboratif P2P de l'équipe
       - Projet qui sert de plateforme de démonstration et d'expérimentations pour les travaux de l'équipe
@@ -16570,7 +16574,7 @@ print (r.geeks)
     - J'ai donc démarré une thèse, toujours au sein de l'équipe Coast
     - Sur la thématique des types de données répliqués, que l'on appelle communément CRDTs dans la littérature
       - Le sujet exact est la ré-identification efficace dans les CRDTs
-      - Je suis encadré dans le cadre de cette thèse par Olivier Perrin et Gérald Oster
+      - Je suis encadré de cette thèse par Olivier Perrin et Gérald Oster
       - Globalement les CRDTs sont des nouvelles structures de données
       - Pour les types de données existants comme l'Ensemble ou la Séquence
       - La spécificité de ces structures, c'est qu'elles sont conçues pour être répliquées par différents pairs d'un système
@@ -16633,6 +16637,16 @@ print (r.geeks)
 	 - Mais à part ça, j'ai des bons échos
       3. IUT Nancy Charlemagne
       4. Le reste (FST, IDMC, ENSEM)
+    - Carrière
+      - Souhaiterais poursuivre dans l'académique
+      - Vise un poste de McF
+      - Mais j'ai encore des doutes sur mes chances d'obtenir un poste
+	- Notamment à cause du volet recherche de mon dossier
+      - Pour ça que le choix de Polytech Nancy me paraît un bon compromis
+	- Me permet d'enrichir mon dossier sur la partie enseignement, avec des cours en M1/M2
+	- Tout en me permettant de reprendre certains modules que j'ai déjà enseigné cette année
+	- Ce qui me permet de lisser un peu la charge de travail dédiée à l'enseignement
+	- Et de me laisser du temps pour essayer de faire avancer la partie recherche de mon dossier
 - These : Lire manuscrit de Nédelec
   - Inscrit son travail dans le mouvement pour la re-décentralisation du Web et ses applications
     - IPFS, Project Maelstrom, Solid, Ethereum
@@ -16643,9 +16657,298 @@ print (r.geeks)
       - Dispo ici : https://dl.acm.org/doi/10.1016/0020-0190%2891%2990055-M
     - Serait intéressant de jeter un oeil à cet article
   - Citent plusieurs articles pour un mécanisme de GC des métadonnées en distribué
+    - Concernant l'approche tombstone, cite *Garbage collecting the Internet: a survey of distributed garbage collection*
+      - Par Saleh E. Abdullahi et Graem A Ringwood en 1998
+      - Dispo ici : https://dl.acm.org/doi/abs/10.1145/292469.292471
+    - Concernant l'approche core-nebula, cite *Signature-Free Asynchronous Binary Byzantine Consensus with t < n/3, O(n2) Messages, and O(1) Expected Time*
+      - Par Achour Mostéfaoui, Hamouma Moumen et Michel Raynal en 2015
+      - Dispo ici : https://dl.acm.org/doi/abs/10.1145/2785953
+  - CRATE s'intègre bien dans son manuscrit car permet réunir les 2 contributions de la thèse
+    - LSEQ et SPRAY
+    - Sert de plateforme d'expérimentation pour ses contributions
+    - Notamment expériences réunissant 600 éditeurs sur Grid'5000
+    - Pour confirmer le facteur logarithmique de SPRAY
+    - Et taille polylogarithmique des identifiants de LSEQ
+  - Est-ce que je peux présenter MUTE de la sorte ?
+    - Pas vraiment utilisé dans le cadre de nos expériences
+    - Peut le présenter et m'en servir comme POC
+    - Et comme cadre de réfléxions pour l'implémentation du mécanisme
+    - Couche CRDT
+      - Structures utilisées
+      - Optimisations explorées
+    - Couche réseau
+      - Pulsar
+      - SPRAY
+      - Et Hyperlog, si je trouve le temps
+    - Exploration du mécanisme de membership
+      - SWIM et Lifeguard
+    - Un peu dubitatif sur l'intérêt d'une telle section dans le cadre de la thèse
+      - À voir avec Gérald et Olivier leur avis sur la question
+    - Voir après lecture du chapitre sur CRATE si ça me donne une idée pour un meilleur angle
+  - Chapitre sur *CRATE*
+    - Intro
+      - Commence par justifier l'intérêt de la collaboration
+	- Répartir les tâches
+	- Améliorer implication des participants
+	- Améliorer qualité du résultat
+	- Facilité de la méthode de travail
+      - Démocratisation des éditeurs collaboratifs web
+	- Applications web universelles vis-à-vis des applis desktops
+	- Popularisation de ce type d'outils grâce à Google Docs et Etherpad
+	- Simplicité d'usage
+      - Mais éditeurs existants problématiques
+	- Architecture centralisée
+	- Pose problème de confidentialité, censure, passage à échelle et SPOF
+      - Tend donc vers la décentralisation pour résoudre ces problèmes
+	- En plus désormais possible dans les navigateurs grâce à WebRTC
+      - Propose CRATE
+	- Éditeur collaboratif temps réel pair-à-pair
+	- Document uniquement partagé par les collaborateurs
+	- Utilise SPRAY pour la couche réseau
+	- LSEQ pour la couche CRDT
+    - CRATE
+      - Se décompose en 4 couches
+	- Couche réseau
+	  - Englobe mécanisme d'appartenance au réseau
+	    - Protocole de membership ?
+	    - Ou protocole pour rejoindre le réseau ?
+	  - Et mécanisme de propagation des messages
+	- Couche causalité
+	  - Chargée d'ajouter des informations de causalité aux opérations locales
+	  - Ainsi que de délivrer une fois les conditions remplies les opérations distantes à l'utilisteur
+	- Couche structure pour séquences
+	  - LSEQ
+	  - Permet de représenter une séquence autorisant l'insertion et la suppression de ses éléments
+	  - Garantit la convergence
+	- Couche IHM
+	  - L'éditeur de texte
+	  - Et la visualisation de l'état du document
+      - Présente comment une modification locale passe à travers ses différentes couches successives avant d'être propagée
+	- Et inversement
+      - Mentionne aussi l'existence d'un mécanisme d'anti-entropie
+	- Cite à ce sujet 2 articles
+	  - *Epidemic algorithms for replicated database maintenance*
+	    - Par Alan Demers, Dan Greene, Carl Houser, Wes Irish, John Larson, Scott Shenker, Howard Sturgis, Dan Swinehart et Doug Terry en 1999
+	    - Dispo ici : https://dl.acm.org/doi/10.1145/43921.43922
+	  - *Δ-CRDTs: making δ-CRDTs delta-based*
+	    - Par Albert van der Linde, João Leitão et Nuno Preguiça en 2016
+	    - Dispo ici : https://dl.acm.org/doi/abs/10.1145/2911151.2911163
+        - Correspondent pas à l'article que je cite perso
+	- Serait p-e intéressant de lire *Epidemic algorithms for replicated database maintenance*
+      - Puis reviens plus en détails sur chacune des couches composant CRATE
+      - Réseau
+	- Explique la nécessité d'une topologie réseau s'adaptant dynamiquement au nombre de participants
+	- Revient sur SPRAY et justifie que ça permet de limiter le voisinage d'un pair malgré un changement d'ordre de magnitude au nombre de participants
+	- Décrit que les messages vont être propagés de manière épidémique
+	  - Au voisinage du pair qui a effectué des modifications
+	  - Puis ces voisins vont eux-mêmes relayer le message à leurs voisins
+	  - Et ainsi de suite
+	- Décrit ensuite le mécanisme utilisé pour qu'un pair rejoigne le réseau
+	  - De base, session inaccessible
+	  - Un pair de la session peut ouvrir un accès
+	  - Créé alors puis maintient une connexion avec le serveur de signaling
+	  - CRATE génère une URL partageable pour permettre à un utilisateur externe de rejoindre la session
+	  - Lorsque l'utilisateur accède à l'URL, le signaling sert de médiateur entre le nouveau pair et le pair "porte"
+	  - Permet d'établir une co webRTC entre l'entrant et la porte
+	  - Le nouveau venu peut alors se déco du serveur de signaling
+	  - Le nouveau venu utilise SPRAY pour faire connaître son arrivée au réseau et s'inclure
+	  - Peut avoir plusieurs portes utilisant des serveurs de signaling différents en même temps semblerait
+      - Causalité
+	- Fait le constat que le coût pour suivre la causalité des évènements est trop élévé pour les grands groupes
+	  - Linéaire au nombre de participants
+	  - À voir si les travaux de Baquero sur l'utilisation de Bloom Filter et autres structures probabilistes n'invalident pas ce constat désormais
+	- Du coup, limite la causalité qu'aux opérations liées entre elles
+	  - Une suppression arrive après l'insertion correspondante
+	- Utilise un vecteur d'horloges avec exception pour cela
+	  - Cite plusieurs papiers pour cette structure de données
+	  - *Concise version vectors in WinFS*
+	    - Par Dahlia Malkhi et Doug Terry en 2007
+	    - Dispo ici : https://link.springer.com/article/10.1007/s00446-007-0044-y
+	  - *Optimized OR-Sets without Ordering Constraints*
+	    - Par Madhavan Mukund, Gautham Shenoy R. et S. P. Suresh en 2014
+	    - Dispo ici : https://link.springer.com/chapter/10.1007/978-3-642-45249-9_15
+	  - Concrètement, s'agit d'un vecteur d'horloges se souvenant du compteur maximal connu pour chaque pair
+	  - Et qui maintient en plus de cela des exceptions pour chaque pair
+	    - Il s'agit des valeurs connues de ces pairs, mais dont on n'a pas encore reçu l'opération associée
+	  - Structure maintenue en locale
+	  - Ajoute à chaque message que la valeur d'horloge du pair auteur
+	    - Donc impact constant sur les métadonnées des infos de causalité circulant sur le réseau
+      - Anti-entropie
+	- Décrit le but et fonctionnement du mécanisme d'anti-entropie implémenté dans CRATE
+	- Similaire à celui présent dans MUTE
+      - Séquence Répliquée
+	- Définit la convergence forte à terme
+	- Indique que dans le cas de CRATE, utilise une structure basée sur LSEQ pour cela
+	- Permet ainsi de garantir convergence tout en limitant croissance des identifiants
+	- Peut alors se passer d'un mécanisme de renommage des identifiants
+	- Borne la complexité en communication de la structure
+	  - Entre O(log(I) * (ln R)) et O((log(I))^2 * ln R)
+	  - Où I est le nombre d'insertions
+	  - R le nombre de replicas dans le système
+      - Interface Utilisateur
+	- Présente l'interface et les technologies utilisées de l'éditeur
+    - Expérimentation
+      - Objectif
+	- Montrer la scalabilité de CRATE
+      - Description
+	- Effectue des sessions d'édition collaborative avec 101, 201, ..., 601 participants
+	- 1 participant initie la session d'édition collaborative
+	- Les autres le rejoignent
+	- Puis ensuite collaborent pour rédiger un document de millions de caractères
+	  - Insère toujours à la fin
+	  - Ce qui favorise une certaine stratégie d'allocation non ?
+	  - Pourquoi pas plus ou moins random comme on a pu faire dans nos expériences ?
+	- Effectue globalement 100 opérations par seconde, réparties sur l'ensemble du réseau
+	  - Pourquoi charge de travail fixe ?
+	  - Intuitivement, aurais fait augmenter le nombre d'opérations avec le nombre de pairs
+	- La session de collaboration dure 7h
+      - Résultat
+	- 1 seule figure résultat
+	- Mesure le traffic moyen généré par chaque éditeur au fur et à mesure de la progression de l'expérimentation
+	  - Et donc au fur et à mesure que le nombre d'opérations d'insertion passées augmente
+	  - Et donc que la taille des identifiants croît
+	- Compare ce résultat pour les expérimentations à 101, 201, ... et 601 éditeurs
+	- Observe globalement une forte croissance initiale, accrue en fonction du nombre d'éditeurs
+	- Puis une stabilisation
+      - Explication
+	- L'idée est que la croissance des identifiants ralenti à partir d'un certain stade
+	  - Grâce aux fonctions d'allocation de LSEQ
+	- Ce qui démarque les différentes courbes est en fait le nombre de messages que chaque noeud doit envoyer
+	  - Augmente de façon logarithmique avec le nombre de pairs du système
+	  - Mais normalement stable tout au long d'une exécution
+	  - Indique que chaque noeud envoie exactement 1 fois chaque opération à son voisinage
+      - Mais du coup, serait curieux de voir le coût exact de l'augmentation de la charge de travail
+	- Si plus d'opérations par seconde pour une même taille de groupe
+	- Quelles têtes auraient les courbes ?
+      - Un peu dommage aussi de ne pas voir l'évolution en métadonnées de la structure chez les noeuds
+    - Conclusion
+      - Résume fonctionnalités offertes par CRATE
+      - Indique que par contre CRATE ne gère par la persistance des sessions d'édition
+	- Document éphémère
+	- Besoin de le sauvegarder localement si souhaité
+	- Besoin d'avoir un pair permanent si souhaite faire persister session d'édition collaborative
+	- Pourrait être un des aspects que je pourrais développer dans mon chapitre sur MUTE
+	  - BotStorage
+	  - Pulsar
+	    - Problématique de chiffrement
+      - Conclut que CRATE montre que l'édition collaborative en temps réel avec un système distribuée et sans limite d'échelle est possible
+	- Me paraît un peu rapide comme conclusion
+	- Ici, atteint un traffic réseau généré allant de 400Ko/s à 800Ko/s
+	  - Est-ce acceptable ?
+	  - C'était quoi la limite et comment a-t-elle été définie ?
+	- Impact de l'évolution de la charge de travail sur les communications ?
+	- Expérience utilisateur lors de sessions collaboratives à si large échelle ?
+	  - Est-ce viable ou un joyeux bordel ?
+	  - Quels outils de conscience de groupe mettrent en place pour rendre smooth cette expérience ?
+  - Chapitre *Perspectives*
+    - Fusion de réseaux
+      - Peut vouloir fusionner 2 réseaux existants
+	- Par exemple à l'issue d'une partition réseau
+      - Explique que dans le cas de 2 réseaux construits avec SPRAY, rencontre un problème
+      - Comment garantir que le réseau final satisfasse la progression logarithmique de la vue partielle ?
+      - Idée naive est de simplement faire rejoindre chacun des membres du 2nd réseau le 1er réseau
+	- Mais pose des problèmes de perfs
+	- Utilise l'analogie des grains de sable passant d'un cadran de sablier à l'autre
+	- Le pair du 1er réseau qui va servir de médiateur va devoir supporter toute la charge
+	- Et ne pas planter durant tout le processus
+	- Pose donc aussi des risques d'échec
+      - L'autre idée est de simplement laisser le mécanisme de mélange de SPRAY fusionner les réseaux au fil du temps
+	- Je sais pas ce qu'est ce mécanisme de mélange
+	  - Intuitivement je dirais un mécanisme de ré-équilibrage des voisinages
+	- Mais d'après Brice, ne fonctionnerait pas complètement
+	- Crééerait bien des connexions entre les 2 réseaux au fil du temps
+	- Mais ne garantirait pas la progression logarithmique des voisinages
+      - La question reste donc en suspens
+    - Table de hachage répartie
+      - Permet de retrouver rapidement une ressource dans un réseau
+      - Recherche se fait à l'aide d'une clé permettant l'exploration efficace
+      - Indique que les DHTs existantes reposent sur des vues partielles logarithmique
+      - Mais ayant une taille fixe définie en amont
+      - En cas de churn des noeuds du système, besoin d'un mécanisme pour ré-estimer la taille du réseau
+      - Ce qui implique un coût
+      - Propose donc de construire une DHT en reposant sur SPRAY
+      - Permettrait d'améliorer la résistance au churn
+      - Sans impacter grandement les performances semblerait
+      - M'y connait pas assez je dois avouer
+    - Compromis causalité et concurrence
+      - Rappelle que le vecteur d'horloges à exception stocke en local au moins un entier par membre du système
+      - Indique que cela peut poser un problème pour les devices les moins puissants
+	- Tels que les smartphones
+	- Bon vu les configs actuelles, je sais pas si ça pose vraiment un problème
+	- Mais en tout cas, peut vouloir faire mieux
+      - Propose de remplacer ce vecteur d'horloges de taille W par un vecteur d'horloges de taille K
+	- Où W correspond au nombre de pairs du système
+	- Et K un entier nettement inférieur
+      - Comprend l'intention mais pas l'idée à vrai dire
+      - Repose sur le fait que, sans concurrence, une horloge suffit pour représenter les relations causales
+      - Donc la présence de doublons d'une valeur horloge témoigne de concurrence ?
+      - Propose d'utiliser
+	- Un vecteur d'horloges à taille variable, en fonction de la concurrence observée
+	- Un mécanisme de recouvrement d'erreur
+	- Un mécanisme d'anti-entropie
+	  - Si pas d'identifiant des opérations, fonctionnerait comment ?
+	  - CRDT à base deltas ?
+	  - Ou mécanisme d'anti-entropie reposant sur un Merkle Tree ?
+      - Je comprends pas comment cela fonctionnerait et le rôle individuel de chacun de ces composants
+	- Notamment celui du recouvrement d'erreur
 - Projet Informatique
   - Rendu le vendredi de l'avant dernière semaine de la 3ème période
     - Fin mai - début juin
+  - On essaie de se trouver un créneau avec Tesnim et Vincent pour faire le point ensemble
+  - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
+    - A réussi à lancer leur projet
+      - Sur ma machine Windows
+      - Doit pas avoir incorporer la version pour Mac de la librairie LWJGL
+      - Izoké pour le moment
+      - À garder en tête
+    - Gaston a implémenté un début de logique de combat
+      - Interface textuelle pour le moment
+      - Boucle de jeu où on affiche les stats initiales des combattants
+      - Puis on met à jour les infos à l'issue de chaque tour
+      - Propose au joueur de continuer ou d'abandonner le combat à l'issue de chaque tour
+      - Pour le moment, pas d'action entre les combattants lors d'un tour
+      - Donc globalement, boucle infinie
+      - A montré son code qui gérait les choix de l'utilisateur en plus
+      - Lui a conseillé d'utiliser un Enum pour délimiter les différents choix possibles et conserver la sémantique dans le code
+    - Comment tu t'en sors Axel ?
+      - Tu m'expliquais avoir du mal à LWJGL
+      - Est-ce que ça va mieux de côté ?
+      - Compte changer de librairie
+	- Pour Slick2D
+	- Plus simple d'utilisation
+    - Et toi Lucas ?
+      - A ajouté pas mal de squelettes de classes
+	- *Competences*, *Joueur*, *Race*, *Classe*
+	- Faire les constructeurs spécifiques à chaque Race et Classe
+    - C'est quoi le programme ?
+      - Serait pas mal IMO de mettre en place une interaction avec l'utilisateur
+	- Genre afficher le personnage sur le jeu
+	- Et pouvoir le déplacer
+  - En entreprise à partir de la semaine pro
+- Meeting
+  - Préparé et passé les auditions pour poste ATER l'an prochain
+    - J'ai demandé Polytech Nancy
+    - Mes envies ont l'air de correspondre à leurs besoins
+    - Et me paraît un bon compromis pour lisser ma charge de travail en reprenant des modules que j'ai déjà fait et en ajoutant des nouveaux
+  - Filé un coup à Martine pour Arteoz
+    - On voit le bout \o/
+    - On a réussi à regénérer des images Docker fonctionnelles
+    - Reste plus qu'à avoir un VPS
+  - Lu la partie de la thèse de Nédelec sur CRATE
+    - Dans le cadre de ma réflexion sur intégrer un chapitre sur MUTE dans mon manuscrit
+    - Je cherche quel angle adopter pour ce chapitre
+    - Donc je voulais voir comment Nédelec avait fait pour CRATE
+    - Pas vraiment similaire
+    - CRATE lui sert à joindre ses 2 contributions de sa thèse
+      - LSEQ : Réduction de la croissance des identifiants dans Sequence CRDT
+      - SPRAY : Topologie réseau limitant le nombre de connexions par pair de manière adaptative en fonction de la taille du réseau
+    - Et lui sert comme plateforme d'expérimentations
+      - A évalué LSEQ et SPRAY à l'aide de benchmarks sur Grid'5000 où déployait des centaines de CRATE
+    - Dans mon cas, je réutilise pas vraiment MUTE
+    - Mais certaines de ses briques logicielles
+      - Notamment sa couche CRDT et Causalité
+    - L'angle de Nédelec me paraît pas adapté à ma situation
+    - Je poursuis ma réflexion à ce sujet
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
