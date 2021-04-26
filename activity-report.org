@@ -16937,9 +16937,169 @@ print (r.geeks)
 - Pas eu le temps de faire un CM sur les fonctionnalités avancées des BDs
   - Vues, tables temporaires, triggers, anomalies d'écritures/lectures
 - Histoire qu'iels puissent tout de même découvrir ces sujets, je vais faire une VOD
-**** IN-PROGRESS Thèse : Rédiger section sur LogootSplit
-- Me paraît une bonne façon d'entamer le manuscrit
-- Me permet de définir le formalisme des identifiants, la notion de blocs et les limites de cette version
+*** Done
+- Répétition HDR Claudia
+  - Slide 3
+    - C'est quoi l'intention derrière chaque exemple donné ?
+    - Le 1er exemple est un exemple où la collaboration échouait
+    - P-e pas le meilleur exemple pour commencer
+      - Wikipédia ?
+  - Slide 7
+    - La transition entre systèmes collaboratifs pair-à-pair et conflits me paraît un peu rude
+  - Slide 15
+    - Plutôt de dire que p_i est un entier, dire sa sémantique ?
+      - Position ?
+  - Slide 18
+    - Tiens, y a pas le numéro de la slide
+    - Dans l'exemple,  manque pas un composant à l'identifiant ?
+      - p1 ?
+    - En reprenant les exemples de Luc dans son manuscrit, lui aussi omet initialement p1
+    - Donc non, identifiants valides
+  - Slide 24
+    - Pas de citation sur la méthode d'évaluation utilisée pour la qualité du document ?
+    - Les citations dans la présentation de l'HDR ne doivent être que tes publis ?
+    - Semblerait que non d'après slide 30 sur les trust games
+  - Slide 38
+    - Sur la partie sur le compromis entre state-based et operation-based, quelles différences avec les delta-based ?
+- Thèse : Rédiger section sur LogootSplit
+  - Je suis bien embêté
+  - Me suis rendu compte qu'il y a une différence entre comment je formalise les identifiants de LogootSplit et la formalisation dans la littérature
+  - La version décrite se décompose plutôt en base:interval dans le manuscrit de Luc et le papier
+    - Avec base une suite d'entiers finissant par le couple node_id et node_sequence_number
+    - Et interval, une range d'entiers
+  - La version avec des identifiants composés de quadruplets vient d'où ?
+    - De notre refactoring dans MUTE ?
+      - À partir d'une évolution de Logoot
+    - Ou est décrite dans un article ?
+      - Si c'est le cas, je n'arrive pas à retrouver où
+      - Y a bien l'article de RGASplit qui se contente de préciser que les identifiants LogootSplit comporte un offset
+  - À voir comment unifier cela
+    - Peut présenter ma formalisation
+    - Et indiquer qu'on peut optimiser la taille des identifiants en considérant position, node_id et node_sequence_number de manière uniforme, en tant que base
+    - Et voir la base uniquement comme une liste d'entiers finissant par le couple node_id et node_sequence_number
+    - Permet des optis en omettant position lors de la génération de nouveaux identifiants lorsque la valeur de node_id permet de garantir l'ordre souhaité
+    - Et que c'est cette version qui est mise en avant dans l'article d'origine et la thèse
+    - Mais que peut ne pas vouloir cette opti
+      - Types de données différents pour position (entier à base variable), node_id (uuid), node_sequence_number (entier naturel)
+      - Complexité de l'algorithme de génération de la base
+    - Nous allons donc nous baser sur la version simplifiée pour cela
+- Réunion thèse
+  - Papier
+    - Depuis que j'ai envoyé la version complète du papier
+    - J'ai eu des réunions avec Gérald
+    - Pour le moment, m'a fait ses retours sur les 3 premières sections de l'article
+    - Et on les a retravaillé ensemble en conséquence
+    - Ce qui correspond aux 3 premières pages de l'article
+    - Voir ce que tu en penses Olivier
+    - Il y avait juste les 2 derniers paragraphes de la section 3.2 où on hésitait
+      - Gérald proposait de les enlever
+    - Sinon autre principal changement
+    - J'ai modifié les algos du papier
+      - À la base, je voulais proposer des fonctions de renommage et d'inversion du renommage réciproques
+      - Mais je n'y arrivais pas sans ajouter des métadonnées
+	- Genre epoch d'origine de l'identifiant
+	- Ce qui aurait empêcher d'aggréger en blocs
+      - Donc je suis retourné à une version où l'undo est supporté
+      - Mais pas redo
+      - Donc globalement, pas de v2 de /renameId()/
+      - J'ai retravaillé la fin de la section 5.3 pour expliquer en quoi ça ne posait pas un problème
+  - Thèse
+    - A apporté quelques modifications au plan par rapport au draft que j'avais fait pour la réinscription
+    - Notamment pour refléter l'évolution du plan de l'article de journal aussi
+    - Globalement, un chapitre pour les sections *Overview*, *RLS without concurrent rename operations*, *RLS with concurrent rename operations*
+    - Un peu mitigé pour le chapitre *Overview*
+      - Me paraît un peu court
+      - Mais je pars là-dessus pour le moment
+      - On pourra toujours déplacer ça le moment venu
+    - En train de développer et ordonner les différents points que je souhaite aborder dans chaque section
+      - Histoire de voir si y a des endroits où le plan coince encore un peu
+    - Je voulais aussi rédiger la section sur LogootSplit pour démarrer
+      - Mais me suis rendu compte que la formalisation des identifiants que j'utilise ne correspondait pas à celle du papier et de la thèse de Luc
+      - Celle de la littérature, c'est celle qui repose sur une base:interval
+      - Et je n'ai pas réussi à trouver une trace de la formalisation que j'utilise quelque part d'autre que dans l'implem de MUTE
+  - Points restants
+    - Plan d'un chapitre sur MUTE
+      - Pas bien clair encore qu'est-ce qui serait intéressant et pertinent d'aborder dans ce chapitre
+    - Stratégies de déclenchement du renommage
+      - Vise la minimisation du nombre d'opérations de renommage tout en évitant coordination synchrone et famine
+      - Faut que je trouve des travaux pour mesurer/estimer la concurrence dans un système distribué
+      - Nédelec mentionne l'utilisation d'un tel mécanisme pour ajuster dynamiquement la taille du vecteur d'horloge stocké en local par chaque noeud
+      - Mais ne cite pas de références à ce sujet
+  - Réunion
+    - Papier
+      - Certains n'aiment pas références dans intro
+	- Sauf que moi je met le paquet
+	- À voir reviews
+      - Figures qui sont loin du texte
+	- Voir pour les rapprocher
+      - Faire disparaître la notion de user experience de la présentation de l'opé de renommage
+      - Offset
+	- Pas clair que je définis ça comme un entier
+	- Puis devient ensuite un interval
+	- Ajouter formalisation de l'interval d'identifiants ?
+      - Propriété Well-formed
+	- Dissocier la définition de la propriété de préserver la well-formed sequence de la définition de well-formed sequence
+	- Mais dans ce cas, où placer la définition de la well-formed sequence ?
+      - Algo 1
+	- Expliquer que d'autres fonctions sont dispos en annexe
+	- Même commentaire en toute logique pour algo 2
+      - Reprendre les différentes sections
+	- Devait suivre le déroulement suivant
+	  - Quoi ?
+	  - Pourquoi ?
+	  - Comment ?
+	- A tendance à partir dans des parenthèses, à divaguer
+	- Ce qui perd le lecteur
+	- Refocaliser/Mieux structurer les différentes sections
+	- Cite notamment la 5.3 en exemple
+	  - Part pour décrire l'algo 2
+	  - Puis finalement explique tout ce qu'il y a autour
+	    - Ordre des epochs à l'aide de /priority/
+	    - Computation de l'ordre des renommages à annuler à partir du LCA
+	  - Puis décrit enfin Algo 2
+	- Même problème à la fin de la 5.1
+	  - Explique qu'on propose d'appliquer seulement un renommage depuis un ensemble de renommages concurrents
+	  - Mais avant d'expliquer comment faire
+	    - Définition de priority
+	    - Définition de Algo 2
+	  - Explique déjà qu'on a le droit de faire ça car pas d'intention d'utilisateur associé à l'opération
+	  - Ce qui n'est pas ce que le lecteur attend semblerait
+	- Réordonner les éléments/revoir les objectifs des sections pour que le déroulé soit plus cohérent et linéaire
+      - Réduire figure 9
+      - Figure 10, même remarque que Gérald
+      - Sous-section 6.1
+	- Indiquer que c'est dans un but de reproductibilité que tout est à disposition
+      - Ce qui fait peur à Olivier
+	- C'est la partie performances
+	- Ajouter des pistes d'amélioration ?
+	  - Parallélisation
+	  - Renommage par bloc
+	  - Renommage par operation-log
+      - Dispo la semaine prochaine pour travailler sur le document
+	- RDV <2021-04-29 Thu> 09h30 au labo
+    - Thèse
+      - Traduire les sections de l'article correspond à des chapitres
+      - Chapitre sur MUTE
+	- Décrire l'état actuel
+	  - Replacer RLS dans ce contexte
+	- Discuter des autres aspects
+	  - Couche réseau
+	  - Composition de CRDTs
+	    - Si on intègre d'autres éléments dans l'éditeur
+	      - Titre
+	      - Chat
+          - Conscience de groupe à large échelle
+	  - Sécurité
+	  - Place des serveurs dans le système
+	  - Cohabitation des différentes versions de l'appli
+** Semaine du <2021-04-26 Mon> au <2021-04-30 Fri>
+*** Planned
+**** TODO PaPoC'21 : Suivre les talks
+- Plusieurs présentations m'ont l'air intéressantes
+- Y assister
+**** TODO EuroSys'21 : Suivre les talks
+- Enes, Baquero et Gotsman présentent leurs travaux : *Efficient Replication via Timestamp Stability*
+- Assister au talk
 **** TODO Papier : Refaire figure 10 sur la taille du document
 - Regénérer l'image pour placer la légende en-dessous des graphes
 **** TODO Papier : Revoir les citations pour les propriétés de l'opération /rename/
@@ -16948,6 +17108,34 @@ print (r.geeks)
 - Une autre référence serait p-e plus indiquée
   - Spécification des CRDTs ?
   - Pure Op-based CRDTs ?
+**** TODO Papier : Rapprocher les figures de leur utilisation dans le texte
+- Olivier faisait la remarque que l'article était rendu laborieux à lire à cause des allers-retours entre texte et figure
+- Maintenant que le gros de l'article est fixé, essayer de positionner les images au mieux
+**** TODO Papier : Ajouter une explication du formalisme des blocs
+- Olivier expliquait que le formalisme employé n'était pas forcément clair
+- Au début présente offset comme un entier
+- Puis ensuite je montre un exemple de blocs où j'ai un interval d'offsets
+- Sans expliquer cette notion d'interval, ce formalisme
+**** TODO Papier : Reformuler ce que j'entends par la notion de /user experience/ lors de la présentation de l'opé de renommage
+- Dans la sous-section 5.1, j'explique qu'on peut ignorer des renommages concurrents sans perturber l'user experience
+- Mais ce terme ne correspond pas à ce que j'entend
+- Moi j'entend juste que cela ne va pas produire une anomalie aux yeux des utilisateurs
+- User experience englobe plus d'aspects (ergonomie, utilisabilité, valeurs véhiculées...)
+**** TODO Papier : Indiquer qu'une partie des fonctions sont disponibles en annexes
+- Pour le moment, les algos sont mis à dispos en annexe
+- Mais aucun lien n'est fait avec eux dans le texte
+**** TODO Papier : Réduire taille de la figure 9
+**** TODO Papier : Mentionner reproductibilité au sujet des expériences
+- Pour le moment, j'indique juste que le code des expériences et les données obtenues sont dispos sur le repo github
+- Indiquer que c'est dans un soucis de reproductibilité peut toujours être bien
+**** TODO Papier : Identifier parties où le discours s'éparpille un peu trop
+- Olivier expliquait que j'avais tendance à faire des disgressions dans mon article
+- Ce qui pouvait rendre confus et difficile sa lecture
+- Mentionnait la 5.1 et 5.3 comme exemples
+- Voir si d'autres parties gagneraient à être ré-ordonnées
+**** IN-PROGRESS Thèse : Rédiger section sur LogootSplit
+- Me paraît une bonne façon d'entamer le manuscrit
+- Me permet de définir le formalisme des identifiants, la notion de blocs et les limites de cette version
 **** TODO Papier : Relire *A Conflict-Free Replicated JSON Datatype* de Kleppmann
 - A été publié dans TPDS
 - Permettra de voir le format/les termes employés
@@ -17088,157 +17276,27 @@ print (r.geeks)
 - De façon à limiter le nombre d'exécutions du 2PC
 - Dispo ici : http://www.vldb.org/pvldb/vol14/p743-lu.pdf
 *** Done
-- Répétition HDR Claudia
-  - Slide 3
-    - C'est quoi l'intention derrière chaque exemple donné ?
-    - Le 1er exemple est un exemple où la collaboration échouait
-    - P-e pas le meilleur exemple pour commencer
-      - Wikipédia ?
-  - Slide 7
-    - La transition entre systèmes collaboratifs pair-à-pair et conflits me paraît un peu rude
-  - Slide 15
-    - Plutôt de dire que p_i est un entier, dire sa sémantique ?
-      - Position ?
-  - Slide 18
-    - Tiens, y a pas le numéro de la slide
-    - Dans l'exemple,  manque pas un composant à l'identifiant ?
-      - p1 ?
-    - En reprenant les exemples de Luc dans son manuscrit, lui aussi omet initialement p1
-    - Donc non, identifiants valides
-  - Slide 24
-    - Pas de citation sur la méthode d'évaluation utilisée pour la qualité du document ?
-    - Les citations dans la présentation de l'HDR ne doivent être que tes publis ?
-    - Semblerait que non d'après slide 30 sur les trust games
-  - Slide 38
-    - Sur la partie sur le compromis entre state-based et operation-based, quelles différences avec les delta-based ?
-- Thèse : Rédiger section sur LogootSplit
-  - Je suis bien embêté
-  - Me suis rendu compte qu'il y a une différence entre comment je formalise les identifiants de LogootSplit et la formalisation dans la littérature
-  - La version décrite se décompose plutôt en base:interval dans le manuscrit de Luc et le papier
-    - Avec base une suite d'entiers finissant par le couple node_id et node_sequence_number
-    - Et interval, une range d'entiers
-  - La version avec des identifiants composés de quadruplets vient d'où ?
-    - De notre refactoring dans MUTE ?
-      - À partir d'une évolution de Logoot
-    - Ou est décrite dans un article ?
-      - Si c'est le cas, je n'arrive pas à retrouver où
-      - Y a bien l'article de RGASplit qui se contente de préciser que les identifiants LogootSplit comporte un offset
-  - À voir comment unifier cela
-    - Peut présenter ma formalisation
-    - Et indiquer qu'on peut optimiser la taille des identifiants en considérant position, node_id et node_sequence_number de manière uniforme, en tant que base
-    - Et voir la base uniquement comme une liste d'entiers finissant par le couple node_id et node_sequence_number
-    - Permet des optis en omettant position lors de la génération de nouveaux identifiants lorsque la valeur de node_id permet de garantir l'ordre souhaité
-    - Et que c'est cette version qui est mise en avant dans l'article d'origine et la thèse
-    - Mais que peut ne pas vouloir cette opti
-      - Types de données différents pour position (entier à base variable), node_id (uuid), node_sequence_number (entier naturel)
-      - Complexité de l'algorithme de génération de la base
-    - Nous allons donc nous baser sur la version simplifiée pour cela
-- Réunion thèse
-  - Papier
-    - Depuis que j'ai envoyé la version complète du papier
-    - J'ai eu des réunions avec Gérald
-    - Pour le moment, m'a fait ses retours sur les 3 premières sections de l'article
-    - Et on les a retravaillé ensemble en conséquence
-    - Ce qui correspond aux 3 premières pages de l'article
-    - Voir ce que tu en penses Olivier
-    - Il y avait juste les 2 derniers paragraphes de la section 3.2 où on hésitait
-      - Gérald proposait de les enlever
-    - Sinon autre principal changement
-    - J'ai modifié les algos du papier
-      - À la base, je voulais proposer des fonctions de renommage et d'inversion du renommage réciproques
-      - Mais je n'y arrivais pas sans ajouter des métadonnées
-	- Genre epoch d'origine de l'identifiant
-	- Ce qui aurait empêcher d'aggréger en blocs
-      - Donc je suis retourné à une version où l'undo est supporté
-      - Mais pas redo
-      - Donc globalement, pas de v2 de /renameId()/
-      - J'ai retravaillé la fin de la section 5.3 pour expliquer en quoi ça ne posait pas un problème
-  - Thèse
-    - A apporté quelques modifications au plan par rapport au draft que j'avais fait pour la réinscription
-    - Notamment pour refléter l'évolution du plan de l'article de journal aussi
-    - Globalement, un chapitre pour les sections *Overview*, *RLS without concurrent rename operations*, *RLS with concurrent rename operations*
-    - Un peu mitigé pour le chapitre *Overview*
-      - Me paraît un peu court
-      - Mais je pars là-dessus pour le moment
-      - On pourra toujours déplacer ça le moment venu
-    - En train de développer et ordonner les différents points que je souhaite aborder dans chaque section
-      - Histoire de voir si y a des endroits où le plan coince encore un peu
-    - Je voulais aussi rédiger la section sur LogootSplit pour démarrer
-      - Mais me suis rendu compte que la formalisation des identifiants que j'utilise ne correspondait pas à celle du papier et de la thèse de Luc
-      - Celle de la littérature, c'est celle qui repose sur une base:interval
-      - Et je n'ai pas réussi à trouver une trace de la formalisation que j'utilise quelque part d'autre que dans l'implem de MUTE
-  - Points restants
-    - Plan d'un chapitre sur MUTE
-      - Pas bien clair encore qu'est-ce qui serait intéressant et pertinent d'aborder dans ce chapitre
-    - Stratégies de déclenchement du renommage
-      - Vise la minimisation du nombre d'opérations de renommage tout en évitant coordination synchrone et famine
-      - Faut que je trouve des travaux pour mesurer/estimer la concurrence dans un système distribué
-      - Nédelec mentionne l'utilisation d'un tel mécanisme pour ajuster dynamiquement la taille du vecteur d'horloge stocké en local par chaque noeud
-      - Mais ne cite pas de références à ce sujet
-  - Réunion
-    - Papier
-      - Certains n'aiment pas références dans intro
-	- Sauf que moi je met le paquet
-	- À voir reviews
-      - Figures qui sont loin du texte
-	- Voir pour les rapprocher
-      - Offset
-	- Pas clair que je définis ça comme un entier
-	- Puis devient ensuite un interval
-	- Ajouter formalisation de l'interval d'identifiants ?
-      - Propriété Well-formed
-	- Dissocier la définition de la propriété de préserver la well-formed sequence de la définition de well-formed sequence
-	- Mais dans ce cas, où placer la définition de la well-formed sequence ?
-      - Algo 1
-	- Expliquer que d'autres fonctions sont dispos en annexe
-	- Même commentaire en toute logique pour algo 2
-      - Reprendre les différentes sections
-	- Devait suivre le déroulement suivant
-	  - Quoi ?
-	  - Pourquoi ?
-	  - Comment ?
-	- A tendance à partir dans des parenthèses, à divaguer
-	- Ce qui perd le lecteur
-	- Refocaliser/Mieux structurer les différentes sections
-	- Cite notamment la 5.3 en exemple
-	  - Part pour décrire l'algo 2
-	  - Puis finalement explique tout ce qu'il y a autour
-	    - Ordre des epochs à l'aide de /priority/
-	    - Computation de l'ordre des renommages à annuler à partir du LCA
-	  - Puis décrit enfin Algo 2
-	- Même problème à la fin de la 5.1
-	  - Explique qu'on propose d'appliquer seulement un renommage depuis un ensemble de renommages concurrents
-	  - Mais avant d'expliquer comment faire
-	    - Définition de priority
-	    - Définition de Algo 2
-	  - Explique déjà qu'on a le droit de faire ça car pas d'intention d'utilisateur associé à l'opération
-	  - Ce qui n'est pas ce que le lecteur attend semblerait
-	- Réordonner les éléments/revoir les objectifs des sections pour que le déroulé soit plus cohérent et linéaire
-      - Réduire figure 9
-      - Figure 10, même remarque que Gérald
-      - Sous-section 6.1
-	- Indiquer que c'est dans un but de reproductibilité que tout est à disposition
-      - Ce qui fait peur à Olivier
-	- C'est la partie performances
-	- Ajouter des pistes d'amélioration ?
-	  - Parallélisation
-	  - Renommage par bloc
-	  - Renommage par operation-log
-      - Dispo la semaine prochaine pour travailler sur le document
-	- RDV <2021-04-29 Thu> 09h30 au labo
-    - Thèse
-      - Traduire les sections de l'article correspond à des chapitres
-      - Chapitre sur MUTE
-	- Décrire l'état actuel
-	  - Replacer RLS dans ce contexte
-	- Discuter des autres aspects
-	  - Couche réseau
-	  - Composition de CRDTs
-	    - Si on intègre d'autres éléments dans l'éditeur
-	      - Titre
-	      - Chat
-	  - Sécurité
-	  - Place des serveurs dans le système
+- PaPoC'21 : Suivre les talks
+  - *Array CRDTs Using Delta-Mutations.*
+  - *Access Control Conflict Resolution in Distributed File Systems using CRDTs.*
+  - *Improving the Reactivity of Pure Operation-Based CRDTs.*
+  - *Totally-Ordered Prefix Parallel Snapshot Isolation.*
+  - *Cambria: Schema Evolution in Distributed Systems with Edit Lenses.*
+- EuroSys'21
+  - *Efficient Replication via Timestamp Stability*
+- Meeting
+  - J'ai mon ATER à Polytech pour l'an prochain
+  - Manuscrit
+    - En train de traduire l'article de journal
+    - Ajout d'une partie sur l'utilisation de l'opé de renommage comme base pour un mécanisme de synchro par snapshot
+      - Globalement, l'opération de renommage remplace toutes les opérations dont elle dépend causalement
+      - Peut tirer profit de cette spécificité pour améliorer le mécanisme d'anti-entropie, de synchronisation entre pairs
+      - Plutôt que de faire rejouer toutes les opérations à un nouveau pair rejoignant la collaboration
+      - Serait plus performant de synchroniser un nouveau pair à partir de l'opé de renommage courante, des opés concurrentes, et des opérations produites depuis
+      - Peut pousser la réflexion plus loin : au-delà des nouveaux pairs, pourrait utiliser cette approche pour synchroniser les pairs qui ont accumulé trop de retard sur l'état courant
+      - Reste à définir quand est-ce qu'un noeud a accumulé trop de retard ?
+      - Pour y répondre, étudie dans quels cas c'est plus rentable d'utiliser la méthode de synchro habituelle plutôt que celle par snapshot
+      - Pour le moment, liste juste les grandes lignes de cette section
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
