@@ -17094,12 +17094,67 @@ print (r.geeks)
 	  - Cohabitation des différentes versions de l'appli
 ** Semaine du <2021-04-26 Mon> au <2021-04-30 Fri>
 *** Planned
-**** TODO PaPoC'21 : Suivre les talks
+**** DONE Papier : Ajouter une explication du formalisme des blocs
+- Olivier expliquait que le formalisme employé n'était pas forcément clair
+- Au début présente offset comme un entier
+- Puis ensuite je montre un exemple de blocs où j'ai un interval d'offsets
+- Sans expliquer cette notion d'interval, ce formalisme
+**** DONE Papier : Reformuler ce que j'entends par la notion de /user experience/ lors de la présentation de l'opé de renommage
+- Dans la sous-section 5.1, j'explique qu'on peut ignorer des renommages concurrents sans perturber l'user experience
+- Mais ce terme ne correspond pas à ce que j'entend
+- Moi j'entend juste que cela ne va pas produire une anomalie aux yeux des utilisateurs
+- User experience englobe plus d'aspects (ergonomie, utilisabilité, valeurs véhiculées...)
+**** DONE PaPoC'21 : Suivre les talks
 - Plusieurs présentations m'ont l'air intéressantes
 - Y assister
-**** TODO EuroSys'21 : Suivre les talks
+**** DONE Papier : Mentionner reproductibilité au sujet des expériences
+- Pour le moment, j'indique juste que le code des expériences et les données obtenues sont dispos sur le repo github
+- Indiquer que c'est dans un soucis de reproductibilité peut toujours être bien
+**** DONE EuroSys'21 : Suivre le talk
 - Enes, Baquero et Gotsman présentent leurs travaux : *Efficient Replication via Timestamp Stability*
 - Assister au talk
+**** DONE Papier : Réduire taille de la figure 9
+**** DONE Papier : Indiquer qu'une partie des fonctions sont disponibles en annexes
+- Pour le moment, les algos sont mis à dispos en annexe
+- Mais aucun lien n'est fait avec eux dans le texte
+**** DONE Projet Informatique : Préparer réunion
+- Revoir un peu les objectifs qu'on avait fixé initialement
+- Faire le point d'où en sont mes groupes
+  - Avancement
+  - Difficultés rencontrées
+- Revoir les objectifs en considération
+**** DONE Papier : Identifier parties où le discours s'éparpille un peu trop
+- Olivier expliquait que j'avais tendance à faire des disgressions dans mon article
+- Ce qui pouvait rendre confus et difficile sa lecture
+- Mentionnait la 5.1 et 5.3 comme exemples
+- Voir si d'autres parties gagneraient à être ré-ordonnées
+**** TODO Papier : Ajouter une section 4.3 *Optimisations*
+- Y déplacer
+  - Le mécanisme de GC de l'opération /rename/
+  - Le mécanisme de compression de l'opération /rename/
+- Revoir en conséquence le lien entre 4.2 et 4.3
+**** TODO Papier : Introduire la pré-condition d'être sur l'epoch d'origine pour utiliser /renameId/ dès que possible
+- En parle actuellement que tard
+  - Section 5.3
+- Si en parle dès l'introduction de /renameId/, me simplifierait la justification du problème posé par des /rename/ concurrents
+- Et ce qui manque à mon système à ce stade pour être capable de les gérer
+**** TODO Papier : Retravailler la section 5.1 à partir du plan suivant
+- Revoir le plan de la 5.1
+  - Reprendre l'exemple
+  - Expliquer l'arbre des epochs
+  - Besoin d'une relation de priority pour définir epoch cible
+  - Expliquer que renameId ne me permet pas de passer d'un sibling à l'autre
+  - Besoin d'une fonction pour établir le chemin entre epoch courante et epoch cible
+  - Besoin d'une fonction pour remonter l'arbre
+- Faire gaffe au passage à parler désormais de parler d'epochs et non plus de /rename/ operations
+**** TODO Papier : Modifier Figure 6
+- Faire apparaître les 2 opérations /rename/ concurrentes
+- Ne plus faire apparaître les 2 états incohérents après synchronisation
+**** TODO Papier : Refaire l'exemple de la figure 7
+- Exemple est actuellement trop bâteau pour bien faire ressortir le fonctionnement de /priority/
+- Avoir un arbre avec plusieurs niveaux et montrant bien qu'on repose sur l'ordre lexico des paths
+  - Et non pas seulement des noms d'epochs
+- Se fait facilement en ajoutant un eC7 en epoch fille de eA1
 **** TODO Papier : Refaire figure 10 sur la taille du document
 - Regénérer l'image pour placer la légende en-dessous des graphes
 **** TODO Papier : Revoir les citations pour les propriétés de l'opération /rename/
@@ -17111,28 +17166,6 @@ print (r.geeks)
 **** TODO Papier : Rapprocher les figures de leur utilisation dans le texte
 - Olivier faisait la remarque que l'article était rendu laborieux à lire à cause des allers-retours entre texte et figure
 - Maintenant que le gros de l'article est fixé, essayer de positionner les images au mieux
-**** TODO Papier : Ajouter une explication du formalisme des blocs
-- Olivier expliquait que le formalisme employé n'était pas forcément clair
-- Au début présente offset comme un entier
-- Puis ensuite je montre un exemple de blocs où j'ai un interval d'offsets
-- Sans expliquer cette notion d'interval, ce formalisme
-**** TODO Papier : Reformuler ce que j'entends par la notion de /user experience/ lors de la présentation de l'opé de renommage
-- Dans la sous-section 5.1, j'explique qu'on peut ignorer des renommages concurrents sans perturber l'user experience
-- Mais ce terme ne correspond pas à ce que j'entend
-- Moi j'entend juste que cela ne va pas produire une anomalie aux yeux des utilisateurs
-- User experience englobe plus d'aspects (ergonomie, utilisabilité, valeurs véhiculées...)
-**** TODO Papier : Indiquer qu'une partie des fonctions sont disponibles en annexes
-- Pour le moment, les algos sont mis à dispos en annexe
-- Mais aucun lien n'est fait avec eux dans le texte
-**** TODO Papier : Réduire taille de la figure 9
-**** TODO Papier : Mentionner reproductibilité au sujet des expériences
-- Pour le moment, j'indique juste que le code des expériences et les données obtenues sont dispos sur le repo github
-- Indiquer que c'est dans un soucis de reproductibilité peut toujours être bien
-**** TODO Papier : Identifier parties où le discours s'éparpille un peu trop
-- Olivier expliquait que j'avais tendance à faire des disgressions dans mon article
-- Ce qui pouvait rendre confus et difficile sa lecture
-- Mentionnait la 5.1 et 5.3 comme exemples
-- Voir si d'autres parties gagneraient à être ré-ordonnées
 **** IN-PROGRESS Thèse : Rédiger section sur LogootSplit
 - Me paraît une bonne façon d'entamer le manuscrit
 - Me permet de définir le formalisme des identifiants, la notion de blocs et les limites de cette version
@@ -17184,6 +17217,7 @@ print (r.geeks)
 - Par Geoffrey Litt, Peter van Hardenberg et Orion Henry
 - Présenté à PaPoC'21
 - Dispo ici : https://dl.acm.org/doi/10.1145/3447865.3457963
+- Une version plus détaillée est disponible ici : https://www.inkandswitch.com/cambria.html
 **** TODO CRDT : Lire *Towards the Synthesis of Coherence/Replication Protocols from Consistency Models via Real-Time Orderings*
 - Par Vasilis Gavrielatos, Vijay Nagarajan et Panagiota Fatourou
 - Présenté à PaPoC'21
@@ -17277,15 +17311,393 @@ print (r.geeks)
 - Dispo ici : http://www.vldb.org/pvldb/vol14/p743-lu.pdf
 *** Done
 - PaPoC'21 : Suivre les talks
+  - *Certified Mergeable Replicated Datatypes*
+    - MRDTs
+      - Se base sur une modèle version-control de la réplication
+      - Où chaque version d'une donnée est un état d'un CRDT
+      - 3-way merge function
+	- 2 versions concurrentes et leur LCA
+    - Donne un exemple avec le counter
+      - Propose une fonction de merge
+    - Comment vérifier que la fonction de merge assure la convergence ?
+    - Doit vérifier 3 propriétés
+      - Commutativity, Associativity, Idempotence
+      - Prouve cela dans leur papier
+    - Utilise F* comme assistant de preuves
+    - Propose une librairie permettant de définir l'état, les opérations, la fonction de merge d'un MRDT
+    - La librarie vérifie que la fonction de merge vérifie les 3 propriétés pour convergence
+    - Peut ensuite générer code OCaml correspondant au MRDT
   - *Array CRDTs Using Delta-Mutations.*
+    - S'intéresse aux Delta-based CRDTs
+      - Repose sur l'utilisation de Dots
+      - Stocke l'ensemble des dots dans un Dot Store
+      - Utilise un Causal Context pour compresser ce Dot Store
+    - Cas d'utilisation : documents JSON
+    - Utilise actuellement des maps pour representer documents JSON
+    - Besoin d'une structure Array notamment pour
+      - Nested elements
+      - Moving elements around
+    - Propose 2 nouveaux Delta-based CRDTs Arrays
+      - Remove-Wins Array (RWArray)
+	- Remove > Move, Update
+      - Observed-Remove Array (ORArray)
+	- Update > Remove > Move
+    - Propriétés
+      - Arbitrary nesting
+      - Moving elements around
+      - No tombstones
+    - Move seulement au sein d'un array, pas à travers la hierarchie de arrays
   - *Access Control Conflict Resolution in Distributed File Systems using CRDTs.*
+    - DFS
+      - Organise fichiers et dossiers sous la forme d'une hierarchie
+      - Chaque élément possède un identifiant unique
+	- Par exemple son path
+      - Veut assurer disponibilité et sécurité du DFS
+    - Opérations à supporter
+      - Créer, déplacer, modifier, gérer les droits d'accès
+    - Se base sur POSIX access control policy
+    - Challenges
+      - Disponibilité
+      - Conflits sur la structure du DFS
+      - Conflits sur les droits d'accès
+	- Doit se prémunir de data leakage and corruption
+    - Définit les propriétés de sécurité
+      - Confidentiality
+      - Integrity : prohibits unauthorized write access
+      - Accessibiliy : guarantees that authorized access will succeed
+    - Conflits sur la structure
+      - Si 2 fichiers avec le même identifiant créés en parallèle, les renomme
+    - Contribution
+      - Modèle formel d'un DFS simplifié basé sur CRDTs
+      - Gère acccess control conflicts
+      - Dispo sur AntitodeDB - filesystem
+    - Que faire si un admin et le owner d'un fichier modifie de manière concurrente les droits d'accès à un fichier ?
+      - L'admin gagne
+    - Obtient résultat de l'impossibilité d'assurer la confidentialité, l'intégrité et l'accessibilité dans un système distribué
+    - Rôle de l'admin géré statiquement
+      - Pas de gestion de conflits des droits d'admin
   - *Improving the Reactivity of Pure Operation-Based CRDTs.*
+    - Se base sur le framework Pure Operation-Based CRDTs
+    - Log d'opérations
+    - Essaie de maintenir le log le plus petit possible
+      - De le compacter, de le tronquer en fonction des données de stabilité
+    - Repose sur Reliable Causal Broadcasting pour propager opérations
+    - Argue que RCB gêne la réactivité du système
+    - Force la livraison causale des opérations
+    - Mais de temps en temps RCB ajoute des dépendances causales là où il n'y en a pas
+    - Donc peut se retrouve à bufferiser une opération alors que pourrait la livrer du point de vue de l'opé
+    - Etend le pure op-based framework pour permettre la livraison de ces opérations
+    - Retravaille la couche RCB pour ajouter des informations de causal context (?)
+    - Permet de définir quand une opération doit être buffer ou délivrée (?)
+    - Formalise cette nouvelle relation dans le framework
+    - Implémente actuellement AW-Set à titre de POC
+    - Réalise des expériences
+    - Montre que atteint la stabilité et compacte plus rapidement le log grâce à la version /reactive/ de RCB comparé à la traditionnelle
+  - *Towards the Synthesis of Coherence/Replication Protocols from Consistency Models via Real-Time Orderings.*
+    - Propose une toolchain
+      - Description du consistency model
+      - Traduction en protocol high-level
+      - Puis en protocol low-level
+      - Qui est ensuite vérifié et experimenté
+      - Puis finalement implémenté
   - *Totally-Ordered Prefix Parallel Snapshot Isolation.*
+  - *Advanced Domain-Driven Design for Consistency in Distributed Data-Intensive Systems.*
+  - *SCEW: Programmable BFT-Consensus with Smart Contracts for Client-Centric P2P Web Applications.*
+  - *Convergent Causal Consistency for Social Media Posts.*
   - *Cambria: Schema Evolution in Distributed Systems with Edit Lenses.*
-- EuroSys'21
+    - Comment gérer l'évolution du schéma de données dans un système distribué ?
+      - Peut ajouter un fallback pour le champ modifié
+	- Error-prone
+	- Complexifie le code
+    - Serait mieux d'ajouter une couche de Schema transformation
+    - Specifie un graphe bidirectionnel de schémas
+    - Cambria permet de
+      - Traduire les schémas à l'exécution
+      - Définir des types statiques
+      - Intégré dans Automerge
+    - Permet de
+      - Rajouter des valeurs par défaut pour des nouveaux champ
+      - De mapper des valeurs vers les valeurs d'un nouveau type
+    - Repose sur le langage Lens
+      - Applique des opérations aux schémas plutôt que de transformer le schéma entier (?)
+    - Futures Challenges
+      - Quasi-lenses : transformations difficilement bidirectionnelles
+      - Conflict-resolution à travers les Lenses
+    - Question
+      - Qui gère les transformations ? Est-ce le noeud avant l'envoi ou le noeud à la réception ?
+	- D'après sa réponse, les noeuds à la réception
+	- Les Lenses sont en fait représentables en tant que métadonnées
+	- Donc un pair qui se met à jour peut partager les nouvelles Lenses avec des noeuds étant toujours à une ancienne version
+	- Fonctionne tant que le langage des lenses ne change pas
+	  - Ce qui me semble une hypothèse réaliste
+      - Quel est le coût d'une Lens ?
+  - *Read-Write Quorum Systems Made Practical.*
+  - *Metadata compression in Automerge CRDT library*
+    - Lightning talk par Kleppmann
+    - Techniques de compression pour réduire la taille d'un document texte dans Automerge
+    - Atteint un ratio de 0.8 byte/op
+    - Faudrait que je compare ça par rapport à mes résultats
+    - Et si c'est orthogonal
+  - *Building DistSys with StateRight*
+    - Librairie Rust permettant de vérifier la correction d'une implémentation
+    - Consiste en du model checking
+  - *What not where: Sharing in a world of distributed, persistent memory*
+    - Twizzler : Data-Centric OS for Non-volatile Memory
+    - What are computers for?
+      - Storing, processing and ??? data
+    - What is process?
+      - Computation + Virtual memory, files, security context
+    - What's a process for?
+      - Pour générer un résultat à partir de données d'entrée
+    - Difficile de partager des données d'un process à l'autre actuellement
+      - Les process sont first-class citizens
+      - Pas les données
+    - Nouvelle techno apparaît (NVM) et permet de repenser l'OS
+    - Prend l'exemple de SSD qui a entraîné l'approche CORFU
+      - Mais communauté a choisi approche incrémentale
+      - Pense qu'il s'agit d'une opportunité loupée
+    - Vu la vitesse des NVM, propose que les applications puissent accéder directement au disque sans passer par le kernel
+    - Si commence à travailler directement sur le disque, ça sert à quoi les références virtuelles ?
+      - Les données vont outlive les process
+    - Besoin de revoir la notion de pointeur
+    - Ont implémenté l'OS
+    - Ont construit un KV-Store dessus
+    - Tendances
+      - Storage is converging
+	- Cache, Disque Dur, DRAM, SRAM -> NVM
+      - CPU is diverging
+	- CPU -> Multi-cores CPU, GPU, NIC, FPGAs
+- EuroSys'21 : Suivre le talk
   - *Efficient Replication via Timestamp Stability*
+    - Contexte est planet-scale replicated systems
+    - Pourquoi planet-scale replicated ?
+      - fault-tolerance
+      - low-latency
+    - Vise strong consistency, plus particulièrement linearizability
+      - Donc comme si une seule machine traitait toutes les opés
+      - Ou je confonds ?
+    - Existe des protocoles leader-based de State Machine Replication (SMR)
+      - Genre Paxos
+    - Pitfalls de cette approche
+      - Latence de la communication envers le leader
+	- Unfair for faraway clients
+      - No load balancing
+      - SPOF
+    - Existe Mencius qui propose Multi-leader SMR
+      - Maintient plusieurs paxos log pour ordonner les opérations
+      - Mais besoin d'avoir reçu toutes les opés de chaque leader pour pouvoir process le timestamp suivant
+      - Plus fair
+      - Plus load-balancé
+      - Mais plus lent
+    - Propose leaderless SMR with tempo
+      - Majorité de processus propose un timestamp pour une commande
+      - La commande se voit attribué le timestamp le plus élevé des votes
+      - Possible d'avoir plusieurs commandes avec le même timestamp
+    - Quand est-ce safe d'exécuter une opération ?
+      - Utilise timestamp stability
+      - Peut seulement exécuter une opé quand son timestamp est stable
+      - Donc toutes les opés avec un timestamp plus petit ou égale ont été commités
+      - En cas d'égalité de timestamp, ordonne les commandes à l'aide de leur identifiant
+    - Résultats
+      - Latence de 350ms pour le 99.9th percentile
+	- Alors que leader-based SMR se compte en secondes
+      - Latence n'augmente que très peu avec le nombre de pairs
+    - Remarques
+      - Système statique ?
+	- Vu que ça se base sur une majorité
+      - Bloque en cas de partition réseau ?
+	- Puisque ne peut plus observer la majorité des proposals ?
+- Papier : Indiquer qu'une partie des fonctions sont disponibles en annexes
+  - Comment faire le lien ?
+  - Distingue /renameId/ de /Algo 1/
+  - Permet ensuite de dire que /Algo 1/ n'est qu'une partie de /renameId/
+  - Que le reste se trouve en /Annexe A/
+  - Fait pareil du coup pour /revertRenameId/ et /Algo 2/
+    - Reste à voir comment formuler le cas que /Algo 2/ permet de gérer
+  - Je me demande juste jusqu'où je dois aller dans les détails
+- Papier : Identifier parties où le discours s'éparpille un peu trop
+  - Section 4.2
+    - Est-ce que cette section ne serait pas trop fournie ?
+    - Plan de la section
+      1. Appliquer naivement opérations concurrentes à /rename/ produit anomalies
+      2. Met en place un mécanisme d'epochs pour détecter les opérations concurrentes aux opés /rename/
+      3. Chaque noeud maintient une copie de l'/epoch chain/ et tag les opérations avec l'epoch de génération et màj du modèle de cohérence
+      4. Utilise /renameId/ pour intégrer opération /insert/ ou /remove/ sans anomalie
+      5. Exemple d'utilisation de /renameId/
+      6. Algo 1 est qu'une partie, reste en annexe
+      7. /renameId/ sert aussi intégrer opération /rename/ sans anomalie
+      8. Besoin de stocker le /former state/ jusqu'à /causal stability/, ce qui nécessite un protocole de /membership/
+      9. Peut stocker /former states/ sur le disque en attendant
+    - Est-ce que peut décomposer cette section en plusieurs ?
+      - À creuser
+  - Section 5.1
+    - Le problème souligné dans cette section était le suivant
+      1. J'indique que des /rename/ concurrents provoquent un conflit
+      2. Puis propose d'appliquer seulement un /rename/ de l'ensemble des /rename/ concurrents
+      3. Justifie qu'on peut faire ça car pas d'intention de l'utilisateur liée au /rename/
+      4. Puis explique comment on procéde pour implémenter cette approche
+	 - Relation /priority/
+	 - Fonction /revertRenameId/
+    - C'est le point 3. qui pose problème
+      - Un peu un HS d'après Olivier
+    - Solutions possibles
+      - Virer le point 3.
+	- Mouais
+	- Me paraît important de justifier qu'on peut faire ça
+      - Inverser le point 2. et 3.
+	- Après avoir expliqué que /rename/ concurrent provoquent conflits
+	- Pourrait dire
+	  - "Remarquez que les opérations /rename/ sont des opérations systèmes"
+	  - "Pour éliminer conflits, peut décider de ne jouer qu'une seule opé /rename/ d'un ensemble d'opés concurrentes"
+	- Et retomber ensuite sur le point 4.
+	  - "Pour que cette approche soit viable, doit..."
+  - Section 5.2
+    - La seconde moitié de l'avant-dernier paragraphe ne me paraît pas nécessaire
+      - Surtout si je décompose ensuite la 5.3 en 2 sous-sections
+    - Peut garder le focus de cette section sur juste déterminer la /primary rename/ operation
+  - Section 5.3
+    - Le problème dans cette section est que je veux en fait présenter 2 algos différents
+    - Je veux présenter /revertRenameId/, ses objectifs et donner un exemple d'utilisation
+    - Et je veux présenter l'algo global pour intégrer une opération
+    - Les 2 algos se retrouvent entre-mêlés, ce qui gêne la compréhension
+    - Peut décomposer la 5.3 en 2 sections distinctes
+    - Une introduisant uniquement /revertRenameId/
+      - Comment illustrer son utilisation ?
+    - Une *Putting it all together*
+- Réunion papier
+  - Depuis la dernière réunion, j'ai
+    - Ajouté une phrase sur le formalisme pour représenter un interval d'identifiants correspondant à un bloc dans 2.1
+    - Remplacé le terme user experience dans 5.1
+      - Parle maintenant de "ne pas produire d'anomalies"
+    - Corrigé Algo 1 dans 4.2
+      - Utilisé encore /renamedBlocks/ alors que passé à /renamedIds/
+    - Mention de reproducibility lorsque je pointe vers le repo github des expériences
+    - Réduit la taille de la figure 9
+    - Indiqué que les algos sont qu'une partie de /renameId/ et /revertRenameId/ et que le reste se trouve en annexes
+  - Réunion
+    - Ajouter une section 4.3 *Optimisations*
+      - Y déplacer
+	- Le mécanisme de GC de l'opération /rename/
+	- Le mécanisme de compression de l'opération /rename/
+      - Revoir en conséquence le lien entre 4.2 et 4.3
+    - Section 4
+      - Ajouter pré-condition que le rename peut être appliqué uniquement si on est sur l'epoch parente
+    - Section 5.1
+      - Revoir figure 6
+	- Pourrait juste reprendre figure 5 et ajouter le rename de B
+      - Si explique au préalable que renameId a comme précondition d'être sur l'epoch parente
+      - Simplifierait l'explication du problème posé par rename concurrents
+      - Erreur de termes dans 5.1
+	- Je veux parler de choisir une epoch cible de l'ensemble des epochs
+	- Mais je parle actuellement de /rename/ operations
+	- Pas pareil
+      - Revoir le plan de la 5.1
+	- Reprendre l'exemple
+	- Expliquer l'arbre des epochs
+	- Expliquer que renameId ne me permet pas de passer d'un sibling à l'autre
+	- Besoin d'une relation de priority pour définir epoch cible
+	- Besoin d'une fonction pour établir le chemin entre epoch courante et epoch cible
+	- Besoin d'une fonction pour remonter l'arbre
+    - Section 5.2
+      - Pas clair qu'on utilise l'ordre lexicographique sur le PATH
+      - Faire un exemple plus complexe
+	- Noeud C qui fait un rename à partir de A1
+	- Pas grave que l'exemple soit distinct de celui fil rouge
+    - Réflexions
+      - Section 4.2
+	- Est-ce qu'on a besoin de montrer l'exemple qui ne fonctionne pas (Figure 4) ?
+	  - Ou on peut le supposer évident et donc le supprimer
+	- Est-ce qu'on laisse l'algo 1 là ?
+	  - En l'état, on va pas le lire
+	  - Manque des infos (genre commentaires) pour ça
+	  - Donc est-ce qu'il a besoin d'être à cet endroit ?
+  - Réunion <2021-05-06 Thu> à 09h30 pour refaire le point
+- Réunion Projet Informatique
+  - Objectifs initiaux
+    - 1ère période : conception
+    - 2nde période : implémentation
+    - 3ème période : fin implémentation + documentation
+  - De mon côté, j'avais à l'issue de la 1ère période, j'avais un diagramme de classes pour chacun de mes groupes
+    - Mais peu détaillé niveau méthodes et interactions
+    - Pas clair par exemple qui était chargé d'instancier un objet donné
+    - Vu qu'ils avaient du mal avec le diagramme de classe, j'avais postponé la partie conception de la BD
+  - Au cours de la 2nde période
+    - Ont commencé à coder
+    - Mais ont dû revenir sur la conception pour revenir sur les limites de leur diagramme de classes
+    - + quelques problèmes/difficultés rencontrées
+      - Utilisation d'une librairie graphique trop bas niveau
+      - Ont fait un plateau de jeu à cases hexagonales, donc quelques difficultés à faire matcher
+    - Chaque groupe m'a expliqué aussi galérer avec le rythme de travail
+      - J'ai pu constater une baisse du nombre de commits la semaine du 5 au 9 avril
+      - Vos groupes aussi ?
+    - Globalement, une 1ère version du jeu affichant le plateau
+      - Chez un groupe, peut déplacer l'équipe de personnages et rencontrer un évènement placeholder
+  - Donc quoi prévoir pour la 3ème ?
+  - Réunion
+    - Objectifs
+      - Faudrait qu'ils aient tous quelque chose à présenter
+    - Modalités d'évaluation
+      - Soutenance la dernière semaine
+      - Vendredi de l'avant-dernière semaine, envoi de l'ensemble des documents
+	- Documentation
+	  - Doc technique (Javadoc)
+	  - Diagramme de classes à jour
+	- Code
+	- Préparer soutenance : 20min de présentation + 10min de questions
+	  - Avec démo
+	  - P-e faire jouer une responsable de la formation dans le cadre de ces démos
+	  - Leur demander d'expliquer leur choix
+	    - Notamment au niveau du plateau
+	  - Leur demander de prendre du recul
+	    - Les bonnes décisions
+	    - Les mauvaises décisions
+    - Priorités
+      1. Avoir un prototype
+      2. Faire la javadoc et mettre le diagramme de classes à jour
+      3. Itérer
 - Meeting
-  - J'ai mon ATER à Polytech pour l'an prochain
+  - Cédric m'a informé que son frère, étudiant en DUT Info à l'IUT Nancy Charlemagne, est à la recherche d'un stage de fin d'études
+    - Si ça peut intéresser quelqu'un, je peux lui dire de vous contacter
+  - J'ai mon ATER à temps plein à Polytech pour l'an prochain
+  - PaPoC
+    - J'ai suivi PaPoC'21 ce lundi
+    - Plusieurs talks intéressants à suivre
+      - IBM Research qui a bossé sur des Delta-based Array CRDTs
+	- Arbitrary nesting, moving elements, no tombstones
+	- Faudra que j'étudie le papier et revois le talk
+	- Histoire de comprendre ces nouvelles structures
+	- Mais papier un extended abstract donc pas trop de détails
+	- Trouve quelques spécifications dans le talk qui ne sont pas dans le papier par exemple
+	- Pas vu de lien vers une implem open-source en survolant l'article
+      - Bienusa qui travaille sur un CRDT pour les droits d'accès pour un DFS
+	- Apporte une preuve de l'impossibilité d'assurer la confidentialité, l'intégrité et l'accessibilité dans un DFS
+	  - Faudrait que je revois ce qu'elles entendent par ces propriétés
+	  - Et quel choix elles font
+	- Mais peut justifier/définir l'objectif d'un nouveau CRDT pour les droits d'accès
+	- Par contre repose en partie sur un rôle d'admin
+	- Qui a l'air d'être défini de manière statique
+	- Peut poser problème en fonction des hypothèses du système
+      - Les gens de Ink and switch (Local-First Software) ont présenté Cambria, une solution pour l'évolution de schéma de données dans un dist sys
+	- Un problème que l'on rencontre dans MUTE
+	- Par exemple quand on mettait à jour notre implem de LS pour des noms d'attributs plus clairs
+	- Nous on utilise successivement plusieurs constructeurs pour créer notre objet
+	  - Mais si reçoit version plus récente de l'objet, n'arrive pas à le construire
+	- Eux proposent d'utiliser Lens, un langage permettant de décrire sous forme d'opérations l'évolution du schéma
+	- Cette description prend la forme de métadonnées
+	- Possible de composer un graphe pour "naviguer" entre les versions d'un objet à partir de ça
+	- Répliquer ce graphe permettrait à des noeuds potentiellement à des versions différentes de l'appli de collaborer
+  - Article
+    - Réunion jeudi dernier avec Olivier et Gérald pour me faire part de leurs retours et commentaires
+      - Quelques petites modifs à effectuer par-ci par-là
+      - Mais quelques sections à retravailler car confuses
+    - Cette semaine je me suis chargé d'effectuer les petites modifs
+    - Et préparer le terrain pour revoir les sections confuses
+    - Réunion ce jeudi pour rediscuter plus en détails de ces sections
+    - C'est cool, j'ai eu pas mal de retours sur des problèmes de ces sections
+      - Ce qui m'a permis prendre un peu de recul et d'y voir plus clair
+    - C'est cool, j'ai pas mal de changements à faire
+      - Globalement, pas mal de refactoring de la partie contribution en vue
+    - On se revoit jeudi matin prochain pour faire le point sur les modifs et itérer
   - Manuscrit
     - En train de traduire l'article de journal
     - Ajout d'une partie sur l'utilisation de l'opé de renommage comme base pour un mécanisme de synchro par snapshot
@@ -17296,7 +17708,7 @@ print (r.geeks)
       - Peut pousser la réflexion plus loin : au-delà des nouveaux pairs, pourrait utiliser cette approche pour synchroniser les pairs qui ont accumulé trop de retard sur l'état courant
       - Reste à définir quand est-ce qu'un noeud a accumulé trop de retard ?
       - Pour y répondre, étudie dans quels cas c'est plus rentable d'utiliser la méthode de synchro habituelle plutôt que celle par snapshot
-      - Pour le moment, liste juste les grandes lignes de cette section
+      - Pour le moment, établit juste les grandes lignes de cette section
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
