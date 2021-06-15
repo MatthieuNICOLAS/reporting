@@ -17684,7 +17684,7 @@ print (r.geeks)
       - Prépare slides pour webinar Fair & Smart
 ** Semaine du <2021-05-10 Mon> au <2021-05-12 Wed>
 *** Planned
-**** IN-PROGRESS Papier : Unifier sections sur la GC des epochs
+**** DONE Papier : Unifier sections sur la GC des epochs
 - Actuellement, a 2 sous-sections qui parlent de comment GC les métadonnées du mécanisme de renommage
   - Une 1ère une fois que j'ai présenté le renommage en centralisé
     - Repose uniquement sur la relation de causalité et la notion de stabilité causale pour GC
@@ -17698,17 +17698,618 @@ print (r.geeks)
 - Et inverser le déroulement
   - Déjà présenter le mécanisme pour GC les epochs dans le cas le plus général
   - Puis ensuite montrer que dans le cas sans renommages concurrents, la stabilité causale suffit
-**** TODO Papier : Refaire figure 10 sur la taille du document
+*** Done
+- Papier : Unifier sections sur la GC des epochs
+  - Y a moyen de simplifier les règles
+  - En fait, peut supprimer de l'arbre des epochs toutes les epochs précédentes ou concurrentes au LCA du sous-ensemble des epochs obtenu en
+    - Identifiant l'epoch /e/ causalement stable maximale
+    - Filtrant l'ensemble des epochs pour ne garder que celles supérieures ou égales à /e/ d'après la relation /priority/
+  - S'agit du sous-ensemble des epochs auxquelles les pairs du système sont potentiellement
+  - Nomme cet ensemble les /potential current epochs/
+  - Ah non, cet algo est incomplet et ne GC pas toutes les epochs qui pourraient l'être
+  - Par exemple, le LCA pourrait avoir une branche enfant d'epochs qu'on sait devenues obsolètes
+  - D'après l'énoncé, comme ces epochs obsolètes ne sont ni précédentes ou concurrentes au LCA, elles ne seraient pas supprimées
+  - Une bonne formulation serait de dire que le nouveau epoch tree est uniquement composé des /potential current epochs/ et des epochs appartenant au chemin entre elles et leur LCA
+  - Donc une epoch peut être GC si elle n'appartient à l'ensemble des epochs formant les chemins entre le LCA et les /potential current epochs/
+  - Plan de la section
+    - Indiquer qu'on veut GC les métadonnées du mécanismes de renommage
+    - Alors que le système progresse, des epochs et leurs données associées deviennent inutiles
+    - Doit identifier de quelles epochs on peut se séparer
+    - Pour cela, repose sur la notion de stabilité causale des opérations
+    - Une fois qu'une opération /rename/ est stable, cela signifie que tous les noeuds ont au moins progressé sur l'epoch correspondante
+      - Ou une epoch plus grande d'après la relation /priority/
+    - Permet donc d'identifier l'ensemble des /potential current epochs/
+    - Besoin de maintenir un chemin entre ces epochs
+    - Identifie donc leur LCA
+    - Définit les /required epochs/ comme l'ensemble des epochs qui appartiennent aux chemins entre LCA et les /potential current epochs/
+    - Peut GC toute epoch n'appartenant pas à /required epochs/
+    - Illustrer avec un exemple
+    - Faire remarquer que dans le cas sans operations /rename/ concurrentes, le LCA des /potential current epochs/ correspond à la /maximum causally stable epoch/
+      - Cette epoch devient donc la nouvelle racine de l'/epoch tree/
+** Semaine du <2021-05-17 Mon> au <2021-05-21 Fri>
+*** Planned
+*** Done
+- Meeting
+  - Réunion article avec Olivier et Gérald mardi matin
+    - Depuis la dernière fois, j'avais notamment retravaillé la partie sur la GC des métadonnées du mécanisme de renommage
+    - En changeant la manière de détecter/exprimer les epochs que l'on peut GC
+    - Donc on a validé ensemble ces changements et discuté de quelques améliorations à apporter à l'article
+    - Travaille depuis dessus
+    - Je finis une nouvelle version cet aprem et je leur envoie
+    - On se retrouve <2021-05-25 Tue> matin
+  - Sinon, j'ai de nouveau filé un coup de main à Martine Gautier pour Arteoz
+    - Cette fois-ci, c'était la bonne
+    - On a enfin redéployé une version fonctionnelle de Arteoz sur leur nouveau VPS
+    - Donc elles ne devraient plus avoir besoin de mon aide ces prochains temps (tant que ça marche)
+  - Notes réunion
+    - Claudia
+      - Réunion mardi avec Gérald pour ADT MUTE
+	- Très bien passé
+	- Plusieurs questions
+	- Savent pas encore si financement
+	- Pourrait avoir ingé à partir de septembre pour 2 ans sur MUTE
+      - D'ailleurs labo sait pas non plus si financement pour les thèses CORDI (?)
+      - Rapport d'avancement pour thèse à faire pour le 18 juin
+      - Pour Victorien
+	- A fait tous les documents nécessaires pour recrutement
+	- Devrait commencé le 1er juillet
+	- Sa soutenance est prévue pour le 14 juin 14h
+      - Réunions avec Alex
+      - Réunion avec P-A
+      - Commission de recrutements de MCF
+	- Thomas LAMBERT classé 1er
+	- Mais il est aussi classé 1er ailleurs
+	- À voir ce qu'il choisit
+      - Diverses reviews
+    - Alex
+      - Réunions avec Claudia
+      - Beaucoup de lectures d'articles
+      - A quasi terminé son rapport d'avancement
+      - Travaille sur la formalisation de son problème de recherche
+      - Réunion avec Claudia mardi
+    - Matthieu
+    - PA
+      - Réunion sur scénarios la semaine dernière
+      - Refait une réunion hier en présentiel
+	- Bien plus simple avec tableaux
+	- Pas mal d'interactions avec la couche crypto qui doivent être incorporés dans les scénarios (?)
+	- Retravaille ses scénarios du coup
+** Semaine du <2021-05-25 Tue> au <2021-05-28 Fri>
+*** Planned
+**** DONE Papier : Refaire figure 10 sur la taille du document
 - Regénérer l'image pour placer la légende en-dessous des graphes
-**** TODO Papier : Revoir les citations pour les propriétés de l'opération /rename/
+**** DONE Papier : Rapprocher les figures de leur utilisation dans le texte
+- Olivier faisait la remarque que l'article était rendu laborieux à lire à cause des allers-retours entre texte et figure
+- Maintenant que le gros de l'article est fixé, essayer de positionner les images au mieux
+*** Done
+- Réunion papier
+  - Depuis la dernière fois
+    - Modifié la figure 10 sur le mécanisme de garbage collection et mis à jour le texte correspondant
+    - Remonté dans la partie évaluation l'explication des temps d'intégration des opérations de renommage en fonction du cas
+    - Ré-écrit la section sur le report du rename vers la nouvelle epoch target en cas de concurrence élevée
+  - Question
+    - La dernière fois, on parlait d'utiliser des définitions pour mettre en avant certains termes
+      - priority relation, target epoch, LCA, potential current epochs, required epochs
+    - Quelle forme prendrait ces définitions ?
+      - Dans les papiers que je regarde, les définitions sont souvent formelles/mathématiques
+      - Est-ce que c'est ça qu'on entend ?
+- Projet informatique
+  - Groupe Thomas Champseix - Gabriel Masschelein
+    - Ont avancé sur le projet au cours de leur période d'entreprise
+    - Principale modif est l'ajout du système d'inventaire
+      - S'agit d'une liste de slots d'inventaires
+      - *Inventaire* hérite de *List*
+      - Les slots sont associés à un type d'objet (arme, equipement, ressource)
+	- Nombre paramétrisable de chacun de ces types de slots
+      - Pourquoi *Inventaire* n'est qu'une seule et unique liste ?
+	- Et non pas une liste pour les armes, une liste pour les équipements, une liste pour les ressources ?
+      - Comprend pas /listObjetUnique()/
+	- Permet de récupérer la liste des objets contenus dans l'inventaire en éliminant les doublons
+	  - /Distinct/ me paraît plus adapté que /Unique/
+	- C'est quoi le but d'une telle méthode ?
+      - Même remarque pour /slotsOfThisObjet()/
+      - Pas un problème dans /ajouter()/ de *Inventaire* quand j'ai plusieurs slots d'un même item mais que le 1er slot est plein ?
+      - Dans *Slot_Inventaire*, peut m'expliquer /plein()/ et /vide()/ ?
+      - Où sont créés les *Objets* dans le programme ?
+    - A l'air aussi d'avoir avancé sur la partie combat
+      - Mais l'exécution du main associé génère une erreur chez moi
+        #+BEGIN_SRC
+Traceback (most recent call last):
+  File "src/Combat.py", line 119, in <module>
+    c = Combat(equipe)
+  File "src/Combat.py", line 23, in __init__
+    self.creerMenu(eventJson["titre"], eventJson["texte"], eventJson["image"], self.lancement(self._equipe))
+  File "src/Combat.py", line 32, in lancement
+    listeOrdre = self.__creerOrdreTour(m, g)
+  File "src/Combat.py", line 75, in __creerOrdreTour
+    listeDesordre = ep1.getPersonnages() + ep2.getPersonnages()
+AttributeError: 'NoneType' object has no attribute 'getPersonnages'
+        #+END_SRC
+      - Sinon j'ai un problème avec /choisirCible()/
+	- Ça marche /random.choice()/ sur une *EquipeDePersonnages* ?
+	- Ça me paraît pas être une liste
+    - Problème est que les différents aspects du jeu ne sont pas connectés
+      - On a un plateau sur lequel on peut déplacer une équipe de personnages, rencontrer des évènements
+      - Mais pas de combat, pas de gestion d'inventaire
+    - Priorité IMO est d'en faire un jeu avec début, début de la boucle de gameplay et une fin
+    - Sur quoi êtes vous en train de travailler dorénavant ?
+      - Affichage de l'inventaire
+      - Prendre en compte l'équipement dans les stats
+      - Ajout des combats
+    - Prochaine réunion <2021-06-03 Thu> à 13h30
+  - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
+    - A réussi à lancer leur jeu
+      - Fallait que j'ajoute les .dll présents dans le répertoire native/ au classpath pour que ça marche
+    - Accède à une carte du monde où je peux me déplacer le long d'un chemin, avec des ennemis disposé à certains endroits
+    - Mais me déplace par sauts, et non pas case par case
+    - Ce qui a l'air de casser le jeu
+    - Rencontre une erreur après certains déplacements
+    - Obtient l'erreur suivante au lancement du programme (encore à l'écran titre)
+      #+BEGIN_SRC
+Thu May 20 08:42:42 CEST 2021 WARN:class org.newdawn.slick.opengl.PNGImageData failed to read the data
+java.lang.UnsupportedOperationException: Unsupported format for this image
+	at org.newdawn.slick.opengl.PNGDecoder.decode(PNGDecoder.java:272)
+	at org.newdawn.slick.opengl.PNGImageData.loadImage(PNGImageData.java:97)
+	at org.newdawn.slick.opengl.CompositeImageData.loadImage(CompositeImageData.java:62)
+	at org.newdawn.slick.opengl.CompositeImageData.loadImage(CompositeImageData.java:43)
+	at org.newdawn.slick.opengl.InternalTextureLoader.getTexture(InternalTextureLoader.java:292)
+	at org.newdawn.slick.opengl.InternalTextureLoader.getTexture(InternalTextureLoader.java:254)
+	at org.newdawn.slick.opengl.InternalTextureLoader.getTexture(InternalTextureLoader.java:187)
+	at org.newdawn.slick.Image.<init>(Image.java:192)
+	at org.newdawn.slick.tiled.TileSet.<init>(TileSet.java:124)
+	at org.newdawn.slick.tiled.TiledMap.load(TiledMap.java:661)
+	at org.newdawn.slick.tiled.TiledMap.<init>(TiledMap.java:106)
+	at org.newdawn.slick.tiled.TiledMap.<init>(TiledMap.java:90)
+	at src.game.Plateau.<init>(Plateau.java:23)
+	at src.game.StateGame.initStatesList(StateGame.java:41)
+	at org.newdawn.slick.state.StateBasedGame.init(StateBasedGame.java:164)
+	at org.newdawn.slick.AppGameContainer.setup(AppGameContainer.java:393)
+	at org.newdawn.slick.AppGameContainer.start(AppGameContainer.java:317)
+	at src.game.StateGame.main(StateGame.java:45)
+      #+END_SRC
+    - Une fois sur le plateau de jeu, rencontre l'erreur suivante si essaie de me déplacer vers la gauche (en dehors des limites du jeu)
+      #+BEGIN_SRC
+Thu May 20 08:44:14 CEST 2021 ERROR:Index -1 out of bounds for length 13
+java.lang.ArrayIndexOutOfBoundsException: Index -1 out of bounds for length 13
+	at org.newdawn.slick.tiled.TiledMap.getTileImage(TiledMap.java:199)
+	at src.game.Plateau.isVisitable(Plateau.java:128)
+	at src.game.Plateau.updateCharacter(Plateau.java:72)
+	at src.game.Plateau.update(Plateau.java:65)
+	at org.newdawn.slick.state.StateBasedGame.update(StateBasedGame.java:266)
+	at org.newdawn.slick.GameContainer.updateAndRender(GameContainer.java:663)
+	at org.newdawn.slick.AppGameContainer.gameLoop(AppGameContainer.java:411)
+	at org.newdawn.slick.AppGameContainer.start(AppGameContainer.java:321)
+	at src.game.StateGame.main(StateGame.java:45)
+Thu May 20 08:44:14 CEST 2021 ERROR:Game.update() failure - check the game code.
+org.newdawn.slick.SlickException: Game.update() failure - check the game code.
+	at org.newdawn.slick.GameContainer.updateAndRender(GameContainer.java:669)
+	at org.newdawn.slick.AppGameContainer.gameLoop(AppGameContainer.java:411)
+	at org.newdawn.slick.AppGameContainer.start(AppGameContainer.java:321)
+	at src.game.StateGame.main(StateGame.java:45)
+      #+END_SRC
+    - Rencontre l'erreur suivante si essaie d'affronter un boss
+      #+BEGIN_SRC
+java.io.FileNotFoundException: .\json\boss.json (No such file or directory)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:211)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:153)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:108)
+	at java.base/java.io.FileReader.<init>(FileReader.java:60)
+	at src.game.Boss.<init>(Boss.java:36)
+	at src.game.Plateau.updateCharacter(Plateau.java:84)
+	at src.game.Plateau.update(Plateau.java:65)
+	at org.newdawn.slick.state.StateBasedGame.update(StateBasedGame.java:266)
+	at org.newdawn.slick.GameContainer.updateAndRender(GameContainer.java:663)
+	at org.newdawn.slick.AppGameContainer.gameLoop(AppGameContainer.java:411)
+	at org.newdawn.slick.AppGameContainer.start(AppGameContainer.java:321)
+	at src.game.StateGame.main(StateGame.java:45)
+Thu May 20 08:45:24 CEST 2021 ERROR:Cannot invoke "org.newdawn.slick.Image.drawCentered(float, float)" because the return value of "src.game.Personnage.getImage()" is null
+java.lang.NullPointerException: Cannot invoke "org.newdawn.slick.Image.drawCentered(float, float)" because the return value of "src.game.Personnage.getImage()" is null
+	at src.game.Combat.render(Combat.java:166)
+	at org.newdawn.slick.state.StateBasedGame.render(StateBasedGame.java:199)
+	at org.newdawn.slick.GameContainer.updateAndRender(GameContainer.java:688)
+	at org.newdawn.slick.AppGameContainer.gameLoop(AppGameContainer.java:411)
+	at org.newdawn.slick.AppGameContainer.start(AppGameContainer.java:321)
+	at src.game.StateGame.main(StateGame.java:45)
+Thu May 20 08:45:24 CEST 2021 ERROR:Game.render() failure - check the game code.
+org.newdawn.slick.SlickException: Game.render() failure - check the game code.
+	at org.newdawn.slick.GameContainer.updateAndRender(GameContainer.java:691)
+	at org.newdawn.slick.AppGameContainer.gameLoop(AppGameContainer.java:411)
+	at org.newdawn.slick.AppGameContainer.start(AppGameContainer.java:321)
+	at src.game.StateGame.main(StateGame.java:45)
+      #+END_SRC
+      - Semble résolue si je change le chemin pour utiliser des "/" à la place des "\"
+      - Existe plusieurs façons de récupérer le file separator en Java
+	- https://mkyong.com/java/how-to-get-file-path-separator-in-java/
+      - Utiliser l'un d'entre eux
+    - C'est moi où vous me forcer à manger le fruit lors de l'event ?
+      - Que j'appuie sur A ou Z, le résultat semble le même
+    - Pourquoi perso_joueur de *StateGame* est défini comme un *Personnage* et non pas un *Joueur* ?
+      - Vous oblige à utiliser un cast
+      - Généralement une mauvaise pratique
+	- Peut être utile en cas de désérialisation
+	- Ou de manipulation de génériques
+      - Mais là c'est vous qui venez d'instancier l'objet
+    - Gagnerait à avoir une méthode statique qui instancie votre *Joueur* tout fait
+    - Pourquoi eventFruitAuSol est une méthode de *Evenement* et non pas une classe dédiée ?
+      - Comment vous faites si vous souhaitez ajouter un nouvel event ?
+    - Avez-vous la date de rendu ?
+    - Sur quoi êtes vous en train de travailler dorénavant ?
+      - Souhaiterait ajouter le moyen de dépenser des points de compétence
+    - Pistes possibles
+      - Correction de bugs (me paraît importante)
+      - Ajout de feedback (sons ? musiques ?)
+	- Oui
+      - Ajout d'un HUD
+	- En combat ou sur le plateau
+      - Garder en tête que ça peut faire l'objet de slides "perspectives" pour la soutenance
+	- Si intéressant d'un point de vue Conception
+    - Prochaine réunion <2021-06-02 Wed> à 15h30
+** Semaine du <2021-05-31 Mon> au <2021-06-04 Fri>
+*** Planned
+*** Done
+- Réflexion sur future work
+  - Stratégies pour minimiser nombre d'opérations /rename/ concurrentes
+    - Vraiment un intérêt ?
+    - J'ai dû mal à voir ce que je vais pouvoir faire de plus que laisser uniquement faire le noeud du groupe en ligne avec le plus grand identifiant
+      - En cas de panne du "chargé de renommage", le protocole de membership va le noter comme déconnecté
+      - Un nouveau "chargé de renommage" va donc être désigné et procéder au renommage
+      - Je vois pas quelle stratégie je pourrais proposer pour gérer les pannes qui seraient mieux que celles dans les protocoles de membership
+    - Quel(s) autre(s) paramètre(s) pourrais-je utiliser ?
+  - Stratégies pour déclencher opérations /rename/ avant que n'impacte performances utilisateurs
+    - Pour le moment, /rename/ a une complexité linéaire avec le nombre d'éléments à renommer
+    - N'a donc aucun contrôle sur le temps d'intégration de l'opération /rename/
+    - Doit déjà améliorer le mécanisme de renommage
+    - [ ] /renameBlock/ au lieu de /renameId/
+      - Comme /rename/ permet de réduire le nombre de blocs, permettrait d'avoir une fonction qui réduit son propre futur temps d'exec
+      - Et peut alors déclencher /rename/ dès qu'on atteint un certain nombre de blocs
+      - Mais rien ne permet de limiter le nombre de blocs qu'aura un pair dans son état au moment où il recevra le /rename/
+    - [ ] Implémentation basée sur un operation log
+      - Permet de déplacer la complexité temporelle sur le nombre d'opés manquantes
+	- Le temps d'intégration va dépendre du nombre d'opérations que j'ai dans mon log qui ne sont pas couvertes par l'opé de renommage
+      - Permet aussi de faire sauter la contrainte sur le /redo/
+      - Mais pas de contrôle sur le nombre d'opérations concurrentes à une opé /rename/
+    - Ces 2 améliorations sont orthogonales
+    - Les 2 peuvent se cumuler
+  - Verrait donc bien pour future work
+    1. Proposer /renameBlock()/ et /revertRenameBlock()/
+       -
+    2. Proposer une ou plusieurs stratégies pour déclencher opérations /rename/
+       - Et visant à émettre une opé /rename/ avant que son temps d'inté ne soit trop important
+       - Même si en vrai, ne peut pas garantir le temps d'exécution sur la copie des pairs distants
+       -
+- Réunion papier
+  - Depuis la dernière fois
+    - Ajouté les définitions des concepts importants (page 6 & 8)
+    - Indiqué que retirer le préfixe d'un id permet à revertRenameId() d'undo la transformation appliquée par renIdFromPredId() (page 7)
+    - Modifié la description de la figure 10 pour introduire le formalisme utilisé avant de décrire le scénario illustré (page 8)
+      - Epochs causalement stables, potential current epochs et required epochs
+    - Déplacé la légende la figure 11 (page 10)
+    - Changé les noms des catégories des opérations rename dans la section évaluation (page 11)
+    - Ajouté quelques lignes à la conclusion pour re-situer le contexte (page 12)
+  - Questions
+    - Est-ce que RenamableLogootSplit apparaît comme viable ?
+      - La complexité temporelle du mécanisme de renommage étant fonction du nombre d'éléments, de plus en plus coûteux
+      - À quel point ça peut être "éliminatoire" ?
+    - Quoi mettre en future work ?
+      - En l'état, peut pas minimiser l'impact du renommage sur l'expérience utilisateur
+      - Ajouter un paragraphe sur le design de /renameBlock/ et /revertRenameBlock/ ?
+	- Fonctions auraient pour but de renommer par blocs et non plus par identifiants
+	- Permettrait de déplacer la complexité du nombre d'identifiants, aka le nombre d'éléments, sur lequel on a aucun contrôle
+	- Au nombre de blocs, qu'on peut réduire en effectuant un renommage
+	- Après, ça donne pas un contrôle total sur le temps d'exec du renommage sur les autres noeuds
+	  - Si un noeud a appliqué des renommages concurrents, rien ne garantit le nombre de blocs dans son état au moment une fois revenu au LCA
+- Projet Informatique
+  - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
+    - Vu les différents commits
+    - Mais tjrs un bug au niveau du déplacement qui fait crash le jeu chez moi dès que j'essaie d'avancer
+    - J'ai pu le corriger en retirant la multiplication par delta dans /getNextX()/ et /getNextY()/
+    - Dans *Plateau*
+      - Pourquoi /getNextX()/ et /getNextY()/ renvoient des float ? Et non pas des int ?
+    - Problème avec les chemins des fichiers
+      - Sous Mac (et je suppose Linux), le chemin d'un fichier utilise des / et non \
+      - Dans le code, vous n'utilisez que \
+      - Fait planter le jeu au moment d'afficher un sprite
+      - Me semble que Windows acceptent les / dans les chemins de fichiers
+      - Sinon, existe la variable de classe /separator/ de *File* qui vaut soit / ou \ en fonction de l'OS utilisé
+    - Pas mal sinon les anims d'attaques
+    - Pas vu de modification de *Evenement* par contre
+    - Bugs à corriger
+      - De temps en temps, en finissant un combat, se retrouve avec un *Container* vide
+	- Qui fait planter au moment du render
+    - Ajout de musique
+    - Ajout de log du combat
+    - Prochain RDV <2021-06-09 Wed> à 09h00
+  - Groupe Thomas Champseix - Gabriel Masschelein
+    - Des commits depuis la semaine dernière
+    - Un lancement rapide du jeu ne m'a pas permis pas de constater de changements
+      - Peut toujours uniquement me balader sur la carte, rencontrer des "events"
+      - Les systèmes de combat et d'inventaire n'ont pas encore été implémenté
+      - Pas d'objectif de défini
+    - Pouvez-vous m'expliquer /creerEquipeMechant()/ de *Combat* ?
+    - D'ailleurs, petite erreur de nommage du paramètre self de /creerMechant()/
+    - Ajout des classes *Arme* et *Equipement*
+      - Pourquoi dans un même fichier que *Objet*
+    - Ont commencé à générer la doc
+      - Le rendu est pas mal
+      - Voir s'il y a moyen d'avoir un système pour naviguer entre les différentes pages
+      - Quel outil utilisez-vous ?
+      - Classes faites
+	- Jeu, Inventaire, Slot_Inventaire, Objet, Arme, Equipement
+    - Prochain RDV <2021-06-09 Wed> à 16h30
+- Réunion ATER
+  - Voir consignes pour rendu et soutenance du Projet Informatique
+  - Je profite de l'occasion pour aborder le sujet de Lucas Seznec
+    - Axel et Gaston, ses camarades pour le Projet Informatique, m'ont expliqué avoir un peu de mal à le contacter ces derniers temps
+    - Un peu peur qu'il soit en train de décrocher
+    - Est-ce que d'autres enseignant-e-s ont constaté ça dans d'autres modules ?
+    - À surveiller
+  - Modules
+    - BD1 IA2R
+      - En septembre - octobre
+      - 21h TD
+    - BD2 IA2R
+      - En novembre - décembre
+      - 21h TD
+    - BD1 EMME
+      - En novembre - décembre
+      - 18h/30h TD
+    - Algo 2A
+      - En mars - avril
+      -
+    - Algo dist
+      - En mars - avril
+      - 60h TD
+    - Génie Logiciel Avancé
+      - En janvier - février
+      - 12h CM + 12h TD : 30h TD
+    - Peut splitter algo dist avec un autre et prendre un groupe d'algo en 2A
+- Meeting
+  - ATER
+    - Réunion avec Vincent Despré <2021-06-03 Thu> pour fixer mon service de l'an prochain
+  - Article
+    - Eu une réunion sur l'article <2021-05-25 Tue>
+    - A envoyé une nouvelle version de l'article prenant en compte les retours en fin de semaine dernière
+    - Réunion <2021-06-04 Fri> pour refaire le point
+  - Rapport d'avancement
+  - Réunion
+    - François
+      - Thomas Lambert rejoint l'équipe à partir de septembre
+      - Réunion Open
+	- Lynda a présenté ses travaux sur la composition de services cognitifs
+      - A reçu l'argent de Open
+	- Devrait pouvoir financer publications/conférences
+      - Prépare la soutenance de Vic le 14
+	- Répétition mardi
+      - Réunion, avec Claudia, sur distribution sur les bourses de thèse
+    - Abir
+      - Reprend le travail sur le manuscrit
+      - Travaille sur le 3ème chapitre sur les scénarios de ses cas d'études
+	- 2 cas d'études qu'elle utilise dans chaque contribution
+    - Alexandre
+      - Une réunion par semaine avec Claudia
+      - Rapport d'avancement validé par Claudia, devrait l'envoyer cet aprem
+      - Étude bibliographique sur comment définir les interactions entre utilisateurs
+      - A contacté un chercheur pour récupérer un code
+	- Mais s'est fait redirigé vers un autre
+    - Carla
+      - Stage avec Clélie pour 2 mois
+      - Doit mettre en place plateforme expérimentale pour la thèse
+      - A commencé à se former
+    - Claudia
+      - Réunion avec Alex
+      - Réunion avec PA
+      - Participé aux jurys de Rennes et Grenoble
+      - A fait review ANR
+      - A eu un entretien pour qu'Inria fasse un article sur son parcours
+      - Part en vacs jusqu'au <2021-06-22 Tue>
+    - Matthieu
+    - Olivier
+      - Réunion avec JP, Anis, PA et moi
+    - PA
+      - Réunion avec Olivier et Claudia
+      - A ré-étudié un protocole de chiffrement de groupe : PKEM
+	- Pour le comparer à Signal et BD (?)
+      - A finalisé son rapport d'avancement
+      - A avancé sur les scénarios sur CRDTs pour contrôle d'accès
+** Semaine du <2021-06-07 Mon> au <2021-06-11 Fri>
+*** Planned
+**** DONE Papier : Voir avec Gérald et Olivier la question du self-plagiarism
+  - En comparant l'article avec celui de PaPoC, constate que plusieurs parties ont été reprises sans modifications
+    - Abstract, pour environ 50%
+    - Introduction, le 1er paragraphe
+    - Background, complètement
+    - System Model, complètement
+    - Proposed rename operation, complètement
+    - Dealing with concurrent updates, présentation des exemples
+    - Simulations and benchmarks, tout sauf le paragraphe sur les renommages concurrents
+  - Je me cite
+  - Mais est-ce suffisant ?
+**** DONE Papier : Voir avec Gérald et Olivier la question des keywords/index terms
+**** CANCELLED Papier : Revoir les citations pour les propriétés de l'opération /rename/
 - Pour le moment, référence core & nebula
 - Mais certaines propriétés sont des propriétés des Operation-based CRDTs
 - Une autre référence serait p-e plus indiquée
   - Spécification des CRDTs ?
   - Pure Op-based CRDTs ?
-**** TODO Papier : Rapprocher les figures de leur utilisation dans le texte
-- Olivier faisait la remarque que l'article était rendu laborieux à lire à cause des allers-retours entre texte et figure
-- Maintenant que le gros de l'article est fixé, essayer de positionner les images au mieux
+*** Done
+- Papier : Modifier conclusion
+  - Rework du paragraphe sur les performances de RLS
+  - Rework du paragraphe sur future work
+    - Ne mentionne que de nouvelles stratégies pour /priority/
+    - Ne détaille plus le comment, indique juste le but
+- Papier : Introduire annexes
+  - Qu'est-ce que j'ai envie de dire à cet endroit ?
+  - Pour Annexe A
+    - S'agit des fonctions restantes qui composent /renameId/
+    - /renIdLessThanFirstId/ (resp. /renIdGreaterThanLastId/) permet de gérer le cas où l'on renomme un id tel que /id < firstId/ (resp. /lastId < id/)
+    - L'insight de ces fonctions est qu'il n'y a pas besoin de modifier les identifiants n'appartenant pas à l'interval renommé (/[min(firstId, newFirstId), max(lastId, newLastId)]/)
+    - Dans les autres cas, comme /renIdFromPredId/, /renIdLessThanFirstId/ (resp. /renIdGreaterThanLastId/) prepends le prédécesseur de newFirstId (resp. newLastId) à id pour préserver l'ordre
+  - Pour Annexe B
+- Papier : Corriger /revRenIdGreaterThanNewLastId/
+  - En relisant les algos pour les expliquer, me suis rendu compte qu'il y avait un cas manquant
+  - Le cas où on a /lastId < id < newLastId/
+    - S'agit forcément d'un identifiant inséré en concurrence du bloc /firstId - lastId/ et du renommage
+  - /renameId(id) = newLastId + id/
+  - /revertRenameId(newLastId + id = newLastId + id/
+  - /revertRenameId()/ n'inverse donc pas /renameId()/
+  - Modification de /revertRenameId()/ pour détecter et traiter ce cas
+  - Mais ce problème s'accompagne d'autres cas manquants
+  - /newLastId + tail/ avec /tail < lastId/
+    - Si un identifiant /id/ de la forme /newLastId + tail/ avec /lastId < tail < newLastId/ existe
+    - Possible de générer un identifiant /id'/ entre /newLastId/ et /id/
+      - Ce dernier est alors forcément causalement après le renimmage
+    - Peut alors obtenir un /id'/ de la forme /newLastId + tail/ avec /tail < lastId/
+    - Exemple
+      - /lastId = <10, -6, 0, 3>/ avant /renameId/, /newLastId = <10, 0, 0, 3>/ après
+      - /id = <10, -2, 0, 0>/ avant /renameId/, /id = <10, 0, 0, 3><10, -2, 0, 0>/ après
+      - /id' = <10, 0, 0, 0><53, -2, 0, 0>
+    - Peut retourner /lastId + MIN_TUPLE + tail/ dans ce cas pour préserver l'ordre
+      - Donnerait <id' = <10, -6, 0, 3><MIN_TUPLE><53, -2, 0, 0> dans l'exemple
+      - On avait /newLastId < id' < id/
+      - On a bien toujours /lastId < id', id/ après l'inversion du renommage
+	- /<10, -6, 0, 3> <  <10, -6, 0, 3><MIN_TUPLE><53, -2, 0, 0> <  <10, -2, 0, 0>/
+  - /newLastId + tail/ avec /newLastId < tail/
+    - Uniquement possible s'il existe
+      - Un identifiant /id/ de la forme /newLastId + tail/ avec /lastId < tail < newLastId/
+	- S'agit forcément d'un identifiant inséré en concurrence du bloc /firstId - lastId/ et du renommage
+      - Un identifiant /id'/ tel que /position(newLastId) = position(id')/ et /nodeId(newLastId) < nodeId(id')/
+	- S'agit forcément d'un identifiant inséré en concurrence du bloc /firstId - lastId/ et du renommage
+    - Dans ce cas, possible d'insérer un nouvel identifiant entre /id/ et /id'/
+    - Et d'obtenir un identifiant /id"/ de la forme /newLastId + tail/ avec /newLastId < tail/
+      - Forcément inséré causalement après le renommage
+    - Exemple
+      - /lastId = <10, -6, 0, 3>/ avant /renameId/, /newLastId = <10, 0, 0, 3>/ après
+      - /id = <10, -2, 0, 0>/ avant /renameId/, /id = <10, 0, 0, 3><10, -2, 0, 0>/ après
+      - /id' = <10, 1, 0, 0>/ avant et après /renameId/
+	- Car en dehors de l'intervalle affecté par le renommage
+      - /id" = <10, 0, 0, 0><53, -2, 0, 0>/
+    - Peut simplement retourner /id"/ tel quel pour préserver l'ordre
+      - On avait /newLastId < id < id" < id'/
+      - On a bien toujours /lastId < id < id" < id'/ après l'inversion du renommage
+	- /<10, -6, 0, 3> < <10, -2, 0, 0> < <10, 0, 0, 0><53, -2, 0, 0> < <10, 1, 0, 0>/
+- Papier : Soumettre papier
+  - [X] Vérifier que les références sont complètes
+    - Citations must include full publication information—for articles, this means listing all authors, the article name, the publication’s full name, the volume, issue number, month, year of publication, and the pages cited.
+    - Peut utiliser un outil en ligne pour vérifier que les références sont conformes
+      - http://refassist.ieee.org/
+    - Confirmation number is 132427
+    - A reçu le PDF généré annoté
+    - Mais comprend pas les annotations
+  - [X] Valider le LaTeX à l'aide de l'outil en ligne
+    - http://latexqc.ieee.org/
+    - Fichier valide mais avec un warning
+     #+BEGIN_SRC
+Package fixltx2e Warning: fixltx2e is not required with releases after 2015
+(fixltx2e)                All fixes are now in the LaTeX kernel.
+(fixltx2e)                See the latexrelease package for details.
+     #+END_SRC
+    - Dû au package /dblfloatfix/
+    - Le retirer supprime le warning et n'a pas l'air de modifier le résultat
+  - [X] Valider le PDF
+    - Demande de valider le PDF au prélable
+    - Validation se fait à l'aide de l'outil suivant : https://ieee-pdfchecker.org/
+    - Le test est passé avec succès
+  - [ ] Préparer justification pour extension de prior publication
+    - Doit répondre aux questions suivantes
+      1. What are the novel contributions of the submitted paper (beyond the authors’ previous publication(s))?
+      2. What is the new content and in which sections does this content appear in the submission?
+      3. How do the contributions (and content) build on the previous published material?
+    - Doit aussi fournir les fichiers des prior publications
+      - Dans mon cas, le Doctoral Symposium de Midddleware et PaPoC
+  - [X] Vérifier nombre de mots de l'abstract
+    - Doit faire en 100 et 200 mots
+    - En fait 208 en l'état
+    - En supprimant /in the context of real-time collaborative editing/, tombe à 201 mots
+    - En remplaçant /As a result, identifiers tend to grow/ par /Identifiers hence tend to grow/, tombe à 199 mots
+  - [X] Utiliser les keywords/index terms parmi la sélection proposée
+    - Taxonomy disponible ici : https://ieeecs-media.computer.org/assets/pdf/taxonomy.pdf
+    - Pour le papier, ceux qui m'ont l'air valides
+      - C.2.4.b : Distributed applications
+      - D.2.8.B : Performance measures
+      - D.3.3.g : Data types and structures
+      - D.3.3.h : Distributed objects, components, containers
+      - D.4.5.e : High availability
+	- Mais se trouve dans la catégorie OS :/
+      - D.4.7.b : Distributed systems
+      - D.4.8.a : Measurements
+      - E.1.b : Distributed data structures
+      - H.3.4.b : Distributed systems
+      - H.3.4.e : Performance evaluation
+      - H.5.3.b : Collaborative computing
+      - H.5.3.c : Computer-supported cooperative work
+      - K.4.3.b : Computer-supported cooperative work
+    - Ne trouve pas de keywords en lien avec
+      - Consistency
+      - P2P
+      - Optimistic Replication
+    - Est-ce qu'il s'agit de termes à associer lors de la soumission du papier, ou à mettre directement l'article ?
+      - Les articles que j'ai récupéré utilisent plutôt leurs propres /Index Terms/
+  - [X] Créer compte sur ScholarOne Manuscripts
+    - Outil utilisé pour soumettre l'article
+    - Dispo ici : https://mc.manuscriptcentral.com/cs-ieee
+  - [X] Associer identifiant ORCID au compte ScholarOne Manuscripts
+    - Demandé par ScholarOne Manuscripts à la soumission de l'article
+    - Se créé ici : https://orcid.org/register
+  - [X] Vérifier qu'on tombe pas dans le cas du self-plagiarism
+    - Voir le contenu en commun avec l'article de PaPoC
+    - Si significant, voir comment on met ça en forme
+  - [ ] Ajouter les biographies et photos
+    - Submissions must include the following elements: title page, abstract, index terms, illustrations, bibliography, and author bios and photos.
+      - D'après la page : https://www.computer.org/publications/author-resources/peer-review/journals
+  - Temps de traitement de 6 à 12 mois
+- Projet Informatique
+  - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
+    - Plusieurs commits
+    - Fixent le problème du déplacement
+    - Pas de fix par contre pour le chemin des fichiers
+    - Ajoute des sons aux jeux
+    - Mais ne fonctionne pas chez moi
+      #+BEGIN_SRC
+AL lib: (WW) FreeContext: (0x7fe4dc6dd6d0) Deleting 64 Source(s)
+Exception in thread "main" java.lang.NoClassDefFoundError: com/jcraft/jorbis/Info
+	at org.newdawn.slick.openal.OggInputStream.<init>(OggInputStream.java:35)
+	at org.newdawn.slick.openal.OggDecoder.getData(OggDecoder.java:311)
+	at org.newdawn.slick.openal.SoundStore.getOgg(SoundStore.java:835)
+	at org.newdawn.slick.openal.SoundStore.getOgg(SoundStore.java:793)
+	at org.newdawn.slick.Music.<init>(Music.java:163)
+	at org.newdawn.slick.Music.<init>(Music.java:75)
+	at src.game.Joueur.<init>(Joueur.java:48)
+	at src.game.StateGame.initStatesList(StateGame.java:27)
+	at org.newdawn.slick.state.StateBasedGame.init(StateBasedGame.java:164)
+	at org.newdawn.slick.AppGameContainer.setup(AppGameContainer.java:393)
+	at org.newdawn.slick.AppGameContainer.start(AppGameContainer.java:317)
+	at src.game.StateGame.main(StateGame.java:57)
+Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:636)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:182)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:519)
+	... 12 more
+      #+END_SRC
+    - Erreur commune ou spécifique à ma config ?
+      - S'agissait d'un oubli d'ajout des librairies au repo
+      - Avec les librairies, ça marche mieux
+    - Pas d'avancée sur la javadoc
+      - Possible de la générer facilement via le menu Tools de Intellij Idea
+    - Diagramme de classes ?
+    - Lucas cas contact Covid
+      - Comment se passe pour la soutenance ?
+  - Groupe Thomas Champseix - Gabriel Masschelein
+    - Plusieurs commits
+    - Correction du bug pour le char
+    - Intégration des combats au mode exploration
+    - Bug empêchant le jeu de se fermer proprement en cas de défaite
+    - A pull juste avant la réunion
+    - N'est plus bloquant de perdre un combat
+    - Mais peut me balader en tant que zombie sur la carte
+    - Ajout d'objets pour l'inventaire, mais ne voit pas où c'est utilisé
+    - Conserve ses pvs d'un combat à l'autre ?
+      - Semblerait
+    - Pas d'avancée sur la pydoc
+    - Diagramme de classes ?
+** Semaine du <2021-06-14 Mon> au <2021-06-18 Fri>
+*** Planned
+**** TODO Papier : Voir avec Gérald et Olivier pour leur bio et photo
 **** IN-PROGRESS Thèse : Rédiger section sur LogootSplit
 - Me paraît une bonne façon d'entamer le manuscrit
 - Me permet de définir le formalisme des identifiants, la notion de blocs et les limites de cette version
@@ -17853,29 +18454,9 @@ print (r.geeks)
 - De façon à limiter le nombre d'exécutions du 2PC
 - Dispo ici : http://www.vldb.org/pvldb/vol14/p743-lu.pdf
 *** Done
-- Papier : Unifier sections sur la GC des epochs
-  - Y a moyen de simplifier les règles
-  - En fait, peut supprimer de l'arbre des epochs toutes les epochs précédentes ou concurrentes au LCA du sous-ensemble des epochs obtenu en
-    - Identifiant l'epoch /e/ causalement stable maximale
-    - Filtrant l'ensemble des epochs pour ne garder que celles supérieures ou égales à /e/ d'après la relation /priority/
-  - S'agit du sous-ensemble des epochs auxquelles les pairs du système sont potentiellement
-  - Nomme cet ensemble les /potential current epochs/
-  - Ah non, cet algo est incomplet et ne GC pas toutes les epochs qui pourraient l'être
-  - Par exemple, le LCA pourrait avoir une branche enfant d'epochs qu'on sait devenues obsolètes
-  - D'après l'énoncé, comme ces epochs obsolètes ne sont ni précédentes ou concurrentes au LCA, elles ne seraient pas supprimées
-  - Une bonne formulation serait de dire que le nouveau epoch tree est uniquement composé des /potential current epochs/ et des epochs appartenant au chemin entre elles et leur LCA
-  - Donc une epoch peut être GC si elle n'appartient à l'ensemble des epochs formant les chemins entre le LCA et les /potential current epochs/
-  - Plan de la section
-    - Indiquer qu'on veut GC les métadonnées du mécanismes de renommage
-    - Pour cela, repose sur la notion de stabilité causale des opérations
-    - Une fois qu'une opération /rename/ est stable, cela signifie que tous les noeuds ont au moins progressé sur l'epoch correspondante
-      - Ou une epoch plus grande d'après la relation /priority/
-    - Permet donc d'identifier l'ensemble des /potential current epochs/
-    - Besoin de conserver un chemin entre ces epochs
-    - Identifie donc leur LCA
-    - Définit les /required epochs/ comme l'ensemble des epochs qui appartiennent aux chemins entre LCA et les /potential current epochs/
-    - Peut GC toute epoch n'appartenant pas à /required epochs/
-    - Illustrer avec un exemple
+- Projet informatique
+  - Groupe Thomas Champseix - Gabriel Masschelein
+  - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
