@@ -17973,11 +17973,9 @@ org.newdawn.slick.SlickException: Game.render() failure - check the game code.
     - Les 2 peuvent se cumuler
   - Verrait donc bien pour future work
     1. Proposer /renameBlock()/ et /revertRenameBlock()/
-       -
     2. Proposer une ou plusieurs stratégies pour déclencher opérations /rename/
        - Et visant à émettre une opé /rename/ avant que son temps d'inté ne soit trop important
        - Même si en vrai, ne peut pas garantir le temps d'exécution sur la copie des pairs distants
-       -
 - Réunion papier
   - Depuis la dernière fois
     - Ajouté les définitions des concepts importants (page 6 & 8)
@@ -18210,7 +18208,7 @@ Package fixltx2e Warning: fixltx2e is not required with releases after 2015
     - Demande de valider le PDF au prélable
     - Validation se fait à l'aide de l'outil suivant : https://ieee-pdfchecker.org/
     - Le test est passé avec succès
-  - [ ] Préparer justification pour extension de prior publication
+  - [X] Préparer justification pour extension de prior publication
     - Doit répondre aux questions suivantes
       1. What are the novel contributions of the submitted paper (beyond the authors’ previous publication(s))?
       2. What is the new content and in which sections does this content appear in the submission?
@@ -18254,7 +18252,7 @@ Package fixltx2e Warning: fixltx2e is not required with releases after 2015
   - [X] Vérifier qu'on tombe pas dans le cas du self-plagiarism
     - Voir le contenu en commun avec l'article de PaPoC
     - Si significant, voir comment on met ça en forme
-  - [ ] Ajouter les biographies et photos
+  - [X] Ajouter les biographies et photos
     - Submissions must include the following elements: title page, abstract, index terms, illustrations, bibliography, and author bios and photos.
       - D'après la page : https://www.computer.org/publications/author-resources/peer-review/journals
   - Temps de traitement de 6 à 12 mois
@@ -18309,7 +18307,281 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
     - Diagramme de classes ?
 ** Semaine du <2021-06-14 Mon> au <2021-06-18 Fri>
 *** Planned
-**** TODO Papier : Voir avec Gérald et Olivier pour leur bio et photo
+*** Done
+- Projet informatique
+  - Groupe Thomas Champseix - Gabriel Masschelein
+    - Énormément de commits depuis la dernière réunion
+    - Quelques commits ont eu lieu après la date de rendu
+      - Jusqu'au mardi matin
+      - Est-ce que ces commits ont corrigé beaucoup de choses ?
+      - Correction d'un bug au niveau du calcul de dégâts fait au tank à l'aide du Panzerschrek
+      - Modification des contrôles au clavier
+      - Correction d'un bug au niveau des méthodes pour récupérer l'arme et l'armure du personnage pour le système de combat
+      - Export de la doc
+      - Export du diagramme de classes
+    - Lancer le jeu me permet de voir l'ajout des fonctionnalités suivantes
+      - Affichage du nombre de points de vie des personnages
+      - Limitation du déplacement à 1 case
+      - Ajout des contrôles au clavier
+      - Obtention d'un butin à l'issue d'un évènement (simple ou combat)
+	- Pas très intuitif comment on peut récupérer le butin
+      - Possibilité d'équiper des armes et protections à nos personnages
+      - Possibilité de stocker des patates
+      - Possibilité de consommer des patates pour se soigner
+      - Écran de défaite et fin du jeu si l'équipe est éliminée
+      - Écran de victoire et fin du jeu si l'équipe vainc le tank
+    - Bugs notés
+      - Le butin à l'issue d'un évènement apparaît même en cas de défaite
+    - Documentation
+      - Ok
+      - Quelques coquilles
+	- La description de *EquipeDePersonnages* qui est en fait celle d'une case
+    - Diagramme de classes
+      - Plutôt complet
+      - Dommage que la conception de la partie Gestion a disparu
+    - Remarques
+      - Déclenchement des combats me paraît un peu étrange
+	- C'est *Expedition* qui effectue le déplacement de l'équipe
+	- Demande alors à la *Case* sur laquelle l'équipe est si l'évènement se déclenche
+	- C'est ensuite *Jeu* qui examine où l'évènement s'est déclenché pour déterminer quel *Combat* ou quelle *Récompense* instancier
+      - Gestion des coordonnées de l'équipe
+	- Pourquoi c'est *EquipeDePersonnages* qui possède ses coordonnées ?
+	- Ça n'aurait pas plus de sens de déplacer cet attribut dans *Expedition* ?
+      - Pourquoi /getLoot()/ de *Evenement* est abstraite ?
+	- Quelle différence existe-t-il entre /getLoot()/ de *Récompense* et de *Combat* ?
+      - Est-ce que ça vous semble viable comment vous avez géré l'insensibilité du tank à toutes les attaques sauf au panzershrek ?
+	- Si non, avez-vous une idée/piste pour proposer mieux ?
+    - Bilan
+      - Groupe sérieux, qui a bossé globalement tout du long
+      - 215 commits, avec une répartition du travail qui m'a l'air bonne
+	- 80 pour Gabriel, 130 pour Thomas
+      - Rendu complet
+      - Projet avec un grand nombre de fonctionnalités
+	- Un peu peur un moment car les fonctionnalités n'étaient pas encore imbriquées ensemble
+      - Code plutôt propre
+	- Noms d'attributs, variables, méthodes clairs
+	- Des méthodes ! Et plutôt courtes en générale
+  - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
+    - Quelques commits depuis la dernière réunion
+    - Tous dans les temps par contre
+    - Correction de l'event du fruit
+    - Correction des chemins des fichiers
+    - Suppression d'un son de victoire
+    - Génération de la javadoc
+    - Ajout d'un timer pour l'objectif speedrun
+    - Génération d'un JAR
+      - Que je n'arrive pas à faire fonctionner
+    - MàJ du diagramme de classes
+    - Bugs notés
+      - Le JAR pas exécutable
+      - Action spéciale qui n'est pas utilisable
+    - Documentation
+    - Diagramme de classes
+      - Manque des flèches vers *StateGame*
+	- Genre de *Plateau*, *Recompense*, *Combat* et *Menu*
+    - Remarques
+      - Je ne vois une hierarchie de classes que pour *Personnage*, *Joueur* et *Boss* dans votre diagramme
+	- Y a-t-il un ou plusieurs endroits où ça serait utile de retravailler votre conception ?
+      - Pourquoi la méthode /ameliorerProgressionBoss()/ dans *Joueur* ?
+	- Instinctivement, mettrait ça dans *Plateau*
+	- Signifie que la classe *Joueur* connaît *Boss*, ou du moins le nombre de *Boss*
+    - Bilan
+      - Groupe sérieux
+	- Même si au début un peu de mal à travailler sur le projet
+	- Mais ont fait des efforts pour "rattraper" le retard
+      - Un effort sur la partie technique du projet
+	- Sprites, animations, sons
+      - Rendu complet
+      - 162 commits, avec à priori une répartition plutôt bonne
+      - Un ensemble de fonctionnalités de base
+      - Une technique plutôt avancée
+      - P-e des difficultés pour faire évoluer le projet
+	- Nouveaux évènements
+	- Boss avec des comportements particuliers
+- Meeting
+  - Eu les soutenances des projets que j'encadrais, donc fini les cours à Polytech pour cette année
+  - Complété et envoyé le rapport d'avancement à l'école doctorale
+  - Papier
+    - A envoyé une version complète de l'article à Gérald et Olivier
+    - En attendant retours de Gérald et Olivier, j'en ai profité pour revoir un peu les consignes pour la soumission de l'article et faire un peu de finition
+    - A reçu le feu vert pour soumettre l'article, manque juste la biographie et photo de Gérald
+  - Manuscrit
+    - A commencé à traduire l'article pour en faire des chapitres de mon manuscrit
+    - A traduit la partie contribution (renommage, inversion du renommage, garbage collection) et évaluation
+  - Réunion
+    - François
+      - Soutenance de Vic <2021-06-14 Mon>
+      - Visites de stage
+      - Comité de suivi individuel
+      - Séminaire stratégie pour les 30 ans de TELECOM Nancy
+      - Thomas Lambert a accepté le poste de McF à la rentrée
+    - Abir
+      - Avance sur la rédaction
+      - Réunion hier pour rapport d'avancement
+      - Préparé examen de rattrapage pour la semaine pro
+    - Alex
+      - Repris du code produit y a quelques mois pour faire des simulations
+	- A corrigé des bugs
+    - Carla
+      - Avance sur l'application
+	- Devrait avoir déployé d'ici la fin de semaine le chat et interface admin
+    - Clélie
+      - Repris les analyses de ses questionnaires
+	- Participants qui avaient comme assistant un humain ont + l'impression qu'il s'adapte pour les manipuler
+      - Travaille sur la conclusion de ses résultats
+    - Khalid
+      - Écrit rapport sur une thèse
+      - Réunion avec Abir
+    - Linda
+      - Travaille sur la composition de services cognitifs dans le cloud
+	- Quelques problèmes niveaux implémentation pour trouver dataset, pour mettre en place simulations
+	- Souhaite soumettre article mi-aout
+    - Matthieu
+    - PA
+      - Continue à formaliser une définition de CRDT pour gérer les droits d'accès
+	- Modèle operation-based, mais pas très concluant
+	- Part sur un modèle state-based
+** Semaine du <2021-06-21 Mon> au <2021-06-25 Fri>
+*** Planned
+**** DONE Thèse : Complèter section *Limites* de LogootSplit
+**** DONE Thèse : Traduire section *Overview*
+**** DONE Thèse : Traduire section *Compression et limitation de la taille de l'opération /rename/*
+**** DONE Thèse : Traduire section *Stockage des anciens états sur disque*
+**** DONE Thèse : Traduire section *Définition de relations de priorité plus optimales*
+**** DONE Papier : Voir avec Gérald et Olivier pour leur bio et photo
+**** DONE Papier : Rédiger *Summary of differences*
+*** Done
+- Papier : Voir avec Gérald et Olivier pour leur bio et photo
+  - Me manque plus que celle de Gérald
+  - Lui a envoyé un rappel
+  - A reçu sa bio et photo
+  - Version finale du papier complétée \o/
+- Papier : Rédiger *Summary of differences*
+  - Dans la version publiée à PaPoC, nous présentons
+    - le problème de la croissance non-bornée des métadonnées dans les Sequence CRDTs
+    - notre approche pour y répondre qui consiste à utiliser un mécanisme de renommage pour réduire ponctuellement les métadonnées de la structure
+    - RenamableLogootSplit, un nouveau Sequence CRDT incorporant un tel mécanisme
+      - Ce mécanisme prend la forme d'un nouveau type d'opération : l'opération /rename/
+    - le mécanisme de résolution de conflits permettant de rendre compatible l'opération /rename/ avec les autres types d'opérations des Sequence : /insert/ et /remove/
+    - une évaluation des performances de RenamableLogootSplit par rapport à l'état de l'art
+  - Mais une limitation de ce travail préliminaire était que nous n'abordions pas la problématique de la gestion d'opérations /rename/ concurrentes
+  - Dans cette version étendue, nous reprenons ces différents éléments et les complétons avec
+    - une définition plus détaillée de l'opération /rename/ de RenamableLogootSplit et des propriétés qu'elle doit respecter
+    - une présentation du mécanisme de résolution de conflits pour les opérations /rename/ concurrentes
+    - une présentation du mécanisme de garbage collection des métadonnées introduites par le mécanisme de renommage
+    - une évaluation des performances de RenamableLogootSplit en cas d'opérations /rename/ concurrentes
+- Meeting
+  - A enfin soumis le papier à TPDS
+    - Attente de 6 mois à 1 an
+  - Le but du jeu maintenant est de soutenir avant d'avoir reçu une réponse de TPDS
+  - Travaille donc sur le manuscrit de thèse
+    - Fini de traduire les sections pertinentes de l'article
+    - Doit maintenant rédiger du nouveau contenu
+    - Me penche sur l'état de l'art
+      - Relis la thèse de Brice Nédelec, Gérald et Luc
+** Semaine du <2021-06-28 Mon> au <2021-07-02 Fri>
+*** Planned
+**** DONE Thèse : Traduire section *Report de la transition vers la nouvelle époque cible*
+**** DONE Thèse : Ajouter plan chapitre sur *MUTE*
+**** DONE Thèse : Fusionner plan des chapitres sur *RenamableLogootSplit*
+- Est-ce que je garde le chapitre *Présentation de l'approche* séparé ?
+- Ou je le fusionne avec ?
+*** Done
+- Meeting
+  - A enfin soumis le papier à TPDS
+    - Attente de 6 mois à 1 an
+  - Le but du jeu maintenant est de soutenir avant d'avoir reçu une réponse de TPDS
+  - Travaille donc sur le manuscrit de thèse
+    - Fini de traduire les sections pertinentes de l'article
+    - Doit maintenant rédiger du nouveau contenu
+    - A ajouté le plan détaillé du chapitre sur MUTE
+    - Me penche sur l'état de l'art
+      - Relis la thèse de Brice Nédelec, Gérald et Luc
+    - En parallèle, réfléchis à comment je pourrais enrichir le chapitre sur RenamableLogootSplit
+      - A commencé à détailler les structures de données que j'utilise et que je propose
+  - Mon été va consister à rédiger la thèse
+  - Réunion
+    - François
+      - 2ème phase de Projet avec Linagora
+	- Plateforme collaborative fédérée
+      - En congés offline du 16 au 30 juillet
+      - En télétravail du 1er aout au 15 aout
+    - Abir
+      - Correction de ses rattrapages
+      - Rédige une bonne partie de son état de l'art
+	- Intégration BPM et IOT
+    - Carla
+      - Sur la mise en ligne de la plateforme
+	- Problème de port HTTPS sur la machine virtuelle
+      - Reste encore la mise en place du chat, du chatbot et du jeu pour le mois de Juillet
+    - Claudia
+      - Webinaire avec Fair & Smart
+	- Présentation de PA sur la partie blockchain
+      - Réunion avec Gérôme (c'est qui ?)
+	- Veut faire un audit de la signature des reçus (?)
+	- Peut faire des questionnaires aux clients pour établir la valeur de confiance
+      - A soumis papier à conf ICPP
+	- Synthèse sur comment calculer valeur de confiance dans collaboration basée sur contrat et trust-game
+      - Vic a démarré son contrat
+	- A discuté sur les différentes problématiques
+	  - Bases de données répliquées, maintien des contraintes d'uniqueness et de referential integrity
+	  - Formalisation des séquences répliquées & Dotted LogootSplit
+	  - RGA sur une solution d'entrelaçement
+    - Clélie
+      - Travaille sur le chatbot pour 2nde expérience
+      - Remis sous forme de notebook ses analyses de la 1ère expérience
+      - Va rédiger article
+      - Et doit continuer travaux sur chatbot
+    - Gérald
+      - Des réunions
+      - Va passer son été à relire ma thèse
+    - Khalid
+      - S'occupe de visites de stages
+      - A une soutenance de thèse la semaine pro
+      - Va passer son été à relire la thèse d'Abir
+    - Linda
+      - Fait des visites de stages
+      - Va envoyer article de journal lundi
+      - Travaille sur article de conf pour mi-aout
+	- Galère pour l'expérience
+	- Tente de contacter
+    - Matthieu
+    - Pierre-Antoine
+      - Travaille sur CRDT de contrôle d'accès
+      - Quelques évolutions côté Fair & Smart
+	- Nouveau cas d'utilisation avec signatures de reçus
+      - Présentation lors de Webinar Fair & Smart
+    - Victorien
+** Semaine du <2021-07-05 Mon> au <2021-07-09 Fri>
+*** Planned
+*** Done
+- Thèse : Ajout du plan détaillé de la section sur l'implem basée sur un operation-log
+- Thèse : Ajout du plan détaillé de la section sur la complexité temporelle des opérations
+- Thèse : Ajout du plan détaillé de la section conclusion sur RenamableLogootSplit
+** Semaine du <2021-07-12 Mon> au <2021-07-16 Fri>
+*** Planned
+**** IN-PROGRESS Thèse : Ajouter les définitions des structures de données utilisées
+- [X] Id-Tuple
+- [X] Id
+- [X] Id Interval
+- [X] LogootS Seq
+- [X] LogootSIns
+- [X] LogootSDel
+- [X] Former State
+- [X] LogootSRename
+- [X] Epoch
+- [X] Epoch Tree
+- [ ] RLS Seq
+**** TODO Thèse : Détailler plan de la section sur les *Transformées opérationnelles*
+**** TODO Thèse : Détailler plan de la section sur *WOOT*
+**** TODO Thèse : Détailler plan de la section sur *RGA*
+**** TODO Thèse : Détailler plan de la section sur *Treedoc*
+**** TODO Thèse : Détailler plan de la section sur *Logoot*
+**** TODO Thèse : Étudier si mécanisme de renommage applicable à RGASplit
+- Une piste de travail potentielle
+- Est-ce qu'il est spécifique à des Sequence CRDTs à positions densément ordonnées ?
+- Ou peut-on produire des fonctions de transformation des /insert/ et /remove/ concurrents pour RGASplit aussi ?
+  - Revoir pour cela RGASplit
 **** IN-PROGRESS Thèse : Rédiger section sur LogootSplit
 - Me paraît une bonne façon d'entamer le manuscrit
 - Me permet de définir le formalisme des identifiants, la notion de blocs et les limites de cette version
@@ -18453,10 +18725,109 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 - Et d'utiliser les epochs comme unité de commit
 - De façon à limiter le nombre d'exécutions du 2PC
 - Dispo ici : http://www.vldb.org/pvldb/vol14/p743-lu.pdf
+**** TODO CRDT : Lire *OWebSync: Seamless Synchronization of Distributed Web Clients*
+- Par Kristof Jannes, Bert Lagaisse et Wouter Joosen
+- Publié à TPDS en septembre 2021
+- A l'air de proposer un mécanisme d'anti-entropie basé sur Merkle Tree plus efficace que state of the art
+- Dispo ici : https://kristofjannes.com/papers/tpds_owebsync.pdf
 *** Done
-- Projet informatique
-  - Groupe Thomas Champseix - Gabriel Masschelein
-  - Groupe Lucas Seznec - Axel Thouvenin - Gaston Maimbourg
+- Réunion manuscrit
+  - Manuscrit
+    - A traduit l'article
+    - Prend la forme d'un chapitre contribution
+    - Par rapport au papier, j'ai ajouté plusieurs sous-sections
+      - Evolution du modèle de livraison des opérations
+	- Pour expliquer que les opérations doivent dorénavant être livrées après l'opération /rename/ qui a introduit leur époque
+	- Dans le papier, consistait en un paragraphe
+	- Veux détailler un peu plus ici
+      - Processus d'intégration d'une opération
+	- Aimerais bien une sous-section dédiée à ce sujet
+	- Mais comme dans l'article, n'arrive pas à vraiment à présenter/expliquer l'algo /revertRenameId/ sans déborder sur ce sujet
+	- Donc sais pas si je vais la conserver
+      - Preuve de correction de /renameId/
+	- But serait de montrer qu'au moins /renameId/ est valide
+	  - Déterministe
+	  - Préserve l'unicité des identifiants
+	  - Préserve l'ordre des identifiants
+	- Vu nombre de cas, pense que faisable "à la main"
+	- Ai noté histoire de ne pas oublier cette piste
+	- Mais pour le moment, ne me penche pas dessus
+      - Complexité temporelle
+	- Me paraît intéressant comme sous-section
+	- Me permet de re-expliquer le fonctionnement des différentes opérations, en local et distant, avant la partie évaluation expérimentale
+	- Me demande si je peux simplifier et ignorer la taille des identifiants dans mes complexités
+	  - Bien plus petit que le nombre d'éléments
+	  - Réinitialisée à chaque renommage
+      - Utilisation de l'opération /rename/ comme snapshot
+	- En avait parlé plusieurs fois mais jamais rédigé quelque chose à ce sujet
+	- Ai commencé à réfléchir
+      - Définition de relations de priorité pour minimiser traitements
+	- Une sous-section de l'article qui était passée à la trappe
+	- L'a fait revenir
+      - Implémentation alternative à base d'operation-log
+	- Présente une implémentation alternative du mécanisme de renommage
+      - Report de la transition vers la nouvelle époque principale
+	- Une sous-section de l'article qui était passée à la trappe
+	- L'a fait revenir
+    - Me reste à remettre la comparaison par rapport au /related work/
+      - Vais reprendre ce que j'avais noté sur Core & Nebula et LSEQ
+      - Réfléchissais à inclure d'autres travaux
+	- Travaux sur stabilité causale de Jim Bauwens et Elisa Gonzalez Boix
+	- Composing and Decomposing Op-Based CRDTs with Semidirect Products de Matthew Weidner, Heather Miller et Christopher Meiklejohn
+	  - Utilise OT pour composer des CRDTs ayant domaine similaire, mais opérations non-commutatives
+	    - Exemple du nombre sur lequel on peut faire une addition ou multiplication
+	- Legion/Merging OT and CRDT Algorithms
+	  - Plus capillotracté comme /related work/ IMO
+	  - S'agit d'architectures systèmes mêlant CRDT et OT, et non plus au niveau de la structure de données utilisée
+    - Autres pistes pour développer ce chapitre
+      - Peut couvrir plus en détails en les algos /renameId/ et /revertRenameId/
+	- Plutôt que de ne montrer que les cas principaux, peut avoir un ou plusieurs exemples plus poussés pour illustrer les cas que je présentais uniquement en annexe
+      - Mon mécanisme doit être un mécanisme existant de OT
+	- Mon arbre des époques n'est qu'une représentation alternative du log des opérations
+	- Reste à trouver lequel
+    - A commencé à planifier chapitre sur MUTE
+      - J'avais un peu de mal à trouver dans quelle direction aller avec ce chapitre
+      - Angle avec lequel je suis le plus confortable est de faire le point les éditeurs collaboratifs en local-first
+      - Permet de présenter MUTE
+      - Comment mes travaux s'inscrivent dedans
+      - Et les autres travaux autours
+	- Group awareness, chiffrement (Trusternity), évolution de schéma (Cambria)
+      - Et les pistes de recherche restantes
+	- CRDTs pour commentaires/suggestions, pour les styles, pour documents structurés
+	- Droits d'accès
+	- Problème d'utilisabilité du full P2P (récupérer les opérations, déchiffrer les messages, etc.)
+    - État de l'art
+      - Pour le moment, détaille LogootSplit
+	- Reprend ce que j'avais dans le papier
+	- Mais définie plus clairement les structures de données (tuples, identifiants, intervals d'identifiants, etc.) et les fonctions définies dessus
+	- Ainsi que le modèle de livraison des opérations
+      - Un peu de mal à voir ce que je dis sur LSEQ et Core & Nebula à ce stade du manuscrit
+  - Retours
+    - Pour la 2.3.4
+      - Pourrait inverser l'ordre avec la 2.3.3
+      - Présenter déjà l'algo globale
+      - Et puis ensuite présenter la brique /revertRenameId/
+    - Pour la partie /related work/
+      - Peut partir de stabilité causale, snapshotting
+      - Le but est de ne pas avoir une énumération de /related work/, mais un fil conducteur entre ces différents /related work/
+    - Pour état de l'art
+      - Peut ajouter aussi tout une partie sur problématiques dans systèmes distribués
+	- CAP
+	- Notamment consensus synchrone
+    - Pour la spécification faible et forte
+      - Peut l'indiquer au niveau de l'intention dans OT
+    - MUTE
+      - Ne pas partir dans tous les sens avec les pistes de travail
+	- Notamment la partie gestion des changements de version
+      - Peut plutôt organiser le chapitre en ayant une partie par couche
+	- Présentation
+	- Choix effectué
+	- Discussion
+	  - Où je peux ouvrir rapidement vers de nouvelles pistes
+  - Vise de ne pas se réinscrire ?
+    - Jusqu'au 30 septembre pour se réinscrire
+    - Peut déposer jusqu'au 22/10/2021 sans se réinscrire pour soutenance avant 31/12/2021
+    - Envoyer un mail à l'école doctorale pour demander comment ça se passe
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
