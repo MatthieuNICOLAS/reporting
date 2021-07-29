@@ -18560,6 +18560,154 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 - Thèse : Ajout du plan détaillé de la section conclusion sur RenamableLogootSplit
 ** Semaine du <2021-07-12 Mon> au <2021-07-16 Fri>
 *** Planned
+*** Done
+- Réunion manuscrit
+  - Manuscrit
+    - A traduit l'article
+    - Prend la forme d'un chapitre contribution
+    - Par rapport au papier, j'ai ajouté plusieurs sous-sections
+      - Evolution du modèle de livraison des opérations
+	- Pour expliquer que les opérations doivent dorénavant être livrées après l'opération /rename/ qui a introduit leur époque
+	- Dans le papier, consistait en un paragraphe
+	- Veux détailler un peu plus ici
+      - Processus d'intégration d'une opération
+	- Aimerais bien une sous-section dédiée à ce sujet
+	- Mais comme dans l'article, n'arrive pas à vraiment à présenter/expliquer l'algo /revertRenameId/ sans déborder sur ce sujet
+	- Donc sais pas si je vais la conserver
+      - Preuve de correction de /renameId/
+	- But serait de montrer qu'au moins /renameId/ est valide
+	  - Déterministe
+	  - Préserve l'unicité des identifiants
+	  - Préserve l'ordre des identifiants
+	- Vu nombre de cas, pense que faisable "à la main"
+	- Ai noté histoire de ne pas oublier cette piste
+	- Mais pour le moment, ne me penche pas dessus
+      - Complexité temporelle
+	- Me paraît intéressant comme sous-section
+	- Me permet de re-expliquer le fonctionnement des différentes opérations, en local et distant, avant la partie évaluation expérimentale
+	- Me demande si je peux simplifier et ignorer la taille des identifiants dans mes complexités
+	  - Bien plus petit que le nombre d'éléments
+	  - Réinitialisée à chaque renommage
+      - Utilisation de l'opération /rename/ comme snapshot
+	- En avait parlé plusieurs fois mais jamais rédigé quelque chose à ce sujet
+	- Ai commencé à réfléchir
+      - Définition de relations de priorité pour minimiser traitements
+	- Une sous-section de l'article qui était passée à la trappe
+	- L'a fait revenir
+      - Implémentation alternative à base d'operation-log
+	- Présente une implémentation alternative du mécanisme de renommage
+      - Report de la transition vers la nouvelle époque principale
+	- Une sous-section de l'article qui était passée à la trappe
+	- L'a fait revenir
+    - Me reste à remettre la comparaison par rapport au /related work/
+      - Vais reprendre ce que j'avais noté sur Core & Nebula et LSEQ
+      - Réfléchissais à inclure d'autres travaux
+	- Travaux sur stabilité causale de Jim Bauwens et Elisa Gonzalez Boix
+	- Composing and Decomposing Op-Based CRDTs with Semidirect Products de Matthew Weidner, Heather Miller et Christopher Meiklejohn
+	  - Utilise OT pour composer des CRDTs ayant domaine similaire, mais opérations non-commutatives
+	    - Exemple du nombre sur lequel on peut faire une addition ou multiplication
+	- Legion/Merging OT and CRDT Algorithms
+	  - Plus capillotracté comme /related work/ IMO
+	  - S'agit d'architectures systèmes mêlant CRDT et OT, et non plus au niveau de la structure de données utilisée
+    - Autres pistes pour développer ce chapitre
+      - Peut couvrir plus en détails en les algos /renameId/ et /revertRenameId/
+	- Plutôt que de ne montrer que les cas principaux, peut avoir un ou plusieurs exemples plus poussés pour illustrer les cas que je présentais uniquement en annexe
+      - Mon mécanisme doit être un mécanisme existant de OT
+	- Mon arbre des époques n'est qu'une représentation alternative du log des opérations
+	- Reste à trouver lequel
+    - A commencé à planifier chapitre sur MUTE
+      - J'avais un peu de mal à trouver dans quelle direction aller avec ce chapitre
+      - Angle avec lequel je suis le plus confortable est de faire le point les éditeurs collaboratifs en local-first
+      - Permet de présenter MUTE
+      - Comment mes travaux s'inscrivent dedans
+      - Et les autres travaux autours
+	- Group awareness, chiffrement (Trusternity), évolution de schéma (Cambria)
+      - Et les pistes de recherche restantes
+	- CRDTs pour commentaires/suggestions, pour les styles, pour documents structurés
+	- Droits d'accès
+	- Problème d'utilisabilité du full P2P (récupérer les opérations, déchiffrer les messages, etc.)
+    - État de l'art
+      - Pour le moment, détaille LogootSplit
+	- Reprend ce que j'avais dans le papier
+	- Mais définie plus clairement les structures de données (tuples, identifiants, intervals d'identifiants, etc.) et les fonctions définies dessus
+	- Ainsi que le modèle de livraison des opérations
+      - Un peu de mal à voir ce que je dis sur LSEQ et Core & Nebula à ce stade du manuscrit
+  - Retours
+    - Pour la 2.3.4
+      - Pourrait inverser l'ordre avec la 2.3.3
+      - Présenter déjà l'algo globale
+      - Et puis ensuite présenter la brique /revertRenameId/
+    - Pour la partie /related work/
+      - Peut partir de stabilité causale, snapshotting
+      - Le but est de ne pas avoir une énumération de /related work/, mais un fil conducteur entre ces différents /related work/
+    - Pour état de l'art
+      - Peut ajouter aussi tout une partie sur problématiques dans systèmes distribués
+	- CAP
+	- Notamment consensus synchrone
+    - Pour la spécification faible et forte
+      - Peut l'indiquer au niveau de l'intention dans OT
+    - MUTE
+      - Ne pas partir dans tous les sens avec les pistes de travail
+	- Notamment la partie gestion des changements de version
+      - Peut plutôt organiser le chapitre en ayant une partie par couche
+	- Présentation
+	- Choix effectué
+	- Discussion
+	  - Où je peux ouvrir rapidement vers de nouvelles pistes
+  - Vise de ne pas se réinscrire ?
+    - Jusqu'au 30 septembre pour se réinscrire
+    - Peut déposer jusqu'au 22/10/2021 sans se réinscrire pour soutenance avant 31/12/2021
+    - Envoyer un mail à l'école doctorale pour demander comment ça se passe
+** Semaine du <2021-07-19 Mon> au <2021-07-23 Fri>
+*** Planned
+**** DONE Thèse : Détailler plan de la section *Mitigation du surcoût des séquences répliquées sans conflits*
+**** DONE PhD : Contacter IAEM à propos de la réinscription
+**** DONE Thèse : Détailler plan de la section sur *Processus d'intégration d'une opération*
+**** DONE Thèse : Rédiger section *Modèle de livraison* de *LogootSplit*
+*** Done
+- Thèse : Ajouter schéma architecture système de MUTE
+  - Éléments du schéma à considérer
+    - Les composants
+      - Navigateurs web, bots, serveur de signalling, Pulsar
+    - Les connexions
+      - Permanente
+	- Distinguer les connexions WebRTC et Websocket ?
+	  - Trop détaillé p-e ?
+      - Temporaire (pair avec serveur de signalling)
+      - Optionnelle (pair avec Pulsar, pair avec Bot)
+  - Plusieurs questions
+    - [ ] Est-ce que la connexion au *BotStorage* s'effectuait via Netflux et le serveur de signalling ?
+      - Ou était-ce codé en dur dans l'application ?
+    - [ ] Est-ce que 2 bots sont connectés directement via Netflux ?
+      - Me souviens pas d'un tel cas d'utilisation
+      - Lorsqu'on avait le bot de traduction, avait-on le *BotStorage* ?
+    - [ ] Est-ce que j'indique l'existence des serveurs STUN et TURN dans ce schéma ?
+      - Sont nécessaires pour le fonctionnement du protocole WebRTC
+      - Donc devraient apparaîtrent IMO
+      - Mais très spécifique au protocole WebRTC
+	- N'est-ce pas trop détaillé ?
+** Semaine du <2021-07-26 Mon> au <2021-07-30 Fri>
+*** Planned
+**** DONE Thèse : Détailler plan de la section sur l'implémentation de *Exactly-once delivery* dans MUTE
+**** DONE Thèse : Détailler plan de la section sur l'implémentation de *Causal-remove delivery* dans MUTE
+**** DONE Thèse : Détailler plan de la section sur l'implémentation de *Epoch-based delivery* dans MUTE
+**** DONE Thèse : Détailler plan de la section sur l'implémentation du *Mécanisme d'anti-entropie* dans MUTE
+**** DONE Thèse : Retrouver le nom de la structure de données couplant un version vector à un ensemble des dots
+- Permet de représenter efficacement causal context avec des "trous"
+- Remplacer le version vector dans *Sync* par cette structure de données nous permettrait de retirer la contrainte de FIFO delivery
+- Victorien pense que cette structure est décrite dans un des papiers suivants
+  - [X] Concise Version Vectors in WinFS
+  - [X] Optimized OR-Sets Without Ordering Constraints
+- Les lire
+**** IN-PROGRESS Thèse : Détailler plan de la section sur la couche sécurité dans MUTE
+- Relire délivrables de JP pour Open-PaaS:NG
+**** IN-PROGRESS Thèse : Ajouter schéma architecture système de MUTE
+**** TODO Thèse : Ajouter schéma architecture logicielle de MUTE
+**** TODO ATER : Contacter Vincent à propos du CM d'Algo
+**** TODO Thèse : Retravailler section *Limites* de *LogootSplit*
+- Le contenu de cette section correspond à la traduction de l'article pour TPDS
+- Mais ayant développé la section sur *LogootSplit*, cette partie ne doit plus s'intégrer correctement avec le reste
+- La retravailler
 **** IN-PROGRESS Thèse : Ajouter les définitions des structures de données utilisées
 - [X] Id-Tuple
 - [X] Id
@@ -18572,19 +18720,27 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 - [X] Epoch
 - [X] Epoch Tree
 - [ ] RLS Seq
+**** IN-PROGRESS Thèse : Rédiger section sur LogootSplit
+- Me paraît une bonne façon d'entamer le manuscrit
+- Me permet de définir le formalisme des identifiants, la notion de blocs et les limites de cette version
+**** TODO Thèse : Détailler plan de la section sur *Related work*
+**** TODO Thèse : Détailler plan de la section sur *Problématiques des systèmes distribués*
 **** TODO Thèse : Détailler plan de la section sur les *Transformées opérationnelles*
 **** TODO Thèse : Détailler plan de la section sur *WOOT*
 **** TODO Thèse : Détailler plan de la section sur *RGA*
 **** TODO Thèse : Détailler plan de la section sur *Treedoc*
 **** TODO Thèse : Détailler plan de la section sur *Logoot*
+**** TODO Thèse : Réfléchir à intégrer une section sur les modèles de cohérence
+- Souhaite expliquer que les CRDTs garantissent le modèle de cohérence forte à terme
+- Me permet de justifier les contraintes sur le modèle de livraison des messages pour LogootSplit
+  - Et probablement RenamableLogootSplit
+- Pourrais p-e intégrer cette section dans celle sur les problématiques des systèmes distribués
+  - Quand j'aborderai le principe de la réplication optimiste
 **** TODO Thèse : Étudier si mécanisme de renommage applicable à RGASplit
 - Une piste de travail potentielle
 - Est-ce qu'il est spécifique à des Sequence CRDTs à positions densément ordonnées ?
 - Ou peut-on produire des fonctions de transformation des /insert/ et /remove/ concurrents pour RGASplit aussi ?
   - Revoir pour cela RGASplit
-**** IN-PROGRESS Thèse : Rédiger section sur LogootSplit
-- Me paraît une bonne façon d'entamer le manuscrit
-- Me permet de définir le formalisme des identifiants, la notion de blocs et les limites de cette version
 **** TODO Papier : Relire *A Conflict-Free Replicated JSON Datatype* de Kleppmann
 - A été publié dans TPDS
 - Permettra de voir le format/les termes employés
@@ -18718,6 +18874,11 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
   - Moi l'opération de renommage n'est pas commutative avec elle-même
   - Je ne peux donc pas utiliser la même technique
 - À valider au cours d'une nouvelle lecture
+**** TODO CRDT : Voir utilisation des CRDTs dans Dat Protocol
+- Les CRDTs sont assez mis en avant dans le cadre de IPFS
+  - Voir https://research.protocol.ai/tutorials/resnetlab-on-tour/mutable-content/
+- Me semble que Dat Protocol était aussi intéressé par la techno
+- Voir leurs derniers travaux à ce sujet et si ça peut faire des cas d'utilisations intéressants/perspectives intéressantes
 **** TODO Distributed Systems : Lire *Epoch-based Commit and Replication in Distributed OLTP Databases*
 - Par Yi Lu, Lei Cao, Xiangyao Yu, Samuel Madden
 - Si je pige bien, dans le contexte des transactions distribuées
@@ -18731,103 +18892,54 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 - A l'air de proposer un mécanisme d'anti-entropie basé sur Merkle Tree plus efficace que state of the art
 - Dispo ici : https://kristofjannes.com/papers/tpds_owebsync.pdf
 *** Done
-- Réunion manuscrit
-  - Manuscrit
-    - A traduit l'article
-    - Prend la forme d'un chapitre contribution
-    - Par rapport au papier, j'ai ajouté plusieurs sous-sections
-      - Evolution du modèle de livraison des opérations
-	- Pour expliquer que les opérations doivent dorénavant être livrées après l'opération /rename/ qui a introduit leur époque
-	- Dans le papier, consistait en un paragraphe
-	- Veux détailler un peu plus ici
-      - Processus d'intégration d'une opération
-	- Aimerais bien une sous-section dédiée à ce sujet
-	- Mais comme dans l'article, n'arrive pas à vraiment à présenter/expliquer l'algo /revertRenameId/ sans déborder sur ce sujet
-	- Donc sais pas si je vais la conserver
-      - Preuve de correction de /renameId/
-	- But serait de montrer qu'au moins /renameId/ est valide
-	  - Déterministe
-	  - Préserve l'unicité des identifiants
-	  - Préserve l'ordre des identifiants
-	- Vu nombre de cas, pense que faisable "à la main"
-	- Ai noté histoire de ne pas oublier cette piste
-	- Mais pour le moment, ne me penche pas dessus
-      - Complexité temporelle
-	- Me paraît intéressant comme sous-section
-	- Me permet de re-expliquer le fonctionnement des différentes opérations, en local et distant, avant la partie évaluation expérimentale
-	- Me demande si je peux simplifier et ignorer la taille des identifiants dans mes complexités
-	  - Bien plus petit que le nombre d'éléments
-	  - Réinitialisée à chaque renommage
-      - Utilisation de l'opération /rename/ comme snapshot
-	- En avait parlé plusieurs fois mais jamais rédigé quelque chose à ce sujet
-	- Ai commencé à réfléchir
-      - Définition de relations de priorité pour minimiser traitements
-	- Une sous-section de l'article qui était passée à la trappe
-	- L'a fait revenir
-      - Implémentation alternative à base d'operation-log
-	- Présente une implémentation alternative du mécanisme de renommage
-      - Report de la transition vers la nouvelle époque principale
-	- Une sous-section de l'article qui était passée à la trappe
-	- L'a fait revenir
-    - Me reste à remettre la comparaison par rapport au /related work/
-      - Vais reprendre ce que j'avais noté sur Core & Nebula et LSEQ
-      - Réfléchissais à inclure d'autres travaux
-	- Travaux sur stabilité causale de Jim Bauwens et Elisa Gonzalez Boix
-	- Composing and Decomposing Op-Based CRDTs with Semidirect Products de Matthew Weidner, Heather Miller et Christopher Meiklejohn
-	  - Utilise OT pour composer des CRDTs ayant domaine similaire, mais opérations non-commutatives
-	    - Exemple du nombre sur lequel on peut faire une addition ou multiplication
-	- Legion/Merging OT and CRDT Algorithms
-	  - Plus capillotracté comme /related work/ IMO
-	  - S'agit d'architectures systèmes mêlant CRDT et OT, et non plus au niveau de la structure de données utilisée
-    - Autres pistes pour développer ce chapitre
-      - Peut couvrir plus en détails en les algos /renameId/ et /revertRenameId/
-	- Plutôt que de ne montrer que les cas principaux, peut avoir un ou plusieurs exemples plus poussés pour illustrer les cas que je présentais uniquement en annexe
-      - Mon mécanisme doit être un mécanisme existant de OT
-	- Mon arbre des époques n'est qu'une représentation alternative du log des opérations
-	- Reste à trouver lequel
-    - A commencé à planifier chapitre sur MUTE
-      - J'avais un peu de mal à trouver dans quelle direction aller avec ce chapitre
-      - Angle avec lequel je suis le plus confortable est de faire le point les éditeurs collaboratifs en local-first
-      - Permet de présenter MUTE
-      - Comment mes travaux s'inscrivent dedans
-      - Et les autres travaux autours
-	- Group awareness, chiffrement (Trusternity), évolution de schéma (Cambria)
-      - Et les pistes de recherche restantes
-	- CRDTs pour commentaires/suggestions, pour les styles, pour documents structurés
-	- Droits d'accès
-	- Problème d'utilisabilité du full P2P (récupérer les opérations, déchiffrer les messages, etc.)
-    - État de l'art
-      - Pour le moment, détaille LogootSplit
-	- Reprend ce que j'avais dans le papier
-	- Mais définie plus clairement les structures de données (tuples, identifiants, intervals d'identifiants, etc.) et les fonctions définies dessus
-	- Ainsi que le modèle de livraison des opérations
-      - Un peu de mal à voir ce que je dis sur LSEQ et Core & Nebula à ce stade du manuscrit
-  - Retours
-    - Pour la 2.3.4
-      - Pourrait inverser l'ordre avec la 2.3.3
-      - Présenter déjà l'algo globale
-      - Et puis ensuite présenter la brique /revertRenameId/
-    - Pour la partie /related work/
-      - Peut partir de stabilité causale, snapshotting
-      - Le but est de ne pas avoir une énumération de /related work/, mais un fil conducteur entre ces différents /related work/
-    - Pour état de l'art
-      - Peut ajouter aussi tout une partie sur problématiques dans systèmes distribués
-	- CAP
-	- Notamment consensus synchrone
-    - Pour la spécification faible et forte
-      - Peut l'indiquer au niveau de l'intention dans OT
-    - MUTE
-      - Ne pas partir dans tous les sens avec les pistes de travail
-	- Notamment la partie gestion des changements de version
-      - Peut plutôt organiser le chapitre en ayant une partie par couche
-	- Présentation
-	- Choix effectué
-	- Discussion
-	  - Où je peux ouvrir rapidement vers de nouvelles pistes
-  - Vise de ne pas se réinscrire ?
-    - Jusqu'au 30 septembre pour se réinscrire
-    - Peut déposer jusqu'au 22/10/2021 sans se réinscrire pour soutenance avant 31/12/2021
-    - Envoyer un mail à l'école doctorale pour demander comment ça se passe
+- Thèse : Retrouver le nom de la structure de données couplant un version vector à un ensemble des dots
+  - Dans *Optimized OR-Sets Without Ordering Constraints*, auteurs proposent /Interval Version Vectors/
+    - Un version vector où pour chaque entrée, on maintient un ensemble d'intervals
+    - Aggrège les timestamps des opérations reçues dans des intervals
+    - Potentiellement des "trous" entre 2 intervals, indiquant une opération non reçue
+    - Permet ainsi de représenter de manière efficace les opérations reçues
+    - Compatible avec une livraison out-of-order des opérations
+    - À terme, compacte en 1 seul interval les opérations d'un pair
+    - Mentionne et se compare /version vectors with exceptions (VVwE)/
+      - Proposée dans *Concise Version Vector in WinFS*
+      - Permet aussi la livraison out-of-order
+      - Consiste à conserver un /version vector/ et un vecteur d'ensembles de numéros de séquence
+      - Le /version vector/ maintient l'opération la plus récente pour chaque pair
+      - Un ensemble de numéros de séquence liste les opérations dont on connaît l'existence mais qu'on a pas encore reçu
+	- Connaît leur existence car on a reçu une opération avec un numéro de séquence plus élevé
+	- Correspond donc aux "trous" dans la liste des opérations de ce pair reçues
+    - Argue que les /Interval Version Vectors/ sont plus efficaces pour représenter l'ensemble des opérations reçues
+- Thèse : Détailler plan de la section sur la couche sécurité dans MUTE
+  - Vise chiffrement de bout en bout
+  - Présenter mécanisme de chiffrement à base de secret partagé
+  - Expliciter limites
+    - Secret partagé via le réseau
+    - Donc utile seulement si attaquant a loupé cette communication initiale
+  - Souhaite garantir backward et forward secrecies
+    - Backward : nouveau pair ne peut pas déchiffrer les messages précédemments envoyés
+    - Forward : ancien pair ne peut pas déchiffrer les messages envoyés après son départ
+  - Besoin de mettre à jour clé au fur et à mesure des évolutions du groupe
+  - Comment procéder à l'évolution de la clé en distribué ?
+    - Pourrait mettre en place LWW-Register pour secret partagé
+  - Présenter mécanisme de chiffrement à base de clé de groupe
+  - Implémente protocole Burmester - Desmedt pour établir la clé de chiffrement de groupe
+  - Nécessite clés publiques des différents participants
+  - Besoin d'authentifier les clés publiques pour éviter man-in-the-middle attack
+  - Présenter Trusternity
+    - Mécanisme d'audit des PKI
+  - Présenter fonctionnement du protocole BD
+  - Discuter des limites de mécanisme
+    - Requiert participation de l'ensemble des noeuds lors évolution du groupe
+      - Peut être effectué de manière asynchrone
+      - Mais quid des communications durant le re-keying ?
+    - Computationnellement lourd
+  - Discuter des perspectives
+    - Contrôle d'accès
+      - Problème ouvert
+      - Citer travaux de Bienusa et al. à PaPoC'21 comme piste
+    - Détection et éviction de pairs malhonnêtes
+      - Citer travaux de Vic
+      - Nécessiterait évolution du CRDT pour résoudre les équivoques détectés
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
