@@ -18699,10 +18699,84 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
   - [X] Concise Version Vectors in WinFS
   - [X] Optimized OR-Sets Without Ordering Constraints
 - Les lire
-**** IN-PROGRESS Thèse : Détailler plan de la section sur la couche sécurité dans MUTE
+**** DONE Thèse : Détailler plan de la section sur la couche sécurité dans MUTE
 - Relire délivrables de JP pour Open-PaaS:NG
+*** Done
+- Thèse : Retrouver le nom de la structure de données couplant un version vector à un ensemble des dots
+  - Dans *Optimized OR-Sets Without Ordering Constraints*, auteurs proposent /Interval Version Vectors/
+    - Un version vector où pour chaque entrée, on maintient un ensemble d'intervals
+    - Aggrège les timestamps des opérations reçues dans des intervals
+    - Potentiellement des "trous" entre 2 intervals, indiquant une opération non reçue
+    - Permet ainsi de représenter de manière efficace les opérations reçues
+    - Compatible avec une livraison out-of-order des opérations
+    - À terme, compacte en 1 seul interval les opérations d'un pair
+    - Mentionne et se compare /version vectors with exceptions (VVwE)/
+      - Proposée dans *Concise Version Vector in WinFS*
+      - Permet aussi la livraison out-of-order
+      - Consiste à conserver un /version vector/ et un vecteur d'ensembles de numéros de séquence
+      - Le /version vector/ maintient l'opération la plus récente pour chaque pair
+      - Un ensemble de numéros de séquence liste les opérations dont on connaît l'existence mais qu'on a pas encore reçu
+	- Connaît leur existence car on a reçu une opération avec un numéro de séquence plus élevé
+	- Correspond donc aux "trous" dans la liste des opérations de ce pair reçues
+    - Argue que les /Interval Version Vectors/ sont plus efficaces pour représenter l'ensemble des opérations reçues
+- Thèse : Détailler plan de la section sur la couche sécurité dans MUTE
+  - Vise chiffrement de bout en bout
+  - Pour garantir confidentialité, authenticité et intégrité des messages
+  - Souhaite garantir backward et forward secrecies
+    - Backward : nouveau pair ne peut pas déchiffrer les messages précédemments envoyés
+    - Forward : ancien pair ne peut pas déchiffrer les messages envoyés après son départ
+  - Présenter mécanisme de chiffrement à base de secret partagé
+  - Expliciter limites
+    - Secret partagé via le réseau
+    - Donc utile seulement si attaquant a loupé cette communication initiale
+  - Besoin de mettre à jour clé au fur et à mesure des évolutions du groupe
+  - Comment procéder à l'évolution de la clé en distribué ?
+    - Pourrait mettre en place LWW-Register pour secret partagé
+  - Présenter mécanisme de chiffrement à base de clé de groupe
+  - Implémente protocole Burmester - Desmedt pour établir la clé de chiffrement de groupe
+  - Nécessite clés publiques des différents participants
+  - Besoin d'authentifier les clés publiques pour éviter man-in-the-middle attack
+  - Présenter Trusternity
+    - Mécanisme d'audit des PKI
+  - Présenter fonctionnement du protocole BD
+  - Discuter des limites de mécanisme
+    - Computationnellement lourd
+    - Requiert participation de l'ensemble des noeuds lors évolution du groupe
+      - Peut être effectué de manière asynchrone
+      - Mais que faire en attendant que l'ensemble des noeuds
+      - Peu adapté dans un système hautement dynamique
+      - Va passer son temps à regénérer une nouvelle clé
+    - Pour éviter ce problème, considère que le groupe est l'ensemble des noeuds connectés
+      - Mais implique de générer une nouvelle clé à chaque connexion et déconnexion
+      - Peu efficace pour les collaborations où le groupe est stable, mais avec des connexions/déconnexions
+  - Discuter des perspectives
+    - Contrôle d'accès
+      - Problème ouvert
+      - Citer travaux de Bienusa et al. à PaPoC'21 comme piste
+    - Détection et éviction de pairs malhonnêtes
+      - Citer travaux de Vic
+      - Nécessiterait évolution du CRDT pour résoudre les équivoques détectés
+** Semaine du <2021-08-02 Mon> au <2021-08-04 Wed>
+*** Planned
+**** DONE Thèse : Préparer réunion manuscrit
+- Récapituler progrès depuis dernière fois
+- Lister difficultés/interrogations courantes
+- Lister pistes de travail
+**** TODO Thèse : Compléter section *Évolution du modèle de livraison des opérations*
+- Ajouter exemple illustrant que livraison d'une opé avant son opé /rename/ est incohérent
+- Ajouter définition du modèle de livraison des opérations de RLS
+- Expliquer que livraison causale de l'opération /rename/ n'est pas nécessaire
+**** TODO Thèse : Rédiger section *Processus d'intégration d'une opération*
+**** TODO Thèse : Rédiger section *Complexité temporelle*
+**** TODO Thèse : Rédiger section *Utilisation de l'opération de renommage comme snapshot*
+**** TODO Thèse : Rédiger section *Implémentation alternative à base d'operation-log*
+**** TODO Thèse : Rédiger section *Conclusion*
+**** TODO Thèse : Détailler plan de la section sur *Trusternity*
+**** TODO Thèse : Détailler plan de la section sur *Protocol Burmester-Desmedt*
 **** IN-PROGRESS Thèse : Ajouter schéma architecture système de MUTE
+- Faire une version sur draw.io ou un outil similaire pour le moment
 **** TODO Thèse : Ajouter schéma architecture logicielle de MUTE
+- Faire une version sur draw.io ou un outil similaire pour le moment
 **** TODO ATER : Contacter Vincent à propos du CM d'Algo
 **** TODO Thèse : Retravailler section *Limites* de *LogootSplit*
 - Le contenu de cette section correspond à la traduction de l'article pour TPDS
@@ -18892,54 +18966,65 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 - A l'air de proposer un mécanisme d'anti-entropie basé sur Merkle Tree plus efficace que state of the art
 - Dispo ici : https://kristofjannes.com/papers/tpds_owebsync.pdf
 *** Done
-- Thèse : Retrouver le nom de la structure de données couplant un version vector à un ensemble des dots
-  - Dans *Optimized OR-Sets Without Ordering Constraints*, auteurs proposent /Interval Version Vectors/
-    - Un version vector où pour chaque entrée, on maintient un ensemble d'intervals
-    - Aggrège les timestamps des opérations reçues dans des intervals
-    - Potentiellement des "trous" entre 2 intervals, indiquant une opération non reçue
-    - Permet ainsi de représenter de manière efficace les opérations reçues
-    - Compatible avec une livraison out-of-order des opérations
-    - À terme, compacte en 1 seul interval les opérations d'un pair
-    - Mentionne et se compare /version vectors with exceptions (VVwE)/
-      - Proposée dans *Concise Version Vector in WinFS*
-      - Permet aussi la livraison out-of-order
-      - Consiste à conserver un /version vector/ et un vecteur d'ensembles de numéros de séquence
-      - Le /version vector/ maintient l'opération la plus récente pour chaque pair
-      - Un ensemble de numéros de séquence liste les opérations dont on connaît l'existence mais qu'on a pas encore reçu
-	- Connaît leur existence car on a reçu une opération avec un numéro de séquence plus élevé
-	- Correspond donc aux "trous" dans la liste des opérations de ce pair reçues
-    - Argue que les /Interval Version Vectors/ sont plus efficaces pour représenter l'ensemble des opérations reçues
-- Thèse : Détailler plan de la section sur la couche sécurité dans MUTE
-  - Vise chiffrement de bout en bout
-  - Présenter mécanisme de chiffrement à base de secret partagé
-  - Expliciter limites
-    - Secret partagé via le réseau
-    - Donc utile seulement si attaquant a loupé cette communication initiale
-  - Souhaite garantir backward et forward secrecies
-    - Backward : nouveau pair ne peut pas déchiffrer les messages précédemments envoyés
-    - Forward : ancien pair ne peut pas déchiffrer les messages envoyés après son départ
-  - Besoin de mettre à jour clé au fur et à mesure des évolutions du groupe
-  - Comment procéder à l'évolution de la clé en distribué ?
-    - Pourrait mettre en place LWW-Register pour secret partagé
-  - Présenter mécanisme de chiffrement à base de clé de groupe
-  - Implémente protocole Burmester - Desmedt pour établir la clé de chiffrement de groupe
-  - Nécessite clés publiques des différents participants
-  - Besoin d'authentifier les clés publiques pour éviter man-in-the-middle attack
-  - Présenter Trusternity
-    - Mécanisme d'audit des PKI
-  - Présenter fonctionnement du protocole BD
-  - Discuter des limites de mécanisme
-    - Requiert participation de l'ensemble des noeuds lors évolution du groupe
-      - Peut être effectué de manière asynchrone
-      - Mais quid des communications durant le re-keying ?
-    - Computationnellement lourd
-  - Discuter des perspectives
-    - Contrôle d'accès
-      - Problème ouvert
-      - Citer travaux de Bienusa et al. à PaPoC'21 comme piste
-    - Détection et éviction de pairs malhonnêtes
-      - Citer travaux de Vic
-      - Nécessiterait évolution du CRDT pour résoudre les équivoques détectés
+- Réunion manuscrit
+  - Depuis la dernière fois
+    - Rédaction de la sous-section *Modèle de livraison* de LogootSplit (page 11)
+    - Ajout du plan détaillé de la sous-section *Mitigation du surcoût des séquences répliquées* (page 14)
+    - Ajout du plan détaillé de la sous-section *Processus d'intégration d'une opération* (page 29)
+    - Rédaction de la sous-section *Modèle de données du document texte* de MUTE (page 49)
+    - Ajout du plan détaillé de la sous-section *Modèle de livraison des opérations* de MUTE (page 49)
+    - Ajout du plan détaillé de la sous-section *Couche sécurité* de MUTE (page 53)
+  - Difficultés/interrogations courantes
+    - Architecture système de MUTE
+      - Un peu de mal à voir le niveau de détails où je rentre
+      - Par exemple, est-ce que je fais apparaître les serveurs STUN et TURN ?
+	- Nécessaires respectivement pour permettre à un noeud de
+	  - connaître son adresse IP
+	  - communiquer avec un autre pair avec lequel une connexion directe est impossible (firewall)
+      - Sont nécessaires au fonctionnement du système
+      - Mais spécifique à WebRTC
+      - Est-ce intéressant de les faire figurer ?
+    - Mécanisme de chiffrement à base de secret partagé
+      - Pour le moment, ignore le chiffrement basé sur un secret partagé
+      - Un peu de mal à justifier son existence et fonctionnement à posteriori
+	- Augmente la sécurité de très peu
+	  - Si adversaire loupe message
+	  - Mais secret doit être retransmis à chaque connexion d'un nouveau pair
+	- Ne permet d'assurer la backward/forward secrecy
+	  - Le secret est immuable
+	  - Un pair reçoit donc le même secret et calcule la même clé que les précédents et les suivants
+	- Comment résoudre détecter et résoudre conflits si malveillant dans la collaboration ?
+	  - Aucun mécanisme pour résoudre conflits si un pair malveillant commence à émettre d'autres secrets que celui initial
+    - Mécanisme de chiffrement à base de clé de groupe
+      - À quel point je dois rentrer dans les détails de *Trusternity* et *Burmester-Desmedt* ?
+      - Je dois suffisamment présenter *Trusternity* pour expliquer la présence de PKIs et d'une blockchain dans le schéma d'architecture système
+      - Je dois suffisamment présenter *Burmester-Desmedt* pour expliquer les limites de ce protocole (disponibilité, coût)
+    - Mécanisme de GC de RLS
+      - Je n'ai pas implémenté un tel mécanisme dans MUTE pour le moment
+      - Donc n'en mentionne pas
+      - Est-ce un problème ?
+      - N'a pas particulièrement d'idées sur comment l'implémenter efficacement
+  - Pistes de travail
+    - Identifier si un algo de contrôle OT de la littérature correspond à RLS
+      - Me paraît intéressant à identifier pour définir les propriétés de sécurité que doit respecter RLS
+      - Voir si GOTO ou SOCT2 correspondent
+      - Juste le cas bizarre où l'opération /rename/ n'est pas transformée par rapport aux opérations /insert/ et /remove/
+	- L'opération /rename/ prend en compte les effets des opérations /insert/ et /remove/ par définition
+	- Tandis que les opérations /insert/ et /remove/ ne prennent pas en compte ceux de l'opération /rename/
+    - Identifier des travaux existants sur les documents hierarchisés et les documents multimédia
+      - Me paraissent deux pistes de travail intéressantes pour poursuivre les travaux de l'équipe sur les systèmes collaboratifs
+      - Voir les travaux existants, aussi bien OT que CRDT
+      - Y a aussi d'autres features comme les commentaires/suggestions qui seraient intéressant de supporter
+  - Retours
+    - Rédiger chapitre 2
+      - 2.3.4, 2.4.2, 2.5, 2.7 voir 2.6
+      - Permettra de faire des retours sur ce chapitre
+      - Et de l'envoyer aux potentiels membres du jury pour les recruter
+    - Questions sur ce qui va appartenir à l'intro et à l'état de l'art
+      - Va avoir besoin d'assez d'éléments pour faire comprendre la question de recherche et la contribution aux lecteurs
+      - Va donc avoir besoin de la notion de Sequence CRDT et de croissance des métadonnées
+      - Pose des questions sur où doivent être présentés /systèmes distribués/, /réplication optimiste/
+    - Réfléchir aux membres du jury
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
