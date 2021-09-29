@@ -19234,18 +19234,281 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
   - [-] Hero Corp
 ** Semaine du <2021-09-20 Mon> au <2021-09-24 Fri>
 *** Planned
-**** IN-PROGRESS Thèse : Faire réinscription
-**** TODO Papier : Ajouter reviews au repo
-**** TODO Papier : Tagger version soumise
-**** TODO Papier : Mettre en place document pour réponse aux reviewers
+**** DONE BD1-2I : Revoir TD normalisation
+- Me semble que l'an dernier les étudiant-es avaient galéré à comprendre ce que j'attendais d'elleux dans les différents exercices
+- Voir les exercices mis à disposition par Abir si certains correspondent
+*** Done
+- Papier : Reviews
+  - A reçu les retours de la part de TPDS
+  - Consiste en 4 reviews
+  - Jusqu'au 15 décembre pour re-soumettre nouvelle version de l'article
+  - Review 1 : Major revision
+    - Propose d'ajouter une analyse théorique du mécanisme de GC
+    - Propose de se comparer à Core & Nebula lors de l'évaluation
+    - Pas sûr de piger W3 : voudrait une autre façon de présenter les temps d'intégration pour montrer que RLS > LS ?
+    - N'a pas l'air de voir les problèmes posés par 1 seul /renamingBot/
+      - Single Point of Failure
+      - Répartition de la charge
+  - Review 2 : Minor revision
+    - Précise que besoin de tombstones pour la suppression
+    - Pas clair à ce stade semblerait que la transformation des opés utilise l'/ancien état/ qui est immuable
+    - Demande à avoir une évaluation de la taille des opérations (insert, remove, rename)
+    - Suppose ensuite que la transformation des opés repose sur l'/ancien état/ qui doit contenir tous les identifiants
+      - Correspond donc à des tombstones si les éléments correspondants sont supprimés par la suite
+    - Souhaite voir apparaître plus clairement ce point
+    - Et demande, à partir du moment qu'on a des tombstones, pourquoi on a toujours besoin de variable-length identifiers ?
+      - Surtout que le mécanisme de GC repose sur les mêmes contraintes que celui de GC pour les Sequence CRDTs à tombstones
+      - Et c'est une très bonne question
+    - A l'air d'avoir trouvé la section 5.3 très confusante
+      - À ré-écrire
+    - Aussi expliciter /findIndexOfPred()/ et /getFirstOffset()/
+  - Review 3 : Major revision
+    - Pas convaincu que les ajouts de l'article sont suffisants pour mériter un article dans le journal
+    - Suggère de se comparer à plus d'approches par exemple
+    - Explique que l'évaluation n'est pas convaincante non plus
+      - Devrait mettre plus en lumière à quel point l'opération /rename/ est importante
+      - Comment ?
+    - Demande si une évaluation du mécanisme de GC existe
+  - Review 4 : Minor revision
+    - Fait remarquer que je spécifie des propriétés, mais que je ne m'y rattache pas par la suite
+      - Faudrait expliquer certains choix de conception (/former state/ par exemple) par ces propriétés
+    - Note l'absence de preuve de ces propriétés
+      - Dans quel sens ?
+      - Que le mécanisme les intègre ?
+      - Ou qu'elles soient complètes et suffisantes pour garantir la correction du système ?
+    - Demande à se comparer à d'autres approches de l'état de l'art
+    - Demande des précisions sur quand émettre une opération /rename/
+  - Finalement c'est les minor revisions qui posent les questions les plus douloureuses IMO
+  - Pistes de travail
+    - Insister sur les limites d'avoir 1 seul /renamingBot/
+    - Étudier la complexité temporelle du mécanisme de GC
+    - Ajouter la complexité temporelle des opés /insert/, /remove/ et /rename/ ?
+  - Retours
+    - Pour la comparaison Core & Nebula
+      - Re-vérifier si implémentation dispo
+      - Sinon répondre en disant que difficile de se comparer vu l'absence d'implem de référence
+    - Pour R1W3
+      - Faire l'évaluation du temps d'intégration d'un log d'un document avec LS et RLS
+      - Re-ajouter ça dans le papier
+      - Ré-insister sur le fait que ce n'est pas la seule dimension qui nous intéresse avec le /rename/
+	- Veut aussi réduire la taille du document
+    - Pour R1W4
+      - Expliquer qu'avec le même algorithme, on peut faire la version centralisée et distribuée de RLS
+      - Insister sur le fait que 1 seul renamingBot est le mieux d'un point de vue perf
+      - Mais que le système doit pouvoir garantir qu'il y en a qu'un seul
+      - Mais que dans tous les cas, on a un mécanisme de résolution de conflits si on a plusieurs opés /rename/ concurrentes
+	- Donc "assure" la convergence
+    - Pour R2
+      - Voir si peut faire pareil pour RGA/RGASplit
+    - Concernant les expérimentations
+      - Revoir un peu les différentes comparaisons entre Sequence CRDTs dans l'état de l'art
+      - Voir comment se place LogootSplit dedans
+      - Et rajouter une explication "par transitivité" sur comment RLS se place par rapport à l'état de l'art
+      - Tout en expliquant que ça aurait beaucoup de travail de ré-implémenter toutes les solutions et les adapter à notre scénario d'évaluation
+- Réunion thèse
+  - Ré-inscription
+    - A commencé à faire la procédure de réinscription
+    - Doit encore faire ma lettre de motivation
+    - Doit faire signer à Olivier
+      - Feuillet scientifique
+      - Convention individuelle de formation
+    - Doit faire faire à Olivier une lettre de recommandation
+  - Manuscrit
+    - Depuis la dernière fois
+      - Rédaction de la partie *Ajout du processus d'intégration d'une opération* (page 31)
+      - Rédaction de la partie *Utilisation de l'opération /rename/ comme mécanisme de compression du log* (page 48)
+      - Rédaction de la partie *Implémentation alternative de l'opération /rename/ basée sur le log d'opérations* (page 50)
+      - Rédaction de la partie *Conclusion* (page 52)
+      - Début de la rédaction de la partie *Complexité en temps* (page 38)
+    - Difficultés rencontrées
+      - Pas de mécanisme de snapshot pour les Op-based CRDTs dans la littérature ?
+	- Autant je tombe sur des mécanismes de compression du log
+	  - Les mécanismes de fusion d'opérations dans OT
+	  - La notion d'opérations /obsolete/ dans Pure Op-based Ops
+	- Autant je trouve pas trop d'approche de synchronisation par snapshot
+	  - Ou du moins, j'ai pas vu un endroit dans un papier où c'est mentionné comme optimisation/mécanisme pour pallier à la croissance du log
+	- Le plus proche que j'ai trouvé est le mécanisme de join présenté dans *Memory Efficient CRDTs in Dynamic Environments*
+	  - Par Bauwens et Gonzalez Boix
+	  - Date seulement de 2019, ce qui me paraît un peu trop récent pour un tel mécanisme
+	- Quel angle prendre pour présenter ce mécanisme ?
+	  - Compression de log ou snapshot ?
+      - Quelle partie du log envoyer dans le cas de la synchronisation via snapshot ?
+	- Envoyer le log à partir de l'opé /rename/
+	  - Dans ce cas, peut ne pas pouvoir répondre à une demande de synchro
+	  - Comment gérer ce cas ?
+	- Ou envoyer toutes les opés mais ne jouer que celles strictement nécessaires ?
+	  - Mais un coût en bande-passante plus élévé
+	  - L'intérêt du mécanisme de snapshot devient uniquement computationnel
+	- Trancher ou lister les deux possibilités dans le cadre du manuscrit ?
+      - Les sections */rename/ pour compresser log* et *Impl log-based de /rename/* se marchent dessus
+	- Besoin de l'impléméntation log-based de /rename/ pour le mécanisme de compression du log
+	- À partir du moment que j'ai l'implémentation log-based de /rename/, le mécanisme de compression me paraît évident
+	  - Puisque je peux obtenir l'état courant en jouant uniquement la dernière opé /rename/ et les opérations non-causalement couvertes par celle-ci
+	  - Pourquoi rejouer toutes les opés lors d'un join ?
+	- Clunky dans l'état actuel car commence avec le mécanisme de compression du log
+	  - Me retrouve donc à présenter l'implémentation log-based
+	  - Ce qui fait que je me repéte pas mal IMO dans la partie sur l'implémentation log-based
+	- Voir pour inverser les 2 parties ou les fusionner
+      - On est bien d'accord que les perspectives ne sont pas développées dans la conclusion d'un chapitre, mais directement dans le chapitre conclusion ?
+    - Pistes de travail
+      - Fin de la rédaction de la partie *Complexité en temps*
+      - Inversion et rework des sections */rename/ pour compresser log* et *Impl log-based de /rename/*
+      - Rédaction de la partie *Comparaison avec les approches existantes*
+      - Ajouter une partie sur le processus de join dans *MUTE* ?
+	- Me paraît trivial
+	- Mais quand je vois comment le mécanisme de join présenté par Bauwens et Gonzalez Boix est inutilement restrictif
+	  - Besoin d'attendre que tous les pairs du système ait observé le join pour que le nouveau pair puisse récupérer l'état
+	  - Et commencer à collaborer
+	- Peut être pas mal d'enfoncer cette porte ouverte
+    - Retours
+      - Sur la partie du log à partager en cas de snapshot
+	- Partir sur juste le strict nécessaire
+	- Expliquer que peut avoir cas où peut pas répondre à demande de synchronisation
+	- Suffit de rediriger le pair vers un autre
+	- Si besoin, peut rajouter des opérations non-stables redondantes lors de la synchronisation initiale pour permettre synchro avec les autres
+      - Remarque d'Olivier
+	- Faire un choix
+	- Mais faire remarquer que les autres stratégies existent et qu'il y a moyen de converger
+	  - Et d'optimiser tout ça
+  - Papier
+    - Tagger version actuelle du papier
+    - Ajouter reviews au repo
+    - Créer Overleaf pour réponse
+      - Regrouper reviews par thématique
+      - Lister les idées de la réponse par thématique
+    - Pistes de travail
+      - Calculer temps d'exécution total d'un log d'opérations
+      - Générer des logs avec différentes fréquences de génération des /rename/
+	- Voir quelles fréquences choisir
+      - Mettre les résultats dans un tableau
+      - Analyser complexité du mécanisme de GC des epochs
+- BD1-I2 : TD noté
+  - 5 étudiants ont fini en 1h20
+  - 4 autres en 1h30
+  - Les autres en 1h50
+  - Me paraît pas trop mal d'un point de vue durée du coup
+- Thèse : Faire réinscription
+  - J'ai vu avec Olivier pour les différentes pièces que j'avais besoin de sa part
+    - Signature du feuillet scientifique
+    - Signature de la convention individuelle de formation
+    - Rédaction de la lettre du directeur de thèse
+  - J'ai rédigé ma lettre de motivation
+  - J'ai envoyé le feuillet scientifique à Delphine Hubert pour signature par Jean-Yves Marion
+  - Pièces à joindre
+    - [ ] Feuillet scientifique signé
+    - [X] Lettre du directeur de thèse
+    - [X] Lettre de motivation
+    - [X] Titre et résumé de la thèse
+    - [X] Rapport et avis du CSI
+    - [X] Plan de thèse avec quantification du travail effectué
+    - [X] Thèse en l'état
+    - [X] Liste des publications
+    - [X] Convention individuelle de formation
+    - [X] Justificatif de ressources financières
+    - [X] Attestation d'assurance responsabilité civile - vie privée
+    - [ ] Attestation de CVEC
+- BD1-2I : Revoir TD normalisation
+  - Le cours d'Abir n'aborde pas la normalisation
+  - Par contre, le cours de Romain a un TD dédié à la normalisation
+  - Les exos 1 et 4 me paraissent plutôt adaptés à ce que je veux proposer
+- Papier : Proposer une analyse en complexité du mécanisme de GC
+  - Vic a proposé un algo pour générer /required epochs/
+    - Initialiser un ensemble d'epochs, l'ensemble des parents, avec l'epoch courante
+    - Consiste à parcourir dans l'ordre inverse la liste triée des epochs par rapport à la relation /priority/
+    - Tant que l'ensemble des parents n'est pas vide
+      - Si epoch présente dans l'ensemble des parents, la retirer
+      - Si pas encore trouvé l'epoch maximum causalement stable
+	- Ajouter le parent de l'epoch dans un ensemble
+	- Ajouter l'epoch aux /required epochs/
+  - Sur l'arbre des époques utilisé dans mon exemple, a l'air de fonctionner correctement avec différentes valeurs d'epoch causalement stable maximale
+  - Voir pour
+    - [X] Implémenter l'algo
+      - Pas si évident en fait
+      - Quelques conditions un peu particulière pour
+	- S'arrêter dès que possible
+	  - Notamment si l'epoch causalement stable maximale est aussi le LCA des /potential epochs/, doit m'arrêter
+	- Ne pas prendre des epochs en trop
+	  - Si une epoch se trouve entre l'epoch causalement stable maximale et le LCA des /potential epochs/ d'après /priority/ mais pas /parent/, doit l'ignorer
+    - [X] Implémenter tests unitaires correspondant aux exemples qu'on a déroulé sur le tableau
+    - [ ] Implémenter tests unitaires correspondant à d'autres /epoch trees/
+    - [ ] Voir si une relation /priority/ différente casse l'algorithme
+- GLA : Rédiger syllabus
+  - Le module se décompose en 24h
+    - 12h CM
+    - 12h TD
+  - Peut faire comme en BD, faire de l'EI
+    - Et se moquer de l'étiquette des séances
+  - Contenu du module
+    - Git
+      - Fonctionnement interne de git (stash, workspace, index, local repo, upstream repo)
+      - Les branches dans git
+      - Workflows de travail sur git
+	- Branche de fonctionnalité
+	- Gitflow
+      - Bonnes pratiques
+	- Messages de commit
+	- Commits atomiques
+	- Branche main jamais buggée
+	- Code reviews
+    - Outils
+      - Linter
+      - Minificateur
+      - Builder
+      - Code quality
+    - Intégration continue
+      - Tests unitaires
+      - Intégration continue
+      - Code coverage
+      - Code quality
+    - Gestion de versions
+      - Semantic versioning
+      - Outils de gestion de version
+      - Continuous delivery
+    - Gestion de dépendances
+      - Dépendances
+      - Outils de gestion de dépendances
+    - Déploiement et reproducibility
+      - Conteneurs
+      - Composition
+      - Continous Deployement
+  - Quelles technos utiliser ?
+    - Certains outils sont spécifiques à des langages de prog donnés
+      - JS
+	- Minification
+	- Builder (avec tree-checking pour retirer code mort)
+    - Est-ce que ça vaut le coup de parler de ces outils ?
+    - Sinon, quelles technos, quel langage choisir ?
+  - Quelle évaluation ?
+    - Comment je peux les évaluer sur ce module ?
+    - Leur faire faire un projet respectant ces bonnes pratiques ?
+      - Tests unitaires
+      - Intégration continue
+      - Gestion de dépendances
+      - Git workflow
+	- Est-ce que ça a du sens/est-ce possible de leur faire suivre un git workflow à 3-4 ?
+      - docker-compose à l'arrivée
+	- Donc une appli composée de plusieurs services
+	- Se fait facilement avec une BD
+  - Planning
+    - Git : 4h
+    - Intégration Continue : 4h
+    - Gestion de versions et de dépendances : 4h
+    - Déploiement et reproducibility : 4h
+    - Évaluation : 4h
+** Semaine du <2021-09-27 Mon> au <2021-10-01 Fri>
+*** Planned
+**** DONE Papier : Tagger version soumise
+**** DONE Papier : Ajouter reviews au repo
+**** DONE BD1-2I : Revoir CM sur algèbre relationnel
+- Me semble que le cours était un peu confus l'an dernier
+- Voir si des choses sont à corriger
+**** DONE BD1-2I : Revoir TD sur algèbre relationnel
+**** DONE Papier : Mettre en place document pour réponse aux reviewers
 - Un Overleaf serait cool
 - Regrouper les différents commentaires des reviews en thématiques
 - Mettre en place le plan
-**** TODO Papier : Mettre en place benchmark permettant de mesurer le temps pour rejouer l'intégralité d'un log
-- Dans une review, on nous demande de comparer le temps nécessaire pour jouer une exécution avec LogootSplit et RenamableLogootSplit
-- Il s'agit d'une métrique qui me paraît pas trop compliqué
-  - Juste prendre un log d'opérations et le re-exécuter
-**** TODO Papier : Générer des logs avec différentes fréquences pour la génération de /rename/
+**** DONE Thèse : Faire réinscription
+**** IN-PROGRESS Papier : Générer des logs avec différentes fréquences pour la génération de /rename/
 - Une review indique vouloir voir l'effet de la fréquence de génération de l'opé /rename/ sur les perfs
 - Voir pour relancer des simulations avec une valeur pour le paramètre de fréquence
 - Quelles fréquences utiliser ?
@@ -19253,17 +19516,33 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
   - Taille mémoire ?
   - Exécution des opérations standard ?
   - Temps d'exécution global du scénario ?
-**** TODO Papier : Proposer une analyse en complexité du mécanisme de GC
+**** IN-PROGRESS Papier : Proposer une analyse en complexité du mécanisme de GC
 - Des reviews demandent une évaluation du mécanisme de GC
 - Voir pour proposer un algo pour le mécanisme de GC
 - En faire son analyse de complexité en temps
 - En espace aussi ?
-  - Je sais pas si ça a dû sens
+  - Je sais pas si ça a du sens
+**** IN-PROGRESS GLA : Rédiger syllabus
+- J'ai reçu un mail de Polytech me demandant de leur retourner le syllabus du module d'ici la fin du mois
+  - Mail de Marie-Christine Hiblot
+- Il faut déjà décider de ce que le module contient
+- [ ] Décider contenu module
+- [ ] Rédiger syllabus
+**** IN-PROGRESS BD1-2I : Corriger TD noté
+**** TODO BD1-EMME : Corriger énoncé du TD1
+- Le numéro de slide référencé ne correspond pas à la slide souhaitée dans le CM
+- Corriger
+**** TODO BD1-EMME : Ajouter un exercice au TD2
+- Le sujet de TD actuel me paraît un peu trop court
+- Ajouter un 3ème exercice permettrait de s'assurer d'avoir assez de matière, quitte à ne pas le finir
+**** TODO BD1-2I : Rédiger sujet de partiel
+**** TODO BD1-EMME : Rédiger sujet TD noté
+- Voir horaires de la séance 4 de TD de chacun des groupes
+**** TODO Papier : Mettre en place benchmark permettant de mesurer le temps pour rejouer l'intégralité d'un log
+- Dans une review, on nous demande de comparer le temps nécessaire pour jouer une exécution avec LogootSplit et RenamableLogootSplit
+- Il s'agit d'une métrique qui me paraît pas trop compliqué
+  - Juste prendre un log d'opérations et le re-exécuter
 **** IN-PROGRESS Thèse : Rédiger section *Complexité temporelle*
-**** TODO BD1-2I : Corriger TD noté
-**** TODO BD1-2I : Revoir TD normalisation
-- Me semble que l'an dernier les étudiant-es avaient galéré à comprendre ce que j'attendais d'elleux dans les différents exercices
-- Voir les exercices mis à disposition par Abir si certains correspondent
 **** TODO Thèse : Mettre en cohérence *Utilisation de l'opération de renommage comme snapshot* et *Implémentation alternative à base d'operation-log*
 - Ces deux sous-sections redisent parfois la même chose
 - Me paraît plus cohérent finalement de présenter l'implémentation log-based puis le mécanisme de compression du log
@@ -19466,164 +19745,102 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 - A l'air de proposer un mécanisme d'anti-entropie basé sur Merkle Tree plus efficace que state of the art
 - Dispo ici : https://kristofjannes.com/papers/tpds_owebsync.pdf
 *** Done
-- Papier : Reviews
-  - A reçu les retours de la part de TPDS
-  - Consiste en 4 reviews
-  - Jusqu'au 15 décembre pour re-soumettre nouvelle version de l'article
-  - Review 1 : Major revision
-    - Propose d'ajouter une analyse théorique du mécanisme de GC
-    - Propose de se comparer à Core & Nebula lors de l'évaluation
-    - Pas sûr de piger W3 : voudrait une autre façon de présenter les temps d'intégration pour montrer que RLS > LS ?
-    - N'a pas l'air de voir les problèmes posés par 1 seul /renamingBot/
-      - Single Point of Failure
-      - Répartition de la charge
-  - Review 2 : Minor revision
-    - Précise que besoin de tombstones pour la suppression
-    - Pas clair à ce stade semblerait que la transformation des opés utilise l'/ancien état/ qui est immuable
-    - Demande à avoir une évaluation de la taille des opérations (insert, remove, rename)
-    - Suppose ensuite que la transformation des opés repose sur l'/ancien état/ qui doit contenir tous les identifiants
-      - Correspond donc à des tombstones si les éléments correspondants sont supprimés par la suite
-    - Souhaite voir apparaître plus clairement ce point
-    - Et demande, à partir du moment qu'on a des tombstones, pourquoi on a toujours besoin de variable-length identifiers ?
-      - Surtout que le mécanisme de GC repose sur les mêmes contraintes que celui de GC pour les Sequence CRDTs à tombstones
-      - Et c'est une très bonne question
-    - A l'air d'avoir trouvé la section 5.3 très confusante
-      - À ré-écrire
-    - Aussi expliciter /findIndexOfPred()/ et /getFirstOffset()/
-  - Review 3 : Major revision
-    - Pas convaincu que les ajouts de l'article sont suffisants pour mériter un article dans le journal
-    - Suggère de se comparer à plus d'approches par exemple
-    - Explique que l'évaluation n'est pas convaincante non plus
-      - Devrait mettre plus en lumière à quel point l'opération /rename/ est importante
-      - Comment ?
-    - Demande si une évaluation du mécanisme de GC existe
-  - Review 4 : Minor revision
-    - Fait remarquer que je spécifie des propriétés, mais que je ne m'y rattache pas par la suite
-      - Faudrait expliquer certains choix de conception (/former state/ par exemple) par ces propriétés
-    - Note l'absence de preuve de ces propriétés
-      - Dans quel sens ?
-      - Que le mécanisme les intègre ?
-      - Ou qu'elles soient complètes et suffisantes pour garantir la correction du système ?
-    - Demande à se comparer à d'autres approches de l'état de l'art
-    - Demande des précisions sur quand émettre une opération /rename/
-  - Finalement c'est les minor revisions qui posent les questions les plus douloureuses IMO
-  - Pistes de travail
-    - Insister sur les limites d'avoir 1 seul /renamingBot/
-    - Étudier la complexité temporelle du mécanisme de GC
-    - Ajouter la complexité temporelle des opés /insert/, /remove/ et /rename/ ?
-  - Retours
-    - Pour la comparaison Core & Nebula
-      - Re-vérifier si implémentation dispo
-      - Sinon répondre en disant que difficile de se comparer vu l'absence d'implem de référence
-    - Pour R1W3
-      - Faire l'évaluation du temps d'intégration d'un log d'un document avec LS et RLS
-      - Re-ajouter ça dans le papier
-      - Ré-insister sur le fait que ce n'est pas la seule dimension qui nous intéresse avec le /rename/
-	- Veut aussi réduire la taille du document
-    - Pour R1W4
-      - Expliquer qu'avec le même algorithme, on peut faire la version centralisée et distribuée de RLS
-      - Insister sur le fait que 1 seul renamingBot est le mieux d'un point de vue perf
-      - Mais que le système doit pouvoir garantir qu'il y en a qu'un seul
-      - Mais que dans tous les cas, on a un mécanisme de résolution de conflits si on a plusieurs opés /rename/ concurrentes
-	- Donc "assure" la convergence
-    - Pour R2
-      - Voir si peut faire pareil pour RGA/RGASplit
-    - Concernant les expérimentations
-      - Revoir un peu les différentes comparaisons entre Sequence CRDTs dans l'état de l'art
-      - Voir comment se place LogootSplit dedans
-      - Et rajouter une explication "par transitivité" sur comment RLS se place par rapport à l'état de l'art
-      - Tout en expliquant que ça aurait beaucoup de travail de ré-implémenter toutes les solutions et les adapter à notre scénario d'évaluation
-- Réunion thèse
-  - Ré-inscription
-    - A commencé à faire la procédure de réinscription
-    - Doit encore faire ma lettre de motivation
-    - Doit faire signer à Olivier
-      - Feuillet scientifique
-      - Convention individuelle de formation
-    - Doit faire faire à Olivier une lettre de recommandation
-  - Manuscrit
-    - Depuis la dernière fois
-      - Rédaction de la partie *Ajout du processus d'intégration d'une opération* (page 31)
-      - Rédaction de la partie *Utilisation de l'opération /rename/ comme mécanisme de compression du log* (page 48)
-      - Rédaction de la partie *Implémentation alternative de l'opération /rename/ basée sur le log d'opérations* (page 50)
-      - Rédaction de la partie *Conclusion* (page 52)
-      - Début de la rédaction de la partie *Complexité en temps* (page 38)
-    - Difficultés rencontrées
-      - Pas de mécanisme de snapshot pour les Op-based CRDTs dans la littérature ?
-	- Autant je tombe sur des mécanismes de compression du log
-	  - Les mécanismes de fusion d'opérations dans OT
-	  - La notion d'opérations /obsolete/ dans Pure Op-based Ops
-	- Autant je trouve pas trop d'approche de synchronisation par snapshot
-	  - Ou du moins, j'ai pas vu un endroit dans un papier où c'est mentionné comme optimisation/mécanisme pour pallier à la croissance du log
-	- Le plus proche que j'ai trouvé est le mécanisme de join présenté dans *Memory Efficient CRDTs in Dynamic Environments*
-	  - Par Bauwens et Gonzalez Boix
-	  - Date seulement de 2019, ce qui me paraît un peu trop récent pour un tel mécanisme
-	- Quel angle prendre pour présenter ce mécanisme ?
-	  - Compression de log ou snapshot ?
-      - Quelle partie du log envoyer dans le cas de la synchronisation via snapshot ?
-	- Envoyer le log à partir de l'opé /rename/
-	  - Dans ce cas, peut ne pas pouvoir répondre à une demande de synchro
-	  - Comment gérer ce cas ?
-	- Ou envoyer toutes les opés mais ne jouer que celles strictement nécessaires ?
-	  - Mais un coût en bande-passante plus élévé
-	  - L'intérêt du mécanisme de snapshot devient uniquement computationnel
-	- Trancher ou lister les deux possibilités dans le cadre du manuscrit ?
-      - Les sections */rename/ pour compresser log* et *Impl log-based de /rename/* se marchent dessus
-	- Besoin de l'impléméntation log-based de /rename/ pour le mécanisme de compression du log
-	- À partir du moment que j'ai l'implémentation log-based de /rename/, le mécanisme de compression me paraît évident
-	  - Puisque je peux obtenir l'état courant en jouant uniquement la dernière opé /rename/ et les opérations non-causalement couvertes par celle-ci
-	  - Pourquoi rejouer toutes les opés lors d'un join ?
-	- Clunky dans l'état actuel car commence avec le mécanisme de compression du log
-	  - Me retrouve donc à présenter l'implémentation log-based
-	  - Ce qui fait que je me repéte pas mal IMO dans la partie sur l'implémentation log-based
-	- Voir pour inverser les 2 parties ou les fusionner
-      - On est bien d'accord que les perspectives ne sont pas développées dans la conclusion d'un chapitre, mais directement dans le chapitre conclusion ?
-    - Pistes de travail
-      - Fin de la rédaction de la partie *Complexité en temps*
-      - Inversion et rework des sections */rename/ pour compresser log* et *Impl log-based de /rename/*
-      - Rédaction de la partie *Comparaison avec les approches existantes*
-      - Ajouter une partie sur le processus de join dans *MUTE* ?
-	- Me paraît trivial
-	- Mais quand je vois comment le mécanisme de join présenté par Bauwens et Gonzalez Boix est inutilement restrictif
-	  - Besoin d'attendre que tous les pairs du système ait observé le join pour que le nouveau pair puisse récupérer l'état
-	  - Et commencer à collaborer
-	- Peut être pas mal d'enfoncer cette porte ouverte
-    - Retours
-      - Sur la partie du log à partager en cas de snapshot
-	- Partir sur juste le strict nécessaire
-	- Expliquer que peut avoir cas où peut pas répondre à demande de synchronisation
-	- Suffit de rediriger le pair vers un autre
-	- Si besoin, peut rajouter des opérations non-stables redondantes lors de la synchronisation initiale pour permettre synchro avec les autres
-      - Remarque d'Olivier
-	- Faire un choix
-	- Mais faire remarquer que les autres stratégies existent et qu'il y a moyen de converger
-	  - Et d'optimiser tout ça
-  - Papier
-    - Tagger version actuelle du papier
-    - Ajouter reviews au repo
-    - Créer Overleaf pour réponse
-      - Regrouper reviews par thématique
-      - Lister les idées de la réponse par thématique
-    - Pistes de travail
-      - Calculer temps d'exécution total d'un log d'opérations
-      - Générer des logs avec différentes fréquences de génération des /rename/
-	- Voir quelles fréquences choisir
-      - Mettre les résultats dans un tableau
-      - Analyser complexité du mécanisme de GC des epochs
-- BD1-I2 : TD noté
-  - 5 étudiants ont fini en 1h20
-  - 4 autres en 1h30
-  - Les autres en 1h50
-  - Me paraît pas trop mal d'un point de vue durée du coup
+- BD1-EMME : Déroulement TD1
+  - 08h-08h35 : Mise en route (récupération du cours et TD via Arche, relecture du cours par les étudiants, démarrage de l'exo 1 et retours sur quelques schémas conceptuels)
+  - 08h35-08h50 : Correction de l'exo 1 au tableau
+  - 08h50-09h20 : Travail de l'exo 2 par les étudiant-es en autonomie, réponses aux questions, retours sur leur schéma
+  - 09h20-09h35 : Correction de l'exo 2 au tableau
+  - 09h35-09h50 : Réalisation de l'exo 3 avec eux au tableau
+- Papier : Mettre en place document pour réponse aux reviewers
+  - Overleaf
+    - François a créé le document et m'a invité
+    - Me reste à voir avec lui pour obtenir les droits d'invitation
+    - François a invité Gérald et Olivier
+  - Thématiques possibles
+    - Évaluation
+      - Comparaison avec d'autres approches (reviewers 1, 3 et 4)
+	- Il serait intéressant de comparer les performances de RLS avec celles du mécanisme de rebalancing présenté dans Core & Nebula
+	- Mais à notre connaissance, aucune implémentation de ce mécanisme n'a été rendue publique et évaluée
+	  - Pas d'évaluation dans le papier à RenPar'20
+	  - Pas mentionné dans la thèse de Marek
+	- Il serait difficile et coûteux d'en effectuer une implémentation à partir de l'article
+	- Sans compter les questions propres à l'implémentation
+	  - Choix des structures de données utilisées pour Treedoc
+	  - Choix de l'algo de consensus
+	  - Taille du core, de la nebula
+	  - Fréquence du rebalancing
+	- Par contre, peut se comparer de manière transitive avec les autres Sequence CRDTs en se basant sur les évaluations comparant LogootSplit à ces dernières
+	  - Voir si d'autres évaluations que celles présentées dans LS et RGASplit
+	  - Me semble qu'il y a une incohérence dans les courbes entre l'évaluation de LS et celle de RGASplit
+	    - Vérifier cela
+	    - Le cas échéant, voir comment justifier
+      - Évaluation du mécanisme de GC (reviewers 1, 3)
+	- Ajouter une analyse en complexité du mécanisme de GC
+	  - En début de section évaluation
+	  - Y ajouter aussi les complexités en temps des opérations ?
+      - Comparaison des performances de LS et RLS et impact de la fréquence du /rename/ (reviewer 1)
+	- Ajouter une nouvelle partie à l'évaluation consistant à rejouer des logs d'opérations (distantes) de document LS et RLS et de comparer leur temps respectif
+	  - Combien de logs ?
+	  - Quelles mesures faire ?
+	    - Juste une mesure de temps finale ?
+	    - Ou suivre la progression et enregistrer un temps tous les X opérations ?
+	- Peut avoir plusieurs logs pour RLS avec des fréquences différentes d'opés /rename/
+	  - Doit refaire tourner des simus pour générer ces logs
+	  - Quelles fréquences choisir ?
+    - Intérêt de supporter plusieurs renaming bots (reviewers 1)
+    - RLS, un variable-length tombstone-based Sequence CRDT ? (reviewer 2)
+    - Algorithmes
+      - Rework de la section 5.3
+      - Ajout de précisions sur les différentes fonctions utilisées
+    - Utilisation des propriétés pour la définition de /renameId/ et de /revertRenameId/
+    - Discussion sur la stratégie de déclenchement du renommage
+    - Typos (reviewers 1, 2, 3 et 4)
+      - Merci pour les retours, c'est corrigé
+- Strange Loop'21
+  - Strange Loop a lieu cette semaine
+    - Du <2021-09-30 Thu> au <2021-10-02 Sat>
+  - Plusieurs talks ont l'air intéressants
+    - *Prevent phishing and impersonation with trust loops*
+      - Par Karissa McKelvey
+      - Travaille chez Ink & Switch
+      - Présente leurs travaux récents sur Backchannel, un système d'identification distribué
+	- https://www.inkandswitch.com/backchannel/
+    - *Making Webapps Collaborative with Composable CRDTs*
+      - Par Matthew Weidner et Heather Miller
+	- Ceux qui avaient proposé *Composing and Decomposing Op-Based CRDTs with Semidirect Products*
+	- Sur la composition de CRDTs avec des opérations exclusives en utilisant OT
+      - Présentent Compoventuals, une librairie Typescript de collaborative data types
+    - *Injecting Security at the Cloud Edge*
+      - Par Susan Hinrichs
+      - Présente ses travaux chez Yahoo/Verizon sur assurer des politiques de sécurité entre des clouds privés et publics
+      - Pas sûr de trop piger quelque chose par contre
+  - Les conférences seront dispos sur YT, mais après plusieurs mois :/
+- BD1-2I : Revoir CM sur algèbre relationnel
+  - [X] Présence d'une erreur dans les slides sur les jointures externes pleines
+    - La description et l'opérateur présenté sont les mêmes que pour la jointure externe à gauche
+    - Modification pour indiquer que cela effectue la jointure des 2 relations et que ça conserve les tuples sans correspondance de R1 et de R2
+    - Modification pour utiliser l'opérateur /FULL-JOIN/
+  - [X] La présentation actuelle de la division est confusante/contre-intuitive
+    - La division permet de récupérer l'ensemble des tuples d'une première table qui sont en relation avec tous les tuples d'une seconde table
+    - Mais présente en 1er la relation *Produit*, en 2nd la relation *Stock*
+    - Ce qui va dans le sens contraire de l'utilisation que l'on va faire de ces relations
+    - Serait bien de traduire l'effet de la division
+      - Plutôt que de simplement dire "récupère les tuples de ..."
+      - Dire que la division permet de répondre à des questions genre "Quel dépôt stocke l'ensemble des produits différents ?"
+    - La requête algébrique présentée me paraît aussi maladroite
+      - Ce n'est pas clair quelles structures doivent avoir les relations utilisées dans le cadre d'une division
+    - En reparcourant les internets, je trouve le formalisme suivant
+      - R1(X, Y) ÷ R2(Y) -> R3(X)
+      - Avec X et Y deux ensembles d'attributs
+    - A modifié les slides en conséquence
+- BD1-2I : Revoir TD sur algèbre relationnel
+  - Bon le sujet n'est pas passionnant
+  - Mais il fait le taf
 - Thèse : Faire réinscription
-  - J'ai vu avec Olivier pour les différentes pièces que j'avais besoin de sa part
-    - Signature du feuillet scientifique
-    - Signature de la convention individuelle de formation
-    - Rédaction de la lettre du directeur de thèse
-  - J'ai rédigé ma lettre de motivation
-  - J'ai envoyé le feuillet scientifique à Delphine Hubert pour signature par Jean-Yves Marion
+  - Vient de recevoir le feuillet scientifique signé
+  - Peut enfin envoyer le dossier
   - Pièces à joindre
-    - [ ] Feuillet scientifique signé
+    - [X] Feuillet scientifique signé
     - [X] Lettre du directeur de thèse
     - [X] Lettre de motivation
     - [X] Titre et résumé de la thèse
@@ -19635,6 +19852,39 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
     - [X] Justificatif de ressources financières
     - [X] Attestation d'assurance responsabilité civile - vie privée
     - [ ] Attestation de CVEC
+  - J'ai envoyé les documents à Aurore Tranchina
+  - Reste plus qu'à attendre la validation
+- Papier : Générer des logs avec différentes fréquences pour la génération de /rename/
+  - Quelles résultats je veux présenter, et comment ?
+  - Dépend de sur quoi a un impact la fréquence de /rename/
+    - Évolution de la taille des métadonnées du document
+      - Devrait limiter la taille maximale du document et rapprocher les pics pour la courbe RLS with GC
+      - Pas sûr que ça ait un impact sur RLS w/o GC par contre
+	- Même nombre d'opérations devrait donner le même nombre de blocs et donc le même volume de métadonnées
+	- Ça réduira p-e la taille des identifiants
+	- Mais pas sûr que ça soit significatif
+    - Évolution du temps d'intégration des opérations standards
+      - Comme pour l'évolution en mémoire, devrait atténuer l'amplitude des courbes
+      - Devrait aussi réduire le surcoût de transformer les opérations concurrentes à un /rename/
+    - Aucun impact sur le temps d'exécution de l'opération /rename/
+      - Puisqu'on mesure le temps depuis la dernière opération /rename/
+    - Temps d'exécution total d'un log d'opérations
+      - Pas sûr de l'impact
+      - Je pense que chaque opé /rename/ va ajouter un surcoût
+      - Surtout les dernières qui vont être violentes car vont /rename/ tout l'état
+      - Autant au début, l'optimisation de la structure va p-e compenser ce temps d'exécution
+      - Mais ça me paraît plus crédible en fin de vie du document
+  - Pourrait proposer une seconde version des figures 11 et 12 avec cette valeur différente pour la fréquence de /rename/
+  - Reste à choisir une valeur de fréquence
+    - Pas vraiment de règle à suivre pour choisir cette valeur :/
+    - J'aurais juste tendance à la réduire par rapport à 30k
+    - 7.5k me paraît un choix pas trop mauvais et pratique
+      - Divise 150k
+      - Est divisible par 3 pour avoir 2 points/valeurs entre chaque /rename/
+	- Et conserver la même structure qu'on avait avec les /rename/ tous les 30k opés et les snapshots tous les 10k
+  - J'ai lancé des simus avec ces paramètres
+  - Voir comment de logs je veux pour chaque catégorie
+    - On en avait 18 de chaque pour la 1ère version du papier
 * Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
