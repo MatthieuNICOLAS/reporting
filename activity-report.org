@@ -19508,7 +19508,7 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 - Regrouper les différents commentaires des reviews en thématiques
 - Mettre en place le plan
 **** DONE Thèse : Faire réinscription
-**** IN-PROGRESS Papier : Générer des logs avec différentes fréquences pour la génération de /rename/
+**** DONE Papier : Générer des logs avec différentes fréquences pour la génération de /rename/
 - Une review indique vouloir voir l'effet de la fréquence de génération de l'opé /rename/ sur les perfs
 - Voir pour relancer des simulations avec une valeur pour le paramètre de fréquence
 - Quelles fréquences utiliser ?
@@ -19516,12 +19516,27 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
   - Taille mémoire ?
   - Exécution des opérations standard ?
   - Temps d'exécution global du scénario ?
-**** IN-PROGRESS Papier : Proposer une analyse en complexité du mécanisme de GC
-- Des reviews demandent une évaluation du mécanisme de GC
-- Voir pour proposer un algo pour le mécanisme de GC
-- En faire son analyse de complexité en temps
-- En espace aussi ?
-  - Je sais pas si ça a du sens
+**** IN-PROGRESS Papier : Mettre en place benchmark permettant de mesurer le temps pour rejouer l'intégralité d'un log
+- Dans une review, on nous demande de comparer le temps nécessaire pour jouer une exécution avec LogootSplit et RenamableLogootSplit
+- Il s'agit d'une métrique qui me paraît pas trop compliqué
+  - Juste prendre un log d'opérations et le re-exécuter
+**** TODO Papier : Générer figures présentant les résultats des simulations avec /rename/ toutes les 7k5 opés
+- J'ai généré des exécutions avec la fréquence de /rename/ fixée à 7k5 opés
+- Correspondent aux exécutions suivantes
+  - 1 /renamingBot/ : 1632927124
+  - 2 /renamingBots/ : 1632927403
+  - 3 /renamingBots/ : 1632984394
+  - 4 /renamingBots/ :1632984412
+- [ ] Vérifier qu'exécutions sont valides
+  - Converge
+  - Logs complets
+  - Opérations /rename/ bien concurrentes
+- [ ] Générer les figures d'évolution de la consommation mémoire
+- [ ] Générer les figures d'évolution du temps d'exécution des opérations standards
+- [ ] Mesurer le temps d'exécution global d'un log d'opération
+- Pour chaque, revoir et documenter
+  - Quelles données ai-je besoin ? (snapshots ? logs ? csv ?)
+  - Comment générer ces données si besoin ?
 **** IN-PROGRESS GLA : Rédiger syllabus
 - J'ai reçu un mail de Polytech me demandant de leur retourner le syllabus du module d'ici la fin du mois
   - Mail de Marie-Christine Hiblot
@@ -19538,10 +19553,190 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 **** TODO BD1-2I : Rédiger sujet de partiel
 **** TODO BD1-EMME : Rédiger sujet TD noté
 - Voir horaires de la séance 4 de TD de chacun des groupes
-**** TODO Papier : Mettre en place benchmark permettant de mesurer le temps pour rejouer l'intégralité d'un log
-- Dans une review, on nous demande de comparer le temps nécessaire pour jouer une exécution avec LogootSplit et RenamableLogootSplit
-- Il s'agit d'une métrique qui me paraît pas trop compliqué
-  - Juste prendre un log d'opérations et le re-exécuter
+*** Done
+- BD1-EMME : Déroulement TD1
+  - 08h-08h35 : Mise en route (récupération du cours et TD via Arche, relecture du cours par les étudiants, démarrage de l'exo 1 et retours sur quelques schémas conceptuels)
+  - 08h35-08h50 : Correction de l'exo 1 au tableau
+  - 08h50-09h20 : Travail de l'exo 2 par les étudiant-es en autonomie, réponses aux questions, retours sur leur schéma
+  - 09h20-09h35 : Correction de l'exo 2 au tableau
+  - 09h35-09h50 : Réalisation de l'exo 3 avec eux au tableau
+- Papier : Mettre en place document pour réponse aux reviewers
+  - Overleaf
+    - François a créé le document et m'a invité
+    - Me reste à voir avec lui pour obtenir les droits d'invitation
+    - François a invité Gérald et Olivier
+  - Thématiques possibles
+    - Évaluation
+      - Comparaison avec d'autres approches (reviewers 1, 3 et 4)
+	- Il serait intéressant de comparer les performances de RLS avec celles du mécanisme de rebalancing présenté dans Core & Nebula
+	- Mais à notre connaissance, aucune implémentation de ce mécanisme n'a été rendue publique et évaluée
+	  - Pas d'évaluation dans le papier à RenPar'20
+	  - Pas mentionné dans la thèse de Marek
+	- Il serait difficile et coûteux d'en effectuer une implémentation à partir de l'article
+	- Sans compter les questions propres à l'implémentation
+	  - Choix des structures de données utilisées pour Treedoc
+	  - Choix de l'algo de consensus
+	  - Taille du core, de la nebula
+	  - Fréquence du rebalancing
+	- Par contre, peut se comparer de manière transitive avec les autres Sequence CRDTs en se basant sur les évaluations comparant LogootSplit à ces dernières
+	  - Voir si d'autres évaluations que celles présentées dans LS et RGASplit
+	  - Me semble qu'il y a une incohérence dans les courbes entre l'évaluation de LS et celle de RGASplit
+	    - Vérifier cela
+	    - Le cas échéant, voir comment justifier
+      - Évaluation du mécanisme de GC (reviewers 1, 3)
+	- Ajouter une analyse en complexité du mécanisme de GC
+	  - En début de section évaluation
+	  - Y ajouter aussi les complexités en temps des opérations ?
+      - Comparaison des performances de LS et RLS et impact de la fréquence du /rename/ (reviewer 1)
+	- Ajouter une nouvelle partie à l'évaluation consistant à rejouer des logs d'opérations (distantes) de document LS et RLS et de comparer leur temps respectif
+	  - Combien de logs ?
+	  - Quelles mesures faire ?
+	    - Juste une mesure de temps finale ?
+	    - Ou suivre la progression et enregistrer un temps tous les X opérations ?
+	- Peut avoir plusieurs logs pour RLS avec des fréquences différentes d'opés /rename/
+	  - Doit refaire tourner des simus pour générer ces logs
+	  - Quelles fréquences choisir ?
+    - Intérêt de supporter plusieurs renaming bots (reviewers 1)
+    - RLS, un variable-length tombstone-based Sequence CRDT ? (reviewer 2)
+    - Algorithmes
+      - Rework de la section 5.3
+      - Ajout de précisions sur les différentes fonctions utilisées
+    - Utilisation des propriétés pour la définition de /renameId/ et de /revertRenameId/
+    - Discussion sur la stratégie de déclenchement du renommage
+    - Typos (reviewers 1, 2, 3 et 4)
+      - Merci pour les retours, c'est corrigé
+- Strange Loop'21
+  - Strange Loop a lieu cette semaine
+    - Du <2021-09-30 Thu> au <2021-10-02 Sat>
+  - Plusieurs talks ont l'air intéressants
+    - *Prevent phishing and impersonation with trust loops*
+      - Par Karissa McKelvey
+      - Travaille chez Ink & Switch
+      - Présente leurs travaux récents sur Backchannel, un système d'identification distribué
+	- https://www.inkandswitch.com/backchannel/
+    - *Making Webapps Collaborative with Composable CRDTs*
+      - Par Matthew Weidner et Heather Miller
+	- Ceux qui avaient proposé *Composing and Decomposing Op-Based CRDTs with Semidirect Products*
+	- Sur la composition de CRDTs avec des opérations exclusives en utilisant OT
+      - Présentent Compoventuals, une librairie Typescript de collaborative data types
+    - *Injecting Security at the Cloud Edge*
+      - Par Susan Hinrichs
+      - Présente ses travaux chez Yahoo/Verizon sur assurer des politiques de sécurité entre des clouds privés et publics
+      - Pas sûr de trop piger quelque chose par contre
+  - Les conférences seront dispos sur YT, mais après plusieurs mois :/
+- BD1-2I : Revoir CM sur algèbre relationnel
+  - [X] Présence d'une erreur dans les slides sur les jointures externes pleines
+    - La description et l'opérateur présenté sont les mêmes que pour la jointure externe à gauche
+    - Modification pour indiquer que cela effectue la jointure des 2 relations et que ça conserve les tuples sans correspondance de R1 et de R2
+    - Modification pour utiliser l'opérateur /FULL-JOIN/
+  - [X] La présentation actuelle de la division est confusante/contre-intuitive
+    - La division permet de récupérer l'ensemble des tuples d'une première table qui sont en relation avec tous les tuples d'une seconde table
+    - Mais présente en 1er la relation *Produit*, en 2nd la relation *Stock*
+    - Ce qui va dans le sens contraire de l'utilisation que l'on va faire de ces relations
+    - Serait bien de traduire l'effet de la division
+      - Plutôt que de simplement dire "récupère les tuples de ..."
+      - Dire que la division permet de répondre à des questions genre "Quel dépôt stocke l'ensemble des produits différents ?"
+    - La requête algébrique présentée me paraît aussi maladroite
+      - Ce n'est pas clair quelles structures doivent avoir les relations utilisées dans le cadre d'une division
+    - En reparcourant les internets, je trouve le formalisme suivant
+      - R1(X, Y) ÷ R2(Y) -> R3(X)
+      - Avec X et Y deux ensembles d'attributs
+    - A modifié les slides en conséquence
+- BD1-2I : Revoir TD sur algèbre relationnel
+  - Bon le sujet n'est pas passionnant
+  - Mais il fait le taf
+- Thèse : Faire réinscription
+  - Vient de recevoir le feuillet scientifique signé
+  - Peut enfin envoyer le dossier
+  - Pièces à joindre
+    - [X] Feuillet scientifique signé
+    - [X] Lettre du directeur de thèse
+    - [X] Lettre de motivation
+    - [X] Titre et résumé de la thèse
+    - [X] Rapport et avis du CSI
+    - [X] Plan de thèse avec quantification du travail effectué
+    - [X] Thèse en l'état
+    - [X] Liste des publications
+    - [X] Convention individuelle de formation
+    - [X] Justificatif de ressources financières
+    - [X] Attestation d'assurance responsabilité civile - vie privée
+    - [ ] Attestation de CVEC
+  - J'ai envoyé les documents à Aurore Tranchina
+  - Reste plus qu'à attendre la validation
+- Papier : Générer des logs avec différentes fréquences pour la génération de /rename/
+  - Quelles résultats je veux présenter, et comment ?
+  - Dépend de sur quoi a un impact la fréquence de /rename/
+    - Évolution de la taille des métadonnées du document
+      - Devrait limiter la taille maximale du document et rapprocher les pics pour la courbe RLS with GC
+      - Pas sûr que ça ait un impact sur RLS w/o GC par contre
+	- Même nombre d'opérations devrait donner le même nombre de blocs et donc le même volume de métadonnées
+	- Ça réduira p-e la taille des identifiants
+	- Mais pas sûr que ça soit significatif
+    - Évolution du temps d'intégration des opérations standards
+      - Comme pour l'évolution en mémoire, devrait atténuer l'amplitude des courbes
+      - Devrait aussi réduire le surcoût de transformer les opérations concurrentes à un /rename/
+    - Aucun impact sur le temps d'exécution de l'opération /rename/
+      - Puisqu'on mesure le temps depuis la dernière opération /rename/
+    - Temps d'exécution total d'un log d'opérations
+      - Pas sûr de l'impact
+      - Je pense que chaque opé /rename/ va ajouter un surcoût
+      - Surtout les dernières qui vont être violentes car vont /rename/ tout l'état
+      - Autant au début, l'optimisation de la structure va p-e compenser ce temps d'exécution
+      - Mais ça me paraît plus crédible en fin de vie du document
+  - Pourrait proposer une seconde version des figures 11 et 12 avec cette valeur différente pour la fréquence de /rename/
+  - Reste à choisir une valeur de fréquence
+    - Pas vraiment de règle à suivre pour choisir cette valeur :/
+    - J'aurais juste tendance à la réduire par rapport à 30k
+    - 7.5k me paraît un choix pas trop mauvais et pratique
+      - Divise 150k
+      - Est divisible par 3 pour avoir 2 points/valeurs entre chaque /rename/
+	- Et conserver la même structure qu'on avait avec les /rename/ tous les 30k opés et les snapshots tous les 10k
+  - J'ai lancé des simus avec ces paramètres
+  - Voir comment de logs je veux pour chaque catégorie
+    - On en avait 18 de chaque pour la 1ère version du papier
+  - Déjà faire une simu pour chacun des settings de /nbRenamingBots/
+  - À partir de là, générer de nouvelles figures
+    - Évolution de la conso mémoire
+    - Évolution du temps d'inté des opérations standards
+    - Temps global d'exécution du log d'opérations
+  - Permettra de comparer les résultats avec /rename/ toutes les 7k5 opés par rapport à avec /rename/ toutes les 30k opés
+- Papier : Mettre en place benchmark permettant de mesurer le temps pour rejouer l'intégralité d'un log
+  - Le log contient chaque opération au format /remote/
+  - Peut ainsi instancier une copie et exécuter chacune des opérations dessus
+  - Possède déjà des scripts similaires
+    - /generate-intermediate-snapshots/
+    - /replay-log/
+  - Peut reprendre certaines de leurs fonctions pour ce script
+  - Script consiste à
+    - Récupérer le log
+    - Le parser pour obtenir la liste des opérations au format /remote/
+    - Créer une instance de RLS
+    - Appliquer l'ensemble des opérations à l'instance
+  - Reste à déterminer quelles mesures effectuer
+  - Quels temps je veux mesurer ?
+    - [ ] Seulement le temps final ?
+    - [X] Aussi les temps intermédiaires ?
+      - Permettrait de représenter l'évolution du temps d'inté des opérations
+  - Vais prendre une mesure de temps tous les 2k5 opérations
+  - Une fois le log exécuté, enregistrer les temps dans CSV
+    - nbOpes, type, time
+    - Avec type qui est une valeur entre
+      - LS
+      - RLS-1rb
+      - RLS-2rb
+      - RLS-3rb
+      - RLS-4rb
+** Semaine du <2021-10-04 Mon> au <2021-10-08 Fri>
+*** Planned
+**** TODO Papier : Préparer réunion sur réponse aux reviewers
+*** Done
+* Backlog
+**** IN-PROGRESS Papier : Proposer une analyse en complexité du mécanisme de GC
+- Des reviews demandent une évaluation du mécanisme de GC
+- Voir pour proposer un algo pour le mécanisme de GC
+- En faire son analyse de complexité en temps
+- En espace aussi ?
+  - Je sais pas si ça a du sens
 **** IN-PROGRESS Thèse : Rédiger section *Complexité temporelle*
 **** TODO Thèse : Mettre en cohérence *Utilisation de l'opération de renommage comme snapshot* et *Implémentation alternative à base d'operation-log*
 - Ces deux sous-sections redisent parfois la même chose
@@ -19744,148 +19939,7 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 - Publié à TPDS en septembre 2021
 - A l'air de proposer un mécanisme d'anti-entropie basé sur Merkle Tree plus efficace que state of the art
 - Dispo ici : https://kristofjannes.com/papers/tpds_owebsync.pdf
-*** Done
-- BD1-EMME : Déroulement TD1
-  - 08h-08h35 : Mise en route (récupération du cours et TD via Arche, relecture du cours par les étudiants, démarrage de l'exo 1 et retours sur quelques schémas conceptuels)
-  - 08h35-08h50 : Correction de l'exo 1 au tableau
-  - 08h50-09h20 : Travail de l'exo 2 par les étudiant-es en autonomie, réponses aux questions, retours sur leur schéma
-  - 09h20-09h35 : Correction de l'exo 2 au tableau
-  - 09h35-09h50 : Réalisation de l'exo 3 avec eux au tableau
-- Papier : Mettre en place document pour réponse aux reviewers
-  - Overleaf
-    - François a créé le document et m'a invité
-    - Me reste à voir avec lui pour obtenir les droits d'invitation
-    - François a invité Gérald et Olivier
-  - Thématiques possibles
-    - Évaluation
-      - Comparaison avec d'autres approches (reviewers 1, 3 et 4)
-	- Il serait intéressant de comparer les performances de RLS avec celles du mécanisme de rebalancing présenté dans Core & Nebula
-	- Mais à notre connaissance, aucune implémentation de ce mécanisme n'a été rendue publique et évaluée
-	  - Pas d'évaluation dans le papier à RenPar'20
-	  - Pas mentionné dans la thèse de Marek
-	- Il serait difficile et coûteux d'en effectuer une implémentation à partir de l'article
-	- Sans compter les questions propres à l'implémentation
-	  - Choix des structures de données utilisées pour Treedoc
-	  - Choix de l'algo de consensus
-	  - Taille du core, de la nebula
-	  - Fréquence du rebalancing
-	- Par contre, peut se comparer de manière transitive avec les autres Sequence CRDTs en se basant sur les évaluations comparant LogootSplit à ces dernières
-	  - Voir si d'autres évaluations que celles présentées dans LS et RGASplit
-	  - Me semble qu'il y a une incohérence dans les courbes entre l'évaluation de LS et celle de RGASplit
-	    - Vérifier cela
-	    - Le cas échéant, voir comment justifier
-      - Évaluation du mécanisme de GC (reviewers 1, 3)
-	- Ajouter une analyse en complexité du mécanisme de GC
-	  - En début de section évaluation
-	  - Y ajouter aussi les complexités en temps des opérations ?
-      - Comparaison des performances de LS et RLS et impact de la fréquence du /rename/ (reviewer 1)
-	- Ajouter une nouvelle partie à l'évaluation consistant à rejouer des logs d'opérations (distantes) de document LS et RLS et de comparer leur temps respectif
-	  - Combien de logs ?
-	  - Quelles mesures faire ?
-	    - Juste une mesure de temps finale ?
-	    - Ou suivre la progression et enregistrer un temps tous les X opérations ?
-	- Peut avoir plusieurs logs pour RLS avec des fréquences différentes d'opés /rename/
-	  - Doit refaire tourner des simus pour générer ces logs
-	  - Quelles fréquences choisir ?
-    - Intérêt de supporter plusieurs renaming bots (reviewers 1)
-    - RLS, un variable-length tombstone-based Sequence CRDT ? (reviewer 2)
-    - Algorithmes
-      - Rework de la section 5.3
-      - Ajout de précisions sur les différentes fonctions utilisées
-    - Utilisation des propriétés pour la définition de /renameId/ et de /revertRenameId/
-    - Discussion sur la stratégie de déclenchement du renommage
-    - Typos (reviewers 1, 2, 3 et 4)
-      - Merci pour les retours, c'est corrigé
-- Strange Loop'21
-  - Strange Loop a lieu cette semaine
-    - Du <2021-09-30 Thu> au <2021-10-02 Sat>
-  - Plusieurs talks ont l'air intéressants
-    - *Prevent phishing and impersonation with trust loops*
-      - Par Karissa McKelvey
-      - Travaille chez Ink & Switch
-      - Présente leurs travaux récents sur Backchannel, un système d'identification distribué
-	- https://www.inkandswitch.com/backchannel/
-    - *Making Webapps Collaborative with Composable CRDTs*
-      - Par Matthew Weidner et Heather Miller
-	- Ceux qui avaient proposé *Composing and Decomposing Op-Based CRDTs with Semidirect Products*
-	- Sur la composition de CRDTs avec des opérations exclusives en utilisant OT
-      - Présentent Compoventuals, une librairie Typescript de collaborative data types
-    - *Injecting Security at the Cloud Edge*
-      - Par Susan Hinrichs
-      - Présente ses travaux chez Yahoo/Verizon sur assurer des politiques de sécurité entre des clouds privés et publics
-      - Pas sûr de trop piger quelque chose par contre
-  - Les conférences seront dispos sur YT, mais après plusieurs mois :/
-- BD1-2I : Revoir CM sur algèbre relationnel
-  - [X] Présence d'une erreur dans les slides sur les jointures externes pleines
-    - La description et l'opérateur présenté sont les mêmes que pour la jointure externe à gauche
-    - Modification pour indiquer que cela effectue la jointure des 2 relations et que ça conserve les tuples sans correspondance de R1 et de R2
-    - Modification pour utiliser l'opérateur /FULL-JOIN/
-  - [X] La présentation actuelle de la division est confusante/contre-intuitive
-    - La division permet de récupérer l'ensemble des tuples d'une première table qui sont en relation avec tous les tuples d'une seconde table
-    - Mais présente en 1er la relation *Produit*, en 2nd la relation *Stock*
-    - Ce qui va dans le sens contraire de l'utilisation que l'on va faire de ces relations
-    - Serait bien de traduire l'effet de la division
-      - Plutôt que de simplement dire "récupère les tuples de ..."
-      - Dire que la division permet de répondre à des questions genre "Quel dépôt stocke l'ensemble des produits différents ?"
-    - La requête algébrique présentée me paraît aussi maladroite
-      - Ce n'est pas clair quelles structures doivent avoir les relations utilisées dans le cadre d'une division
-    - En reparcourant les internets, je trouve le formalisme suivant
-      - R1(X, Y) ÷ R2(Y) -> R3(X)
-      - Avec X et Y deux ensembles d'attributs
-    - A modifié les slides en conséquence
-- BD1-2I : Revoir TD sur algèbre relationnel
-  - Bon le sujet n'est pas passionnant
-  - Mais il fait le taf
-- Thèse : Faire réinscription
-  - Vient de recevoir le feuillet scientifique signé
-  - Peut enfin envoyer le dossier
-  - Pièces à joindre
-    - [X] Feuillet scientifique signé
-    - [X] Lettre du directeur de thèse
-    - [X] Lettre de motivation
-    - [X] Titre et résumé de la thèse
-    - [X] Rapport et avis du CSI
-    - [X] Plan de thèse avec quantification du travail effectué
-    - [X] Thèse en l'état
-    - [X] Liste des publications
-    - [X] Convention individuelle de formation
-    - [X] Justificatif de ressources financières
-    - [X] Attestation d'assurance responsabilité civile - vie privée
-    - [ ] Attestation de CVEC
-  - J'ai envoyé les documents à Aurore Tranchina
-  - Reste plus qu'à attendre la validation
-- Papier : Générer des logs avec différentes fréquences pour la génération de /rename/
-  - Quelles résultats je veux présenter, et comment ?
-  - Dépend de sur quoi a un impact la fréquence de /rename/
-    - Évolution de la taille des métadonnées du document
-      - Devrait limiter la taille maximale du document et rapprocher les pics pour la courbe RLS with GC
-      - Pas sûr que ça ait un impact sur RLS w/o GC par contre
-	- Même nombre d'opérations devrait donner le même nombre de blocs et donc le même volume de métadonnées
-	- Ça réduira p-e la taille des identifiants
-	- Mais pas sûr que ça soit significatif
-    - Évolution du temps d'intégration des opérations standards
-      - Comme pour l'évolution en mémoire, devrait atténuer l'amplitude des courbes
-      - Devrait aussi réduire le surcoût de transformer les opérations concurrentes à un /rename/
-    - Aucun impact sur le temps d'exécution de l'opération /rename/
-      - Puisqu'on mesure le temps depuis la dernière opération /rename/
-    - Temps d'exécution total d'un log d'opérations
-      - Pas sûr de l'impact
-      - Je pense que chaque opé /rename/ va ajouter un surcoût
-      - Surtout les dernières qui vont être violentes car vont /rename/ tout l'état
-      - Autant au début, l'optimisation de la structure va p-e compenser ce temps d'exécution
-      - Mais ça me paraît plus crédible en fin de vie du document
-  - Pourrait proposer une seconde version des figures 11 et 12 avec cette valeur différente pour la fréquence de /rename/
-  - Reste à choisir une valeur de fréquence
-    - Pas vraiment de règle à suivre pour choisir cette valeur :/
-    - J'aurais juste tendance à la réduire par rapport à 30k
-    - 7.5k me paraît un choix pas trop mauvais et pratique
-      - Divise 150k
-      - Est divisible par 3 pour avoir 2 points/valeurs entre chaque /rename/
-	- Et conserver la même structure qu'on avait avec les /rename/ tous les 30k opés et les snapshots tous les 10k
-  - J'ai lancé des simus avec ces paramètres
-  - Voir comment de logs je veux pour chaque catégorie
-    - On en avait 18 de chaque pour la 1ère version du papier
-* Backlog
+* Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
   - L'opération locale est appliquée sur le modèle
