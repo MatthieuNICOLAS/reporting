@@ -19467,8 +19467,16 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
     - Gestion de dépendances
       - Dépendances
       - Outils de gestion de dépendances
-    - Déploiement et reproducibility
+      - Différences entre dépendances et lockfile
+    - Micro-services
+      - Peut tourner ça en composition de services
+      - Voir si intéressant et le temps d'en parler
+	- Alex pense que oui
+	- PA est un peu plus mitigé
+	  - Argue que ça nécessite trop de pré-requis pour cela
+    - Déploiement et reproductibilité
       - Conteneurs
+	- Voir NixOS
       - Composition
       - Continous Deployement
   - Quelles technos utiliser ?
@@ -19516,17 +19524,32 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
   - Taille mémoire ?
   - Exécution des opérations standard ?
   - Temps d'exécution global du scénario ?
-**** IN-PROGRESS Papier : Mettre en place benchmark permettant de mesurer le temps pour rejouer l'intégralité d'un log
+**** DONE Papier : Mettre en place benchmark permettant de mesurer le temps pour rejouer l'intégralité d'un log
 - Dans une review, on nous demande de comparer le temps nécessaire pour jouer une exécution avec LogootSplit et RenamableLogootSplit
 - Il s'agit d'une métrique qui me paraît pas trop compliqué
   - Juste prendre un log d'opérations et le re-exécuter
+**** DONE BD1-EMME : Corriger énoncé du TD1
+- Le numéro de slide référencé ne correspond pas à la slide souhaitée dans le CM
+- Corriger
+**** DONE BD1-EMME : Ajouter un exercice au TD2
+- Le sujet de TD actuel me paraît un peu trop court
+- Ajouter un 3ème exercice permettrait de s'assurer d'avoir assez de matière, quitte à ne pas le finir
+**** DONE GLA : Rédiger syllabus
+- J'ai reçu un mail de Polytech me demandant de leur retourner le syllabus du module d'ici la fin du mois
+  - Mail de Marie-Christine Hiblot
+- Il faut déjà décider de ce que le module contient
+- [X] Décider contenu module
+- [X] Rédiger syllabus
+**** IN-PROGRESS BD1-2I : Rédiger sujet de partiel
+- Peut reprendre un exercice du TD noté
+**** IN-PROGRESS BD1-2I : Corriger TD noté
 **** TODO Papier : Générer figures présentant les résultats des simulations avec /rename/ toutes les 7k5 opés
 - J'ai généré des exécutions avec la fréquence de /rename/ fixée à 7k5 opés
 - Correspondent aux exécutions suivantes
-  - 1 /renamingBot/ : 1632927124
+  - 1 /renamingBot/  : 1632927124
   - 2 /renamingBots/ : 1632927403
   - 3 /renamingBots/ : 1632984394
-  - 4 /renamingBots/ :1632984412
+  - 4 /renamingBots/ : 1632984412
 - [ ] Vérifier qu'exécutions sont valides
   - Converge
   - Logs complets
@@ -19537,22 +19560,6 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 - Pour chaque, revoir et documenter
   - Quelles données ai-je besoin ? (snapshots ? logs ? csv ?)
   - Comment générer ces données si besoin ?
-**** IN-PROGRESS GLA : Rédiger syllabus
-- J'ai reçu un mail de Polytech me demandant de leur retourner le syllabus du module d'ici la fin du mois
-  - Mail de Marie-Christine Hiblot
-- Il faut déjà décider de ce que le module contient
-- [ ] Décider contenu module
-- [ ] Rédiger syllabus
-**** IN-PROGRESS BD1-2I : Corriger TD noté
-**** TODO BD1-EMME : Corriger énoncé du TD1
-- Le numéro de slide référencé ne correspond pas à la slide souhaitée dans le CM
-- Corriger
-**** TODO BD1-EMME : Ajouter un exercice au TD2
-- Le sujet de TD actuel me paraît un peu trop court
-- Ajouter un 3ème exercice permettrait de s'assurer d'avoir assez de matière, quitte à ne pas le finir
-**** TODO BD1-2I : Rédiger sujet de partiel
-**** TODO BD1-EMME : Rédiger sujet TD noté
-- Voir horaires de la séance 4 de TD de chacun des groupes
 *** Done
 - BD1-EMME : Déroulement TD1
   - 08h-08h35 : Mise en route (récupération du cours et TD via Arche, relecture du cours par les étudiants, démarrage de l'exo 1 et retours sur quelques schémas conceptuels)
@@ -19710,8 +19717,9 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
   - Script consiste à
     - Récupérer le log
     - Le parser pour obtenir la liste des opérations au format /remote/
-    - Créer une instance de RLS
+    - Créer une instance de LS ou de RLS
     - Appliquer l'ensemble des opérations à l'instance
+  - Et ce pour chaque log à exécuter
   - Reste à déterminer quelles mesures effectuer
   - Quels temps je veux mesurer ?
     - [ ] Seulement le temps final ?
@@ -19726,10 +19734,189 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
       - RLS-2rb
       - RLS-3rb
       - RLS-4rb
+  - A implémenté une 1ère version du script /log-integration-time/
+    - Code en dur les différents fichiers de logs concernés
+  - A envoyé la nouvelle version de /results-exploit/ sur coast-dev2
+  - A aussi envoyé les fichiers de logs sur coast-dev2
+  - A lancé le script
+    - Reste plus qu'à attendre les résultats
+  - Temps finaux obtenus
+    - LS      :    50 949 723 898 (51s)
+    - RLS-1rb :    51 986 126 737 (52s)
+    - RLS-2rb :    79 609 770 981 (80s)
+    - RLS-3rb : 2 728 101 817 812 (2728s)
+    - RLS-4rb :    96 252 888 395 (96s)
+  - M'étais planté, je loggais le temps après chaque opération dans cette version
+  - Ces temps doivent donc être un peu altérés par ces mesures intempestives
+  - Peut tout de même regarder rapidement ces résultats
+  - Temps varient entre 50s et 100s
+    - À l'exception de RLS-3rb qui prend 45min
+    - Pour quelle(s) raison(s) ?
+      - Voir à partir de quelle opération ça dévie fortement des autres progressions
+    - Bizarre surtout que ça rediminue ensuite avec RLS-4rb
+    - Voir si reproductible
+  - A relancé une version en loggant toutes les 2k5 opérations
+    - Devrait réduire l'impact du monitoring sur les résultats
+  - Voir si encore une anomalie au niveau des temps obtenus pour le log de RLS-3rb
+  - Nouveaux temps finaux obtenus
+    - LS      :    50 173 571 015
+    - RLS-1rb :    51 254 705 680
+    - RLS-2rb :    78 834 583 771
+    - RLS-3rb : 2 721 841 008 725
+    - RLS-4rb :    95 094 485 276
+  - Temps raccords avec ceux obtenus précédemment
+    - Même pour RLS-3rb
+  - Anomalie de RLS-3rb
+    - Présente dès la 1ère vague de /rename/
+    - Avant 1er /rename/, on a les temps d'intégration du log qui sont, pour 7k5 opés, à
+      - RLS-3rb : 1 733 499 666 (1,7s)
+      - RLS-4rb : 1 718 328 249 (1,7s)
+    - Puis, à 10k opés, on mesure
+      - RLS-3rb : 47 494 043 592 (47s)
+      - RLS-4rb : 2 643 737 959 (2,6s)
+  - A relancé un benchmark, mais cette fois-ci sur les logs provenant d'exécution avec un /rename/ toutes les 30k opés
+  - Utilise les logs suivants
+    - LS : 1595210401
+    - RLS-1rb : 1595829602
+    - RLS-2rb : 1594634401
+    - RLS-3rb : 1595944802
+    - RLS-4rb : 1594392615
+  - Temps finaux obtenus
+    - LS      :    48 361 764 100 (48s)
+    - RLS-1rb :    49 224 314 634 (49s)
+    - RLS-2rb :    54 493 176 846 (54s)
+    - RLS-3rb : 9 467 681 103 044 (9467s)
+    - RLS-4rb :    57 663 243 374 (57s)
+  - Temps varie entre 50s et 58s
+    - À l'exception de RLS-3rb qui déconne de nouveau et prend 2h37
+    - De façon intéressante, obtient des meilleures perfs qu'avec /rename/ toutes les 7k5 opérations
+    - Doit s'expliquer par le nombre plus petit d'opérations /rename/ qui deviennent très coûteuses par rapport aux autres à partir d'une certaine taille de document
+    - Je suppose que cette version est plus lente au début par contre que la version renommant toutes les 7k5 opérations
+    - Faudrait générer graphique représentant le nombre d'opérations jouées en fonction du temps pour voir si les courbes se croisent
+- BD1-EMME : Ajouter un exercice au TD2
+  - Exercice sur Gestion de cours
+    - Simple, efficace
+    - Voir si nécessite hiérarchie de classes et associations n-aires
+  - Exercice sur Pokémon possible
+    - P-e remanier en simples animaux/oiseaux (zoologie) pour retirer la partie évolution qui était galère/pas évidente
+    - Voir si nécessite hiérarchie de classes et associations n-aires
+  - Je pars sur l'exo Pokémon
+    - Sans le retravailler
+    - Ne nécessite pas de hiérarchie de classes ni d'associations n-aires
+    - Mais plusieurs associations pas évidentes
+      - Évolution
+      - TableType
+    - Me semble suffisant pour les faire travailler
+    - Reste à mettre à jour la correction
+- GLA : Rédiger syllabus
+  - J'ai envoyé une 1ère version du syllabus à Vincent pour validation
+  - J'ai aussi récupéré le module qu'a enseigné Quentin
+    - Globalement le même contenu que ce que je prévois
+    - Incorpore quelques ressources
+      - Livres sur Docker
+      - Livre sur Continuous Delivery
+    - J'ai de quoi lire pour un petit moment
+  - Reste plus qu'à attendre validation de Vincent pour l'envoyer
+- BD1-2I : Rédiger sujet de partiel
+  - Au moins décider des exercices que j'utilise
 ** Semaine du <2021-10-04 Mon> au <2021-10-08 Fri>
 *** Planned
-**** TODO Papier : Préparer réunion sur réponse aux reviewers
+**** DONE Papier : Préparer réunion sur réponse aux reviewers
+**** IN-PROGRESS BD1-2I : Corriger TD noté
+**** TODO BD1-EMME : Rédiger sujet TD noté
+- Voir horaires de la séance 4 de TD de chacun des groupes
+  - TD1 : <2021-10-20 Wed> à 16h
+  - TD2 : <2021-10-20 Wed> à 08h
+  - TD3 : <2021-10-21 Thu> à 08h
+  - TD4 : <2021-10-13 Wed> à 10h
+- Voir les exercices intéressants
+  - Qui veut gagner des millions ?
+  - Archéologie
+    - Exercice 3 du TD3 fourni par Abir
+**** TODO GLA : Envoyer syllabus
+- Dans l'attente de la validation par Vincent
+- L'envoyer une fois que c'est fait
+**** TODO Papier : Générer figures présentant les résultats des simulations avec /rename/ toutes les 7k5 opés
 *** Done
+- BD1-EMME : Déroulement TD2
+  - Bisserie absente
+  - 08h-08h15 : Complément de cours
+  - 08h15-08h45 : Travail exo 1
+  - 08h45-09h05 : Correction de l'exo 1
+  - 09h05-09h25 : Travail exo 2
+  - 09h25-09h37 : Correction exo 2
+  - 09h37-09h50 : Travail exo 3
+  - J'ai profité du TD pour voir si wamp était installé sur les machines
+  - Il l'est
+  - Mais besoin des crédentials d'admin pour le lancer
+  - Le service info voit pour changer ça
+    - Et pour le mettre à dispo en C244
+  - Les crédentials pour se connecter à la DB depuis phpmyadmin sont
+    - login : "root"
+    - mdp : ""
+- Papier : Préparer réunion sur réponse aux reviewers
+  - Travail effectué
+    - Lettre de réponse
+      - A commencé à regrouper les différents commentaires en thématiques
+	- Evaluation
+	  - Comparaison avec related work
+	  - Évaluation du mécanisme de GC
+	  - Impact sur les performances de la fréquence des opérations /rename/
+	- Importance de supporter les opérations /rename/ concurrentes
+	  - Pour insister sur les problèmes posés par avoir qu'un seul /renaming bot/
+	  - Et rappeler que les performances obtenues ne prennent pas en compte un protocole de consensus qui serait nécessaire pour empêcher des opérations /rename/ concurrentes
+	- Explications des algorithmes
+	  - Pour éclaircir certains points des algorithmes qui semblent pas clairs
+	    - Section 5.3
+	    - Fonctions utilitaires utilisées
+	- Utilisation des propriétés pour concevoir /renameId/ et /revertRenameId/
+	  - Pour montrer certains choix de design à l'aide de ces propriétés
+	    - Déterministe -> renamedIds
+	    - User-intention preservation -> concaténation au prédecesseur
+      - Sais pas trop comment intégrer les autres commentaires à la lettre de réponse
+    - Évaluation mécanisme de GC
+      - A commencé à revoir l'algorithme du mécanisme de GC
+      - Et les différentes étapes qui les composent
+	- Identification de l'epoch maximale causalement stable
+	- Identification du LCA entre un ensemble d'epochs
+	  - Doit se diviser en une succession d'identification du LCA entre 2 epochs
+        - Identification des epochs constituant le chemin des epochs potentielles au LCA
+	- Suppression des epochs non-requises
+      - En présentant l'algo à Vic pour avoir son avis sur les structures de données à utiliser, celui-ci m'a proposé un algo pour identifier les epochs requises
+	- Nécessite de maintenir une liste ordonnée des epochs
+	- Mais possède une complexité linéaire avec le nombre d'epochs
+        - A implémenté l'algo
+	- A implémenté plusieurs tests unitaires
+	- À creuser
+    - Évaluation temps d'exécution d'un log
+      - A refait tourner des simulations histoire d'avoir des logs avec différentes fréquences de /rename/
+      - On avait fréquence toutes les 30k
+      - Là j'en ai fait tourner avec toutes les 7k5
+	- Savait pas trop quelle valeur choisir
+	- S'agit d'un diviseur de 150k et est divisible par 3
+	- Permet de prendre des snapshots toutes les 2k5 opés
+      - A mis en place un script qui prend bêtement un log et le rejoue dans son intégralité
+      - Enregistre les temps au fur et à mesure
+	- Justement, tous les 2k5
+      - A obtenu les résultats suivants
+	- Temps obtenus pour /rename/ toutes les 7k5
+	  - LS      :    50 173 571 015 (50s)
+	  - RLS-1rb :    51 254 705 680 (51s)
+	  - RLS-2rb :    78 834 583 771 (79s)
+	  - RLS-3rb : 2 721 841 008 725 (2721s)
+	  - RLS-4rb :    95 094 485 276 (95s)
+	- Temps obtenus pour /rename/ toutes les 30k
+	  - LS      :    48 361 764 100 (48s)
+	  - RLS-1rb :    49 224 314 634 (49s)
+	  - RLS-2rb :    54 493 176 846 (54s)
+	  - RLS-3rb : 9 467 681 103 044 (9467s)
+	  - RLS-4rb :    57 663 243 374 (57s)
+      - /rename/ n'a pas l'air introduire un surcoût computationnel trop important
+	- Outre les résultats très étranges pour les logs à 3 /renaming bots/
+      - Serait intéressant de générer les courbes de progression du log en fonction du temps pour chaque couple (/nbRenamingBots/, /renameFrequency/)
+	- Histoire de voir la tête de ces courbes
+	- Pourrait aider à déterminer une stratégie
+	  - P-e rentable de /rename/ fréquémment au début puis d'espacer de plus en plus car le coût computationnel devient trop élévé avec la taille du document
 * Backlog
 **** IN-PROGRESS Papier : Proposer une analyse en complexité du mécanisme de GC
 - Des reviews demandent une évaluation du mécanisme de GC
@@ -20099,6 +20286,8 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
     - /tmux a -t matthieu/
 - Convertir un PDF en noir et blanc
   - /convert -colorspace GRAY -density 400 -quality 100 main.pdf gray.pdf/
+- Exécuter un script node sans JIT
+  - /node --max-old-space-size=8192 --jitless bot-results.js --log-execution-time/
 * Glossaire
 - <<<Eventual convergence>>> property
   #+BEGIN_QUOTE
