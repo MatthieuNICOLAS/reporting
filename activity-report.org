@@ -19822,7 +19822,18 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 ** Semaine du <2021-10-04 Mon> au <2021-10-08 Fri>
 *** Planned
 **** DONE Papier : Préparer réunion sur réponse aux reviewers
+**** DONE BD1-2I : Rédiger sujet de partiel
+- Peut reprendre un exercice du TD noté
 **** IN-PROGRESS BD1-2I : Corriger TD noté
+**** IN-PROGRESS Papier : Lancer benchmark rejeu du log en ciblant uniquement log avec 3 /renaming bots/
+- Histoire de confirmer si le problème vient de ce log
+- Ou s'il vient de l'exécution du benchmark lui-même
+**** IN-PROGRESS Papier : Explorer les options de Node permettant de gagner du contrôle sur l'exécution
+- J'utilise déjà l'option --jitless pour désactiver l'optimisation à chaud du code exécuté
+- Gérald me disait qu'il existe aussi plusieurs options vis-à-vis du GC
+- Voir si certaines options me donneraient plus de contrôle
+  - Ou au moins plus d'informations
+  - Genre quand est-ce que le GC s'est déclenché
 **** TODO BD1-EMME : Rédiger sujet TD noté
 - Voir horaires de la séance 4 de TD de chacun des groupes
   - TD1 : <2021-10-20 Wed> à 16h
@@ -19836,7 +19847,28 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 **** TODO GLA : Envoyer syllabus
 - Dans l'attente de la validation par Vincent
 - L'envoyer une fois que c'est fait
+**** TODO Papier : Comparer évaluations de LS et de RGASplit
+- Revoir ces deux évaluations pour déterminer si y a une contradiction entre les résultats obtenus
+- Si contradiction, trouver origine
+**** TODO Papier : Faire comparaison transitive de RLS avec autres approches
+- À partir des évaluations de LS et de RGASplit, comparer RLS aux autres approches existantes
 **** TODO Papier : Générer figures présentant les résultats des simulations avec /rename/ toutes les 7k5 opés
+- J'ai généré des exécutions avec la fréquence de /rename/ fixée à 7k5 opés
+- Correspondent aux exécutions suivantes
+  - 1 /renamingBot/  : 1632927124
+  - 2 /renamingBots/ : 1632927403
+  - 3 /renamingBots/ : 1632984394
+  - 4 /renamingBots/ : 1632984412
+- [ ] Vérifier qu'exécutions sont valides
+  - Converge
+  - Logs complets
+  - Opérations /rename/ bien concurrentes
+- [ ] Générer les figures d'évolution de la consommation mémoire
+- [ ] Générer les figures d'évolution du temps d'exécution des opérations standards
+- [ ] Mesurer le temps d'exécution global d'un log d'opération
+- Pour chaque, revoir et documenter
+  - Quelles données ai-je besoin ? (snapshots ? logs ? csv ?)
+  - Comment générer ces données si besoin ?
 *** Done
 - BD1-EMME : Déroulement TD2
   - Bisserie absente
@@ -19898,6 +19930,9 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
       - A mis en place un script qui prend bêtement un log et le rejoue dans son intégralité
       - Enregistre les temps au fur et à mesure
 	- Justement, tous les 2k5
+      - A fait tourner sur 1 log pour chaque configuration pour le moment
+	- /rename/ toutes les 7k5 ou 30k opés
+	- 1, 2, 3 ou 4 /renaming bots/
       - A obtenu les résultats suivants
 	- Temps obtenus pour /rename/ toutes les 7k5
 	  - LS      :    50 173 571 015 (50s)
@@ -19917,6 +19952,75 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 	- Histoire de voir la tête de ces courbes
 	- Pourrait aider à déterminer une stratégie
 	  - P-e rentable de /rename/ fréquémment au début puis d'espacer de plus en plus car le coût computationnel devient trop élévé avec la taille du document
+  - Questions
+    - Est-ce que j'inclus de nouvelles figures liées aux exécutions avec /rename/ plus fréquents ?
+      - Si oui, comment ?
+    - Est-ce que j'inclus l'analyse de complexité en temps des opérations dans le papier ?
+      - Une piste possible pour développer la partie évaluation pour répondre aux commentaires qu'elle est insuffisante (R3W1, R3W2)
+      - Peut aussi s'accompagner d'une partie analyse en complexité spatiale pour répondre au commentaire demandant la taille des opérations (R2C2)
+    - Tant que j'y pense, si tu as des ressources sur génie logiciel, suis preneur
+      - Workflow git, intégration continue, livraison continue
+      - Gérald m'envoie des ressources
+      - Olivier a un cours sur le sujet
+- Papier : Réunion
+  - Concernant les commentaires qui ne fittent aucune grande catégorie précédente
+    - Faire une section /divers/ dans laquelle on y répond par un par un
+    - Pourrait y faire figurer une partie sur la stratégie /rename/
+      - Dire qu'on a progressé depuis le papier sur la partie /rename/
+      - Et qu'avec nos nouveaux résultats, on peut proposer par exemple de /rename/ fréquemment jusqu'à un nombre d'éléments donnés puis ensuite ralentir
+  - Concernant l'anomalie du temps de rejeu d'un log avec 3 /renaming bots/
+    - Rejouer juste ce log pour voir si résultat reproductible
+    - Voir avec les options de node pour détecter quand GC a lieu, minimiser l'exécution du GC, etc.
+  - Concernant la preuve des propriétés
+    - Peut choisir l'axe qu'il s'agit de prouver que /renameId()/ et /revertRenameId()/ respectent ces propriétés
+    - Auquel je peux répondre qu'on a pas de preuve à l'heure actuelle
+    - Que par contre notre validation expérimentale semble indiquer pour le moment que notre mécanisme de renommage les respectent
+    - Mais qu'il serait effectivement intéressant de proposer une preuve formelle dans des travaux futurs
+  - Concernant la 2nde version globalement
+    - Doit pas modifier en profondeur l'article
+    - Doit bien cibler les changements
+  - Plan
+    - Bosse sur les anomalies de temps de rejeu du log
+    - Génère les figures de l'évolution du temps de rejeu d'un log
+    - Commence à retravailler l'article
+      - Voir quelle(s) section(s) retravailler en priorité
+    - Réunion avec Gérald <2021-10-12 Tue> pour voir la comparaison transitive avec les autres approches
+      - Revoir l'évaluation de LogootSplit
+      - Revoir l'évaluation de RGASplit
+- BD1-2I : Rédiger sujet de partiel
+  - Peut remplacer le sujet de l'exercice d'algèbre relationnelle
+  - Peut utiliser le schéma relationnel issu de l'exercice du Pokédex à la place
+  - Permet quelques requêtes sympathiques
+- Papier : Lancer benchmark rejeu du log en ciblant uniquement log avec 3 /renaming bots/
+  - J'ai relancé le benchmark avec un log d'exécution avec /rename/ toutes les 30k opés
+  - En monitorant l'exécution, remarque la RAM utilisée est de 1.6Go
+    - Loin des 8Go que j'ai attribué à Node
+  - Cela me fait douter de l'argument que c'est le processus de GC qui fait exploser les perfs
+- Papier : Explorer les options de Node permettant de gagner du contrôle sur l'exécution
+  - L'article suivant présente le fonctionnement du GC de Node
+    - https://medium.com/voodoo-engineering/nodejs-internals-v8-garbage-collector-a6eca82540ec
+  - Il pointe vers le repo suivant qui liste l'ensemble des options relatives au GC
+    - https://gist.github.com/listochkin/10973974
+  - Quelques options sortent du lot
+    - /--max_old_space_size/ qu'on utilise déjà pour passer à 8Go la RAM utilisable par Node
+    - /--max_new_space_size/
+      - Permet de préciser la RAM disponible pour les nouveaux objets créés
+      - S'agit d'un espace plutôt petit
+      - Soit les objets créés disparaissent rapidement
+      - Soit ils sont déplacés au /old_space/
+      - Vois pas trop ce qu'on a à gagner à manipuler ce paramètre
+    - /--max_executable_size/
+      - Obsolète d'après cette issue : https://github.com/nodejs/node/issues/13341
+  - Autre article à creuser
+    - https://tejom.github.io/general/nodejs/v8/debugging/2017/01/16/nodejs-and-v8.html
+  - Vic m'a partagé un lien vers un outil pour explorer un profiling
+    - https://github.com/jlfwong/speedscope
+    - Plus précisément, la page suivante indique comment générer un profiling pour un script Node
+      - https://github.com/jlfwong/speedscope/wiki/Importing-from-Node.js#importing-from-node---prof
+    - Voir pour générer un profiling sur RLS avec 1 /renaming bot/
+    - Si résultat satisfaisant, voir pour générer un profiling sur un des logs à 3 /renaming bots/
+      - Limite, exécuter qu'une partie du log suffira
+      - Genre les 20k premières opérations
 * Backlog
 **** IN-PROGRESS Papier : Proposer une analyse en complexité du mécanisme de GC
 - Des reviews demandent une évaluation du mécanisme de GC
