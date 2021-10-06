@@ -19824,16 +19824,18 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 **** DONE Papier : Préparer réunion sur réponse aux reviewers
 **** DONE BD1-2I : Rédiger sujet de partiel
 - Peut reprendre un exercice du TD noté
-**** IN-PROGRESS BD1-2I : Corriger TD noté
-**** IN-PROGRESS Papier : Lancer benchmark rejeu du log en ciblant uniquement log avec 3 /renaming bots/
+**** DONE Papier : Lancer benchmark rejeu du log en ciblant uniquement log avec 3 /renaming bots/
 - Histoire de confirmer si le problème vient de ce log
 - Ou s'il vient de l'exécution du benchmark lui-même
-**** IN-PROGRESS Papier : Explorer les options de Node permettant de gagner du contrôle sur l'exécution
+**** DONE Papier : Explorer les options de Node permettant de gagner du contrôle sur l'exécution
 - J'utilise déjà l'option --jitless pour désactiver l'optimisation à chaud du code exécuté
 - Gérald me disait qu'il existe aussi plusieurs options vis-à-vis du GC
 - Voir si certaines options me donneraient plus de contrôle
   - Ou au moins plus d'informations
   - Genre quand est-ce que le GC s'est déclenché
+**** IN-PROGRESS Papier : Profiler le rejeu du log RLS-7k5-3rb et analyser résultats
+- Histoire de comprendre d'où viennent les performances étranges de ce cas
+**** IN-PROGRESS BD1-2I : Corriger TD noté
 **** TODO BD1-EMME : Rédiger sujet TD noté
 - Voir horaires de la séance 4 de TD de chacun des groupes
   - TD1 : <2021-10-20 Wed> à 16h
@@ -19995,7 +19997,12 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
   - J'ai relancé le benchmark avec un log d'exécution avec /rename/ toutes les 30k opés
   - En monitorant l'exécution, remarque la RAM utilisée est de 1.6Go
     - Loin des 8Go que j'ai attribué à Node
+    - Surtout que de base le système utilise 500Mo
   - Cela me fait douter de l'argument que c'est le processus de GC qui fait exploser les perfs
+  - A obtenu le résultat suivant
+    - RLS-3rb : 9 469 353 491 672 (9469s)
+  - Le nombre d'opérations intégrées en fonction du temps a l'air de suivre la même progression que lors du 1er benchmark
+  - Vais creuser ça avec l'outil propposé par Vic
 - Papier : Explorer les options de Node permettant de gagner du contrôle sur l'exécution
   - L'article suivant présente le fonctionnement du GC de Node
     - https://medium.com/voodoo-engineering/nodejs-internals-v8-garbage-collector-a6eca82540ec
@@ -20017,10 +20024,91 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
     - https://github.com/jlfwong/speedscope
     - Plus précisément, la page suivante indique comment générer un profiling pour un script Node
       - https://github.com/jlfwong/speedscope/wiki/Importing-from-Node.js#importing-from-node---prof
-    - Voir pour générer un profiling sur RLS avec 1 /renaming bot/
+  - Voir pour générer un profiling sur RLS avec 1 /renaming bot/
     - Si résultat satisfaisant, voir pour générer un profiling sur un des logs à 3 /renaming bots/
       - Limite, exécuter qu'une partie du log suffira
       - Genre les 20k premières opérations
+  - Marche plutôt pas mal
+  - J'ai généré un profiling pour RLS-7k5-1rb
+  - Résultats
+    - Image
+      #+CAPTION: Profiling de RLS sur log avec rename toutes les 7k5 opés et 1 seul renaming bot
+      [[./img/profiling-rls-7k5-1rb.png]]
+    - Observe que les insertions prennent 52% du temps, les renames 29% et les removes 13% des 55s du benchmark
+      - Sachant que 5% du benchmark sont utilisés pour le setup (instanciation des opérations depuis le fichier du log)
+    - Observe que le /rename/ est bien de plus en plus coûteux
+      - Commence à l'observer lorsqu'il prend 100ms
+      - Dépasse 1s au bout d'un moment
+  - Reste à refaire pareil avec RLS-7k5-3rb
+- BD1-2I : Déroulement DS
+  - 4 étudiants ont fini vers 17h45
+  - 5 vers 17h50
+  - Le reste à 18h00
+- BD1-EMME : Déroulement TD3
+  - 08h-08h15 : Travail sur Pokédex
+  - 08h15-08h35 : Correction exo Pokédex
+  - 08h40-08h45 : Annonce TD noté à la prochaine séance
+  - 08h45-09h15 : Début TD3
+  - 09h15-09h35 : Correction Exo 1
+  - 09h35-09h43 : Travail Exo 2
+  - 09h43-09h50 : Correction Exo 2
+- Papier : Profiler le rejeu du log RLS-7k5-3rb et analyser résultats
+  - Histoire d'accélérer l'obtention du profile, contente d'exécuter seulement les 30k premières opérations
+  - A obtenu le profile correspondant
+  - Obtient le résultat suivant
+    - Image
+      [[file:img/profiling-rls-7k5-3rb.png]]
+    - Observe l'absence de renames dans les temps mesurés
+    - Observe que les insertions prennent 80% du temps et les removes 20% des 7min du benchmark
+  - En fait, y a bien des renames qui sont exécutés
+    - En détecte 2 de 3.70s à 4s
+    - À eux deux, représentent 270ms des 274ms consacrées à /renameRemote()/
+    - N'arrive pas à en trouver d'autres
+  - Est-ce que ça indique une erreur dans l'implémentation de /priority/ ?
+    - Les autres renames ne figureraient pas/seraient exécutés trop rapidement car ils seraient juste ignorés ?
+    - Comment vérifier cela ?
+  - A relancé une exécution rapidement du log en ajoutant un message comparant les epochs quand un rename est ignoré
+    - Obtient la sortie suivante
+      #+BEGIN_BLOCK
+0,0,262812106,1 > 0,0,-937570014,1 ?
+0,0,2044304816,1 > 0,0,262812106,1,-937570014,2 ?
+0,0,2044304816,1 > 0,0,262812106,1,262812106,2 ?
+0,0,2044304816,1 > 0,0,262812106,1,2044304816,2 ?
+0,0,2044304816,1 > 0,0,262812106,1,262812106,2,262812106,3 ?
+0,0,2044304816,1 > 0,0,262812106,1,262812106,2,-937570014,3 ?
+0,0,2044304816,1 > 0,0,262812106,1,262812106,2,2044304816,3 ?
+#+END_BLOCK
+    - Correspond bon à l'ordre lexicographique souhaité
+  - Pose par contre la question de pourquoi les noeuds insistent tant avec la branche d'epochs /0,0,26281210, 1/ alors que /0,0,2044304816,1/ est prioritaire
+  - S'explique par le fix de la relation /priority/ provenant du commit suivant
+    - https://github.com/coast-team/mute-structs/commit/d59c8d12622e38c98d1e6aeea39343112f59f526
+  - Ce fix a été release via la version 2.0.1 de /mute-structs/
+  - /results-exploit/ utilise cette version de /mute-structs/
+  - Mais /mute-bot-random/ utilise encore la version 2.0.0-11
+  - Les performances étranges lors du rejeu de certains logs s'expliquent par cette différence
+    - Lors de la simulation, les noeuds utilisent l'ancienne version de /priority/ et convergent donc sur une epoch donnée
+    - Lors du rejeu du log issu de la simulation, le noeud utilise la nouvelle version de /priority/ et privilégie une autre epoch
+    - À partir de là, toutes les opérations suivantes doivent être transformées pour être intégrées à son état car elles proviennent d'une autre epoch
+  - Un autre résultat du profiling allant de ce sens est le temps passé dans /insertRemote()/ à /renameFromEpochToCurrent()/
+    - Dans le log 7k5 1rb, passe 6% des 52% du temps consacré à /insertRemote()/ à effectuer /renameFromEpochToCurrent()/
+    - Dans le log 7k5 3rb, passe 78% des 80% du temps consacré à /insertRemote()/ à effectuer /renameFromEpochToCurrent()/
+    - Une proportion un peu trop élévé étant donné qu'on est juste censé transformer les opérations concurrentes au rename
+  - Conclusions
+    - Une différence de versions de /priority/ entre /mute-bot-random/ et /results-exploit/ fait que, pour un même log, un noeud n'arrive pas à la même epoch
+    - Lors du rejeu d'un log, les opérations générées après la divergence vont l'être sur une epoch différente de l'epoch attendue
+    - Toutes ces opérations vont donc devoir être transformées pour être intégrées
+    - Cette étape ajoute un surcoût à l'intégration de chaque opération
+      - Au lieu de seulement les opérations concurrentes aux renames
+    - Ce surcoût s'accroît au fur et à mesure que la distance entre l'epoch obtenue par /results-exploit/ et l'epoch obtenue par /mute-bot-random/ augmente
+    - Corriger la version de /priority/ utilisée par /mute-bot-random/ et générer de nouveaux logs devraient corriger le problème constaté
+  - Étapes à suivre
+    - Mettre à jour /mute-bot-random/
+    - Générer la nouvelle image Docker correspondante
+    - Générer les nouveaux docker-compose basés sur cette image
+    - Déployer sur coast-srv0 l'image et les docker-compose
+    - Relancer des simus avec rename toutes les 7k5 et 30k opés, avec 1-4 renaming bots
+    - Mesurer le temps de rejeu des logs obtenus
+    - Identifier si d'autres résultats obtenus (temps d'intégration des opérations) a pu être affecté par ce bug
 * Backlog
 **** IN-PROGRESS Papier : Proposer une analyse en complexité du mécanisme de GC
 - Des reviews demandent une évaluation du mécanisme de GC
