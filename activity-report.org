@@ -19833,8 +19833,22 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
 - Voir si certaines options me donneraient plus de contrôle
   - Ou au moins plus d'informations
   - Genre quand est-ce que le GC s'est déclenché
-**** IN-PROGRESS Papier : Profiler le rejeu du log RLS-7k5-3rb et analyser résultats
+**** DONE Papier : Profiler le rejeu du log RLS-7k5-3rb et analyser résultats
 - Histoire de comprendre d'où viennent les performances étranges de ce cas
+**** DONE Papier : Mettre à jour /mute-bot-random/
+- Corriger la version de /mute-structs/ utilisée par le projet
+- S'agit d'une dépendance transitive via /mute-core/
+**** DONE PhD : Validation de VTSA 2019
+- En passant à l'école doctorale pour ma réinscription, on a fait le point sur les formations
+- Me manque encore une formation scientifique à valider
+- J'ai toujours ma participation à VTSA 2019 que je n'ai jamais fait validé
+- Faire la démarche sur ADUM
+  - Passe en tant que /formation hors catalogue/
+**** TODO Papier : Générer nouvelle image Docker de /mute-bot-random/ et la déployer sur serveur
+**** TODO Papier : Générer fichiers /docker-compose/ utilisant la nouvelle version de /mute-bot-random/
+**** TODO Papier : Générer simulations
+- Générer de nouvelles traces d'exécution
+- Faire varier les paramètres de fréquence de /rename/ et de /nbRenamingBots/
 **** IN-PROGRESS BD1-2I : Corriger TD noté
 **** TODO BD1-EMME : Rédiger sujet TD noté
 - Voir horaires de la séance 4 de TD de chacun des groupes
@@ -20109,6 +20123,289 @@ Caused by: java.lang.ClassNotFoundException: com.jcraft.jorbis.Info
     - Relancer des simus avec rename toutes les 7k5 et 30k opés, avec 1-4 renaming bots
     - Mesurer le temps de rejeu des logs obtenus
     - Identifier si d'autres résultats obtenus (temps d'intégration des opérations) a pu être affecté par ce bug
+- PhD : Validation de VTSA 2019
+  - J'ai rempli le formulaire de validation de la formation et fourni les pièces demandées
+  - En attente d'une validation par Souad
+- Papier : Mettre à jour /mute-bot-random/
+  - J'ai voulu release une nouvelle version de /mute-structs/
+    - Pour inclure un fix de /revertRenameId()/
+  - J'ai eu le plaisir de découvrir que la CI ne fonctionne plus
+    - Travis a l'air d'avoir changé de domaine
+    - Passé de https://travis-ci.org/ à https://www.travis-ci.com/
+    - Quand essaie de me connecter sur .org, boucle sur la page d'accueil
+    - Me suis loggé sur .com, considère que je suis un nouvel utilisateur
+  - Tente de remettre en place la CI
+  - Mais Travis ne liste pas certains repos
+    - mute-structs et mute-core en font partie
+  - Et ne comprend pas pourquoi ces repos sont manquants
+  - A tenté de faire un commit sur mute-structs et de le push pour voir si Travis réagit
+  - Pas de réaction
+  - D'après le post suivant, s'agit d'un problème de migration
+    - https://travis-ci.community/t/cant-find-a-repository-that-i-just-added-travis-yml-to/10909
+    - Concerne l'ensemble des repos ayant un processus de CI via .org
+    - Doit faire une démarche supplémentaire, s'inscrire à la beta du programme de migration, pour que .com gère désormais ce repo
+    - Effectivement, une fois cette étape effectuée, les repos apparaissent dans la liste
+  - A tenté de lancé un build
+  - Rencontre l'erreur suivante : /Could not authorize build request/
+  - D'après le lien suivant, s'agit d'un problème d'abonnement
+    - https://github.com/travis-ci/docs-travis-ci-com/issues/733
+  - Effectivement, j'avais sélectionné un plan pour mon compte mais pas pour l'organisation
+  - Une fois le plan sélectionné, a pu lancer un build
+  - Celui-ci a mis en lumière plusieurs changements à apporter à la configuration du CI
+    #+BEGIN_BLOCK
+jobs.include.deploy: deprecated key skip_cleanup (not supported in dpl v2, use cleanup)
+jobs.include: skipping job #1 because its condition does not match: tag IS present
+root: missing dist, using the default xenial
+root: missing os, using the default linux
+jobs.include.deploy: key api_key is an alias for api_token, using api_token
+    #+END_BLOCK
+  - A mis à jour la config du .travis.yml
+    - Y a un linter en ligne pour vérifier que la config est valide avant de pusher
+    - https://config.travis-ci.com/explore
+  - Après quelques ratés, a release mute-structs@2.0.5
+  - Rencontre maintenant des difficultés pour release la nouvelle version de mute-core
+    - 1ère tentative a fail car il ne s'agissait pas de la branche master
+    - 2nde tentative a fail pour une raison que je ne comprends pas
+      #+BEGIN_BLOCK
+npm ERR! code E404
+
+npm ERR! 404 Not Found - PUT https://registry.npmjs.org/@coast-team%2fmute-core - Not found
+
+npm ERR! 404
+
+npm ERR! 404  '@coast-team/mute-core@10.0.0-experiment-3.10' is not in this registry.
+
+npm ERR! 404 You should bug the author to publish it (or use the name yourself!)
+
+npm ERR! 404
+
+npm ERR! 404 Note that you can also install from a
+
+npm ERR! 404 tarball, folder, http url, or git url.
+
+npm ERR! A complete log of this run can be found in:
+
+npm ERR!     /home/travis/.npm/_logs/2021-10-07T14_18_41_139Z-debug.log
+
+Failed to publish
+      #+END_BLOCK
+      - Se produit après avoir généré l'archive du paquet
+  - J'ai relancé le build après avoir set le repo du package comme étant public, sans succès
+  - J'ai relancé le build en remplaçant le token d'accès par le token précédent, ça marche
+    - Quelle est cette sorcellerie ?
+  - Pas pratique pour release d'avoir un mono-repo
+  - A ajouté un tag spécifique à la release de mute-bot-random@2.0.1
+** Semaine du <2021-10-11 Mon> au <2021-10-15 Fri>
+*** Planned
+**** DONE BD1-EMME : Rédiger sujet TD noté
+- Voir horaires de la séance 4 de TD de chacun des groupes
+  - TD1 : <2021-10-20 Wed> à 16h
+  - TD2 : <2021-10-20 Wed> à 08h
+  - TD3 : <2021-10-21 Thu> à 08h
+  - TD4 : <2021-10-13 Wed> à 10h
+- Voir les exercices intéressants
+  - Qui veut gagner des millions ?
+  - Archéologie
+    - Exercice 3 du TD3 fourni par Abir
+**** DONE Papier : Générer nouvelle image Docker de /mute-bot-random/ et la déployer sur serveur
+**** DONE Papier : Générer fichiers /docker-compose/ utilisant la nouvelle version de /mute-bot-random/
+**** DONE Papier : Identifier si résultats obtenus ont pu être affectés par différence de relation /priority/ entre simus et benchmarks
+**** DONE Papier : Générer simulations
+- Générer de nouvelles traces d'exécution
+- Faire varier les paramètres de fréquence de /rename/ et de /nbRenamingBots/
+**** IN-PROGRESS GLA : Envoyer syllabus
+- Dans l'attente de la validation par Vincent
+- L'envoyer une fois que c'est fait
+**** IN-PROGRESS BD1-2I : Corriger TD noté
+**** IN-PROGRESS Papier : Comparer évaluations de LS et de RGASplit
+- Revoir ces deux évaluations pour déterminer si y a une contradiction entre les résultats obtenus
+- Si contradiction, trouver origine
+**** TODO Papier : Faire comparaison transitive de RLS avec autres approches
+- À partir des évaluations de LS et de RGASplit, comparer RLS aux autres approches existantes
+**** TODO Papier : Générer figures présentant les résultats des simulations avec /rename/ toutes les 7k5 opés
+- J'ai généré des exécutions avec la fréquence de /rename/ fixée à 7k5 opés
+- Correspondent aux exécutions suivantes
+  - 1 /renamingBot/  : 1632927124
+  - 2 /renamingBots/ : 1632927403
+  - 3 /renamingBots/ : 1632984394
+  - 4 /renamingBots/ : 1632984412
+- [ ] Vérifier qu'exécutions sont valides
+  - Converge
+  - Logs complets
+  - Opérations /rename/ bien concurrentes
+- [ ] Générer les figures d'évolution de la consommation mémoire
+- [ ] Générer les figures d'évolution du temps d'exécution des opérations standards
+- [ ] Mesurer le temps d'exécution global d'un log d'opération
+- Pour chaque, revoir et documenter
+  - Quelles données ai-je besoin ? (snapshots ? logs ? csv ?)
+  - Comment générer ces données si besoin ?
+**** TODO BD1-EMME : Rédiger sujet TD4
+- A lieu <2021-10-21 Thu> à 10h
+- Porte sur le déploiement d'une base de données relationnelle en utilisant phpMyAdmin
+- Et l'utilisation de SQL pour l'interroger
+- Restera plus qu'un TD ensuite
+- Portera sur les requêtes avancées en SQL
+  - Utilisation des clauses GROUP BY, HAVING et des fonctions d'aggrégations
+*** Done
+- GLA : Envoyer syllabus
+  - A relancé Vincent à propos du syllabus
+- BD1-EMME : Rédiger sujet TD noté
+  - Possède 4 exercices
+  - A fait et envoyé les corrections à Lauriane
+  - On a de quoi faire au moins 4 sujets, à voir combien on en fait au total
+- Arteoz : Bug RUNNING_PID
+  - Martine et Brigitte m'ont contacté à propos d'un bug qu'elles rencontrent en essayant de lancer la nouvelle version de /webarteoz/
+  - Le problème semble être la présence du fichier RUNNING_PID au lancement du conteneur
+  - Plusieurs cas possibles
+    - Le fichier RUNNING_PID a été ajouté lors de la création de l'image
+      - Dans ce cas, il faut le supprimer de l'arborescence qui a servi à construire l'image et en regénérer une nouvelle
+    - Le fichier RUNNING_PID a été créé lors du 1er lancement du conteneur mais pas supprimé à son arrêt à cause d'un crash
+      - Vu qu'elles ont l'air de rencontrer le même problème en essayant de relancer une ancienne version de l'application, pense qu'il s'agit plutôt de ça
+	- À moins qu'elles n'aient relancer les mêmes conteneurs lors de cette étape
+      - Dans ce cas, il faut identifier la raison du 1er crash de /webarteoz/
+	- Une raison possible est si le serveur démarre alors que la /messagequeue/ elle n'est pas démarrée
+	- Est-ce que le serveur crashe ou attend patiemment ?
+  - Leur ait répondu cette présentation du bug qu'elle rencontre
+  - Dans sa réponse, Martine indique qu'elle n'a pas trouvé de RUNNING_PID dans son arborescence
+    - Oriente de plus en plus vers un bug provoquant un crash de Arteoz à son 1er lancement
+- Papier : Générer nouvelle image Docker de /mute-bot-random/ et la déployer sur serveur
+  - Génération de botrandom-2.0.1
+- Papier : Générer fichiers /docker-compose/ utilisant la nouvelle version de /mute-bot-random/
+  - A généré les nouveaux fichiers
+  - En ait profité pour faire un peu d'organisation dans le repo
+    - Possède dorénavant un répertoire par version de botrandom
+  - Ce qui m'a posé des problèmes au moment de lancer les simulations
+    - Le changement dans l'arborescence provoquait un décalage au moment où j'essayais de monter le dossier de résultats en volume du conteneur
+  - A corrigé les fichiers
+- Papier : Identifier si résultats obtenus ont pu être affecté par différence de relation /priority/ entre simus et benchmarks
+  - Plusieurs évaluations ont pu être effectuées sur des simulations générées avec une autre version de mute-structs
+  - Et donc une autre version de /priority/
+  - Quel(s) impact(s) cela a pu avoir sur les résultats obtenus ?
+  - [X] Snapshot sizes
+    - Instancie des snapshots pour mesurer leur taille
+    - Puisque se base sur des snapshots, pas de problème
+    - Réinstancie la séquence et l'epoch courante à partir de la sérialisation JSON
+    - Ne ré-évalue pas quelle epoch devrait être l'epoch courante
+    - Donc reprend depuis la même epoch que le noeud lors de la simulation
+  - [X] Integration times insert
+    - De même, réutilise une snapshot pour appliquer des opérations insert dessus
+    - Utilise l'epoch courante de la snapshot comme base des opérations
+    - Ne pose pas de problème, même pour les scénarios générant des opés rename depuis cet état
+      - Puisque les nouvelles epochs vont dépendre sur l'epoch courante
+  - [X] Integration times rename
+    - Pareil que précédemment
+    - Utilise des snapshots
+    - Reprend donc l'epoch courante déterminée à l'aide de l'ancienne relation /priority/
+    - À partir de là, utilise la nouvelle relation pour déterminer ordre entre epochs générées à partir de celle-ci
+    - Même si l'epoch initiale n'est pas celle escomptée, le scénario du benchmark se comporte comme prévu
+    - Donc pas de problème
+- Papier : Générer simulations
+  - A commencé à générer des simulations
+  - 7k5-1rb
+    - 1633956472
+  - 7k5-2rb
+    - 1633956503
+  - 7k5-3rb
+    - 1633962034
+  - 7k5-4rb
+    - 1633962052
+  - 30k-1rb
+    - 1634020866
+  - 30k-2rb
+    - 1634020893
+  - 30k-3rb
+    - 1634028929
+  - 30k-4rb
+    - 1634028946
+- Papier : Comparer évaluations de LS et de RGASplit
+  - LS
+    - Génère des traces de manière artificielle
+    - Pour chacune, se décompose en 2 phases
+      - 10k opés avec 80% insert, 20% delete
+      - 10k opés avec ratio inversé
+    - 100 noeuds éditent le document
+      - Quand/Comment les noeudds se synchronisent ?
+      - Y a-t-il un délai entre 2 opés ?
+    - 2 types de traces
+      - 1er type de trace
+	- Positions des opérations choisies de manière aléatoire
+	- Opés de 50 caractères
+      - 2nd type de trace
+	- insert à la fin du doc
+	- remove aléatoire
+	- 50 caractères
+    - Évalue
+      - Temps local
+      - Temps distant
+      - Taille du doc en fonction du nombre d'opés
+    - Compare les performances de plusieurs CRDTs
+      - Treedoc
+      - WOOT
+	- Quelle version ?
+      - Logoot
+      - LogootSplitAVL
+      - LogootSplitNaive
+      - LogootSplitString
+    - Résultats obtenus
+      - Utilisation mémoire
+	- Dans le 1er type de trace, augmente de manière linéaire lors de la 1ère phase
+	- Dans le 2nd type de trace, augmente de manière supra-linéaire lors de la 1ère phase
+	- Puis dans les 2 cas décroît de manière logarithmique lors de la 2nde phase
+	- Le papier n'explique que brièvement ces résultats
+	- Autant je comprends la croissance linéaire dans le 1er cas
+	  - Chaque insertion split un bloc, introduit un nouveau bloc et génère un identifiant avec une taille incrémentée
+	- Et la décroissance logarithmique
+	  - Les suppressions ne suppriment pas entièrement les blocs
+	  - Les identifiants insérés réutilisent des identifiants existants et longs comme préfixes
+        - Autant je ne pige pas la croissance supra-linéaire dans le 2nd cas
+      - Opération locale
+      - Opération distante
+  - RLS
+- Réunion Gérald
+  - Comparaison avec l'existant
+    - Par rapport à Core & Nebula
+      - 1er axe sur l'absence d'implémentation de Core & Nebula
+	- Rend difficile la comparaison
+      - 2nd axe sur comment on se compare directement
+	- Mais rejoint ce que l'on a déjà dit dans la partie Related Work du papier
+    - Par rapport à la comparaison par rapport aux autres approches
+      - Les 2 papiers contredisent les performances de LogootSplit notamment par rapport à Treedoc
+    - Angle possible
+      - Dire que le but de l'article n'est pas de déterminer quelle approche est la meilleure entre TreeDoc, RGASplit et LogootSplit
+      - Ni dire que RLS est mieux que tout ça
+      - Mais dire qu'un mécanisme de renommage/d'optimisation de la représentation interne de la structure de données est utile
+	- Ce que faisait Core & Nebula avec Treedoc
+      - Et qu'on en propose un adapté à LogootSplit
+      - Et que certains de ses composants sont réutilisables et applicables à d'autres structures de données
+  - Sur la présence de tombstones dans la structure
+    - Approche s'apparente à des tombstones
+    - Mais celles-ci sont en marge de la structure utilisée pour les opérations principales
+    - Et impactent en temps d'intégration uniquement les opérations concurrentes aux rename
+    - Et impactent en occupation mémoire uniquement le temps que les former states soient déchargés/GC
+    - Contrairement à RGA où on aurait des tombstones qui impactent l'ensemble des performances de la structure jusqu'au GC
+  - Sur la partie évaluation
+    - Serait intéressant de faire des boxplots sur le temps d'intégration des opérations
+    - Pourrait faire varier la fréquence de rename pour mettre en lumière que ça permet de borner le temps d'inté des opés
+    - Gérald proposait aussi de calculer la moyenne des temps d'intégration et y ajouter le temps de rename
+      - Permettrait de faire grimper artificiellement la moyenne pour y inclure le coût du rename
+      - Mais rejoint le résultat déjà illustré par le benchmark du rejeu d'un log
+  - Concernant la stratégie pour rename
+    - Pas vraiment de réponse à apporter
+    - Explique déjà qu'il n'y a pas de solution pour tous les systèmes
+    - Peut prendre des paramètres de performances en considération
+    - Mais ne peut pas instaurer une contrainte forte, une borne, sur ces paramètres
+      - Par exemple, peut rename avant que ma copie locale ne devienne trop lourde
+      - Mais ne peut pas empêcher les /n/ autres noeuds de faire de même
+      - Et que d'inclure chacune de leur opération rename fait exploser la mémoire à cause de chaque /former state/
+    - À partir de là, quoi proposer ?
+    - Peut aussi inclure des paramètres de l'état du système
+      - Nombre de noeuds connectés
+      - Période d'idle du système
+    - Mais pareil, comment les insérer et privilégier un sur l'autre ?
+  - Sur la discussion pourquoi tradeoff entre l'approche tombstone-based et variable-size identifiers based
+    - Argumenter sur le fait qu'il n'y a pas de consensus sur la superiorité d'une approche sur l'autre
+    - Expliquer du coup qu'on pouvait prendre une approche ou l'autre pour ce que l'on faisait
+    - A donc pris LogootSplit par familiarité et expertise avec l'approche
 * Backlog
 **** IN-PROGRESS Papier : Proposer une analyse en complexité du mécanisme de GC
 - Des reviews demandent une évaluation du mécanisme de GC
