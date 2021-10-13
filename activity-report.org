@@ -20213,16 +20213,7 @@ Failed to publish
 **** DONE Papier : Générer simulations
 - Générer de nouvelles traces d'exécution
 - Faire varier les paramètres de fréquence de /rename/ et de /nbRenamingBots/
-**** IN-PROGRESS GLA : Envoyer syllabus
-- Dans l'attente de la validation par Vincent
-- L'envoyer une fois que c'est fait
-**** IN-PROGRESS BD1-2I : Corriger TD noté
-**** IN-PROGRESS Papier : Comparer évaluations de LS et de RGASplit
-- Revoir ces deux évaluations pour déterminer si y a une contradiction entre les résultats obtenus
-- Si contradiction, trouver origine
-**** TODO Papier : Faire comparaison transitive de RLS avec autres approches
-- À partir des évaluations de LS et de RGASplit, comparer RLS aux autres approches existantes
-**** TODO Papier : Générer figures présentant les résultats des simulations avec /rename/ toutes les 7k5 opés
+**** IN-PROGRESS Papier : Générer figures présentant les résultats des simulations avec /rename/ toutes les 7k5 opés
 - J'ai généré des exécutions avec la fréquence de /rename/ fixée à 7k5 opés
 - Correspondent aux exécutions suivantes
   - 1 /renamingBot/  : 1632927124
@@ -20235,10 +20226,19 @@ Failed to publish
   - Opérations /rename/ bien concurrentes
 - [ ] Générer les figures d'évolution de la consommation mémoire
 - [ ] Générer les figures d'évolution du temps d'exécution des opérations standards
-- [ ] Mesurer le temps d'exécution global d'un log d'opération
+- [X] Mesurer le temps d'exécution global d'un log d'opération
 - Pour chaque, revoir et documenter
   - Quelles données ai-je besoin ? (snapshots ? logs ? csv ?)
   - Comment générer ces données si besoin ?
+**** IN-PROGRESS GLA : Envoyer syllabus
+- Dans l'attente de la validation par Vincent
+- L'envoyer une fois que c'est fait
+**** IN-PROGRESS BD1-2I : Corriger TD noté
+**** IN-PROGRESS Papier : Comparer évaluations de LS et de RGASplit
+- Revoir ces deux évaluations pour déterminer si y a une contradiction entre les résultats obtenus
+- Si contradiction, trouver origine
+**** CANCELLED Papier : Faire comparaison transitive de RLS avec autres approches
+- À partir des évaluations de LS et de RGASplit, comparer RLS aux autres approches existantes
 **** TODO BD1-EMME : Rédiger sujet TD4
 - A lieu <2021-10-21 Thu> à 10h
 - Porte sur le déploiement d'une base de données relationnelle en utilisant phpMyAdmin
@@ -20249,6 +20249,8 @@ Failed to publish
 *** Done
 - GLA : Envoyer syllabus
   - A relancé Vincent à propos du syllabus
+  - M'a rep que ce n'était pas si urgent que ça, qu'il regarde ça à l'occasion
+  - Par contre, que si j'ai besoin de quelque chose de façon urgente, lui envoyer un mail le signalant
 - BD1-EMME : Rédiger sujet TD noté
   - Possède 4 exercices
   - A fait et envoyé les corrections à Lauriane
@@ -20402,10 +20404,46 @@ Failed to publish
       - Nombre de noeuds connectés
       - Période d'idle du système
     - Mais pareil, comment les insérer et privilégier un sur l'autre ?
+    - Pas de réponse pour le moment
   - Sur la discussion pourquoi tradeoff entre l'approche tombstone-based et variable-size identifiers based
     - Argumenter sur le fait qu'il n'y a pas de consensus sur la superiorité d'une approche sur l'autre
     - Expliquer du coup qu'on pouvait prendre une approche ou l'autre pour ce que l'on faisait
     - A donc pris LogootSplit par familiarité et expertise avec l'approche
+- Papier : Faire comparaison transitive de RLS avec autres approches
+  - Une conclusion de la réunion avec Gérald est qu'on peut difficilement utiliser les évaluations papiers de LS et de RGASplit pour se comparer aux autres approches
+    - Dans celle de LS, on a LS qui est la meilleure des approches comparées
+      - Meilleures performances que WOOT, Treedoc et Logoot
+    - Dans celle de RGASplit, on a LS qui est une des moins bonnes approches comparées
+      - Notamment moins bon que Treedoc
+      - Même sur la série d'expériences avec des opérations block-wise
+    - D'ailleurs, ça veut dire quoi des opérations block-wise sur un CRDT qui n'a pas de notion de block ?
+      - Genre Treedoc, Logoot et RGA ?
+      - Pas précisé dans l'article
+  - À partir de là, difficile de tirer des conclusions sur comment RLS se compare
+  - Part sur le moment sur un autre angle qui est de dire qu'on veut évaluer le mécanisme de renommage
+- BD1-EMME : TD noté
+  - Manque une précision sur le nombre d'imposteurs dans une partie
+  - 1ère copie rendue à 11h45
+- Papier : Générer figures présentant les résultats des simulations avec /rename/ toutes les 7k5 opés
+  - J'ai obtenu des temps d'exécution du rejeu de logs
+    - En faisant varier les paramètres de la fréquence de rename et du nombre de /renaming bots/
+  - J'ai réalisé rapidement un script seaborn pour générer des graphiques montrant la progression du rejeu du log en fonction du temps
+    - Une figure pour chaque fréquence de rename
+      - 7k5
+	[[file:img/replay-log-7k5.png]]
+      - 30k
+	[[file:img/replay-log-30k.png]]
+  - Correspond bien à la progression que j'avais conjecturé d'après les 1ers résultats
+    - Dans le cas du rename toutes les 7k5 opés, les renames réguliers ralentissent de plus en plus la progression du rejeu
+    - Jusqu'au point de rendre moins efficace d'un point de vue temps de calculs RLS par rapport à LS
+    - À l'inverse, rename toutes les 30k permet de mieux capitaliser sur l'amélioration des temps d'exécution des opérations standards
+    - Permet à cette configuration d'obtenir de meilleurs performances ou des performances équivalentes à celles de LS dans le cas avec 1 ou 2 /renaming bots/
+** Semaine du <2021-10-18 Mon> au <2021-10-22 Fri>
+*** Planned
+**** IN-PROGRESS BD1-2I : Corriger TD noté
+**** TODO BD1-2I : Corriger DS
+**** TODO BD1-EMME : Corriger TD noté
+*** Done
 * Backlog
 **** IN-PROGRESS Papier : Proposer une analyse en complexité du mécanisme de GC
 - Des reviews demandent une évaluation du mécanisme de GC
