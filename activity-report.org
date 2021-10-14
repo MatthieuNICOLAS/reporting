@@ -20216,7 +20216,7 @@ Failed to publish
 **** DONE Papier : Mettre en place tâche CRON pour générer simulations
 - J'avais mis en place une tâche CRON sur coast-srv0 pour générer les simulations à l'époque
 - Histoire de me générer un dataset de traces avec rename toutes les 7k5 opés, la remettre en place
-**** IN-PROGRESS Papier : Générer figures présentant les résultats des simulations avec /rename/ toutes les 7k5 opés
+**** DONE Papier : Générer figures présentant les résultats des simulations avec /rename/ toutes les 7k5 opés
 - J'ai généré des exécutions avec la fréquence de /rename/ fixée à 7k5 opés
 - Correspondent aux exécutions suivantes
   - 1 /renamingBot/  : 1632927124
@@ -20227,7 +20227,7 @@ Failed to publish
   - Converge
   - Logs complets
   - Opérations /rename/ bien concurrentes
-- [ ] Générer les figures d'évolution de la consommation mémoire
+- [X] Générer les figures d'évolution de la consommation mémoire
 - [-] Générer les figures d'évolution du temps d'exécution des opérations standards
 - [X] Mesurer le temps d'exécution global d'un log d'opération
 - Pour chaque, revoir et documenter
@@ -20451,6 +20451,17 @@ Failed to publish
     - Le résultat sera probablement illisible
     - Voir comment je peux présenter ces résultats autrement
       - Peut reconsidérer l'idée de Gérald de plutôt proposer une mesure globale du temps d'exécution des opérations
+  - Concernant la figure d'évolution de la taille de la structure de données
+    - A généré une figure à partir des mesures effectuées sur les snapshots avec rename toutes les 7k5 opés
+    - Obtient le résultat suivant
+      [[file:img/snapshot-sizes-7k5.png]]
+    - La courbe de la taille de RLS avec le mécanisme de GC se comporte comme attendu
+      - Des escaliers plus fréquents
+      - "Borne" la taille du document dans ce contexte de forte connectivité
+    - De même pour la courbe concernant la taille de RLS sans le mécanisme de GC
+      - Si on compare aux résultats obtenus à partir des traces avec rename toutes les 30k opés, la différence est faible
+      - La courbe a l'air un peu plus petite dans le cas présent
+      - Mais cette différence peut s'expliquer par le fait que j'ai utilisé qu'une seule exécution pour chaque type pour le moment
 ** Semaine du <2021-10-18 Mon> au <2021-10-22 Fri>
 *** Planned
 **** IN-PROGRESS BD1-2I : Corriger TD noté
