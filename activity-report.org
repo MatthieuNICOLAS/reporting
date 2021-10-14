@@ -20213,6 +20213,9 @@ Failed to publish
 **** DONE Papier : Générer simulations
 - Générer de nouvelles traces d'exécution
 - Faire varier les paramètres de fréquence de /rename/ et de /nbRenamingBots/
+**** DONE Papier : Mettre en place tâche CRON pour générer simulations
+- J'avais mis en place une tâche CRON sur coast-srv0 pour générer les simulations à l'époque
+- Histoire de me générer un dataset de traces avec rename toutes les 7k5 opés, la remettre en place
 **** IN-PROGRESS Papier : Générer figures présentant les résultats des simulations avec /rename/ toutes les 7k5 opés
 - J'ai généré des exécutions avec la fréquence de /rename/ fixée à 7k5 opés
 - Correspondent aux exécutions suivantes
@@ -20225,7 +20228,7 @@ Failed to publish
   - Logs complets
   - Opérations /rename/ bien concurrentes
 - [ ] Générer les figures d'évolution de la consommation mémoire
-- [ ] Générer les figures d'évolution du temps d'exécution des opérations standards
+- [-] Générer les figures d'évolution du temps d'exécution des opérations standards
 - [X] Mesurer le temps d'exécution global d'un log d'opération
 - Pour chaque, revoir et documenter
   - Quelles données ai-je besoin ? (snapshots ? logs ? csv ?)
@@ -20438,6 +20441,16 @@ Failed to publish
     - Jusqu'au point de rendre moins efficace d'un point de vue temps de calculs RLS par rapport à LS
     - À l'inverse, rename toutes les 30k permet de mieux capitaliser sur l'amélioration des temps d'exécution des opérations standards
     - Permet à cette configuration d'obtenir de meilleurs performances ou des performances équivalentes à celles de LS dans le cas avec 1 ou 2 /renaming bots/
+  - Concernant les figures d'évolution du temps d'exécution des opérations standards
+    - Je ne vois pas trop comment je vais pouvoir représenter ces données
+    - Doit au moins faire une mesure avant et après chaque rename
+    - Mais si veut capturer le motif en "vagues", me paraît nécessaire de faire une mesure intermédiaire
+    - Dans ce cas, doit faire une mesure tous les 2k5 opés
+    - Me retrouverais avec 75 boxplots à présenter rien que pour l'évolution du temps d'inté des opés dans le cas de base de RLS
+    - Y a aussi les boxplots pour LS, pour les opés provenant de l'epoch passée et pour les opés provenant de l'epoch sibling
+    - Le résultat sera probablement illisible
+    - Voir comment je peux présenter ces résultats autrement
+      - Peut reconsidérer l'idée de Gérald de plutôt proposer une mesure globale du temps d'exécution des opérations
 ** Semaine du <2021-10-18 Mon> au <2021-10-22 Fri>
 *** Planned
 **** IN-PROGRESS BD1-2I : Corriger TD noté
@@ -20815,6 +20828,10 @@ Failed to publish
   - /convert -colorspace GRAY -density 400 -quality 100 main.pdf gray.pdf/
 - Exécuter un script node sans JIT
   - /node --max-old-space-size=8192 --jitless bot-results.js --log-execution-time/
+- Lister et éditer les tâches cron
+  - /crontab -l/
+  - /crontab -e/
+  - Peut commenter une tâche à l'aide du caractère #
 * Glossaire
 - <<<Eventual convergence>>> property
   #+BEGIN_QUOTE
