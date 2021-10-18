@@ -20240,6 +20240,28 @@ Failed to publish
 **** IN-PROGRESS Papier : Comparer évaluations de LS et de RGASplit
 - Revoir ces deux évaluations pour déterminer si y a une contradiction entre les résultats obtenus
 - Si contradiction, trouver origine
+**** IN-PROGRESS BD1-EMME : Rédiger complément de cours pour TD4
+- Me paraît adapté de faire un complément de cours pour introduire cette nouvelle partie du module
+- Plan
+  - Présenter l'environnement de travail
+    - WAMP ou UwAmp
+      - Disponible ici : http://www.uwamp.com/fr/
+      - Tester les fonctionnalités de UwAmp
+      - Et vérifier si fonctionne bien sur les machines de Polytech
+    - Phpmyadmin
+  - Présenter spécificités
+    - Types des données
+    - Clé primaire auto incrémentée
+    - Modes de référence
+  - Démo
+    - Créer une base de données
+    - Créer une relation avec ses attributs, clé primaire
+    - Peupler une relation
+    - Créer relation avec clé étrangère
+    - Peupler relation
+    - Switcher sur une base toute prête
+    - Effectuer quelques requêtes SQL
+      - Présenter le * pour sélectionner l'ensemble des attributs
 **** CANCELLED Papier : Faire comparaison transitive de RLS avec autres approches
 - À partir des évaluations de LS et de RGASplit, comparer RLS aux autres approches existantes
 **** TODO BD1-EMME : Rédiger sujet TD4
@@ -20365,8 +20387,8 @@ Failed to publish
         - Autant je ne pige pas la croissance supra-linéaire dans le 2nd cas
       - Opération locale
       - Opération distante
-  - RLS
-- Réunion Gérald
+  - RGASplit
+- Papier : Réunion Gérald
   - Comparaison avec l'existant
     - Par rapport à Core & Nebula
       - 1er axe sur l'absence d'implémentation de Core & Nebula
@@ -20462,11 +20484,161 @@ Failed to publish
       - Si on compare aux résultats obtenus à partir des traces avec rename toutes les 30k opés, la différence est faible
       - La courbe a l'air un peu plus petite dans le cas présent
       - Mais cette différence peut s'expliquer par le fait que j'ai utilisé qu'une seule exécution pour chaque type pour le moment
+- Papier : Préparation réunion
+  - Travail effectué
+    - Pas mal discuté des reviews avec Gérald mardi
+    - Sur la partie comparaison avec l'existant
+      - On a bien un problème avec les résultats d'expériences présentés dans le papier de LS et de RGASplit
+      - Les 2 sont en désaccord sur les performances de LS par rapport à l'existant
+	- Dans le papier de LS, LS est la meilleure approche de celles comparées
+	- Dans le papier de RLS, LS est une des pires à chaque fois
+      - Peut donc difficilement se baser sur l'une ou sur l'autre, sachant que les 2 existent, pour effectuer une comparaison transitive de RLS par rapport aux autres approches
+      - L'angle proposé par Gérald qui permet de répondre à ces commentaires est d'axer la discussion sur le mécanisme de renommage lui même
+	- Dire que certaines structures de données répliquées se détériorent au fil de leur utilisation (présence de tombstones, déséquilibre de l'arbre, fragmentation en blocs...)
+	- Qu'un mécanisme d'optimisation de la représentation interne de la structure peut être utile
+	- Que nous en proposons un, utilisable dans un système distribué, adapté à LS
+	- Que sa logique et que certains de ses composants sont génériques
+	  - Mécanisme d'epochs, relation priority, algorithme de contrôle des transformations à effectuer
+	- Que d'autres sont spécifiques à la structure de données
+	  - Fonctions de renommage
+	- Mais qu'on peut donc en proposer d'autres pour les autres structures de données
+	- Et que c'est l'apport de ce mécanisme que nous évaluons
+    - Sur la partie expliquer le trade-off entre tombstone-based identifer-based
+      - Expliquer qu'il n'y a pas de consensus sur superiorité d'une approche sur l'autre
+	- À part cas d'utilisations bien spécifiques (only insert)
+      - Que dans notre cas d'utilisation, les deux approches semblent indiquées
+      - Avons choisi LS par expertise avec l'approche
+    - Sur la partie stratégie /rename/
+      - Peut pas aller beaucoup plus loin de ce qui a été dit
+    - Avancé sur les évaluations avec rename toutes les 7k5 opés
+      - Cf figures
+- Papier : Réunion
+  - Par rapport à comparaison à l'existant
+    - Ok pour cet angle
+    - Juste indiquer au préalable qu'il y a des approches qui n'ont pas d'implémentations et d'évaluation disponibles
+    - Et qu'ensuite les évaluations publiées ne nous permettent de faire cette comparaison avec les autres approches
+    - Va falloir réussir à faire passer le message que c'est aussi difficile de proposer et comparer des implémentations équivalentes pour l'ensemble des Sequence CRDTs
+- Réunion équipe
+  - Préparation
+    - Bosse principalement sur les reviews qu'on a eu pour le papier sur RLS qu'on a proposé à TPDS
+    - Notamment ceux portant sur la partie évaluation
+    - On nous demande de nous comparer aux autres approches de l'état de l'art que LS
+      - On rencontre plusieurs problèmes pour cela
+      - Il n'y a pas, à ma connaissance, d'implémentation et d'évaluation publiées pour l'approche concurrente directe, le mécanisme de rebalancing proposé pour Treedoc dans Core & Nebula
+      - On pensait faire une comparaison par transitivité avec les autres approches (Treedoc, RGA, RGASplit) grâce aux évaluations dispos dans le papier de LS et de RGASplit
+	- Nous on se compare à LS
+	- Et ces papiers comparent LS aux autres approches
+      - Mais ces évaluations se contredisent
+	- Par exemple, LS est meilleur que Treedoc dans le papier de LS mais pire que Treedoc dans le papier de RLS
+      - Donc difficile de se baser là-dessus pour produire une analyse/comparaison
+      - Voir pour formuler notre réponse en disant que ça serait intéressant mais qu'on ne peut pas le faire dans le cadre de cet article
+	- Demandrait trop de temps et de moyen de le faire
+      - Et ramener l'intérêt du papier à la proposition et l'évaluation du mécanisme de renommage pour LogootSplit
+	- Dire que l'approche est générique
+	- Qu'il n'y a que les fonctions de transformation qui sont spécifiques à un type donné
+	- Et qu'on pourrait proposer une version adaptée aux autres approches existantes
+    - L'autre point sur lequel on nous demande de creuser est l'impact du renommage sur les performances en temps
+      - Mis en place un benchmark où je mesure le temps nécessaire pour jouer un log d'opérations correspondant à une exécution
+      - Vu l'implémentation actuelle, m'attendait à des performances dégueulasses
+      - Finalement pas aussi dégueulasses que ce à quoi je m'attendais
+	- Dans le pire cas évalué, observe un overhead de 50%
+	  - Met 75s à effectuer une exécution au lieu de 50s
+	- Pour diviser par un facteur entre 10 et 100 la taille du document
+      - Mais bon, ça reste 50% d'augmentation
+      - Ça risque d'être délicat à présenter
+      - Me demande s'il faut vraiment continuer à évaluer et présenter les résultats de cette version des fonctions de transformation
+	- Et se baser dessus pour proposer une stratégie de renommage
+      - Ou s'il ne faut pas tenter de concevoir et évaluer la version que j'utiliserais dans un vrai système
+  - Réunion
+    - François
+      - La soutenance d'Anis se précise pour le <2021-11-09 Tue> aprem
+      - A envoyé fiche de synthèse (avec Claudia?) pour évaluation Inria
+      - A répondu à une piste de financement potentielle
+    - Claudia
+      - Article accepté à ???
+      - Réunion avec PA
+	- Travaille sur les scénarios possibles avec opérations changements contrôle d'accès et changements sur le doc
+      - Fait des reviews pour conférence KIE
+      - Doit proposer un nouveau projet pour l'équipe
+	- Pour le changement de responsable
+	- 3 axes
+	  - Gestion de données collaboratives à large échelle
+	  - Sécurité dans environnement à large échelle
+	  - Confiance dans environnement à large échelle
+    - Gérald
+      - Doit voir candidats pour ADT MUTE
+      - Reçu proposition pour évaluer thèse CIFRE
+	- Edition collaboration sécurisée en temps réel
+    - Alexandre
+      - Fait son école d'été sur RESCOM
+	- Sur réplicabilité et expérimentations sur g5k et IOT Lab
+      - Occupé avec les cours de TN
+      - Fait les démarches pour obtenir crédentials g5k
+      - Pense démarrer les expérimentations ce soir
+    - Moi
+    - Victorien
+      - Travaille sur la spécification concurrente des bases de données répliquées
+      - Doit trouver compromis entre sémantique intuitive pour développeur/utilisateur et performances/simplicité de la solution
+      - Favorise pour le moment la simplicité de raisonnement
+      - Problème de la version simple est qu'on perd les propriétés de SEC
+    - Abir
+      - Terminé chapitre intro
+      - Reste chapitre conclusion
+      - Relit chapitre par chapitre pour voir si peut ajouter des sections
+- BD1-EMME : Rédiger complément de cours pour TD4
+  - L'an dernier, j'avais utilisé une BD /hero_corp/ comme démo
+    - Construit /hero/, /vilain/ et /nemesis/
 ** Semaine du <2021-10-18 Mon> au <2021-10-22 Fri>
 *** Planned
+**** DONE BD1-EMME : Rédiger complément de cours pour TD4
+- Me paraît adapté de faire un complément de cours pour introduire cette nouvelle partie du module
+- Plan
+  - Présenter l'environnement de travail
+    - WAMP ou UwAmp
+      - Disponible ici : http://www.uwamp.com/fr/
+      - Tester les fonctionnalités de UwAmp
+      - Et vérifier si fonctionne bien sur les machines de Polytech
+    - Phpmyadmin
+  - Présenter spécificités
+    - Types des données
+    - Clé primaire auto incrémentée
+    - Modes de référence
+  - Démo
+    - Créer une base de données
+    - Créer une relation avec ses attributs, clé primaire
+    - Peupler une relation
+    - Créer relation avec clé étrangère
+    - Peupler relation
+    - Switcher sur une base toute prête
+    - Effectuer quelques requêtes SQL
+      - Présenter le * pour sélectionner l'ensemble des attributs
+**** DONE BD1-EMME : Rédiger sujet TD4
+- A lieu <2021-10-21 Thu> à 10h
+- Porte sur le déploiement d'une base de données relationnelle en utilisant phpMyAdmin
+- Et l'utilisation de SQL pour l'interroger
+- Restera plus qu'un TD ensuite
+- Portera sur les requêtes avancées en SQL
+  - Utilisation des clauses GROUP BY, HAVING et des fonctions d'aggrégations
 **** IN-PROGRESS BD1-2I : Corriger TD noté
 **** TODO BD1-2I : Corriger DS
 **** TODO BD1-EMME : Corriger TD noté
+*** Done
+- BD1-EMME : Rédiger complément de cours pour TD4
+  - [X] Ajouter warning pour InnoDB
+- BD1-EMME : Rédiger sujet TD4
+  - Le sujet de l'an dernier est ok-ish
+  - [X] P-e juste modifier l'énoncé pour faire de /prod_id/ un entier plutôt qu'une chaîne de caractères
+  - [X] Ajouter un lien vers un exemple de champ calculé
+  - [X] Ajouter un lien vers un exemple de /CREATE TEMPORARY TABLE/
+- BD1-EMME : Contacter le service info au sujet de l'installation de WampServer
+  - J'ai envoyé un mail au service info de Polytech ce <2021-10-18 Mon> pour demander si le problème pour lancer WampServer avait été résolu
+  - M'ont répondu que c'était bon pour ce jeudi
+  - J'ai demandé si c'était bon pour l'ensemble des salles (A209-210, A111, C244) ou juste la A109
+  - D'après la réponse, pour toutes les salles mais ça sera fait au fil de l'eau
+** Semaine du <2021-10-25 Mon> au <2021-10-29 Fri>
+*** Planned
+**** TODO BD1-EMME : Rédiger complément de cours pour TD5
+**** TODO BD1-EMME : Rédiger sujet TD5
 *** Done
 * Backlog
 **** IN-PROGRESS Papier : Proposer une analyse en complexité du mécanisme de GC
