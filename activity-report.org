@@ -20351,7 +20351,7 @@ Failed to publish
       - 10k opés avec 80% insert, 20% delete
       - 10k opés avec ratio inversé
     - 100 noeuds éditent le document
-      - Quand/Comment les noeudds se synchronisent ?
+      - Quand/Comment les noeuds se synchronisent ?
       - Y a-t-il un délai entre 2 opés ?
     - 2 types de traces
       - 1er type de trace
@@ -20386,7 +20386,37 @@ Failed to publish
 	  - Les identifiants insérés réutilisent des identifiants existants et longs comme préfixes
         - Autant je ne pige pas la croissance supra-linéaire dans le 2nd cas
       - Opération locale
+	- Dans le 1er type de trace, observe un temps quasi-constant
+	  - Que ce soit lors de la 1ère et 2nde phase
+	  - Me paraît pas évident comme résultat puisque la complexité des opérations est en /log(l)/
+	  - Où /l/ est le nombre de blocs
+	  - Devrait donc croître dans une certaine mesure lors de la 1ère phase, et décroître au cours de la 2nde
+	  - Ce que l'on observe pour d'autres implémentations (Naive, String, Logoot)
+	- Dans le 2nd type de trace, observe la même chose
+	  - Juste une augmentation (x4-5) se produit lors du changement de phase
+	    - Pourquoi là et pas lors de la 1ère évaluation ?
+	  - En fait se produit aussi lors de la 1ère évaluation
+	  - Juste un offset de l'origine donne cette impression
+	  - En fait, différentes implémentations (AVL, String, Logoot) performent moins bien dans le 1er cas que dans le 2nd
+	    - Pourquoi donc ?
+	  - Ce qui réduit le décalage entre la phase composée majoritairement d'insertions et la phase composée majoritairement de suppressions
+	  - Ce qu'il faut retenir de cette figure, c'est que Treedoc performe mal dans ce scénario
       - Opération distante
+	- Dans le 1er type de trace
+	  - Progression du temps d'intégration logarithmique pour AVL
+	    - Mais constant (ne diminue pas) lors de la 2nde phase
+	    - Toujours pas clair pourquoi
+	    - Les suppressions ne diminuent pas le nombre de blocs finalement ?
+	      - Nombre de blocs p-e constant car certains blocs sont supprimés, mais d'autres sont seulement splittés
+	  - Constante, mais avec des pics importants, pour WOOT
+	  - Logarithmique puis diminuant pour Naive, String et Logoot
+	  - Logarithmique puis constant+ pour Treedoc
+	- Dans le 2nd type de trace
+	  - Progression linéaire pour AVL
+	    - Que ça soit lors de la 1ère et 2nde phase
+	    - De nouveau, pourquoi ?
+	      - Coût plus important en ré-équilibrage par rapport au 1er type de trace ?
+	  - Mais sert à montrer que les perfs de Treedoc empire bien plus dans ce scénario
   - RGASplit
 - Papier : Réunion Gérald
   - Comparaison avec l'existant
@@ -20619,6 +20649,9 @@ Failed to publish
 - Restera plus qu'un TD ensuite
 - Portera sur les requêtes avancées en SQL
   - Utilisation des clauses GROUP BY, HAVING et des fonctions d'aggrégations
+**** DONE Papier : Comparer évaluations de LS et de RGASplit
+- Revoir ces deux évaluations pour déterminer si y a une contradiction entre les résultats obtenus
+- Si contradiction, trouver origine
 **** IN-PROGRESS BD1-2I : Corriger TD noté
 **** TODO BD1-2I : Corriger DS
 **** TODO BD1-EMME : Corriger TD noté
@@ -20635,6 +20668,73 @@ Failed to publish
   - M'ont répondu que c'était bon pour ce jeudi
   - J'ai demandé si c'était bon pour l'ensemble des salles (A209-210, A111, C244) ou juste la A109
   - D'après la réponse, pour toutes les salles mais ça sera fait au fil de l'eau
+- Papier : Comparer évaluations de LS et de RGASplit
+  - RGASplit
+    - Réutilise le JBenchmarker
+    - Compare les implémentations existantes de TreeDoc, RGA et LogootSplit avec RGA with identifier structure, Logoot with identifier structure, RGA with blocks et RGATreeSplit
+      - Donc les performances de TreeDoc et de LogootSplit ne devraient pas changer par rapport au papier de LS
+    - Pour identifier structure
+      - Utilise Apache's TreeList
+      - Implémente une liste sous la forme d'un arbre équilibré
+    - Pour RGATreeSplit
+      - Utilise un weight-unbalanced binary tree comme identifier structure
+	- Pourquoi ne pas avoir utilisé TreeList ?
+      - Met en place un mécanisme de rebalancing de l'arbre
+	- L'exécute de manière périodique
+      - Incorpore son temps d'exécution dans les temps d'exécution remote
+    - Génère des traces de manière aléatoire
+      - Des traces de 5k, 10k, 15k, 20k, 30k et 40k opérations
+      - 3 traces pour chaque expérience
+      - Chaque fois, consiste en 10 noeuds qui éditent le même document
+      - 80% d'insertion, 20% de suppression
+	- Position aléatoire pour chaque opé je suppose
+      - Chaque opé est concurrente à 2 autres
+    - Deux types de séries d'expérience
+      - Une avec que des opérations single-element
+      - Une avec 20% d'opérations block-wise de 20 éléments
+    - Évalue
+      - Moyenne du temps d'intégration des opérations locales
+      - Moyenne du temps d'intégration des opérations distantes
+      - Taille du doc (moyenne de la taille du doc pour les 100 dernières opérations)
+      - La bande passante consommée
+    - Résultats obtenus
+      - Temps local
+	- Single element serie
+	  - Temps croissant pour Logoot, RGA et RGASplit
+	  - Observe temps à peu près constant (pour pas dire décroissant) pour LogootTree, RGATreeList, RGATreeSplit, LogootSplitAVL, TreeDoc
+	  - Raccord avec ce qu'on observait pour LogootSplitAVL dans le papier précédent
+	    - Mais comprend toujours pas pourquoi
+	    - Suppose que c'est l'échantillonnage qui n'est pas assez fin
+	      - À 5k opérations, doit déjà avoir une majorité d'opérations dont le temps d'exec s'approche du plafond de la progression logarithmique
+	      - Les opérations suivantes n'auraient donc qu'un impact limité sur la moyenne des temps d'exec
+	      - Des boxplots plutôt que des moyennes donneraient une meilleure idée de la variation du temps d'exec
+	      - Un échantillonnage plus fréquent, surtout en début (1k ou 2k opés), permettrait de vérifier cela
+	  - Puisque RGATreeList utilise un weight balanced tree, un peu de mal à voir pourquoi la moyenne n'augmente pas avec la taille du doc
+	  - L'explique encore moins pour TreeDoc
+	  - Et surtout pourquoi TreeDoc performe dorénavant mieux que LSAVL puisque ces implémentations n'ont pas changé
+	- Block element serie
+	  - Progression similaire pour l'ensemble des courbes
+	  - Les opérations blocks ajoutent un léger overhead à l'ensemble des implémentations
+	  - Seules les perfs de LS n'ont pas l'air de changer
+	  - L'ordre entre les implémentations ne varient pas trop
+	    - RGASplit devient meilleur que RGA dans ce scénario
+	    - LogootSplit devient meilleur que TreeDoc et équivalent à LogootTree et RGATreeList dans ce scénario
+	  - RGATreeSplit reste la meilleure implem
+      - Temps distant
+	- Temps croissant pour Logoot
+	- Temps à peu près constant pour le reste
+      - Bande passante
+      - Mémoire
+    - Réflexions
+      - Pourquoi les performances de LSAVL et de TreeDoc ont changé par rapport à celles présentées dans le papier de LS, alors que les implems sont les mêmes ?
+      - Pourquoi TreeDoc performe mieux avec des opés block-wise qu'avec que des opés single-element ?
+      - Pourquoi LogootTree a une meilleure performance en mémoire que LSAVL ?
+  - Observations
+    - Toutes les implems équivalentes ont des performances plus ou moins équivalentes
+      - LSAVL, RGATreeSplit, LogootTree
+      - Même progression pour chacune des courbes
+    - Il est pas évident de déterminer la part de l'offset entre les courbes qui est dû à l'approche elle-même, et celle qui est dû aux efforts d'implémentation
+    - À partir de cette évaluation, et notamment des incohérences observées et inexpliquées avec celle parue dans LS, me paraît difficile de déterminer une approche comme la meilleure
 ** Semaine du <2021-10-25 Mon> au <2021-10-29 Fri>
 *** Planned
 **** TODO BD1-EMME : Rédiger complément de cours pour TD5
