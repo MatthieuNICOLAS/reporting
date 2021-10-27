@@ -20753,7 +20753,20 @@ Failed to publish
 *** Planned
 **** DONE Papier : Rédiger section *Comparison with related work* de la lettre de réponse
 **** DONE Papier : Rédiger section *Benefits of supporting several renaming bots* de la lettre de réponse
-**** TODO BD1-2I : Corriger DS
+**** IN-PROGRESS BD1-2I : Corriger DS
+**** TODO Papier : Rédiger section *Is RenamableLogootSplit a tombstone-based Sequence CRDT ?*
+- Plusieurs commentaires du Reviewer 2 tournent autour du fait que RLS serait un tombstone-based Sequence CRDT
+  - Puisque maintient les identifiants d'éléments supprimés dans le /former state/
+- Ajouter section répondant à ces commentaires
+  - Ce qu'il dit est correct
+  - Les éléments supprimés après ou en concurrence un renommage vont effectivement produire une tombstone, sous la forme de l'ancien id de l'élément dans le /former state/
+  - Ces tombstones vont persister jusqu'à la suppression de l'epoch correspondante à l'opération /rename/
+  - Mais impact limité par rapport aux tombstones présentes dans les approches tombstones-based
+  - Principalement différence est qu'elle n'est pas présente dans la structure principale représentant la séquence
+  - Mais dans les former states
+  - N'est utilisée pour intégrer les opérations concurrentes à l'opération /rename/ uniquement
+    - Et entraîne un overhead computationel seulement pour ces opérations
+  - Tandis que d'un point de vue mémoire, comme dit dans le papier, peut être déchargée et stocker sur le disque jusqu'à son utilisation ou sa suppression définitive
 **** TODO BD1-EMME : Rédiger complément de cours pour TD5
 - A lieu <2021-11-04 Thu> à 10h
 **** TODO BD1-EMME : Rédiger sujet TD5
@@ -20775,6 +20788,10 @@ Failed to publish
   - Autant j'ai du mal à voir où je vais avec ça
   - Voir avec Gérald et Olivier si y a des choses plus intéressantes à dire sur le sujet
   - Et si des modifications sont nécessaires dans l'article
+** Semaine du <2021-11-01 Mon> au <2021-11-05 Fri>
+*** Planned
+**** TODO BD1-EMME : Rédiger sujet de partiel
+*** Done
 * Backlog
 **** IN-PROGRESS Papier : Proposer une analyse en complexité du mécanisme de GC
 - Des reviews demandent une évaluation du mécanisme de GC
