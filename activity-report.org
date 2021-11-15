@@ -20794,9 +20794,9 @@ Failed to publish
 - J'ai seulement pu corriger les 2 premières requêtes du TD4 avec eux
 - Je n'aurai pas le temps de tout corriger si je veux pouvoir entamer le TD5
 - Voir ce que je fais lors de la séance du TD5
-**** TODO BD1-2I : Compiler et envoyer les notes
+**** DONE BD1-2I : Compiler et envoyer les notes
+**** DONE BD1-EMME : Rédiger sujet de partiel
 **** TODO BD1-EMME : Corriger TD noté
-**** TODO BD1-EMME : Rédiger sujet de partiel
 *** Done
 - BD1-EMME : Préparer déroulement TD5
   - Plan
@@ -20804,6 +20804,252 @@ Failed to publish
     - 10h30-11h : Complément cours TD5
     - 11h-12h : TD5
   - Déroulement effectif
+    - À peu près ce que j'avais prévu
+    - Juste pas eu le temps de corriger avec les étudiant-es l'exo 1
+    - Je suis passé dans les rangs, mais j'ai pas fait de correction au tableau
+- Réunion équipe
+  - Préparation
+    - A envoyé à Gérald et Olivier une 1ère version de la lettre de réponse aux reviews
+      - Pas encore complète
+      - Histoire d'avoir leurs retours sur les parties déjà rédigées
+      - Notamment sur la comparaison de RLS avec les autres approches de l'état de l'art, la présence de tombstones dans RLS et les précisions sur le fonctionnement des algos
+    - Essaie de se caler une réunion pour en discuter
+    - En attendant, il me reste à rédiger quelques parties de la lettre de réponse
+      - Impact de la fréquence de /rename/ sur les perfs, conseils pour le design de la stratégie de /rename/
+    - Et à effectuer les modifications dans le papier
+  - Réunion
+    - François
+      - Milite pour la semaine de 4j
+      - Travaille sur révision et lettre de réponse pour article avec Quentin
+    - Olivier
+      - Travaille sur papier avec Ehtesham sur politique de sécu (détecter failles avant de les mettre en prod) sur AWS
+    - Thomas
+      - Papier refusé à Big Data
+	- Sur la précision des mécanismes de détection des strivers dans les processus de gestion
+	  - Voir combien de faux positifs
+	- Se base sur des simulations, ce qui a moyennement plu
+	- Va voir pour le resoumettre
+      - Travaille sur papier sur calculs sur grands graphes (pagerank) avec multi-systèmes avec contraintes/politiques de sécu différentes
+    - Victorien
+      - Était bloqué sur un problème de formalisation
+      - Car modèle de cohérence pour BDs simplistes
+      - Voulait réutiliser framework de sa thèse, mais pas adapté
+      - A relu des papiers proposant des frameworks de formalisations récemment
+      - Pense réutiliser le modèle de Burckhardt étendu avec la notion de transactions
+      - Étudie si le modèle correspond
+      - A lu un papier de Weihai sur la fusion de données et nettoyage de données dans les BDs
+	- Fusion de BDs pour ne garder que les plus récentes
+	- Sans ajouter de métadonnées
+    - Moi
+      - Thomas recommande de faire déjà les modifs du papier pour pouvoir les citer/copier-coller dans la lettre de réponse
+    - Abir
+      - Commence un nouveau chapitre contribution
+	- S'agissait d'un chapitre abandonné précédemment
+	- Mais finalement ont décidé de le réintégrer
+	- Reste à voir comment l'intégrer avec le reste
+    - Alex
+      - Lecture d'articles
+      - Travaille sur formulaire sur confiance des utilisateurs dans collecte de données par entreprises
+    - PA
+      - Étudie notions d'époques pour la politique d'accès sur le document répliqué
+      - Étudie mécanisme de merge entre branches d'un même document répliqué en utilisant
+    - Anis
+      - Rien de spé
+- Soutenance blanche Anis
+  - Global
+    - Va trop vite IMO
+    - Slides chargées
+      - Beaucoup de texte
+      - N'arrive pas à lire car trop petit pour que ça rentre
+  - Slides
+    - Bonjour, t'es qui ? (Pas d'intro ?)
+    - Slide 4 : Non Functional R(?) : l'écrire quelque part ?
+    - Slide 6 : faire apparaître les NFR pour chaque micro-service ?
+    - Slide 12 : NFA ? Non Functional Attributs je suppose
+    - Slide 16 : Quels architectes ?
+      - Validation du questionnaire ?
+    - Slide 26 : Ça veut dire quoi EPU ? MultiAZ ?
+    - Slide 35 et 37 : Faute de frappe à "middeLwares"
+    - Slide 40 : C'est quoi le but de ton algorithme génétique ?
+      - Et c'est quoi les contraintes ?
+      - Tu parles de vitesse d'exécution, ça me paraît pas évident
+** Semaine du <2021-11-08 Mon> au <2021-11-12 Fri>
+*** Planned
+**** DONE BD1-EMME : Répondre à Lauriane au sujet du barême pour les TDs
+- Lauriane m'a contacté pour me demander comment je notais les TDs
+- Elle essaie avec un barême, sans trop de succès
+- Lui répondre que je met une note globale
+- Et que j'ajuste ensuite avec quelques petits critères si besoin
+**** DONE BD1-EMME : Envoyer sujet de partiel à Lauriane
+- Voir avec elle si elle a des retours/remarques
+**** DONE BD2 : Revoir CM1
+- Retirer les slides par rapport au cours à distance de l'an dernier
+- Créer module arche pour cette année
+- Ajouter instructions
+**** DONE BD2 : Revoir TD1
+**** DONE BD2 : Revoir CM2
+**** DONE BD2 : Définir planning des séances
+- Revoir le planning que j'avais suivi l'an dernier
+- Prendre en compte le fait qu'on est en présentiel cette année
+  - Devrait me permettre d'aborder quelques notions que j'avais skippé l'an dernier
+    - Vues, Transactions
+  - Ou de faire un TD noté
+**** DONE BD1-EMME : Envoyer mail récapitulatif
+- Rappel de sur quoi portera l'examen
+  - Passage du schéma conceptuel au schéma relationnel
+  - Interrogation d'une base de données via requêtes SQL
+- Forme de l'examen
+  - Ressemblera aux exercices réalisés au cours des TD3 à 5
+- Consignes
+  - Droit à une feuille manuscrite A4 d'aide-mémoire
+- Mis en ligne des captures d'écrans des résultats attendus pour l'exo 2 du TD4 et pour les exo 1 et 2 du TD5
+- Mis en ligne la correction
+- Si avez des questions, pouvez nous contacter Lauriane et moi par mail
+**** CANCELLED Papier : Clarifier benchmark de *Integration times of standard operations*
+- Pour répondre au R1D2
+- Demande de préciser le nombre de /renaming bots/ et si le mécanisme de GC était utilisé
+  - Pas pertinent pour notre benchmark
+**** CANCELLED Papier : Clarifier benchmark de *Integration times of rename operations*
+- Pour répondre aux R1D2 et R1D3
+- Demande de préciser le nombre de /renaming bots/ et si le mécanisme de GC était utilisé
+  - Pas pertinent pour notre benchmark
+- Demande de préciser la proportion de chaque type d'opération /remote rename/
+  - Pas vraiment de sens au niveau de ce benchmark, vu qu'on génère artificiellement les opés
+  - Ou demande dans le scénario de simulations ?
+- Clarifier aussi que la complexité dépend du nombre d'éléments, pas de quand date la dernière opé /rename/
+**** TODO BD1-EMME : Corriger TD noté
+**** TODO Papier : Générer dataset temps de rejeu des logs
+- Je dois avoir dorénavant assez de traces avec /rename/ tous les 7k5 opés
+- Utiliser ces traces pour faire des mesures de temps de rejeu
+- Voir pour ça la structure du schéma de données à utiliser
+**** TODO Papier : Générer figures temps de rejeu des logs
+**** TODO Papier : Générer dataset taille des snapshots avec /rename/ tous les 7k5 opés
+*** Done
+- BD2 : Définir planning des séances
+  - <2021-11-09 Tue>
+    - CM1 - Bases SQL (SELECT ... FROM ... WHERE)
+    - Début du TD1
+  - <2021-11-10 Wed>
+    - Correction TD1
+    - CM2 - SQL Avancé (GROUP BY, HAVING)
+    - Début du TD2
+  - <2021-11-17 Wed>
+    - Correction TD2
+    - CM3 (CREATE, INSERT...)
+    - Début du TD3
+  - <2021-11-19 Fri>
+    - Correction du TD3
+    - CM4 - Transactions, vues, triggers
+  - <2021-11-22 Mon>
+    - TD noté ?
+  - <2021-11-23 Tue>
+    - ???
+  - <2021-11-30 Tue>
+    - CM4 - Bases de PHP
+    - TD4
+  - <2021-12-01 Wed>
+    - CM5 - Formulaires PHP, traitements des entrées utilisateurs
+    - TD5
+  - <2021-12-03 Fri>
+    - Présentation projet
+    - Début projet
+- Réunion papier
+  - Préparation
+    - Tant que j'y pense, on a reçu un e-mail pour le PhD day
+      - Est-ce que je peux faire le mort ?
+      - J'ai déjà peur de mon planning pour le mois à venir
+	- Lettre de réponse, papier, préparation de mon cours de GLA
+      - Préfererais ne pas avoir à me soucier du PhD day en plus
+    - Questions en cours
+      - Comment introduire dans le papier la discussion sur la présence de tombstones dans RLS ?
+	- À la fin de la 4.2 ?
+	  - Mais section déjà conséquente
+	- Une partie dans discussion ?
+      - Comment répondre au commentaire R1D2
+	- Demande de spécifier des paramètres expérimentaux
+	- Mais ces paramètres ne sont pas pertinents dans ces benchmarks
+	- Juste dire qu'ils ne sont pas pertinents me paraît insuffisant
+	  - Mais me manque en l'état actuel du papier l'analyse en complexité en temps des opérations pour justifier
+	- J'ai l'impression que c'est pas clair du coup ce qu'on fait dans ce benchmark, les paramètres que l'on fait varier et pourquoi on les fait varier
+      - Comment répondre au commentaire R1D3
+	- Déjà, comment le comprendre ?
+	- Est-ce la proportion de
+    - Warning
+      - J'avance plus ces derniers jours
+  - Réunion
+    - PhD Day
+      - Non, pas le droit de faire le mort
+      - Le droit par contre de reprendre ma présentation de la dernière fois
+      - Juste présenter le mécanisme en centralisé
+      - Ajouter une slide pour mécanisme avec renommages concurrents
+	- Principe
+	- Difficultés rencontrées
+      - Mettre à jour la partie évaluation
+      - Perspectives
+    - Ajouter partie dans discussion sur adaptation du mécanisme de renommage
+      - Nope
+      - Demanderait de revoir l'angle du papier
+      - Pas possible à ce stade
+      - Mais peut ajouter quelques lignes en conclusion à ce sujet
+    - Section 8.1
+      - Ajouter une synthèse de ce qui a été dit précédemment en conclusion de cette sous-section
+      - Récapituler les 3 aspects
+      - Et dire que dépend de l'aspect temps réel
+    - Benefits on handling concurrent rename operations
+      - On a plus vraiment de phrases indiquant qu'on vise les systèmes entièrement distribués
+      - Ajouter une phrase à ce sujet dans l'intro et le système modèle
+  - Plan pour la suite
+    - Ré-écrire 5.3
+    - Vérifier utilisation des tombstones dans RGA
+- Papier : Clarifier benchmark de *Integration times of standard operations*
+  - Peut p-e remanier l'intro de la manière suivante
+    - Expliquer qu'on mesure l'évolution du temps d'inté des opérations standards
+    - Que ce temps d'intégration dépend des paramètres suivants
+      - Du nombre de blocs dans la séquence, d'après le papier de LS
+      -
+- BD-EMME : Partiel
+  - 1ère copie rendue au bout de 1h20
+** Semaine du <2021-11-15 Mon> au <2021-11-19 Fri>
+*** Planned
+**** TODO BD2 : Revoir CM3
+**** TODO BD2 : Revoir TD3
+**** TODO Papier : Ajouter section sur complexité du mécanisme de GC
+- Voir comment introduire cette section
+- Le plus gênant est de motiver pourquoi on propose une analyse en complexité et non pas une évaluation empirique comme les autres
+**** TODO Papier : Ré-écrire section 5.3
+- Modifier section pour faire apparaître les invariants que doit respecter /revertRenameId/
+  - Si newId ∈ ]newPredId predId, newPredId succId[
+    - Doit retourner id ]predId, succId[
+    - Notons 2 choses
+      - newId est de la forme newPredId tail avec tail ]predId, succId[
+      - newId peut être le résultat d'une insertion en concurrence au renommage
+	- Dans ce cas, newId est le résultat de renIdFromPredId
+	- Et on a tail = id
+    - On constate donc que renvoyer tail permet de vérifier les 2 constraintes
+  - Si newId ]newPredId, newPredId predId[
+    - Doit retourner id ]predId, id_1[
+    - Notons 2 choses
+      - newId est de la forme newPredId tail avec tail < predId
+	- Ne peut pas simplement retourner tail dans ce cas
+      - newId ne peut être que le résultat d'une insertion ayant eu lieu après le renommage
+	- Mais donc pas de contrainte sur l'identifiant à retourner autre que l'ordre
+    - Pour gérer ce cas, introduisons deux nouveaux tuples seulement utilisable par le mécanisme de renommage MIN_TUPLE et MAX_TUPLE
+      - Respectivement le tuple minimal et le tuple maximal pour générer des identifiants
+    - Retourne id tel que id = predId MIN_TUPLE tail pour respecter l'ordre souhaité
+  - Si newId ]newPredId succId, newSuccId[
+    - Doit retourner id ]id_1, succId[
+    - S'agit du cas inverse du cas précédent
+    - La logique est la même : on génère un préfixe permettant de préserver l'ordre souhaité
+    - Afin que id < succId, utilise predOfSuccId
+      - Qui est obtenu en décrémentant le dernier offset de succId (donner un exemple)
+    - Retourne id tel que id = predOfSuccId MAX_TUPLE tail
+**** TODO Papier : Générer dataset temps de rejeu des logs
+- Je dois avoir dorénavant assez de traces avec /rename/ tous les 7k5 opés
+- Utiliser ces traces pour faire des mesures de temps de rejeu
+- Voir pour ça la structure du schéma de données à utiliser
+**** TODO Papier : Générer figures temps de rejeu des logs
+**** TODO Papier : Générer dataset taille des snapshots avec /rename/ tous les 7k5 opés
+*** Done
 * Backlog
 **** IN-PROGRESS Papier : Proposer une analyse en complexité du mécanisme de GC
 - Des reviews demandent une évaluation du mécanisme de GC
