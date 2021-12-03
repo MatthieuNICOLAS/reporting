@@ -21011,12 +21011,7 @@ Failed to publish
   - 1ère copie rendue au bout de 1h20
 ** Semaine du <2021-11-15 Mon> au <2021-11-19 Fri>
 *** Planned
-**** TODO BD2 : Revoir CM3
-**** TODO BD2 : Revoir TD3
-**** TODO Papier : Ajouter section sur complexité du mécanisme de GC
-- Voir comment introduire cette section
-- Le plus gênant est de motiver pourquoi on propose une analyse en complexité et non pas une évaluation empirique comme les autres
-**** TODO Papier : Ré-écrire section 5.3
+**** DONE Papier : Ré-écrire section 5.3
 - Modifier section pour faire apparaître les invariants que doit respecter /revertRenameId/
   - Si newId ∈ ]newPredId predId, newPredId succId[
     - Doit retourner id ]predId, succId[
@@ -21025,7 +21020,7 @@ Failed to publish
       - newId peut être le résultat d'une insertion en concurrence au renommage
 	- Dans ce cas, newId est le résultat de renIdFromPredId
 	- Et on a tail = id
-    - On constate donc que renvoyer tail permet de vérifier les 2 constraintes
+    - On constate donc que renvoyer tail permet de vérifier les 2 contraintes
   - Si newId ]newPredId, newPredId predId[
     - Doit retourner id ]predId, id_1[
     - Notons 2 choses
@@ -21043,6 +21038,14 @@ Failed to publish
     - Afin que id < succId, utilise predOfSuccId
       - Qui est obtenu en décrémentant le dernier offset de succId (donner un exemple)
     - Retourne id tel que id = predOfSuccId MAX_TUPLE tail
+**** DONE Papier : Ajouter section sur complexité du mécanisme de GC
+- Voir comment introduire cette section
+- Le plus gênant est de motiver pourquoi on propose une analyse en complexité et non pas une évaluation empirique comme les autres
+**** DONE BD2 : Revoir CM3
+**** DONE BD2 : Revoir TD3
+**** DONE Papier : Ajouter une synthèse à l'issue de la section *Issuing rename operations*
+- Pour tenter de répondre au commentaire R4C4
+**** TODO BD2 : Rédiger sujet du projet
 **** TODO Papier : Générer dataset temps de rejeu des logs
 - Je dois avoir dorénavant assez de traces avec /rename/ tous les 7k5 opés
 - Utiliser ces traces pour faire des mesures de temps de rejeu
@@ -21050,8 +21053,247 @@ Failed to publish
 **** TODO Papier : Générer figures temps de rejeu des logs
 **** TODO Papier : Générer dataset taille des snapshots avec /rename/ tous les 7k5 opés
 *** Done
-* Backlog
-**** IN-PROGRESS Papier : Proposer une analyse en complexité du mécanisme de GC
+- Papier : Ajouter section sur complexité du mécanisme de GC
+  - Où placer cette section ?
+    - J'aurais tendance à la placer dans la partie évaluation
+    - Mais où ?
+    - Avant/après partie sur simulations et benchmarks ?
+      - Avant me permet d'expliquer aux lecteurs que je n'ai pas implémenté le mécanisme de GC
+      - Mais me paraît étrange de démarrer la partie évaluation avec une sous-section *Complexity analysis of the GC mechanism*
+	- Pourquoi juste ça ?
+      - Après risque d'être plus perturbant
+      - Mais me permet de dire quelque chose du style
+	- On a évalué de manière expérimentale tout ce qu'on a implémenté
+	- Pour être complet, ajoute une évaluation du mécanisme de GC via analyse en complexité
+      - Vais plutôt partir sur cette seconde option
+  - Plan
+    - Mécanisme de GC se décompose en les étapes suivantes
+      - Établit le version vector des opérations causalement stable
+	- Fusion pair-wise des /n/ entrées des /n/ vecteurs des autres noeuds
+	- Étape en /n^2/
+      - Parcourt en sens inverse l'arbre des /e/ epochs jusqu'à trouver l'epoch maximale causalement stable
+	- Pour chaque epoch, calcule le chemin entre elle et la racine
+	- Étape en /e * h/
+      - Puis calcule le LCA de chaque chemin
+	- Puis calcule l'intersection deux par deux l'intersection entre le chemin du LCA courant et l'epoch donnée
+	  - Étape en /e * h/
+	- LCA est dernière epoch formant le chemin restant
+      - Puis calcule /required epochs/
+	- Ajoute chaque epoch située après LCA dans chemin entre /potential current epochs/ et LCA
+	- Étape en /e * h/
+      - Puis parcourt /epoch tree/ pour supprimer epoch n'appartenant pas à /required epochs/
+	- Étape en /e/
+    - Obtient donc une complexité en /O(n^2 + 3 * (e * h) + e)/
+- Papier : Ajouter une synthèse à l'issue de la section *Issuing rename operations*
+  - A ajouté un paragraphe
+  - Consiste à expliquer qu'on peut proposer des stratégies qui visent à minimiser chaque paramètre de manière individuelle
+  - Que certaines de ses stratégies convergent, mais que d'autres s'opposent
+  - Doit donc faire un choix sur le poids de chaque paramètre en fonction du système conçu
+  - Dans notre cas, privilégeriait le temps d'inté de l'opé rename
+  - Générerait donc des opés rename fréquement, quitte à avoir des opés concurrentes
+- MiseProd : Réflexions
+  - Peut articuler tout le module autour d'un projet sur réaliser un éditeur collaboratif temps réel avec LogootSplit
+  - Test : Leur demander d'implémenter une version naive de l'algo (élément par élément)
+    - Tests de l'ordre lexicographique sur les identifiants
+    - Tests de la génération d'identifiants
+      - Séquence vide
+      - Entre 2 identifiants espacés
+      - Entre 2 identifiants contigus
+    - Tests de l'insertion
+      - Séquence vide
+      - En début de séquence
+      - En fin de séquence
+      - En milieu
+    - Tests de la suppression
+    - Tests de la commutativité
+  - Intégration continue
+    - Ajout de la config pour utiliser le CI de Gitlab
+    - Ajout de la config pour déployer sur plusieurs environnements
+** Semaine du <2021-11-22 Mon> au <2021-11-26 Fri>
+*** Planned
+**** DONE BD2 : Rédiger sujet TD5
+- Porte sur l'utilisation de formulaires pour passer des données
+**** DONE BD2 : Rédiger sujet du projet
+- Voir le scope du projet
+  - Quelles features demander ?
+    - Consultation
+    - Saisie
+    - Edition
+  - Combien de tables ça nécessite ?
+  - Est-ce qu'iels peuvent se répartir le travail facilement ?
+**** IN-PROGRESS MiseProd : Réaliser slides CM1
+- Porte sur
+  - Présentation et organisation du module
+  - Git et son fonctionnement
+  - Git Flow
+  - Bonnes pratiques de Git
+**** TODO MiseProd : Réaliser sujet TD1
+- Quels exercices leur faire faire ?
+- Leur donner un état initial, une suite d'instructions à réaliser provoquant un conflit, et leur demander de surmonter
+- Leur demander de proposer une autre façon de s'organiser qui aurait permis d'éviter/minimiser le conflit ?
+- Leur donner un état initial d'un repo, une suite de commande, leur demander de réfléchir à quel état on obtient
+- Faudrait les faire travailler en groupe
+  - Comment ?
+  - Combien ?
+*** Done
+- Réunion
+  - Section 5.3
+    - Introduire figure 9
+    - Décomposer paragraphe listant les buts pour différencier insérés before et insérés concurrent
+    - Ensuite les invariants par cas
+    - Enfin expliquer les cas
+  - Section 7.3
+    - Ajouter conclusion pour expliquer que le mécanisme de GC n'est pas exécuté fréquemment
+    - Que la contrainte de stabilité causale est plus gênante
+- MiseProd : Réaliser slides CM1
+  - Préparation
+    - Git flow
+      - Présenté ici : https://nvie.com/posts/a-successful-git-branching-model/
+      - Propose d'utiliser plusieurs branches pour séparer le travail
+	- 2 branches éternelles, develop & master
+	- Des branches supports
+	  - feature
+	  - release
+	  - hotfix
+      - Un peu de mal avec les branches hotfix
+	- Part de master
+	- Mais doit être re-mergé dans develop & master après coup
+	- J'aurais eu tendance à la faire partir de develop
+	  - Mais peut avoir dans develop des feature branches de fusionnées
+	  - Peut repartir du commit correspondant à la version releasée dans develop
+	  - Correspond alors à master
+	  - Problème survient si plusieurs hotfixes à faire
+	  - Dans ce cas, paraît effectivement plus simple de repartir de la version master
+      - Dans un de ses blogposts, Adam Ruka propose une simplification de Git flow
+	- Appelé par la suite OneFlow
+	- Dispo ici : https://www.endoflineblog.com/gitflow-considered-harmful
+	- Propose notamment de ne conserver qu'une branche éternelle, master
+	- Donne un exemple de comment s'en sortir dans situations nécessitant un hotfix dans son post suivant
+	- Redonne aussi un exemple où il utilise deux branches éternelles, develop & master
+	  - La principale différence étant alors que la branche master est tjrs mise à jour à l'aide de merge fast-forwarded
+	  - Pas de commit spécifique à cette branche finalement
+	  - S'agit juste d'un marker indiquant la version la plus récente déployée de l'appli
+	  - Préfère plutôt cette vision perso
+      - Détaille ensuite la mise en pratique de One Flow en utilisant les forges et leurs outils
+	- Notamment les forks et PRs
+  - Plan
+    - Intro du module
+      - Se présenter
+      - Organisation du module
+      - Objectifs du module
+      - Syllabus
+      - Évaluation
+      - Biblio
+    - Gestionnaires de versions
+      - Problème initial
+      - Solution
+      - Historique
+    - Git - rappel
+      - Présentation
+      - Principes
+	- Repo
+	- Workspace et index
+	- Commits
+	- Conflits et merge
+	- Tags
+      - Commandes
+	- status, add, commit, push, pull
+    - Git - avancé
+      - Branches
+      - Fast-forward
+      - Rebase
+      - Squash
+    - Bonnes pratiques
+      - Commits atomiques
+      - Messages courts et explicites
+      - Convention de messages
+      - Pusher régulièrement
+	- Partage
+	- Back-up
+	- Permet de détecter conflits rapidement
+	  - Plus simple à corriger
+	  - Puisque moins de matière
+      - Branches short-lived
+	- Permet d'éviter qu'un travail devienne trop distant de la version courante
+	- Et coûte trop cher (temps, effort) à intégrer
+	- Nécessite de définir objectif clair pour chaque branche
+      - Garder une branche fonctionnelle
+	- Pratique si besoin inopiné de faire une démo
+	- Dans le cadre de l'open-source, permet à quelqu'un de tester l'appli
+    - One flow
+      - Principe
+      - Branches principales
+	- develop et main
+      - Branches support
+	- feature
+	- release
+	- hotfix
+      - Récap
+      - Utilisation de fork et de PRs
+      - Utilisation de branches spécifiquement pour le merge-back d'une branche release dans la branche master
+	- Si conflits, les commits pour les résoudre seraient ajoutés dans la release branch
+	- Souhaite que la branche release/X.Y.Z s'arrête au tag X.Y.Z
+	- La branche merge-back-X.Y.Z permet de gérer cela
+    - Récap
+      - Important d'adapter en fonction du contexte
+	- Pas la même utilisation de Git et les mêmes besoins si travaille seul
+	- ou en petit groupe
+	- ou dans un projet avec des dizaines/centaines de contributeurs
+  - À voir
+    - [ ] Doit-on mettre la config de l'IDE dans le repo ?
+      - Par exemple les fichiers du projet pour Eclipse ?
+      - Pratique si plusieurs personnes
+- BD2 : TD5
+  - Demander s'iels savent utiliser Git ?
+    - Nope
+** Semaine du <2021-11-29 Mon> au <2021-12-03 Fri>
+*** Planned
+**** DONE Phd Day : Envoyer abstract
+**** DONE Papier : Intégrer suggestions d'Olivier
+**** DONE Papier : Proposer une analyse en complexité du mécanisme de GC
+**** DONE Papier : Ajouter conclusion à la partie sur mécanisme de GC
+- Version naive du mécanisme de GC
+- N'est pas sur le chemin critique
+- Et executé seulement lors qu'une opération /rename/ devient causalement stable
+- Donc pas le plus critique niveau performance
+- Mais pourrait faire l'objet d'améliorations sur
+  - Mécanisme de détection de la stabilité causale (cf. causal barrier)
+  - Mécanisme d'identification des /required epochs/
+- S'agit de travaux futurs
+**** DONE Papier : Ajouter quelques lignes sur les axes d'amélioration de l'opé /rename/
+- Pour le moment dit que les perfs sont limitantes
+- Devrait donner les pistes d'amélioration pour cette opé
+  - /renameBlock/
+  - Utilisation de threads
+**** DONE Papier : Revoir mécanisme de GC
+- En discutant des axes d'amélioration du mécanisme de GC avec Vic, arrivé à la conclusion que j'ai pas forcément besoin de la stabilité causale
+- J'ai juste besoin de connaître l'epoch minimale courante du système
+- Pour ça, pourrait juste traquer les epochs des différentes noeuds
+  - Information peut s'obtenir via les opérations ou les messages de synchronisation
+- Obtient un vecteur d'epoch
+- Doit trouver l'epoch minimum
+**** DONE Papier : Faire transparaître les liens entre les propriétés qu'on liste et les choix de conception de /renameId/ et /renameBlock/
+**** TODO Papier : Ajouter conclusion sur les différentes approches de Sequence CRDT
+- Quelle conclusion par contre ?
+- Revoir ce que que pouvait dire LSEQ à ce sujet
+**** IN-PROGRESS MiseProd : Réaliser slides CM1
+- Porte sur
+  - Présentation et organisation du module
+  - Git et son fonctionnement
+  - Git Flow
+  - Bonnes pratiques de Git
+**** IN-PROGRESS MiseProd : Réaliser sujet TD1
+- Quels exercices leur faire faire ?
+- Leur donner un état initial, une suite d'instructions à réaliser provoquant un conflit, et leur demander de surmonter
+- Leur demander de proposer une autre façon de s'organiser qui aurait permis d'éviter/minimiser le conflit ?
+- Leur donner un état initial d'un repo, une suite de commande, leur demander de réfléchir à quel état on obtient
+- Faudrait les faire travailler en groupe
+  - Comment ?
+  - Combien ?
+*** Done
+- Papier : Intégrer suggestions d'Olivier
+  - A fait quelques modifs par rapport à sa version
+  - Voir si OK
 - Des reviews demandent une évaluation du mécanisme de GC
 - Voir pour proposer un algo pour le mécanisme de GC
 - En faire son analyse de complexité en temps
@@ -21259,6 +21501,38 @@ Failed to publish
 - Publié à TPDS en septembre 2021
 - A l'air de proposer un mécanisme d'anti-entropie basé sur Merkle Tree plus efficace que state of the art
 - Dispo ici : https://kristofjannes.com/papers/tpds_owebsync.pdf
+- BD2 : Projet
+  - HUET Guillaume fait le projet en solo
+- Papier : Revoir mécanisme de GC
+  - Bon en vrai, il n'y a pas l'air d'y avoir de différence entre traquer les epochs des différents noeuds et en sélectionner l'epoch minimale; et utiliser la stabilité causale
+  - Notamment, les 2 permettent de GC les epochs obsolètes avant qu'elles ne soient causalement stables
+  - Par exemple
+    - Si noeud A est sur l'epoch eA1 et les noeuds B et C sur l'epoch eB1
+    - Lorsque A passe à l'epoch eB1, eA1 devient GC-able alors qu'elle n'est pas forcément causalement stable
+  - La différence porte sur la complexité en temps et en mémoire des 2 approches
+    - La stabilité causale me fait conserver une matrice de vecteurs d'états
+      - Qui peut être raffinée avec une barrière causale
+      - Mais ajoute des informations de causalité à chacune des opérations
+    - Traquer les epochs me fait conserver un vecteur d'epochs
+      - Nécessite par contre d'identifier le minimum de ce vecteur
+      - Sa complexité en temps dépend de la complexité de la relation /priority/
+      - Peut être plus rentable de maintenir une liste triée des epochs en parallèle
+  - P-e pas besoin de modifier la partie du coup
+- Papier : Ajouter conclusion sur les différentes approches de Sequence CRDT
+  - Le papier de LSEQ dit juste qu'ils considèrent les variable-size sequence CRDTs comme l'approche la plus prometteuse dans l'intro
+    - Sans trop argumenter à ce moment
+    - Dans la partie background, explicite que l'approche tombstone a besoin d'un consensus pour purger le document
+      - Ce qui est coûteux, ne scale pas, et pas adapté aux systèmes avec du churn
+    - Explicite que l'approche variable-size a aussi un moment besoin d'un consensus pour réduire la taille des identifiants
+    - Et que leurs travaux ont pour but et effet de retirer ce besoin en limitant la croissance des identifiants
+  - My 2 cents serait de dire que
+    - Les 2 approches du mécanisme de résolution de conflits sont équivalentes
+      - Les 2 présentent un overhead (mémoire et computationnel) au fil du temps
+	- Tombstone a p-e un avantage côté réseau
+	- Mais variable-size a un avantage côté réactivité (pas d'ordre entre les insertions, pouvant même être amélioré en pas d'ordre sur les opérations, cf. DLS)
+      - Les 2 requièrent un mécanisme de consensus, synchrone ou asynchrone, pour réduire périodiquement cet overhead
+    - Ce que les évaluations ont montré est que ce sont les choix des structures de données utilisées et la qualité de leur implémentation qui impactent le plus finalement les performances d'un CRDT
+* Backlog
 * Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
