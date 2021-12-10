@@ -21273,7 +21273,7 @@ Failed to publish
 - Obtient un vecteur d'epoch
 - Doit trouver l'epoch minimum
 **** DONE Papier : Faire transparaître les liens entre les propriétés qu'on liste et les choix de conception de /renameId/ et /renameBlock/
-**** TODO Papier : Ajouter conclusion sur les différentes approches de Sequence CRDT
+**** DONE Papier : Ajouter conclusion sur les différentes approches de Sequence CRDT
 - Quelle conclusion par contre ?
 - Revoir ce que que pouvait dire LSEQ à ce sujet
 **** IN-PROGRESS MiseProd : Réaliser slides CM1
@@ -21532,6 +21532,199 @@ Failed to publish
 	- Mais variable-size a un avantage côté réactivité (pas d'ordre entre les insertions, pouvant même être amélioré en pas d'ordre sur les opérations, cf. DLS)
       - Les 2 requièrent un mécanisme de consensus, synchrone ou asynchrone, pour réduire périodiquement cet overhead
     - Ce que les évaluations ont montré est que ce sont les choix des structures de données utilisées et la qualité de leur implémentation qui impactent le plus finalement les performances d'un CRDT
+  - Du mal à voir comment faire apparaître ça dans le papier
+  - A ajouté un paragraphe à ce sujet en intro de *Background*
+- Papier : Typos
+  - 4.1
+    - To converge, other nodes have to rename their states identically.
+      - To converge, other nodes have to identically rename their states ?
+  - 7.1
+    - In both cases, each bot performs an insert or a remove operation locally every 200 ±50ms and broadcasts it immediately to other nodes using a P2P full mesh network
+      - In both cases, each bot locally performs an insert or a remove operation every 200 ±50ms and immediately broadcasts it to other nodes using a P2P full mesh network ?
+** Semaine du <2021-12-06 Mon> au <2021-12-10 Fri>
+*** Planned
+**** DONE MiseProd : Envoyer un mail pour leur dire de ramener leur machine perso
+**** DONE MiseProd : Ajouter slides sur sites hébergements de repo
+- Disposer d'un repo distant utile
+  - Toujours disponible
+  - Fiable
+- Mais toutes les entreprises n'ont pas les moyens/connaissances pour mettre ça en place
+- D'autres entreprises proposent de les héberger pour elles
+  - GitLab
+  - GitHub
+  - BitBucket
+- Adoptent le modèle économique suivant
+  - Gratuit pour projets publics
+  - Payant pour avoir des repos privés
+- Devenus pierre angulaire de la communauté de l'open-source
+- Proposent généralement des fonctionnalités supplémentaires utiles à la gestion de projets
+  - Issues
+  - Planning
+  - Forks
+  - PR/MR
+  - Outils d'intégration continue/livraison continue
+- Dans le cadre du module, allons utiliser GitHub
+**** DONE MiseProd : Ajouter slides sur DevOps
+- Un petit couac entre le nom du module et ce qu'on va y faire
+- Objectif du module est de vous familiariser avec l'approche DevOps
+  - Ses pratiques
+  - Ses outils
+- Qu'est-ce que DevOps ?
+  - Mouvance attribuée à Patrick Debois, date des années 2007-2009
+  - Ensemble de pratiques visant à unifier le développement de logiciel (dev) avec l'administration système (ops)
+- Problématiques initiales
+  - 2 versants dans un projet informatique
+  - Dev, qui a pour but de développer, maintenir et faire évoluer des logiciels
+  - Ops, qui a pour but de faire tourner de la manière la plus fiable des logiciels
+  - Les deux équipes ont des objectifs contraires, qui nuisent au bon déroulement du projet
+- Idée de la mouvance DevOps
+  - Unifier ces 2 versants
+    - Pour ne plus travailler l'un contre l'autre, mais ensemble
+  - Intégrer principes agiles à la partie Ops
+    - Chercher à réduire le délai entre développement d'une mise à jour et son déploiement
+    - Tout en maintenant un haut niveau de qualité
+  - Pour ça, repose principalement sur l'automatisation
+    - Builds, tests, déploiements
+- Rendu possible grâce à
+  - Adoption des méthodes agiles
+  - Demande d'une fréquence plus grande de releases de la part des utilisateurs
+  - L'emergence du cloud qui facilite le déploiement
+  - L'utilisation accrue de tests automatiques et des méthodes d'intégration continue
+  - Disponibilité massive de ressources sur le sujet
+- Cycle de vie DevOps
+  - Image d'Amazon
+- Syllabus du module
+**** DONE MiseProd : Réaliser slides CM1
+- Porte sur
+  - Présentation et organisation du module
+  - Git et son fonctionnement
+  - Bonnes pratiques de Git
+**** DONE MiseProd : Réaliser sujet TD1
+- Quels exercices leur faire faire ?
+- Leur donner un état initial, une suite d'instructions à réaliser provoquant un conflit, et leur demander de surmonter
+- Leur demander de proposer une autre façon de s'organiser qui aurait permis d'éviter/minimiser le conflit ?
+- Leur donner un état initial d'un repo, une suite de commande, leur demander de réfléchir à quel état on obtient
+- Faudrait les faire travailler en groupe
+  - Comment ?
+  - Combien ?
+**** DONE MiseProd : Réaliser sujet TD2
+- 2 parties
+- 1ère consiste à faire les exercices de https://learngitbranching.js.org/
+- 2nd consiste à développer une petite application en suivant OneFlow et en effectuant des PRs régulièrement
+  - Peut réutiliser l'application de MyMDB
+  - Fonctionnalités
+    - Mise en place de la base de données
+    - Connexion avec la base de données
+    - Liste des films
+    - Liste des acteur-rices
+    - Page d'un-e acteur-rice
+    - Page d'un film
+    - Modification de la liste des acteur-rices pour ajouter des liens vers les pages des acteurs
+    - Modification de la liste des films pour en faire des liens vers les pages des films
+**** DONE MiseProd : Ajouter slides sur stratégies d'utilisation
+- Porte sur Gitflow et OneFlow
+**** DONE MiseProd : Réaliser slides CM2
+- Porte sur
+  - Branches
+  - Merge et rebase
+  - Oneflow
+**** TODO MiseProd : Voir Github Actions
+- J'ai créé un compte sur Gitlab pour test
+- Ça marche bien, mais pour pouvoir faire de la CI, besoin de saisir sa CB
+- Préferer un service qui ne requiert pas ce genre d'infos pour les étudiants
+- Voir si Github Actions le permet
+- Sinon revoir Travis
+**** TODO Papier : Générer dataset temps de rejeu des logs
+- Je dois avoir dorénavant assez de traces avec /rename/ tous les 7k5 opés
+- Utiliser ces traces pour faire des mesures de temps de rejeu
+- Voir pour ça la structure du schéma de données à utiliser
+**** TODO Papier : Générer figures temps de rejeu des logs
+**** TODO Papier : Générer dataset taille des snapshots avec /rename/ tous les 7k5 opés
+*** Done
+- MiseProd : Réaliser slides CM1
+  - Introduction du module
+    - [X] Ajouter slides sur notion de DevOps
+  - Introduction des VCS
+    - [X] Ajouter illustration CVCS
+    - [X] Ajouter illustration DVCS
+  - Bases de Git
+    - [X] Ajouter illustration différents niveaux de stockage
+    - [X] Ajouter illustration SHA-1
+    - [X] Ajouter illustration commandes principales
+- MiseProd : Réaliser sujet TD1
+  - Reprendre le TD de Git de l'IUT pour les faire pratiquer les commandes de bases et la résolution de conflits
+  - Peut aussi les faire pratiquer avec : https://learngitbranching.js.org/
+  - Faire un 2nd sujet pour les faire pratiquer les features branches
+    - Partir sur le sujet de la médiathèque
+- MiseProd : Réaliser slides CM2
+  - Branches
+    - Besoin initial
+      - Commence à travailler sur une nouvelle fonctionnalité
+      - On découvre un bug à corriger
+      - Mais fonctionnalité pas encore prête, encore buggée
+    - Principes des branches
+      - Permet de procéder à plusieurs modifications en parallèle
+      - Dans notre exemple, pourrait avoir une branche /newFeat/ et une autre /bugFix/
+      - Permet de travailler (i.e. faire des commits) sur l'une sans impacter l'autre
+    - Git et les branches
+      - Les branches ne sont pas une nouveautés de Git
+	- Déjà présentes dans SVN
+	- Mais une purge à utiliser
+      - Sous Git, processus léger, ce qui encourage son utilisation
+    - Représentation arborescente
+      - L'historique d'un dépôt est une arborescence de commits
+      - Chaque commit possède au moins un père, à l'exception du commit initial
+    - Branches et branche main
+    - Création d'une nouvelle branche
+      - Peut à tout moment créer une nouvelle branche à d'un commit
+      - git branch newFeat
+    - Travailler sur la nouvelle branche
+      - Peut alors créer de nouveaux commits
+      - Vont s'ajouter à la suite des commits précédents
+    - Changer de branche
+      - Peut à tout moment repasser sur une autre branche
+      - git switch master
+    - Lister les branches
+      - Peut vérifier les branches existantes et sur laquelle on est
+      - git branch
+    - Le pointeur HEAD
+      - Git utilise le pointeur HEAD pour savoir où ajouter le prochain commit
+- MiseProd : Ajouter slides sur stratégies d'utilisation
+  - Récapitulatif
+    - On a vu comment on pouvait utiliser les branches pour travailler en parallèle sur plusieurs tâches
+    - Et comment intégrer ces changements à la branche principale à l'aide de merge et/ou rebase
+  - Mais comment procéder pour bien faire cela ?
+    - Quelles sont les bonnes pratiques à suivre ?
+  - Utilisation de feature branches
+    - L'idée est de ne jamais travailler directement sur la branche principale
+    - Mais de travailler dans des branches éphémères
+      - Existent le temps d'implémenter la fonctionnalité
+      - Supprimée une fois la fonctionnalité intégrée dans la branche principale
+    - Nécessite de réfléchir en amont à ce que l'on va effectuer
+      - Et de potentiellement décomposer une fonctionnalité en plusieurs
+    - Exemple : Ajout de la gestion des utilisateurs
+      - Ajout d'une table users à la BD
+      - Ajout de la création de compte et du mécanisme de login/logout
+      - Ajout du mécanisme de réinitialisation du mot de passe
+      - Ajout de la page de profil
+      - ...
+  - La branche principale doit toujours fonctionner
+    - L'idée derrière l'utilisation de feature branches est aussi de conserver la branche principale fonctionnelle
+    - Rien de plus décourageant/rageant que de cloner un dépôt et de ne pas pouvoir démarrer l'application
+    - Nécessite donc de tester l'état de l'application dans la feature branch avant de l'intégrer
+    - Long et rébarbatif de tester manuellement
+    - On a donc besoin de tests automatiques qui nous alertent en cas de bugs
+      - Cf. suite du cours
+  - Modèles de développement
+    - Des modèles de developpement poussent plus loin l'utilisation des branches pour pouvoir gérer
+      - Les fonctionnalités
+      - Les releases et leur suivi
+      - Les hotfixes
+    - Ces modèles, plus complexes, ont été adoptés dans de nombreux environnements professionnels
+      - gitflow (http://nvie.com/posts/a-successful-git-branching-model/)
+      - OneFlow (https://www.endoflineblog.com/gitflow-considered-harmful)
+    - Intéressant de se les approprier et de les adopter à vos besoins
+      - Important par contre de se mettre d'accord au niveau de l'équipe sur le modèle à suivre
 * Backlog
 * Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
