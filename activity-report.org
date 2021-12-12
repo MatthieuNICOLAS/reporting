@@ -21628,18 +21628,23 @@ Failed to publish
   - Branches
   - Merge et rebase
   - Oneflow
+**** DONE PhD Day : Préparer présentation
+- Présentation de 20 minutes
+- Par rapport à ma présentation de PaPoc ou du précédent PhD Day
+  - Peut présenter la gestion des renommages concurrent
+  - Mettre à jour la partie évaluation avec les nouvelles figures
+**** IN-PROGRESS Papier : Générer dataset temps de rejeu des logs
+- Je dois avoir dorénavant assez de traces avec /rename/ tous les 7k5 opés
+- Utiliser ces traces pour faire des mesures de temps de rejeu
+- Voir pour ça la structure du schéma de données à utiliser
+**** TODO Papier : Générer figures temps de rejeu des logs
+**** TODO Papier : Générer dataset taille des snapshots avec /rename/ tous les 7k5 opés
 **** TODO MiseProd : Voir Github Actions
 - J'ai créé un compte sur Gitlab pour test
 - Ça marche bien, mais pour pouvoir faire de la CI, besoin de saisir sa CB
 - Préferer un service qui ne requiert pas ce genre d'infos pour les étudiants
 - Voir si Github Actions le permet
 - Sinon revoir Travis
-**** TODO Papier : Générer dataset temps de rejeu des logs
-- Je dois avoir dorénavant assez de traces avec /rename/ tous les 7k5 opés
-- Utiliser ces traces pour faire des mesures de temps de rejeu
-- Voir pour ça la structure du schéma de données à utiliser
-**** TODO Papier : Générer figures temps de rejeu des logs
-**** TODO Papier : Générer dataset taille des snapshots avec /rename/ tous les 7k5 opés
 *** Done
 - MiseProd : Réaliser slides CM1
   - Introduction du module
@@ -21725,6 +21730,70 @@ Failed to publish
       - OneFlow (https://www.endoflineblog.com/gitflow-considered-harmful)
     - Intéressant de se les approprier et de les adopter à vos besoins
       - Important par contre de se mettre d'accord au niveau de l'équipe sur le modèle à suivre
+- PhD Day : Préparer présentation
+  - Dispo ici : https://github.com/MatthieuNICOLAS/2021-phd-day/blob/main/presentation.pdf
+- Papier : Générer dataset temps de rejeu des logs
+  - Structure possible
+    - nbOpes,type,time
+    - Avec type de la forme
+      - LS
+      - RLS-<frequency>-<nbRenamingbots>rb
+  - A mis à jour /mapFolders/ pour répertorier les simus avec une fréquence de rename de 7k5
+  - A mis à jour /log-execution-time/ pour utiliser /mapFolders/
+  - Doit maintenant préparer l'environnement sur la machine pour faire tourner ce script
+  - Nécessite l'arborescence suivante sur coast-dev2
+    - 2020-08-rls-with-concurrent-rename/
+      - ls/
+	- dossier/
+	  - Log.Bot0.json
+    - wip-results/
+      - 30k/7k5/
+	- rls-1/2/3/4-renaming-bots/
+	  - dossier/
+	    - Log.Bot0.json
+  - A transféré les fichiers sur coast-dev2
+  - A lancé le benchmark
+- PhD Day : Répétition Alex
+  - Slide 2 : Faire ressortir la problématique de la trust
+    - Pourquoi dans la même slide ?
+    - Et pas dans une slide distincte ?
+    - Prendre un exemple pour motiver ?
+      - Pourrait prendre des exemples de succès
+      - Pourrait ensuite prendre un exemple d'échec
+	- Vandalisme
+    - Slide 3
+      - P-e inverser la cause et l'effet
+	- Trop de révisions par 2s
+	- Doit donc automatiser
+    - Slide 5
+      - Des définitions
+      - Ou des requirements ?
+      - Tu expliques beaucoup de choses avec les bras
+	- Round de collaborations
+      - Un schéma ?
+    - Slide 7
+      - Discours correspond pas trop à ce qui est écrit
+	- Tu me parles de ce qui t'intéresse
+	- Tu me montres ce qui intéresse Wikimédia et la littérature
+    - Slide 8
+      - Article ownership
+	- Pareil, pourrait avoir un schéma plutôt que tes mains
+	- Mériterait p-e d'apparaître sur une slide
+    - Slide 11
+      - Faire apparaître la trajectoire optimale après coup ?
+    - Slide 12
+      - We delete consecutive -> We keep last contrib
+    - Slide 14
+      - Je comprends pas les 2 figures
+  - Global
+    - Faire apparaître au fur et à mesure ton texte
+      - Tu passes pas mal de temps sur tes slides
+      - Permet de se synchroniser avec toi
+  - Questions
+    - C'est quoi le but de mesurer la qualité des contributions plutôt que la qualité des articles ?
+    - Si on sait mesurer la qualité des articles, en prenant 2 révisions, pourquoi j'obtiens pas la la qualité de la contribution ?
+    - Slide 10
+      - Comment tu te protèges du vandalisme avec cette métrique ?
 * Backlog
 * Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
