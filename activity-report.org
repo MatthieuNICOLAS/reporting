@@ -21794,6 +21794,693 @@ Failed to publish
     - Si on sait mesurer la qualité des articles, en prenant 2 révisions, pourquoi j'obtiens pas la la qualité de la contribution ?
     - Slide 10
       - Comment tu te protèges du vandalisme avec cette métrique ?
+** Semaine du <2021-12-13 Mon> au <2021-12-17 Fri>
+*** Planned
+**** DONE Papier : Ajouter sous-section sur le temps de rejeu des logs
+- Peut rédiger cette partie d'après les 1ers résultats que nous avions obtenus
+- La modifier si besoin si les nouveaux résultats invalides les précédents
+**** DONE PhD Day : Ajouter explications sur comment on transforme un identifiant
+- À l'heure actuelle, je dis juste que l'on effectue une transformation
+- Sans préciser comment
+- Ce qui rend difficile l'explication des downsides de RLS
+  - Puisque jamais parlé du /former state/ à ce stade
+- Ajouter des explications sur la transformation effectuée permettrait d'introduire cette notion en amont
+**** DONE Papier : Générer dataset temps de rejeu des logs
+- Je dois avoir dorénavant assez de traces avec /rename/ tous les 7k5 opés
+- Utiliser ces traces pour faire des mesures de temps de rejeu
+- Voir pour ça la structure du schéma de données à utiliser
+**** DONE Papier : Générer figures temps de rejeu des logs
+**** DONE Papier : Générer dataset stats des opérations
+- Gérald proposait un moment de calculer le temps d'intégration des opérations par type
+  - Donc globalement des stats pour l'ensemble des opérations /insert/, /remove/ et /rename/
+  - Permet d'obtenir une idée de l'amplitude des temps d'intégrations
+- Le commentaire R2C2 demande aussi d'avoir les tailles des opérations
+- Le commentaire R1D1 demande de voir l'impact de la fréquence de /rename/ sur les performances
+- Pourrait en profiter pour répondre à ces commentaires
+  - En calculant pour chaque opération son temps d'intégration et sa taille
+  - Et en regroupant les résultats par CRDT (LS, RLS-7k5, RLS-30k) et type d'opération (/insert/, /remove/, /rename/)
+  - En plus, la stat de la taille de l'opération /rename/ traduit aussi la taille de l'état
+    - Puisque correspond au /former state/
+- Laisse par contre de côté les différents renaming bots
+  - Commencerait à faire beaucoup de paramètres différents
+  - Mais exclut toutes les situations où on utilise /revertRenameId/ des résultats
+    - Opération /insert/, /remove/ et /rename/ provenant d'une epoch concurrente
+  - Exclut aussi les situations où on applique un /rename/ "perdant"
+    - Ce qui permettrait de faire redescendre probablement le temps d'intégration moyen des opérations /rename/
+- Résultats attendus
+  - Tailles et temps d'intégration de /insert/ et /remove/
+    - RLS-7k5 < RLS-30k < LS
+  - Tailles de /rename/
+    - RLS-7k5 < RLS-30k
+  - Temps d'intégration de /rename/
+    - RLS-7k5 = RLS-30k
+**** CANCELLED Papier : Générer dataset taille des snapshots avec /rename/ tous les 7k5 opés
+**** DONE Papier : Ajouter partie sur mécanisme de GC à la lettre de réponse
+- Pour dire qu'on a adressé le comment
+**** DONE Papier : Ajouter partie sur temps de rejeu des logs à la lettre de réponse
+- Pour dire qu'on a adressé le comment
+**** DONE Papier : Ajouter partie sur explications des algorithmes à la lettre de réponse
+- Pour répondre à R2C5-7
+**** DONE Papier : Ajouter partie sur l'utilisation des propriétés pour concevoir /renameId()/ et /revertRenameId()/ à la lettre de réponse
+- Pour répondre à R4C1
+**** DONE Papier : Ajouter partie sur comment utiliser l'opération /rename/ dans des cas d'application réels
+- Pour répondre à R4C4
+*** Done
+- Papier : Générer dataset temps de rejeu des logs
+  - L'exécution a échoué car un fichier étant manquant
+    - Faut vraiment que je vois comment mieux ranger mes fichiers sur les machines /coast-srv0/ et /coast-dev2/
+    - Concerne les logs des simus avec /rename/ tous les 30k
+  - Maintenant l'exécution prend trop de temps car certaines des simus avec /rename/ tous les 30k utilisaient la version incorrecte de /priority/
+  - Comment corriger cela ?
+    - Doit identifier ces simus et les retirer du jeu d'essai
+    - Tenter de les exécuter une ou par une et détecter celles qui prennent plus de 2min à rejouer
+    - Ne concerne que les snapshots ayant 2+ renaming bots avec la fréquence à 30k
+  - Peut PAS revenir à l'ancienne version de /mute-structs/ pour ces snapshots
+    - S'agissait de la 2.0.1
+    - Y a une amélio des perfs de l'opération /rename/ pour la 2.0.2
+  - En attendant, j'ai relancé en excluant toutes les simus à 30k
+  - J'ai modifié rapidement le script de rejeu pour ne jouer que les 100k premières opérations
+    - S'effectue en 16s environ pour les logs ne présentant pas le problème
+    - Les autres ne finissent pas même au bout d'1min
+    - Retire ces logs du coup
+  - A pu relancer le benchmark à partir des logs
+  - Juste remarqué un problème de formatage pour les logs
+    - Il n'y a pas de retour à la ligne à la fin d'un log
+    - La 1ère entrée du log suivant est donc concaténée
+    - A corrigé le code
+    - Mais faudra corriger ça pour les entrées existantes
+- Papier : Ajouter sous-section sur le temps de rejeu des logs
+  - Plan
+    - Afin de représenter plus clairement les performances de RLS par rapport à LS, nous avons effectué un dernier benchmark
+    - Mesure le temps mis pour rejouer un log d'opérations
+    - Obtient la figure suivante
+    - Constate que le gain sur l'intégration des opérations /insert/ et /remove/ grâce au renommage permet initialement de contrebalancer le temps d'intégration /rename/
+    - Mais plus l'opération /rename/ impacte d'identifiants, plus elle devient coûteuse
+    - Ce coût est multiplié par le nombre d'opérations /rename/ concurrentes
+    - Et mène à des scénarios où RLS est plus lent à rejouer un log d'opérations que LS
+    - Il est donc nécessaire d'effectuer des efforts d'optimisation sur l'opération /rename/
+  - Ajout de la sous-section
+  - Voir avec Gérald et Olivier s'il y a besoin de développer
+    - Dans quelle direction ?
+      - Amélioration des algos d'intégration de l'opération /rename/
+	- Mais redite avec la sous-section précédente
+- Papier : Ajouter partie sur mécanisme de GC à la lettre de réponse
+  - Plan
+    - Ajouté la section 7.3 au document
+    - Décrit les différentes étapes du mécanisme de GC et analyse leur complexité en temps
+    - Récapitule les résultats dans tableau
+    - ???
+- Papier : Ajouter partie sur temps de rejeu des logs à la lettre de réponse
+  - Plan
+    - Avons executé des benchmarks supplémentaires pour mesurer le temps nécessaire pour intégrer un log d'opérations avec LS et RLS
+    - Avons ajouté une partie à la section 7.2 pour décrire et analyser les résultats obtenus.
+- Papier : Générer dataset stats des opérations
+  - A ajouté le nouveau benchmark /log-stats-per-operation/
+    - Consiste à rejouer les logs des simus
+    - Pour chaque opération du log, enregistre le CRDT courant, son type, son temps d'intégration /remote/ et sa taille
+  - A lancé son exécution sur les logs des simus de LS, RLS-7K5-1rb et RLS-30k-1-rb
+  - Pourrait relancer le script en incorportant les simus avec plusieurs /renaming bots/
+    - De façon à incorporer les cas manquants
+    - Mais dans l'affichage, pourrait ne pas faire de distinction sur ce paramètre
+- Réunion
+  - Plus que 24h pour finaliser tout ça
+  - Depuis la dernière fois
+    - Ajout d'un paragraphe expliquant qu'il n'y a pas une meilleure approche pour les Sequence CRDTs (intro de la section 2, page 2, répond à R2C8)
+    - Ajout de références vers les propriétés définies en 3.2 pour faire apparaître plus clairement le lien entre elles et certains choix de conception (4.1, 4.2, 5.1, répond à R4C1)
+    - Intégration de la version de la 5.3 proposée par Olivier, en effectuant quelques modifs (page 7)
+    - Ajout de pistes d'amélioration des perfs de l'opération rename (7.2, page 11)
+    - Ajout d'une conclusion à la partie sur l'analyse en complexité du mécanisme de GC des epochs (7.3, page 12)
+    - Ajout d'une conclusion à la discussion sur comment définir la stratégie de renommage (8.1, page 12, répond à R4C4)
+    - Ajout d'un glossaire des fonctions "helpers" en annexe. Ça date déjà un peu, mais je ne crois pas qu'on ait en parlé un jour ensemble (page 16, répond à R2C7)
+    - Ajout d'une partie sur le temps de rejeu d'un log (page 11-12)
+  - Retours
+    - Paragraphe sur comparaison des approches
+      - C'est modifié
+    - Section 5.3
+      - Finir de modifier la lettre de réponse
+    - /replay log/
+      - Réduire légende
+      - Retirer fenêtre sur les courbes
+    - Fréquence de /rename/
+      - Dans la réponse
+      - Dire qu'on a fait des évaluations à ce sujet et que comme attendu, on observe que rename plus fréquemment réduit la taille de la structure
+  - Questions
+    - [-] Jusqu'à quand j'ai pour déposer la révision de l'article demain ?
+    - [-] Ajouter une partie sur la présence de tombstones dans RLS ?
+      - Où, comment ?
+    - [-] Ajouter des lignes sur l'impact de la fréquence de /rename/ sur les opérations ?
+      - Manque d'un dataset et de figures pour justifier mes propos
+** Semaine du <2021-12-20 Mon> au <2021-12-23 Thu>
+*** Planned
+**** IN-PROGRESS BD-EMME : Corriger copies du partiel
+**** TODO BD-EMME : Corriger copies du TD noté
+**** TODO BD-EMME : Préparer sujet rattrapage
+- Avait discuté avec Claude
+- Lui conseillait un rattrapage sous la forme d'un oral
+  - 20min de préparation
+  - 30-40min de questions
+- Voir les sujets disponibles
+**** TODO BD-EMME : Contacter étudiants pour fixer date du rattrapage
+**** TODO MiseProd : Voir Github Actions
+- J'ai créé un compte sur Gitlab pour test
+- Ça marche bien, mais pour pouvoir faire de la CI, besoin de saisir sa CB
+- Préferer un service qui ne requiert pas ce genre d'infos pour les étudiants
+- Voir si Github Actions le permet
+- Sinon revoir Travis
+*** Done
+** Semaine du <2021-12-28 Tue> au <2021-12-30 Thu>
+*** Planned
+**** DONE BD-EMME : Corriger copies du partiel
+**** IN-PROGRESS BD-EMME : Corriger copies du TD noté
+**** TODO BD-EMME : Préparer sujet rattrapage
+- Avait discuté avec Claude
+- Lui conseillait un rattrapage sous la forme d'un oral
+  - 20min de préparation
+  - 30-40min de questions
+- Voir les sujets disponibles
+**** TODO BD-EMME : Contacter étudiants pour fixer date du rattrapage
+**** TODO MiseProd : Voir Github Actions
+- J'ai créé un compte sur Gitlab pour test
+- Ça marche bien, mais pour pouvoir faire de la CI, besoin de saisir sa CB
+- Préferer un service qui ne requiert pas ce genre d'infos pour les étudiants
+- Voir si Github Actions le permet
+- Sinon revoir Travis
+*** Done
+** Semaine du <2022-01-03 Mon> au <2022-01-07 Fri>
+*** Planned
+**** DONE BD-EMME : Corriger copies du TD noté
+**** DONE BD-EMME : Contacter étudiants pour fixer date du rattrapage
+**** DONE BD-EMME : Préparer sujet rattrapage
+- Avait discuté avec Claude
+- Lui conseillait un rattrapage sous la forme d'un oral
+  - 20min de préparation
+  - 30-40min de questions
+- Voir les sujets disponibles
+**** DONE MiseProd : Préparer séance de <2022-01-11 Tue>
+- Voir où on s'était arrêté
+- Planifier la séance
+- Ajouter le contenu nécessaire
+**** IN-PROGRESS MiseProd : Mettre à jour TD2
+- Par rapport aux diverses questions que j'ai soulignées pour l'exercice
+- Les inclure dans le sujet
+- Mettre en place un dépôt dans la page du module
+**** IN-PROGRESS MiseProd : Préparer CM3 et TD3
+- Porte sur les tests
+- Peut me contenter dans un 1er temps d'aborder les tests unitaires
+**** TODO MiseProd : Voir Github Actions
+- J'ai créé un compte sur Gitlab pour test
+- Ça marche bien, mais pour pouvoir faire de la CI, besoin de saisir sa CB
+- Préferer un service qui ne requiert pas ce genre d'infos pour les étudiants
+- Voir si Github Actions le permet
+- Sinon revoir Travis
+*** Done
+- BD-EMME : Contacter étudiants pour fixer date du rattrapage
+  - Je viens de regarder l'EDT des étudiants
+  - Ont généralement le jeudi aprem de libre
+  - Souhaiterait leur laisser 2 semaines au moins de préparations/révisions
+  - Mais semaine bloquée du <2022-01-17 Mon> au <2022-01-21 Fri>
+  - A donc proposé le <2022-01-27 Thu>
+  - En attente de leur réponse
+  - CADINOT Clément a répondu être disponible et préférer le créneau de 16h-17h
+    - A un cours de prépa TOEIC de 14h à 16h
+- BD-EMME : Préparer sujet rattrapage
+  - J'ai repris un sujet existant
+  - Un peu réduit son scope pour que le schéma conceptuel soit plus petit
+    - Me permet tout de même d'explorer toutes les configurations du passage du schéma conceptuel au schéma relationnel
+  - Ajout de quelques requêtes SQL pour tester les points clés
+  - Un peu peur que le sujet soit trop long pour les 50min d'oral
+  - Ajustera le barême si besoin
+- MiseProd : Préparer séance de <2022-01-11 Tue>
+  - On venait tout juste de démarrer le TD2
+  - CM1 et TD1 consistait en une introduction/un rappel à Git
+    - Problématiques liées à la collaboration
+    - Besoin de versionner un projet
+    - Commandes de bases
+    - Gestion des conflits
+  - CM2 introduisait des fonctionnalités plus avancées
+    - Besoin de développer en parallèle plusieurs tâches sans interférer les unes avec les autres
+    - Principe des branches
+    - Méthodes de réconciliation de branches à l'aide de merge ou rebase
+    - Stratégies d'utilisation des branches
+      - Feature branch
+      - Main fonctionne toujours
+      - Modèles de développement
+  - Le TD2 sert à travailler tout cela
+    - Manipulation et navigation entre les branches
+    - Principes de gitflow et Oneflow
+    - Utilisation de Oneflow
+  - L'exercice 2 est pour le moment un peu faible
+    - Pas de consigne ni d'objectif clair
+    - Peut gagner à préciser des questions pour guider les étudiant-es et leur faire prendre des notes
+    - Peut demander aux étudiant-es de rendre leurs notes de façon à établir une note de contrôle continu
+      - Peut récupérer un exo par-ci, par-là
+  - Exercice 2
+    - git-flow
+      - Qu'est-ce que git-flow ?
+      - À quoi correspond la branche master dans git-flow ?
+      - À quoi correspond la branche develop dans git-flow ?
+      - Quelles sont les autres types de branches présentées dans git-flow ? Pour chacune, préciser son rôle
+    - OneFlow
+      - Quelles sont les critiques émises à l'égard de git-flow ?
+      - Quelles modifications au workflow OneFlow propose pour répondre aux problèmes soulevés ?
+      - L'auteur précise un cas d'utilisation dans lequel OneFlow (ainsi que GitFlow) n'est pas utilisable tel quel, lequel ?
+      - Pour chaque type de branche autre que main, préciser :
+	- Le point de départ de la branche
+	- La branche dans laquelle les modifications sont intégrées une fois la tâche terminée
+	- La façon d'intégrer les modifications dans la branche finale (merge ou rebase)
+      - Préciser à quelles occasions des tags sont créés
+      - Dans son dernier post, Adam Ruka indique comment appliquer GitFlow pour travailler sur un fork d'un repo hébergé par une plateforme en ligne (GitHub, GitLab...)
+      - Pour chaque type de branche, indiquer :
+	- Le dépôt et le point de départ de la branche
+	- Les étapes pour son intégration dans le repo principal
+      - Comment maintient-on à jour les branches main et develop du fork ? Quand effectuer ces étapes ?
+  - Plan
+    - 14h00-14h10 : Rappel + explication refonte exo 2 + mise en route
+    - 14h10-14h30 : Exo 1
+    - 14h30-15h50 : Exo 2
+    - 16h10-17h10 : Exo 3
+    - 17h10-18h : Débriefing TD2 + Cours tests
+  - Doit donc préparer, ou moins entamer, le cours sur les tests
+  - Voir ce que je veux aborder et comment l'organiser
+- MiseProd : Préparer CM3 et TD3
+  - CM
+    - Objectifs
+      - Motiver les tests
+      - Donner une overview des différents types de tests
+      - Présenter en détails les tests unitaires
+      - Comment bien les écrire
+      - Utiliser les Mocks pour limiter le scope d'un test
+    - Plan
+      - Problématiques initiales
+	- Besoin de détecter les bugs dans notre programme
+	  - Mieux que ça soit nous qui les découvrons que nos utilisateurs
+	- Lent et laborieux de tester manuellement
+	- Lorsque rencontre un bug, besoin de déterminer précisément d'où il provient
+	  - Si lorsque je clique sur un bouton, rien ne se passe, peut provenir de
+	    - Bouton qui ne possède aucune action attachée
+	    - Action côté client qui ne correspond plus à ce que le serveur attend (URL, données...)
+	    - Serveur qui rencontre une erreur dans sa génération de la réponse
+	    - Réponse du serveur au client qui est dans un format incorrect
+	    - Affichage de la réponse qui foire
+	    - Problème réseau tout simplement
+	- Une fois le bug corrigé, besoin de s'assurer qu'il ne se reviendra plus
+      - Solution
+	- Utilisation de tests automatisés pour détecter les régressions
+	- Existe variété de types de tests différents
+	  - Tests unitaires
+	  - Tests d'intégration
+	  - Tests End-to-End
+	  - Tests de performance
+	  - Chaos testing
+	- Chaque type de test a son rôle, ses avantages et inconvénients en terme
+	  - Facilité de mise en place
+	  - Temps d'exécution
+	  - Couverture du code
+	- Pyramide des tests
+	- Va combiner une variété de tests pour garantir au mieux le fonctionnement de l'application
+      - Tests unitaires
+	- Principes
+	  - Test le plus atomique
+	  - Généralement vérifie qu'une fonction/méthode (ou un petit groupe d'entre elles) se comporte de la manière attendue dans un scénario donné
+	  - N'interagissent pas avec la base de données, le système de fichiers ou le réseau
+	  - Exemple
+	- Bonnes pratiques
+	  - Structure
+	    - Préparation des données
+	    - Appel de la fonction/méthode testée
+	    - Comparaison du résultat obtenu avec résultat attendu
+	  - Déterminisme
+	    - Lors de la préparation des données, peut se poser la question de quelles valeurs utiliser
+	    - Pourrait penser qu'il s'agit d'une bonne idée d'utiliser des données aléatoires
+	      - Permet d'écrire un test couvrant l'intégralité du domaine
+	      - Permet ainsi de tester même les cas les plus obscurs, ceux auxquels on n'a pas pensé
+	    - En pratique, peut se révéler problématique
+	    - Comparable à des faux positifs
+	      - J'exécute les tests, ils passent
+	      - Je modifie le code
+	      - Je relance les tests, maintenant ils échouent
+	      - Ma modif qui a provoqué le bug ou s'agit d'une coincidence ?
+	    - Détecter de nouveaux cas est le rôle du fuzzy testing, une autre catégorie de tests
+	      - Avoir des tests des deux catégories
+	  - Pas d'effets de bord/tests standalone/réordonnables
+	    - Permet de simplifier le raisonnemment sur les tests
+	    - Permet de paralléliser leur exécution, ce qui devient important au fur et à mesure que la batterie de tests s'agrandit
+	      - Important de garder un feedback rapide
+	  - Le jour où on détecte un bug
+	    - 2 cas de figure
+	    - Soit détecté par un test
+	      - Dans ce cas, vous voyez que c'est utile
+	    - Soit s'agit d'un cas qu'on a manqué
+	      - Dans ce cas, que faire ?
+	      - Ajouter un test unitaire qui correspond au cas qui bug
+		- Certes, vais me retrouver avec un test qui échoue
+		- Mais ça a son intérêt
+		  - Nécessite d'identifier un scénario reproductible menant au bug
+		  - Permet de le documenter
+		  - Fixe un objectif à atteindre
+		    - Faire fonctionner ce test unitaire
+	      - À partir de là, modifier le code correspondant pour faire tomber en marche le test unitaire nouvellement ajouté
+	- Autres bénéfices des tests unitaires
+	  - Oriente vers une bonne conception
+	    - Si un test unitaire est difficile à écrire
+	    - Peut indiquer que votre fonction/méthode a un problème de conception
+	      - Trop de responsabilités
+	      - Trop de couplages/dépendances
+	  - Permet d'offrir un minimum de confiance dans le travail d'un autre
+	    - À partir du moment où les tests d'un composant passent, m'offre des garanties sur le composant
+	    - Me permet d'utiliser le composant sachant qu'il fonctionne et correspond aux attentes
+	    - S'applique dans différents contextes
+	      - À plusieurs au sein d'un même projet
+		- Chacun travaille sur son composant
+	      - L'utilisation de librairies externes
+	  - Peut servir de documentation
+	    - Défini le comportement de l'objet
+        - Métrique
+	  - Couverture du code
+	  - À tempérer
+	    - Pas très utile d'atteindre les 100%
+	    - Les constructeurs, getters et setters basiques ne sont pas intéressants à tester
+	      - Du temps à écrire et exécuter ces tests pas intéressants
+  - TD
+    - Peut prendre la forme de fonctions à écrire et à tester avec Jest
+      - https://jestjs.io/
+    - 2-3 exos de fonctions atomiques à tester
+    - 2-3 exos de fonctions nécessitant des Mocks
+      - Peut prendre la forme de classes avec plusieurs méthodes
+      - Peut vouloir Mock une méthode de la même classee
+      - Ou un objet d'une autre classe carrément
+    - Plan
+      - /fizzBuzz/
+      - /computeAge/
+	- À partir d'une date de naissance et de la date du jour, retourner l'âge de la personne
+	- Tests possibles
+	  - Si mois est passé
+	  - Si mois n'est pas encore passé mais que jour oui
+	  - Si c'est mois mais pas encore jour
+	  - Si c'est mois et jour est passé
+	  - Si c'est mois et c'est jour
+	  - Si date de naissance est dans le futur
+      - /mergeSortedArrays/
+      - Arborescence
+	- /getAbsolutePath/
+	- /getLowestCommonAncestor/
+	- /getRelativePath/
+- Réunion ATER
+  - Questions
+    - Ressources ?
+    - Ça démarre quand ?
+  - Réunion
+    - 2nd semestre
+      - Programmation orientée objet 2A
+	- 12h CM + 3 groupes de TD de 22h
+	- Représente 84h eq TD
+	- Démarre <2022-02-15 Tue>
+	- Contenu
+	  - Algo
+	  - Complexité
+	  - Récursivité
+	  - Tris
+	    - Tri fusion
+	    - Tri rapide
+	    - Tri par tas (optionnel)
+	  - Structures de données (avec complexité)
+	    - Liste chaînée
+	    - Table hachage
+	    - Risque de galérer pour les TDs
+	- Notation
+	  - 1 exam à la fin
+	    - Grosse partie QCM
+	  - Projet ou TPs notés
+	    - 12 à ceux qui ont bossé
+	    - + à ceux qui ont réussi
+	    - 8 pour ceux qui veulent pas
+      - Algorithmie distribuée
+	- 12h CM + 2 groupes de TD de 12h (4A IA2R) et 8h CM et 1 groupe de 16h de TD (3A IA2R Apprenti)
+	- Représente 70h eq TD en tout
+	- Démarre en février
+	- Potentiellement du Erlang/Elixir
+	- Apprentis
+	  - Format Enseignement Intégré
+	  - Graphes : 8h (6hCM + 2hTD)
+	    - Définition
+	    - Algo arbre de diffusion (BFS (recherche en largeur) et Dijkstra)
+	  - Principe algo/complexité : 6hTD
+	    - Qu'est-ce que algo distribué ?
+	    - Modèle synchrone et asynchrone
+	    - Complexité de ces algorithmes
+	    - Algo
+	      - Élection, Bellman-Ford
+	  - Mise en pratique : 8h
+	  - Exam : 2hCM
+	- Initiaux
+	  - Format traditionnel CM + TD
+	  - Graphes : 4h
+	    - Définition
+	    - Algo arbre (BFS et Dijkstra)
+	  - Principe algo/complexité : 4hCM + 2hTD
+	    - CM élection
+	    - Bellman-Ford
+	  - Mise en pratique : 8hTD
+	  - Exam : 2hCM
+        - Évaluation
+	  - 1 TD de mise en pratique noté
+	  - 1 Exam
+	- Mon service
+	  - Principe algo/complexité des apprentis (6hTD) + Exam (2hCM) (peut débuter début mars)
+	  - Principe algo/complexité des initiaux : seulement CM élection (4h)
+      - Mon service
+	- Prend Programmation orientée objet (CM + 3 groupes TD)
+	- Prend 15h de Algorithmie distribuée
+      - De février à avril
+      - Réunion début février
+** Semaine du <2022-01-10 Mon> au <2022-01-14 Fri>
+*** Planned
+**** DONE MiseProd : Mettre à jour TD2
+- Par rapport aux diverses questions que j'ai soulignées pour l'exercice
+- Les inclure dans le sujet
+- Mettre en place un dépôt dans la page du module
+**** DONE MiseProd : Préparer CM3 et TD3
+- Porte sur les tests
+- Peut me contenter dans un 1er temps d'aborder les tests unitaires
+**** DONE MiseProd : Mettre à jour planning des séances
+- Le TD2 s'est avéré bien plus long que je ne l'avais prévu
+- Revoir le planning pour vérifier qu'on est toujours dans les temps
+**** DONE MiseProd : Préparer CM4
+- Plusieurs directions possibles ici
+- Le cours précédent s'intéressait aux tests unitaires
+- Peut donc poursuivre sur ce sujet avec un cours sur les tests d'intégration
+  - Limite des tests unitaires
+  - Besoin de tester les interactions entre
+    - Composants/services de notre application
+    - Services externes (BDD, API...)
+- Peut sinon dès à présent parler d'intégration continue
+  - Problème du "ça marche sur ma machine"
+  - Besoin d'un environnement de contrôle
+  - Consiste à
+    - Recréer l'application à partir des sources
+    - Lancer les tests
+  - Nécessite
+    - Gestion de dépendances
+    - Build automatisé
+  - Pour le TD, leur faire mettre en place un premier pipeline avec GitHub Actions
+**** TODO MiseProd : Voir Github Actions
+- J'ai créé un compte sur Gitlab pour test
+- Ça marche bien, mais pour pouvoir faire de la CI, besoin de saisir sa CB
+- Préferer un service qui ne requiert pas ce genre d'infos pour les étudiants
+- Voir si Github Actions le permet
+- Sinon revoir Travis
+*** Done
+- MiseProd : Mettre à jour TD2
+  - [X] Mettre à jour les consignes de l'exercice 2
+  - [X] Créer le dépôt sur Arche
+- MiseProd : Préparer CM3 et TD3
+  - [X] Préparer CM3
+  - [X] Préparer TD3
+    - [X] Rédiger sujet
+    - [X] Rédiger fichier README détaillant
+      - Comment installer node
+      - Comment installer les dépendances du projet
+      - Comment lancer les tests
+    - [X] Créer repo à fork par les étudiant-es
+- MiseProd : Déroulement séance de <2022-01-11 Tue>
+  - Planning
+    - 14h00-14h15 : Rappel + explication refonte exo 2 + mise en route
+    - 14h15-15h50 : Exo 1
+    - 16h10-18h00 : Exo 2
+- MiseProd : Mettre à jour planning des séances
+  - En rejetant un oeil au planning que j'avais prévu initialement
+  - Me suis aperçu que j'avais une séance où j'avais rien prévu
+    - Et quelques idées d'approfondissements si besoin
+  - A décalé le contenu par rapport au retard pris jusqu'à présent
+  - Pour le moment, suis encore dans les clous
+  - Peut avoir 4h sur chacune des thématiques que j'avais prévu
+    - <2022-01-14 Fri> : tests unitaires
+    - <2022-01-21 Fri> : tests intégration
+    - <2022-01-28 Fri> : intégration continue
+    - <2022-02-04 Fri> : Docker
+  - Pour évaluation, peut récupérer 1 exo de chaque TD
+    - Au lieu de faire 1 projet
+  - Bon, suis un peu embêté pour la prochaine séance
+    - Je pense ne pas tenir 4h juste sur les tests unitaires
+    - Donc devrait démarrer les tests d'intégration
+    - Mais probablement à peine le temps de présenter le CM
+      - À voir son contenu une fois celui-ci finalisé
+      - Pour voir le temps nécessaire
+- MiseProd : Préparer CM4
+  - Part sur la partie tests d'intégration du module
+  - Questions que je me pose
+    - C'est quoi la différence entre Mock et Stub ?
+    - Pour utiliser une DB dans le cadre d'un test d'intégration
+      - [X] Est-ce qu'on utilise le même SGBD ?
+	- Je vois des articles recommandant des in-memory DB
+      - [X] Comment peupler la base ?
+	- Utiliser une snapshot anonymisée/sans données confidentielles de la base de prod ?
+	  - Comment tu maintiens ça dans ce cas ?
+	- [X] Ne pas peupler la base et laisser chaque test se débrouiller ?
+	  - Pas long et laborieux ?
+      - [X] Qu'est-ce qu'on vérifie à l'issue d'un test ?
+	- L'état ?
+	  - [X] Directement depuis la DB ?
+	  - Via une autre méthode du service ?
+  - Notes
+    - Différents types de tests d'intégration
+      - Ressource : https://openclassrooms.com/fr/courses/6100311-testez-votre-code-java-pour-realiser-des-applications-de-qualite/6616481-decouvrez-les-tests-dintegration-et-les-tests-fonctionnels
+      - Composants
+	- Vérifient si plusieurs unités de code fonctionnent bien ensemble
+	- Similaire à un test unitaire++
+      - Système
+	- Vérifient le bon fonctionnement de plusieurs unités de code, dans le contexte de l'exécution de l'application, en interaction potentielle avec des services externes
+    - Garder les /testing suites/ séparées
+      - Ressource : https://techbeacon.com/app-dev-testing/6-best-practices-integration-testing-continuous-integration
+      - Tests d'intégration ne devraient pas être exécutés avec les tests unitaires
+      - Ralentiraient le process entier
+    - Utiliser le même SGBD
+      - Ressource : https://phauer.com/2019/focus-integration-tests-mock-based-tests/
+      - Using an in-memory database for tests also reduces the reliability and scope of our tests.
+      - The in-memory database and the database used in production behave differently and may return different results.
+      - So a green in-memory-database-based test is absolutely no guaranty for the correct behavior of your application in production.
+      - Moreover, you can easily run into situations where you can’t use (or test) a certain (database-specific) feature because the in-memory database doesn’t support it or act differently.
+    - Tester le comportement et non l'implémentation
+      - Ressource : https://phauer.com/2019/focus-integration-tests-mock-based-tests/
+      - Do you really have to test if a method throws a certain exception?
+	- No, the expected behavior following this exception is much more important.
+	- For instance, that a proper error response is returned to the client or that no data has been changed in the database.
+	- This is what matters. The exception is just an implementation detail to achieve this.
+      - Do you really have to test if a certain intermediate data structure is returned by a method?
+	- No. Again, only the final output matters (like a certain server response or a new entry in the database).
+- MiseProd : Déroulement séance de <2022-01-14 Fri>
+  - 1 seul absent : Théo
+  - Planning
+    - 14h00-14h35 : Fin exo 2
+    - 14h35-15h45 : CM3
+    - 16h10-18h00 : TD3
+  - On est arrivé jusqu'à l'exo 2 généralement
+** Semaine du <2022-01-17 Mon> au <2022-01-21 Fri>
+*** Planned
+**** DONE MiseProd : Finaliser CM4
+- J'avais préparé rapidement le cours sur les tests d'intégration au cas où on aurait avancé trop vite sur les tests unitaires avec les étudiant-es
+- Finalement on a pas fini le TD sur les tests unitaires
+- Peut donc repasser sur les slides pour améliorer/compléter
+**** DONE MiseProd : Préparer TD4
+- Préparer un TD sur les tests d'intégration
+- Leur fournir un squelette d'application web avec un service REST
+- Leur faire écrire des tests d'intégration dessus
+  - Liste/Ajout/Modification/Suppression
+**** DONE BD-EMME : Contacter scolarité pour organiser rattrapage et organiser une salle
+**** DONE BD-EMME : Répondre aux étudiants par rapport au rattrapage
+**** DONE MiseProd : Voir comment mock un appel de fonction
+- Demande aux étudiant-es de mocker l'appel à /getAbsolutePath()/ dans TD3
+- Mais serait p-e bien de le faire moi-même auparavant
+**** DONE MiseProd : Détailler exercice 4 du TD3
+- En relisant le sujet de TD pour jouer avec les mocks
+- Me suis rendu que la présentation de l'exercice est assez sommaire
+- Préciser notamment les types de retour des différentes fonctions
+**** TODO MiseProd : Préparer CM5
+- Porte sur l'intégration continue
+- Reprendre les notes que j'avais préparé sur le sujet
+- Pour le TD, pourra consister à mettre en place un pipeline d'intégration continue pour /MyTodos/
+**** TODO MiseProd : Voir Github Actions
+- J'ai créé un compte sur Gitlab pour test
+- Ça marche bien, mais pour pouvoir faire de la CI, besoin de saisir sa CB
+- Préferer un service qui ne requiert pas ce genre d'infos pour les étudiants
+- Voir si Github Actions le permet
+- Sinon revoir Travis
+*** Done
+- MiseProd : Préparer TD4
+  - Est-ce que juste une appli avec un seul service suffit ?
+  - Ou une appli avec 2-3 ?
+  - Peut axer l'exercice dans 2 directions dans ce cas
+    - 1ère étape consistant à écrire des tests d'intégration entre les services
+    - 2nde étape consistant à écrire des tests d'intégration avec le SGBD
+  - Comment concevoir/architecturer appli dans ce cas ?
+    - [X] Est-ce que des services interagiraient vraiment via HTTP ?
+      - Via HTTP ou via un message bus
+      - Pas clair pour moi quand préférer HTTP au message bus
+      - Message bus me paraît plus résilient
+	- Mais asynchrone
+      - Utiliserais HTTP pour patterns Query
+      - Mais est-ce un pattern à utiliser dans une architecture orientée services ?
+	- Dans ce cas, me retrouve avec une dépendance d'un service A au service B
+	- Si service B down, A ne peut plus effectuer sa tâche
+      - L'article suivant aborde ce sujet : https://thinkingincloudnative.com/microservices-service-to-service-communication/
+	- Peut être OK que A fasse une Query à B
+	- Doit surtout éviter de créer une chaîne de requêtes HTTP en cascade entre services (Fig 4-9)
+	- Si besoin de multiples requêtes à différents services à la suite, peut créer un service dédié (Fig 4-10)
+	- Peut contourner le problème en répliquant dans chaque service les données nécessaires à son fonctionnement
+      - Faudrait que je relise ce que j'avais pu noté sur les Sagas
+	- D'après mes notes dans carnet, mes lectures sur le sujet date de juillet-août 2019
+    - [-] Ou juste des appels de fonction ?
+  - Plutôt me contenter d'un service dans le cadre du TD
+    - Pas envie de complexifier inutilement le sujet
+  - Peut partir sur appli de TODOs
+  - Offre déjà de quoi faire avec les tests
+    - Interactions avec la BD
+      - Lecture, écriture, modification, suppression
+    - Réponses du endpoint
+      - JSON, status code, gestion des erreurs
+  - Est-ce que la partie /réponses du endpoint/ rentre dans le scope des tests d'intégration ?
+    - Plutôt des tests unitaires je dirais
+      - Remet en question la /rule of thumb/ présentée dans le cours
+	- Si sérialisation/désérialisation il y a, alors tests d'intégration il peut y avoir
+    - Ah quoique, ça se discute
+    - Peut considérer qu'il s'agit de tests d'intégration puisqu'on ne vérifie pas seulement la sérialisation
+    - Mais aussi que le service est bien exposé par l'endpoint
+  - À faire
+    - [X] Créer repo
+    - [X] Ajouter base de l'API
+    - [X] Ajouter squelette des tests
+    - [X] Rédiger README
+      - [X] Installation
+      - [X] Lancement
+      - [X] API
+      - [X] Exécution des tests
+    - [X] Rédiger sujet
+      - [X] Présentation du sujet
+      - [X] Installer Docker
+      - [X] Écrire /beforeEach()/ et /afterEach()/
+      - [X] Écrire les tests pour GET
+      - [X] Écrire les tests pour POST dans cas où paramètre est correct
+      - [X] Écrire les tests pour POST dans cas où paramètre est manquant
+      - [X] Écrire les tests pour POST dans cas où paramètre est invalide (chaîne vide)
+      - [X] Compléter POST
+      - [X] Écrire tests pour DELETE
+      - [X] Écrire DELETE
+      - [X] Écrire tests pour PUT
+      - [X] Écrire PUT
+- BD-EMME : Contacter scolarité pour organiser rattrapage et organiser une salle
+  - A envoyé le mail
+  - A demandé confirmation à propos de la situation de Ziyad
+- BD-EMME : Répondre  aux étudiants par rapport au rattrapage
+  - A répondu à Ziyad
+  - A répondu à Clément et Maeric
+- MiseProd : Voir comment mock un appel de fonction
+  - Se fait, mais pas aussi bien qu'espéré
+  - Jest ne propose pas nativement une solution pour ce cas d'usage
+  - La page suivante présente plusieurs workarounds
+    - https://medium.com/welldone-software/jest-how-to-mock-a-function-call-inside-a-module-21c05c57a39f
+  - La solution 2 me paraît la plus simple et effective à mettre en place
+    - La modification du code nécessaire peut facilement être automatisée par un outil de build en plus
+  - J'ai modifié le sujet de TD pour pointer vers celle-ci
 * Backlog
 * Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
