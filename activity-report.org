@@ -1,3 +1,4 @@
+
 #+STARTUP: inlineimages
 #+TODO: TODO IN-PROGRESS CANCELLED DONE
 
@@ -22395,7 +22396,7 @@ Failed to publish
 - En relisant le sujet de TD pour jouer avec les mocks
 - Me suis rendu que la présentation de l'exercice est assez sommaire
 - Préciser notamment les types de retour des différentes fonctions
-**** TODO MiseProd : Préparer CM5
+**** IN-PROGRESS MiseProd : Préparer CM5
 - Porte sur l'intégration continue
 - Reprendre les notes que j'avais préparé sur le sujet
 - Pour le TD, pourra consister à mettre en place un pipeline d'intégration continue pour /MyTodos/
@@ -22481,6 +22482,454 @@ Failed to publish
   - La solution 2 me paraît la plus simple et effective à mettre en place
     - La modification du code nécessaire peut facilement être automatisée par un outil de build en plus
   - J'ai modifié le sujet de TD pour pointer vers celle-ci
+- MiseProd : Préparer CM5
+  - Lit article de Fowler sur le sujet
+    - Lien : https://martinfowler.com/articles/continuousIntegration.html
+    - P-e un peu vieux, date de 2006
+      - Faudra voir pour trouver articles plus récents sur le sujet
+    - Notes
+      - Abstract
+	- Pratique de développement logiciel consistant à intégrer notre travail fréquemment (au moins une fois par jour)
+	- Chaque intégration est vérifiée par un build automatique et une suite de tests
+	- Permet de réduire la difficulté d'intégrer les modifications au projet
+      - Intro
+	- Terme de Continuous Integration provient de Extreme Programming (méthode agile proposée fin années 90)
+	- Part du constat qu'intégrer les modifications dans un projet était généralement une étape douloureuse dans les projets informatiques de l'époque
+	- Devait y avoir moyen de faire mieux
+	- Idée derrière cette pratique : /Pratice makes difficult things easy/
+	- Si on effectue cette étape plus régulièrement
+	- Pourquoi ?
+	  - Déjà on va devenir meilleur en répétant la tâche (étapes à suivre, commandes correspondantes...)
+	  - Ensuite on va intégrer des morceaux plus petits à chaque fois, donc plus simple de raisonner dessus
+	  - Enfin, parce qu'on effectue la tâche fréquemment, on va chercher à l'automatiser
+	  - L'automatisation, à terme, va permettre de réduire davantage le risque d'erreur
+** Semaine du <2022-01-24 Mon> au <2022-01-28 Fri>
+*** Planned
+**** IN-PROGRESS MiseProd : Préparer CM5
+- Porte sur l'intégration continue
+- Reprendre les notes que j'avais préparé sur le sujet
+- Pour le TD, pourra consister à mettre en place un pipeline d'intégration continue pour /MyTodos/
+**** IN-PROGRESS MiseProd : Voir Github Actions
+- J'ai créé un compte sur Gitlab pour test
+- Ça marche bien, mais pour pouvoir faire de la CI, besoin de saisir sa CB
+- Préferer un service qui ne requiert pas ce genre d'infos pour les étudiants
+- Voir si Github Actions le permet
+- Sinon revoir Travis
+**** IN-PROGRESS Prog2 : Préparer CM1
+- J'ai le CM1 de Programmation Algorithmique II le <2022-02-02 Wed>
+- De mémoire, Charles m'avait dit que le support était un peu léger
+- Préparer le CM et compléter le support si besoin
+**** IN-PROGRESS BD2 : Corriger et noter les projets
+**** TODO Prog2 : Mettre en place module Arche
+- Je travaille avec Hans-Jörg SCHURR dans le cadre de ce module
+- Je ne sais pas à quelles ressources il a accès
+- Dans le doute, mettre en place rapidement le module sur Arche pour lui permettre de se préparer
+**** TODO MiseProd : Préparer TD5
+- Rédiger sujet de TD pour le cours sur l'intégration continue
+- Peut consister à mettre en place un processus d'intégration continue pour /MyTodos/
+**** TODO Prog2 : Préparer TD1
+- Le <2022-02-04 Fri>
+**** TODO MiseProd : Évaluer exo 2 du TD1
+- Voir sur combien je le note
+*** Done
+- MiseProd : Préparer CM5
+  - Suite de l'article de Fowler
+    - Building a Feature with CI
+      - Une fois qu'on a fini notre tâche
+      - Exécute les tests sur notre version courante
+      - Si passe, commit les changements et les déploie sur le repo central
+	- En gérant les conflits si besoin
+      - Pourrait croire que c'est fini, mais non
+      - Sur une machine d'intégration, va de nouveau build et exécuter les tests
+      - Permet d'attraper des erreurs supplémentaires (fichiers manquants/pas à jour sur le repo, problème de version, problème d'OS...)
+      - Peut être fait manuellement ou automatisé
+    - Pratices of Continuous Integration
+      - Utiliser un VCS
+      - Automatiser le build
+	- On va build fréquemment
+	- Laborieux de taper et exécuter les différentes commandes manuellement
+	- Dangereux de dépendre d'un IDE pour build
+	- Existe variété d'outils pour cela, en fonction des environnements (Ant, Maven, Gradle, Rake...)
+      - Make Your Build Self-Testing
+	- Compilation permet d'attraper les erreurs statiques (erreurs de syntaxe, erreurs de type...)
+	- Mais laisse passer toutes les erreurs dynamiques (exceptions...)
+	- Et sémantiques (programme ne fait pas ce qui est attendu...)
+	- Faites des tests
+      - Everyone Commits To the Mainline Every Day
+	- Idée est de communiquer rapidement les modifications effectuées aux autres membres de l'équipe
+	- Permet de détecter rapidement les conflits et de les résoudre au plus tôt
+	- Dans le cas où on a pas fini notre branche et qu'on ne peut pas l'intégrer à la branche principale
+	- Peut toujours /rebase/ sa branche régulièrement pour intégrer les modifications des autres
+	  - Et alors détecter et résoudre les conflits si besoin
+	- Viser cette granularité (la journée) permet aussi
+	  - De diviser son travail en tâches courtes (plusieurs heures)
+	  - Permet de facilement suivre sa progression
+	  - Et sentiment de progression
+      - Every Commit Should Build the Mainline on an Integration Machine
+	- Comme dit auparavant, tests automatisés devraient détecter la majorité des bugs avant les commits
+	- Mais peut toujours exister des bugs
+	- Chaque commit va donc déclencher les tests mais sur une machine d'intégration
+	  - Se veut la plus proche possible de la machine de production (OS, base de données, versions utilisées...)
+	- Auparavant, nécessitait de mettre en place son propre environnement d'intégration (Jenkins)
+	- Avec le Cloud et les techniques de virtualisation, des services d'intégration sont apparus
+	  - Travis
+	- Retrouve maintenant directement ces fonctionnalités dans les plateformes d'hébergements de projet (GitHub Actions, GitLab CI/CD...)
+      - Fix Broken Builds Immediately
+	- Des choses qui arrivent, pas si grave
+	- Mais reste important de vite revenir à une version stable de l'application
+	- Une façon simple est de revert le dernier commit
+	  - Permet de débugger en prenant le temps de comprendre ce qui se passe si bug pas trivial
+      - Keep the Build Fast
+	- Dans Build, on entend Build et Tests
+	- But est de fournir un feedback rapide sur le bon fonctionnement de l'application
+	  - Si reçoit aujourd'hui la réponse pour les commits d'hier, perd un peu de son intérêt
+	- Généralement, ce qui ralentit un Build, c'est les tests nécessitant des services externes (bases de données, sites tiers...)
+	  - Les tests d'intégration
+	- Utilise alors un deployment pipeline (aussi appelé build pipeline ou staged build...)
+	- Consiste à décomposer en plusieurs étapes le processus complet de Build
+	- Exemple simple avec 2 étapes
+	  - 1ère consiste à compiler et à exécuter les tests unitaires
+	  - Si détecte une erreur, ça sert à rien d'aller plus loin, s'arrête là
+	  - Sinon si cette 1ère étape est validée, passe à la 2nde
+	  - Consiste à déployer l'environnement nécessaire et à exécuter les tests d'intégration
+	- Si détecte un bug dans une des 2 phases, ajoute un test unitaire couvrant ce bug
+	  - Si pas possible, alors un test d'intégration
+	- Pipeline peut être complété avec autant d'étapes que nécessaires
+	  - Ajout d'une étape pour performance testing...
+	  - Ajout d'une étape de livraison continue
+      - Test in a Clone of Production Environment
+	- Redondant avec ce que j'ai déjà noté dans /Every Commit Should Build the Mainline on an Integration Machine/
+      - Make it Easy for Anyone to Get the Latest Executable
+	- Pratique d'avoir un store où on met à disposition exécutables
+	- Permet aux personnes impliquées dans le projet de récupérer et utiliser l'application
+	  - Pour des démos, tests manuels ou juste suivre l'évolution
+      - Everyone can see what's happening
+	- Toujours dans le but de communiquer
+	- Important d'indiquer l'état du dernier build, les dernières modifications, par qui...
+	- Peut être utile pour monitorer rapidement un projet
+	  - Notamment voir l'évolution du statut des derniers builds
+	  - Si de plus en plus de fail/rouge, enquêter
+      - Automate Deployment
+	- Avec intégration continue, on automatise le build de notre application et l'exécution de ses tests
+	- On teste notre application dans un environnement similaire à celui de production
+	- Pourquoi ne pas aller plus loin ?
+	  - Continuous Delivery (Livraison Continue) consiste à publier automatiquement une nouvelle version de notre application
+	  - Continuous Deployement (Déploiement Continu) consiste à déployer automatiquement une nouvelle version de notre application
+    - Benefits of Continuous Integration
+      - Réduit les risques
+	- Détecte les problèmes d'intégration des travaux des différents membres de l'équipe au plus tôt
+	- Au lieu de les repousser à la phase finale du projet
+	- Permet ainsi de savoir à chaque instant où on en est dans le projet
+      - Réduit ainsi la difficulté de résolution des bugs
+	- Détecte les bugs au plus tôt
+	- Plus simple d'en trouver l'origine et de les résoudre
+	- Évite aussi de trop en cumuler
+      - Réduit la complexité de release/déployer fréquemment
+	- On a quasi tout automatiser
+	- On a confiance en ce qu'on a construit
+	- Peut donc mettre à disposition nos travaux plus fréquemment
+	- Permet d'obtenir feedback
+  - Plan
+    - Motivations
+    - Définition & Principes
+    - Avantages
+    - Pipeline d'intégration
+- Prog2 : Préparer CM1
+  - Effectivement, le support est léger
+  - Comporte 60 slides pour l'ensemble du cours
+  - Pas de présentation du module, de ses objectifs, de l'évaluation, de son syllabus
+  - Le 1er CM porte sur l'analyse en complexité en temps des algorithmes
+  - Seulement 6 slides dédiées
+  - Des ressources supplémentaires de disponibles
+    - Le fichier ./CM/Exemples/Complexités.pdf présente des exercices à faire en CM avec les étudiants
+      - Bon je comprends pas l'exo sur la machine de Turing
+      - Ni sa correction d'ailleurs
+      - À voir ce que je peux reprendre et intégrer en slides
+      - Me paraît mieux d'intégrer cela dans le support que juste en à côté
+    - Le fichier ./Archive Sylvain/Archive-6/cours/1_analyseAlgo/analyseAlgo.pdf est un cours de 79 slides dédié à la complexité
+      - Me paraît p-e une meilleure base pour me remettre à jour/niveau sur ce sujet
+      - Et une source d'inspiration pour compléter les slides
+  - Abir m'a fourni diverses ressources qu'elle avait utilisé pour préparer son cours de complexité
+    - Le cours de Martin
+      - https://people.irisa.fr/Martin.Quinson/Teaching/TOP/TOP-beamer.pdf
+    - Le cours de Pierre Monnin qui s'en inspire
+    - Une vidéo de Guerraoui
+      - https://www.youtube.com/watch?v=exaHKrP6RsA
+    - Une vidéo de Christin Queinnec
+      - https://www.youtube.com/watch?v=UcT_4cWfnAs
+  - Vidéo de Guerraoui
+    - Complexité correspond à quantité de ressources nécessaires à la résolution d'un problème P
+    - S'intéresse principalement à la complexité temporelle
+      - Correspond au nombre d'étapes de calcul élémentaires nécessaires
+    - Pour un même problème, existe plusieurs algorithmes permettant de le résoudre
+    - Complexité d'un problème correspond au minimum des complexités des algorithmes pour le résoudre
+    - S'intéresse donc à comment calculer la complexité d'un algorithme
+    - Problème choisi : /contains(x, L)/
+      - /x/ un élément, /L/ une liste de taille /n/
+      - Retourne vrai si élément /x/ se trouve dans liste /L/
+      - Faux sinon
+    - 1er algo possible R1
+      - Initiale un /i/
+      - Boucle sur la liste
+	- Compare l'élement courant à /x/
+	- Si correspond, renvoie vrai
+	- Sinon incrémente i
+      - Une fois la boucle finie, renvoie faux (on n'a pas trouvé l'élément dans la liste)
+    - Complexité de R1
+      - a + (c + a + n) * n
+	- Le premier /n/ correspond au calcul la taille de la liste
+	- Dans son exemple, considère qu'on parcourt la liste pour trouver sa taille
+	- Le second /n/ correspond au nombre d'itérations dans le pire cas
+      - n^2 + 2n + 1
+    - Pas viable
+    - 2nd algo possible R2
+      - Calcule et stocke la taille de /L/
+      - Puis fait la même chose que R1
+    - Complexité de R2
+      - n + n * 2 + 1
+      - 3n
+    - Déjà beaucoup mieux
+    - CR1 est en O(n^2)
+    - CR2 est en O(n)
+    - Si maintenant ajoute hypothèse que liste est triée
+    - Peut proposer R3
+      - Si L vide, renvoie faux
+      - Si L composé d'un élément /e/, /e ≠ x/, renvoie faux
+      - Sinon divise la liste en deux, L1 et L2
+      - Si /x < max(L1)/, fait une récursion avec L1
+      - Sinon fait une récursion avec L2
+    - CR3 est en O(log(n))
+      - Ne parcourt pas toute la liste
+      - Parcourt seulement des moitiés de listes
+  - 2nd vidéo de Guerraoui
+    - YT m'a recommandé la vidéo suivante après avoir visionné la 1ère
+      - https://www.youtube.com/watch?v=clZ4q5zPBlE
+  - Plan
+    - Organisation du module
+      - 5 CMs, 11 TDs
+    - Objectifs
+      - Découvrir les notions de complexité en algorithmie
+      - Apprendre à analyser la complexité d'algorithmes
+      - Découvrir des algorithmes et structures de données avancées et leurs complexités
+    - Syllabus
+      - Analyse en complexité des algorithmes
+      - Récursivité
+      - Algorithmes de tri avancés
+      - Structures de données
+    - Évaluation
+      - DM(s) et DS
+- BD-EMME : Rattrapage
+  - CADINOT
+    - Schéma relationnel OK
+      - Petite confusion sur clé primaire
+    - Requêtes SQL
+      - 1 : OK
+      - 2 : OK
+      - 3 : OK
+      - 4 : OK
+	- A eu du mal à parler de GROUP BY
+	- Je l'ai p-e interrompu trop vite aussi
+      - 5 : OK-ish
+	- Part sur HAVING
+	- Mais n'utilise pas GROUP BY
+	- N'arrive pas à expliquer la différence entre WHERE et HAVING
+    - 16/17 me paraît pas mal comme note
+  - DEBUCQUET
+    - Schéma relationnel
+      - Ajoute pseudo en attribut de SuperPouvoir
+      - Après ma remarque, corrige
+      - Se trompe juste sur la clé primaire de PossedeSuperPouvoir
+      - Après ma remarque, corrige
+      - S'en sort pour Mission et Rapport
+      - OK pour Nemesis
+    - Requêtes SQL
+      - 1 : OK
+      - 2 : Ok-ish
+	- N'a pas retrouvé IN par lui-même
+	- Mais s'en est sorti
+      - 3 : OK
+	- A proposé NOT IN directement et a expliqué les différences
+      - 4 : OK
+	- A proposé GROUP BY de lui-même assez rapidement
+      - 5 : OK-ish
+	- ne se souvenait plus de HAVING
+    - 14/15 me paraît adapté comme note
+- MiseProd : Déroulement <2022-01-28 Fri>
+  - Absents
+    - MICHELS
+    - TANGAMEN
+  - Déroulé
+    - 14h00-15h50 : TD3
+    - 16h10-16h45 : CM4
+    - 16h45-18h00 : TD4
+** Semaine du <2022-01-31 Mon> au <2022-02-05 Sat>
+*** Planned
+**** DONE BD2 : Corriger et noter les projets
+**** DONE BD2 : Envoyer notes aux étudiant-es
+**** DONE BD-EMME : Envoyer notes du rattrapage aux étudiants
+**** DONE BD2 : Envoyer notes à administration
+**** DONE BD-EMME : Envoyer notes à administration
+**** DONE Prog2 : Préparer CM1
+- J'ai le CM1 de Programmation Algorithmique II le <2022-02-02 Wed>
+- De mémoire, Charles m'avait dit que le support était un peu léger
+- Préparer le CM et compléter le support si besoin
+**** DONE Prog2 : Mettre en place module Arche
+- Je travaille avec Hans-Jörg SCHURR dans le cadre de ce module
+- Je ne sais pas à quelles ressources il a accès
+- Dans le doute, mettre en place rapidement le module sur Arche pour lui permettre de se préparer
+**** DONE Prog2 : Préparer TD1
+- Le <2022-02-04 Fri>
+**** DONE MiseProd : Préparer CM5
+- Porte sur l'intégration continue
+- Reprendre les notes que j'avais préparé sur le sujet
+- Pour le TD, pourra consister à mettre en place un pipeline d'intégration continue pour /MyTodos/
+**** DONE MiseProd : Voir Github Actions
+- J'ai créé un compte sur Gitlab pour test
+- Ça marche bien, mais pour pouvoir faire de la CI, besoin de saisir sa CB
+- Préferer un service qui ne requiert pas ce genre d'infos pour les étudiants
+- Voir si Github Actions le permet
+- Sinon revoir Travis
+**** DONE MiseProd : Préparer TD5
+- Rédiger sujet de TD pour le cours sur l'intégration continue
+- Peut consister à mettre en place un processus d'intégration continue pour /MyTodos/
+**** TODO MiseProd : Évaluer exo 2 du TD1
+- Voir sur combien je le note
+*** Done
+- Prog2 : Préparer CM1
+  - 2nd vidéo de Guerraoui
+    - Comment calculer complexité d'un algorithme ?
+    - Présente méthode incrémenter et compter
+    - Rappels
+      - a) Complexité : ressources nécessaires à l'exécution d'un algorithme
+	- Distingue ressources spatiales (mémoire utilisée) des ressources temporelles (temps utilisé)
+	- Ressources temporelles correspond au nombre d'instructions
+      - b) Complexité dépend d'un paramètre, généralement /n/
+      - c) Quand s'intéresse à complexité, on s'intéresse aux cas avec grand /n/, comportement asymptotique
+	- Utilise O(n) pour représenter la notion de complexité asymptotique
+      - d) Peut s'intéresser au pire cas, au meilleur cas et au cas moyen
+	- Généralement s'intéresse au pire cas
+    - Principe
+      - Compare la complexité de C(n + 1) à C(n)
+      - Si C(n + 1) = C(n), alors O(1) car nombre d'instructions constant
+      - Si C(n + 1) = C(n) + 1, alors O(n) car linéaire
+      - Si C(n + 1) = C(n) + e, où e est < 1 mais difficilement mesurable, alors on sait pas
+      - Si C(n + n) = C(n) + 1, alors O(log(n))
+      - Si C(n + 1) = C(n) + n, alors O(n^2)
+      - Si C(n + 1) = 2 * C(n), alors O(2^n)
+    - Prend exemple d'un algorithme de préparation sportive pour illustrer ces complexités
+      - Considère qu'il reste /n/ jours avant la compétition
+      - Algo 1 : effectue 100 pompes
+	- Algo 1 ne dépend pas de /n/
+	- Peu importe le nombre de jours, va effectuer 100 pompes
+	- O(1)
+      - Algo 2 : effectue 1 pompe par jour
+	- Algo 2 dépend linéairement de /n/
+	- Nombre de pompes augmente linéairement avec nombre de jours restants
+	- O(n)
+      - Algo 3 : effectue 1 pompe pour chaque division de /n/ par 2
+	- Algo 3 a une complexité logarithmique
+	- O(log(n))
+      - Algo 4 : effectue /n/ pompes par jour
+	- Correspond à avoir 2 boucles
+	  - 1 boucle pour les jours
+	  - 1 boucle pour les pompes
+	- O(n^2)
+	- Complexité polynomiale
+      - Algo 5 : effectue /n'/ pompes par jour
+	- Effectue /n'/ pompes chaque jour
+	- Multiplie /n'/ par 2 chaque jour
+	- Obtient alors une complexité exponentielle
+	- O(2^n)
+    - Donne des exemples d'algo pour chaque complexité
+      - O(1) : Retourner les k 1ers éléments d'une liste
+      - O(n) : Recherche d'un élément dans une liste non-ordonnée
+      - O(log(n)) : Recherche d'un élément dans une liste triée
+      - O(n^2) : Traitement sur toutes les paires d'une liste
+      - O(2^n) : Traitement sur tous les sous-ensembles d'un ensemble
+  - Plan
+    - Organisation du module
+      - 5 CMs, 11 TDs
+    - Objectifs
+      - Découvrir les notions de complexité en algorithmie
+      - Apprendre à analyser la complexité d'algorithmes
+      - Découvrir des algorithmes et structures de données avancées et leurs complexités
+    - Syllabus
+      - Analyse en complexité des algorithmes
+      - Récursivité
+      - Algorithmes de tri avancés
+      - Structures de données
+    - Évaluation
+      - DM(s) et DS
+    - Motivations de l'analyse des algorithmes
+      - Rappel algorithme
+      - Pour un même problème, plusieurs algorithmes possibles
+      - Besoin d'une manière de comparer algorithmes entre eux
+      - Critères de choix
+      - Si se focalise sur l'effacité, besoin de la mesurer
+      - Difficulté de l'analyse expérimentale
+	- Peut mettre en place évaluation expérimentale
+	- Conditions expérimentales ?
+	- Limites
+      - Analyse théorique
+	- Principe
+	  - Estimer mathématiquement efficacité d'un algorithme
+	  - À partir de la taille des entrées de l'algorithme
+	- Avantages
+	- Inconvénients
+    - Analyse des algorithmes
+      - Principe
+	- Choisir modèle de calcul
+	- Écrire algorithme en pseudo-code
+	- Déterminer opérations fondamentales apparaissant dans pseudo-code
+	- Compter nombre maximum de ces opérations qui sont exécutées par l'algo en fonction de la taille des entrées
+      - Pseudo-code
+	- Représentation des algorithmes
+	- Désavantages du code
+	- Pseudo-code
+      - Modèle de calcul
+      - Notion de complexité
+      - Exemple avec recherche linéaire
+      - Meilleur cas, pire cas, cas moyen
+      - Complexité asymptotique
+      - Notation Grand-O
+      - Notation Grand-Omega
+- Prog2 : Préparer TD1
+  - J'ai une réunion avec Hans-Jörg pour discuter du TD1 <2022-02-03 Thu> à 9h
+  - Notes pour le sujet
+    - Ex5
+      - Points qui se trouvent dans la partie x^2 + y^2 < 1 du carré appartiennent au disque de rayon r = 1 et d'origine (0,0)
+      - Plus précisément à son quart
+      - L'aire de ce disque est de pi * r^2
+      - L'aire de son quart est donc de pi / 4 (r vaut 1)
+      - Plus on va mettre de points, plus la proportion de points dans ce quart va s'approcher de l'aire de ce quart
+  - Modifications du sujet
+    - Ex3
+      - Suppression de la mention de /k/ pour la formule de la complexité de l'algorithme
+	- Impression que ça orientait trop sur /k/ et faisait oublier /n/
+    - Ex6
+      - Le supprimer ?
+      - Du moins les questions 2 et 3 me paraisent
+  - Modification de la correction
+    - Ex1, Q2
+      - Remplacement de /ln/ par /log/
+  - Consignes
+    - J'ai mis en place module Arche
+      - Pas réussi à inscrire les étudiant-es automatiquement
+      - Mis en place procédure d'auto-inscription
+      - Infos pour s'inscrire au module dispo dans les slides intro
+    - TD1 sur 2 séances
+      - Probablement trop long tout de même
+      - Charles m'expliquait ne pas avoir le temps de faire exercices 5 et 6
+  - Notes
+    - Hans m'a parlé de l'anecdote du mode online de GTA V
+      - https://nee.lv/2021/02/28/How-I-cut-GTA-Online-loading-times-by-70/
+      - Moddeur a réduit le temps de 70% le temps de chargement du mode online de GTA V
+	- De 6m à 1min50
+      - Plusieurs problèmes d'algorithmie et de structures de données utilisées dans le chargement
+	- Recalculait plusieurs fois une même donnée (taille d'une chaîne de caractères)
+	  - Parcourt la chaîne de caractères jusqu'à trouver le symbole de fin de chaîne
+	- Parcourait un tableau de n^2 éléments pour vérifier si un nouvel élément y était déjà
+	  - Existe structure de données (tableau associatif) permettant de faire la même opération en temps constant
 * Backlog
 * Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
