@@ -22792,6 +22792,20 @@ Failed to publish
 **** DONE MiseProd : Préparer TD5
 - Rédiger sujet de TD pour le cours sur l'intégration continue
 - Peut consister à mettre en place un processus d'intégration continue pour /MyTodos/
+**** DONE MiseProd : Faire inventaire des repos
+- Pour évaluation, vais checker les repos du TD3 et TD4
+- Serait intéressant de vérifier que j'ai bien accès aux forks de chacun-e pour ces 2 TDs
+- Et que j'arrive bien à mapper les usernames GitHub aux étudiant-es
+**** TODO Prog2 : Contacter Pierre MONNIN à propos de ses cours
+- Reprendre le cours de Pierre MONNIN sur la récursivité m'arrangerait probablement
+- Ça serait cool d'avoir les sources pour pouvoir faire des modifications
+- Le contacter pour les lui demander
+**** TODO MiseProd : Répondre à Théo
+- Je viens de remarquer que j'ai dit n'importe quoi à Théo
+  - Je lui ai expliqué qu'on avait à peine entamé le TD3
+  - Alors que c'est plutôt le TD4
+- S'il a rendu que le TD2, ça risque d'être chaud pour l'évaluation effectivement
+- Lui demander s'il a possibilité de rattraper
 **** TODO MiseProd : Évaluer exo 2 du TD1
 - Voir sur combien je le note
 *** Done
@@ -22930,6 +22944,670 @@ Failed to publish
 	  - Parcourt la chaîne de caractères jusqu'à trouver le symbole de fin de chaîne
 	- Parcourait un tableau de n^2 éléments pour vérifier si un nouvel élément y était déjà
 	  - Existe structure de données (tableau associatif) permettant de faire la même opération en temps constant
+- MiseProd : Faire inventaire des repos
+  - J'ai 1 utilisateur qui n'est pas identifié pour le moment
+    - Doncfack1807
+  - Et 2 étudiants dont je n'ai pas les usernames GitHub
+    - Théo MICHELS
+    - Dylan TANGAMEN
+  - Warning
+    - Loic n'a rien pushé pour le TD3
+- Prog2 - TD1
+  - Déroulement
+    - 10h10-10h40 : Mise en route + début exo 1
+    - 10h40-10h50 : Correction exo 1
+    - 10h50-11h15 : Exo 2
+    - 11h15-11h27 : Correction exo 2
+    - 11h27-12h00 : Exo 3
+- MiseProd : TD5
+  - Absents
+    - BECK
+    - LEPERS
+    - MICHELS
+    - TANGAMEN
+** Semaine du <2022-02-07 Mon> au <2022-02-11 Fri>
+*** Planned
+**** CANCELLED MiseProd : Répondre à Théo
+- Je viens de remarquer que j'ai dit n'importe quoi à Théo
+  - Je lui ai expliqué qu'on avait à peine entamé le TD3
+  - Alors que c'est plutôt le TD4
+- S'il a rendu que le TD2, ça risque d'être chaud pour l'évaluation effectivement
+- Lui demander s'il a possibilité de rattraper
+**** DONE Prog2 : Contacter Pierre MONNIN à propos de ses cours
+- Reprendre le cours de Pierre MONNIN sur la récursivité m'arrangerait probablement
+- Ça serait cool d'avoir les sources pour pouvoir faire des modifications
+- Le contacter pour les lui demander
+**** DONE Prog2 : Corriger typo TD1
+**** DONE MiseProd : Envoyer mail avec consignes d'évaluation
+- Contacter les étudiant-es pour expliquer que je noterai leurs différents TDs
+- Que je tiendrai compte des absences dans mon évaluation
+- Jusqu'au <2022-02-14 Mon> pour mettre à disposition leurs travaux
+- Doit juste récupérer l'id GitHub de Théo et Dylan
+**** DONE MiseProd : Contacter Théo et Dylan à propos de leur username GitHub
+- En faisant l'inventaire des repos, me suis rendu compte que je n'ai pas de repos pour ces deux étudiants
+- Les contacter pour leur demander de me les indiquer
+**** DONE Papier : Retirer StdDev de Table 2
+- R2C5
+**** DONE Papier : Utiliser seulemeent 3 chiffres significatifs pour Table 2
+- R2C4
+**** DONE Papier : Remplacer notation 7k5
+- R2C1
+**** DONE Prog2 : Revoir nb opérations exécuté par algo 2
+- Le but est de montrer que le nombre d'opérations est la forme Somme des i, i allant de 1 à n
+  - Ce qui correspond à une suite arithmétique
+  - Obtient alors n * (n + 1) / 2
+  - Ce qui nous permet d'obtenir la complexité en O(n^2)
+- Vérifier que les bornes des boucles correspondent bien au nombre d'instructions désiré
+**** DONE Papier : Ajouter explication besoin de supporter opérations concurrentes en début de section 5
+- R1C2
+**** TODO Papier : Ajouter explication de la comparaison seulement avec LS en début de section 7
+- R1C1
+**** TODO Papier : Ajouter références pour performances des algos de consensus
+**** TODO MiseProd : Évaluer exo 2 du TD1
+- Voir sur combien je le note
+*** Done
+- Réunion papier
+  - Préparation
+    - Est-ce qu'on peut se comparer à Core & Nebula de manière théorique ?
+      - Voir si y a une analyse en complexité temporelle et spatiale
+	- Nope
+	- L'article sur LS en présente une faisant figurer TreeDoc
+	- Pourrait servir de base
+      - Voir si on peut en proposer une et facilement se comparer
+	- Pose problème de place dans l'article
+	- Pour le moment, a seulement proposé une analyse en complexité du mécanisme de GC
+	- Devrait ajouter une analyse en complexité de RLS et de Treedoc avec son rebalancing mechanism dans ce cas
+	- Difficile de faire tenir ça en 1 colonne
+  - Questions
+    - Ne comprends pas le commentaire de l'associate editor
+      - C'est lesquels les 2 reviews qui indiquent que la comparaison avec related work est manquante ?
+	- R3
+	- Mais l'autre ?
+	- R1 mentionne ce point dans un commentaire, mais explique par ailleurs qu'il est satisfait de la réponse et du papier
+	- R2 et R4 n'ont pas l'air de correspondre
+	- Donc p-e un peu fort de dire que 2 reviewers font ce constat
+    - Comment ça se passe dans une telle situation ?
+      - 3 minor revisions
+      - 1 major revision
+      - Vu le commentaire de l'éditeur, je suppose pas à notre avantage
+    - Comment interpréter R1C1 ?
+      - Perso je le pige comme "ajouter dans le papier ce que vous avez indiqué dans la lettre de réponse"
+      - Sommes-nous d'accord
+  - Réunion
+    - Prendre en compte reviews de R1 et de R2
+    - Dans la lettre de réponse, mentionner que accordément au souhait du R1, nous avons ajouté les arguments sur pourquoi pas de comparaison de la lettre de réponse au papier
+    - Voir comment on répond
+    - Souligner caractère offensant de R3
+      - Nous apprend notre métier
+      - Pas un hard time, système n'existe pas
+      - Comparaison avec technical report
+- Papier : Remplacer notation 7k5
+  - Ça ne se dit/s'écrit pas ?
+  - 30k est valide, pas 7k5 semblerait
+    - https://en.wikipedia.org/wiki/1000_(number)
+  - Reste à voir si y a une différence entre k et K
+  - 7.5k me paraît correct, je pars là-dessus
+- Papier : Retirer StdDev de Table 2
+  - Pose la question de si StdDev est intéressant à faire apparaître
+    - A l'air de suggérer que c'est intéressant que pour les gausiennes
+  - À ce moment là, est-ce que la moyenne a toujours du sens ?
+  - Pourrait utiliser l'écart interquartile à ce moment là
+** Semaine du <2022-02-14 Mon> au <2022-02-18 Fri>
+*** Planned
+**** DONE Papier : Ajouter explication de la comparaison seulement avec LS en début de section 7
+- R1C1
+**** DONE Papier : Réduire taille
+- Les modifications m'ont fait dépassé les 18 pages de quelques lignes
+- Voir pour raboter un peu
+**** DONE Papier : Retravailler tableau performances opération /rename/
+- R2C5
+- Vient de remarquer que ce commentaire s'applique aussi à Table 1
+  - Qui présente l'évolution du temps d'intégration de l'opération /rename/ en fonction des différents scénarios et taille du document
+- Mettre à jour script et regénérer tableau en conséquence
+**** DONE MiseProd : Évaluer exo 2 du TD1
+- Voir sur combien je le note
+**** DONE MiseProd : Évaluer TDs
+**** IN-PROGRESS Prog2 : Préparer CM2
+- Porte sur la récursivité et la complexité des algorithmes récursifs
+- Pierre m'a transmis les sources de ses cours et TDs
+- À voir ce que je reprends
+  - A l'air d'utiliser le Master theorem
+  - Charles lui utilisait les arbres de récursions
+  - Étudier les deux
+**** IN-PROGRESS Prog2 : Préparer TD2
+- Charles proposait un sujet en 2 parties pour le TD2
+- Quelques uns de ses exos se retrouvent dans le CM de Pierre
+- Voir si je garde ou modifie ces questions
+**** TODO Papier : Ajouter références pour performances des algos de consensus
+*** Done
+- Papier : Ajouter explication de la comparaison seulement avec LS en début de section 7
+  - Idée est de montrer que ça n'apporterait pas grand chose de se comparer aux autres approches
+  - Pour RGA, RGASplit, LSEQ
+    - Indique que ces CRDTs souffrent de problèmes similaires à LS
+    - Qu'on peut adapter le mécanisme de renommage à ces derniers
+    - Et qu'on aurait alors une amélioration similaire
+    - De fait, apporte pas grand chose de se comparer à ces CRDTs directement
+  - Pour Core & Nebula
+    - Les systèmes visés sont différents
+    - Donc c'est pas les performances qu'il faut comparer
+    - Que la comparaison fait plutôt l'objet d'une discussion dans section /Related Work/
+- Prog2 : Préparer CM2
+  - Cormen introduit la méthode diviser-pour-régner dans section 2 (page 26)
+    - Présente dans chapitre 4 comment analyser leur complexité
+  - Méthode diviser-pour-régner
+    - Diviser
+      - Diviser problème en sous-problèmes qui sont des instances plus petites du problème
+    - Régner
+      - si les sous-problèmes sont de taille suffisamment réduites, les résoudre
+      - sinon les résoudre de manière récursive (de nouveau diviser-pour-régner)
+    - Combiner
+      - combiner solutions des sous-problèmes pour produire solution du problème originel
+  - Équation de récurrence
+    - Lorsqu'algo est récursif, son temps d'exécution peut être décrit par équation de récurrence
+    - Si problème de taille /n/ réduite (i.e. on a constante /c/ telle que /n <= c/)
+    - Alors solution prend temps constant => O(1)
+    - Si problème trop gros
+    - Divise en /a/ sous-problèmes de taille 1 / /b/
+    - Doit donc résoudre /a/ problèmes de taille /n/b/
+    - Considère /D(n)/ le temps pour diviser le problème en sous-problèmes
+    - Et /C(n/ le temps de construire la solution finale (combiner)
+    - Alors on a T(n) =
+      - O(1) si /n <= c/
+      - aT(n/b) + D(n) + C(n) sinon
+  - Théorème général
+    - S'agit du /Master theorem/ dont me parlait Charles
+    - Permet d'établir complexité d'un algo récursif à partir de /a/, /b/, /D(n)/ et /C(n)/
+  - Notation o
+    - Permet de définir une borne asymptotique supérieure, mais non serrée
+    - On a donc
+      - 2n = o(n^2)
+      - 2n^2 != o(n^2)
+    - Différence induite est que
+      - Pour f(n) = O(g(n)), on a 0 <= f(n) <= c * g(n) à partir d'une certaine constante c > 0
+      - Alors que pour f(n) = o(g(n)), on a 0 <= f(n) <= c * g(n) pour toute constante c > 0
+  - Notation ω
+    - Pareil que o, mais pour la borne inférieure
+  - Relation entre vitesses de croissance des polynomes et exponentielles
+    - Pour toutes constantes réelles a et b telles que a > 1, on a
+      - lim(n -> inf) n^b / a^n = 0
+    - D'où n^b = o(a^n)
+  - Logarithmes
+    - Notations
+      - lg n = log_2 n (log base 2)
+      - ln n = log_e n (log népérien)
+      - lg^k n = (lg n)^k (exponentiation)
+      - lg lg n = lg(lg n) (composition)
+    - Borne polylogarithmique
+      - f(n) a borne polylogarithmique si f(n) = O(lg^k n) pour constante k
+    - Relation entre vitesses de croissance des polynômes et polylogarithmes
+      - On substitue dans la formule suivante n par lg n, et a par 2^a
+      - Obtient l'équation suivante
+	- lim(n -> inf) lg^b n / 2^(a lg n) = 0
+      - Se simplifie en
+	- lim(n -> inf) lg^b n / n^a
+      - D'où lg^b n = o(n^a) pour tout a > 0
+      - Donc fonction polynomiale positive croît plus vite que fonction polylogarithmique
+  - Méthodes pour résoudre les récurrences
+    - Présente 3 méthodes pour obtenir des bornes asymptotiques Θ et O
+    - Méthode de substitution
+      - Devine borne, puis utilise récurrence mathématique pour démontrer sa validité
+    - Méthode de l'arbre récursif
+      - Représente récurrence par arbre dont les noeuds représentent les coûts des différents appels récursifs
+    - Méthode générale
+      - Fournit des bornes pour récurrences de la forme T(n) = a T(n/b) + f(n)
+  - Exemple du problème du sous-tableau maximal
+    - Considère problème initial suivant
+    - Possède tableau de n valeurs représentant le cours d'une action
+    - Cherche à trouver date d'achat et de revente pour maximiser profit
+    - Doit donc trouver paire d'indices pour laquelle différence est la plus grande
+      - Avec indice d'achat < indice revente
+    - Approche naive
+      - Comparer toutes les paires
+      - Complexité en O(n^2)
+    - Propose alors de transformer le problème pour pouvoir proposer solution plus efficace
+    - Consiste à générer un tableau de n - 1 valeurs, représentant désormais l'évolution du cours de l'action depuis la veille
+    - Trouver le sous-tableau maximal de ce 2nd tableau permet de trouver les dates d'achat et de revente pour le problème initial
+    - Approche naive sur problème transformé
+      - Consiste à comparer la somme de chaque sous-tableau
+      - Peut calculer en temps constant la somme d'un sous-tableau si on connait déjà la somme du précédent
+      - Obtient donc toujours une complexité en O(n^2)
+    - Approche diviser-pour-régner
+      - Si considère le problème du sous-tableau maximal
+      - Remarque qu'il peut être qu'à 1 des 3 emplacements suivants
+	- Soit dans la 1ère moitié du tableau
+	- Soit dans la 2nde moitié du tableau
+	- Soit à cheval sur les deux moitié
+      - Peut donc appliquer l'approche diviser-pour-régner ici
+      - Consiste à
+	- Faire une recherche récursive du sous-tableau maximal sur la 1ère moitié
+	  - On s'arrête lorsque le tableau est de taille 1
+	- Faire une recherche récursive du sous-tableau maximal sur la 2nde moitié
+	- Faire une recherche NON-RECURSIVE du sous-tableau maximal chevauchant les deux moitiés
+	  - Consiste à partir du milieu du tableau
+	  - Faire une boucle itérant jusqu'au début du tableau et vérifiant si on trouve un plus grand sous-tableau
+	  - Faire une boucle itérant jusqu'à la fin du tableau et vérifiant si on trouve un plus grand sous-tableau
+	  - Combiner les résultats des 2 boucles
+	  - Se fait en O(n)
+	- Comparer les sommes des 3 sous-tableaux obtenus et retourner les indices du sous-tableau maximal trouvé
+      - Obtient donc une complexité
+	- T(n) = Θ(1) si n = 1
+	- T(n) = 2 T(n/2) + Θ(n) si n > 1
+      - Correspond à T(n) = Θ(n lg n)
+- Prog2 : Préparer TD2
+  - Questions pour Charles
+    - Est-ce que les étudiant-es ont déjà fait des schémas mémoires ?
+    - Dans TD2-1, exo 1
+      - Comment on passe de sigma(1 / 3^i) pour i de 0 à infini à 3/2 ?
+	- Obtient à un moment 3 * (1 - (1 / 3)^(log_3 n + 1)) / 2
+	- Suppose qu'on approxime le (1 / 3)^(log_3 n + 1) en 0 quand n -> infini
+      - Si c'est le cas, quand peut-on se permettre ce genre d'approximation ?
+	- Retrouve le même raisonnement pour la 3ème récurrence avec (1/4)^(lg n + 1)
+  - Le TD2-1 me paraît un peu long pour 2h
+  - Le raccourcir ?
+  - Il manque aussi d'un exercice du style diviser pour régner qui me paraîtrait intéressant de creuser
+** Semaine du <2022-02-21 Mon> au <2022-02-25 Fri>
+*** Planned
+**** DONE Prog2 : Préparer CM2
+- Porte sur la récursivité et la complexité des algorithmes récursifs
+- Pierre m'a transmis les sources de ses cours et TDs
+- À voir ce que je reprends
+  - A l'air d'utiliser le Master theorem
+  - Charles lui utilisait les arbres de récursions
+  - Étudier les deux
+**** DONE Prog2 : Préparer TD2
+- Charles proposait un sujet en 2 parties pour le TD2
+- Quelques uns de ses exos se retrouvent dans le CM de Pierre
+- Voir si je garde ou modifie ces questions
+**** DONE AlgoDist : Préparer 1ère séance de TD
+- La 1ère séance est programmée pour le <2022-03-16 Wed>
+- Voir si les ressources fournies sont suffisantes
+**** DONE MUTE : Relire notes sur stage d'Oscar pour comprendre pourquoi branche jamais mergée
+- À l'issue du stage d'Oscar, 2 branches ont été développées pour mute-core
+- La 1ère refactore l'implémentation du protocole SWIM et intègre des tests unitaires
+- La 2nde commence à remplacer l'utilisation du networkId dans mute-core par celle du muteCoreId
+- La 1ère semble complète et fonctionnelle
+- Vérifier ce que j'ai pu écrire à l'époque (mi-novembre 2020)
+**** IN-PROGRESS Prog2 : Préparer 2nde session du TD2
+- Charles faisait une séance sur les algos récursifs
+- Puis une séance sur les structures récursives
+- Vu qu'on a à peine commencé les algos récursifs avec mes groupes, continuer dessus ?
+- Dans ce cas voir pour raccourcir partie sur la structure de données récursives ?
+**** TODO Papier : Ajouter références pour performances des algos de consensus
+*** Done
+- Prog2 : Préparer CM2
+  - [X] Améliorer introduction de la récursivité
+    - Part directement sur la notion Diviser pour régner
+    - Me paraîtrait mieux d'introduire la notion de récursivité au préalable
+    - Et de lister les différents cas
+      - Problèmes définis par récurrence
+      - Diviser pour régner
+      - Recherches avec retour arrière
+      - Algos liés aux structures de données récursives
+  - [X] Détailler Diviser pour régner
+    - Peut ajouter un exemple supplémentaire
+    - Recherche dichotomique
+    - Recherche d'un sous-tableau maximal
+  - [X] Présenter la méthode l'arbre récursif pour évaluer la complexité d'un algo récursif
+  - [X] Retirer partie sur les algorithmes de tris récursifs
+  - [X] Ajouter résumé en conclusion
+- Prog2 : Préparer TD2
+  - Exercices Diviser pour régner possible
+    - Recherche dichotomique
+    - Recherche du maximum et du minimum d'un tableau
+- AlgoDist : Préparer 1ère séance du TD
+  - Questions
+    - Est-ce que les étudiant-es sont admin sur leur machine ?
+      - Notamment, est-ce qu'iels peuvent installer Erlang ?
+      - Ou faut voir avec le service info (dans ce cas, se dépêcher)
+    - Est-ce qu'on a les sources des sujets actuels ?
+    - Est-ce qu'on a les corrections des sujets actuels ?
+    - Est-ce qu'il y a une introduction aux systèmes distribués dans le cours ? Autre qu'une introduction à MPI
+    - Dates des cours et format
+      - Avec les 4A SIR, j'ai le 1er CM de 2h le <2022-03-29 Tue>
+      - Et un DS avec eux le <2022-03-04 Fri>
+      - Et un nouveau CM le <2022-04-05 Tue>
+      - C'est normal ?
+      - J'ai cours en A111
+      - Mais j'ai 40 étudiant-es d'après l'ENT
+      - Est-ce que la liste est incorrecte ?
+  - Retours TP1
+    - Dans l'exemple "Hello, World!"
+      - Le export([hello_world/0]) me parait pas clair, notamment le /0
+    - Est-ce qu'on doit importer les modules en Erlang ?
+      - Dans un exemple, tu compiles le module hello et donc tu peux y accéder par la suite
+      - Comment je fais pour utiliser des fonctions de module déjà existants ? Est-ce que je peux juste import ou dois-je les recompiler ?
+    - L'exemple sur les tuples ne me paraît pas clair
+      - C'est plus l'utilisation de format() qui me laisse perplexe
+      - Dans format(), à quoi correspondent ~p et ~n ?
+    - Pour les dictionnaires, tu écris qu'on peut les déclarer avec #[]
+      - Mais les exemples utilisent la syntaxe #{}
+    - Tu évoques la notion d'agent sans vraiment indiquer ce que c'est
+      - Est-ce que ça vaudrait pas le coup de détailler ça ?
+      - Genre, c'est des threads ou c'est plus poussé que ça comme fonctionnalité (peut déployer un agent sur une machine distante?)
+    - Une question sur receive
+      - Combien de fois est déclenché un receive ?
+      - Je dirais une fois si je comprends bien les exemples de code
+      - Mais la phrase sur after me fait douter, notamment "si on n'a pas reçu de message depuis un certain temps" (ce qui me laisse croire qu'on peut en recevoir plusieurs)
+    - Pour la question 4.3, construire le graphe quelconque me paraît pas simple
+      - Risque de passer leur temps à implémenter la construction du graphe plutôt que l'algorithme d'élection de leader
+      - À voir si c'est ok
+    - D'un point de vue forme, je ferai ressortir les morceaux de code avec un fond grisé ou une boîte, notamment ceux sur plusieurs lignes
+    - Typos
+      - --Écriver-- Écrire
+      - --Les tuples-- Un tuple est un ensemble de valeur
+      - qui prend en --entrer-- entrée
+      - que chaque agent --est-- ait un numéro entre
+  - A envoyé mail à Vincent et Léo
+  - Voir en fonction de la réponse de Vincent si je prépare une partie cours sur les systèmes distribués
+- Prog2 : Préparer 2nde session du TD2
+  - Charles avait bien passé seulement 2h sur chaque partie du TD2
+  - Ça vaut p-e le coup de passer une séance de TD de plus sur la récursivité
+  - L'idée serait de faire la session 2 sur les algos et commencer celui sur la structure de données récursive
+  - Et de faire une 3ème séance pour compléter celui sur la structure de données récursive et commencer le DM avec eux
+    - Idéal serait que le DM soit à rendre 10 jours après
+    - Donc pour le <2022-03-20 Sun>
+  - En parlant de DM, Charles faisait des retours mitigés sur son sujet de l'an dernier portant sur la recherche de sous-tableau maximum
+    - Proposer un autre sujet
+    - Une piste est l'algorithme de multiplication de matrices
+    - Voir si autre sujet pourrait être intéressant
+    - Gérald mentionnait la recherche de pattern dans une chaîne de caractères
+      - Idée intéressante
+      - Mais après réflexion, je ne crois pas que ça améliore les perfs par rapport à une approche /sliding window/
+    - Mais mène à d'autres idées
+    - Genre recherche du plus long préfixe commun entre des chaînes
+    - La page suivante donne des pistes
+      - https://www.geeksforgeeks.org/divide-and-conquer/
+- MUTE : Relire notes sur stage d'Oscar pour comprendre pourquoi branche jamais mergée
+  - Une note du <2020-11-06 Fri> indique qu'on avait une version prête à être mergée d'un point de vue fonctionnalités
+  - Que des 1ers tests manuels laissaient penser qu'elle était OK
+  - Qu'il fallait retester plus en détails
+  - Une session de tests dont j'ai des traces dans la discussion Mattermost du <2020-11-12 Thu> indique un bug dans la liste
+    - L'erreur peut potentiellement venir d'un problème d'UI
+  - Serait potentiellement intéressant de faire un résumé de cette conversation
+    - Et d'en faire un dump pour pouvoir le partager avec Baptiste s'il a besoin de fouiller plus en détails
+  - Voir avec Baptiste pour refaire une session de tests
+** Semaine du <2022-02-28 Mon> au <2022-03-04 Fri>
+*** Planned
+**** CANCELLED Papier : Ajouter références pour performances des algos de consensus
+**** DONE Prog2 : Préparer 2nde session du TD2
+- Charles faisait une séance sur les algos récursifs
+- Puis une séance sur les structures récursives
+- Vu qu'on a à peine commencé les algos récursifs avec mes groupes, continuer dessus ?
+- Dans ce cas voir pour raccourcir partie sur la structure de données récursives ?
+**** DONE BD : Rédiger rattrapage
+     SCHEDULED: <2022-03-04 Fri>
+- Doit rédiger un sujet pour le <2022-03-09 Wed>
+**** DONE Prog2 : Préparer DM
+     SCHEDULED: <2022-03-03 Thu>
+**** DONE Prog2 : Préparer CM3
+    SCHEDULED: <2022-03-02 Wed>
+- Porte sur les algorithmes de tris et leur complexité
+- Voir quels algos je présente
+- Charles allait jusqu'au tri par tas
+- Voir si c'est pertinent et si on a le temps
+**** TODO Papier : Effectuer corrections
+*** Done
+- Prog2 : Préparer 2nde session du TD2
+  - Faut p-e retravailler le sujet de TD2-2 un peu
+  - Charles m'expliquait avoir donné le 1er schéma mémoire pour que les étudiant-es démarrent
+  - Et qu'il n'est pas sûr que les étudiant-es aient vu la notion dans un module précédent
+  - [X] Inclure le 1er schéma dans l'énoncé et l'expliquer
+  - [X] Ajouter un exemple d'affichage pour les questions 3.1 et 3.2
+- Prog2 : Préparer CM3
+  - Pour le moment, laisse de côté le tri par tas
+  - Plan est donc le suivant
+    - Tris itératifs
+      - Sélection
+      - Insertion
+      - Bulles
+    - Tris récursifs
+      - Fusion
+      - Rapide
+  - Peut reprendre les slides de Pierre
+    - En fusionnant son cours dédié aux algos de tri itératifs
+    - Et la fin du cours dédié à la récursivité où il présentait fusion et rapide
+  - Rencontre un problème avec les figures du cours
+    - S'agit de fichier au format .fig
+    - Correspond à des figures dont on peut extraire les sous-figures
+    - Réalisées à l'aide du logiciel xfig si je pige bien
+    - Latex rencontre une erreur lors de l'accès aux sous-figures
+      - Manque le fichier figure.pdftex d'après le message d'erreur
+    - A installé fig2dev
+      - Permet de convertir un .fig vers un autre format
+      - Par exemple /fig2dev -L pdf fichier.fig fichier.pdf/
+    - Après quelques tentatives à générer le fichier pdftex, a laissé tomber
+    - A écrit un script pour générer les PDFs des sous-figures
+    - Rencontre un problème où les figures générées ont des éléments manquants
+    - Me suis rendu compte qu'on affichait une figure .fig à un moment dans une slide
+    - C'est donc possible
+    - C'est juste la gestion des sous-figures qui foire
+    - A remplacé les includegraphics pour pointer sur les sous-figures directement
+    - Contourne le problème
+  - En ajoutant les slides sur les algos de tri récursifs, me suis rendu compte qu'il ne suffisait pas seulement du fichier .fig
+    - Besoin aussi des fichiers pstex, pstex_t et pdftex
+  - A pu récupérer et recompiler toutes les slides liées aux tris
+  - Reste à revoir le discours
+  - [ ] Modifier le code donné dans le cours pour du pseudo-code
+    - Si des exos demandent de l'implémenter, p-e éviter de leur donner tout
+    - Peut laisser le 1er en guise d'exemple
+  - [ ] Avant de présenter Tri fusion, présenter algo permettant de fusionner 2 tableaux triés
+    - Représenter situation initiale
+    - Suffit de comparer la plus petite valeur de chaque tableau
+    - Se trouve dans la 1ère case de chaque tableau
+    - De ranger la valeur dans le tableau résultat
+    - Et de recommencer, en ignorant cette case
+    - Complexité en O(n) (même Theta(n))
+  - Code Huffman
+    - Vraiment une application des tris ?
+    - Pourrait juste compter le nombre d'occurrence de chaque caractère
+      - O(n)
+    - Ah non, a besoin de trier les nombres d'occurrence ensuite
+- Papier : Réunion
+  - Questions
+    - Est-ce que introduction de la section 7 validée ?
+  - Notes
+    - Intro section 5
+      - Introduire notion de central authorities est un peu limite
+      - Pareil pour la notion d'organisation qui fournit des noeuds
+      - Devrait plutôt angler avec "souhaite système avec equal peer nodes (rights and responsabilities)"
+      - Et impose aucunes contraintes sur les noeuds
+    - Intro section 7
+      - Comparaison "limiting" est pas très compréhensible
+      - Reformuler pour que ça soit plus clair l'idée
+      - Plutôt que de citer Core & Nebula direct, devrait plutôt dire "se comparer à des systèmes reposant sur un algo centralisé"
+	- Comme RLS pour systèmes pair-à-pair avec equals rights and responsabilities, ne se compare pas à d'autres types d'architecture (reposant sur consensus) dans cette évaluation
+	- Une comparaison avec avec ce type de système est faite dans la 9.1
+	- Dans 9.1, après avoir dit qu'on peut combiner core & nebula avec RLS, expliquer qu'on obtiendrait les perfs correspondant au cas avec 1 rb + le coût du consensus
+	  - Que ce coût dépend de l'algo de consensus utilisé
+      - Serait p-e plus intéressant de faire remarquer que les performances de RLS-1-rb correspond aux performances dans une architecture centralisée, en omettant le coût du consensus
+    - Si besoin de place
+      - Peut essayer de mettre Table 3 à fin de colonne
+      - Peut déplacer légende de Figure 13 sur le côté plutôt qu'en-dessous
+- Prog2 : Déroulé TD3
+  - Plan prévu
+    - 08h-08h30 : TD2, Exercice 2
+    - 08h30-09h00 : TD2, Exercice 3
+    - 09h00-09h20 : Introduction TD3 et Exercice 1 avec eux
+    - 09h20-09h50 : TD3, Exercice 2
+  - Déroulé
+    - 08-09h50 : TD2, Exercice 2
+- BD : Rédiger rattrapage
+  - Déjà, qu'est-ce que je leur ai donné comme sujets lors des évaluations précédentes ?
+    - Schéma conceptuel (BD1, TD noté 1)
+      - Refuge à insecte
+      - Médiathèque
+    - Schéma conceptuel au schéma relationnel, normalisation, algèbre relationnel (BD1, TD noté 2)
+      - Among Us
+      - Twitch
+      - Pokémon
+    - SQL (BD2, projet)
+      - Mario Kart
+  - A donc un sujet de dispo facilement
+  - L'a repris
+- Prog2 : Préparer DM
+  - Exercices possibles
+    - Multiplication égyptienne pour tester la récursivité
+    - Exponentiation rapide pour valider qu'iels ont compris la récursivité
+    - Multiplication de matrices de Strassen
+    - Quickselect
+      - On aura pas encore implémenté Quicksort, donc ça me paraît gênant de leur demander
+      - Peut le mettre de côté pour un 2nd DM
+** Semaine du <2022-03-07 Mon> au <2022-03-11 Fri>
+*** Planned
+**** DONE Prog2 : Préparer TD4
+- Porte sur les algorithmes de tri
+- Prévu sur 2 séances
+- Reprendre le TD de l'an dernier
+- [X] Modifier l'énoncé pour utiliser la classe *MyArray*
+- [X] Revoir l'énoncé concernant le tri à bulle optimisé
+  - Il s'agit potentiellement de la version présentée dans le cours
+  - Voir si c'est bien le cas
+  - Si c'est le cas, voir s'il a y a moyen de proposer autre chose
+    - Version avec double bulles (1ère valeur et dernière valeur)
+- [X] Retravailler l'énoncé pour séparer les différentes questions
+- [X] Ajouter des questions sur le calcul de la complexité du tri fusion à l'aide de la méthode de l'arbre récursif
+  - Mise en place de la formule de récurrence
+  - Déroulement de l'arbre récursif correspondant
+  - Évaluation de la complexité
+- [X] Retirer la partie sur le tri par tas
+**** IN-PROGRESS AlgoDist : Préparer TD1
+- Porte sur l'élection de leader
+- Doit tenir sur 4h
+- A recontacté Vincent pour avoir la correction
+- Et savoir si je dois faire un point de cours en introduction
+**** TODO AlgoDist : Préparer cours sur DistSys
+- Ma partie du module porte sur les algos pour systèmes distribués
+- Mais il n'y a pas de cours introduisant cette notion pour le moment semblerait
+  - À voir si Vincent retrouve des ressources des années précédentes
+- Dans le doute, préparer un cours sur le sujet risque de s'avérer utile pour mieux lancer les étudiants sur le sujet en TD
+- 1er jet de plan
+  - Systèmes centralisés et limites
+    - Passage à l'échelle
+    - Disponibilité
+    - SPOF
+    - Confidentialité
+  - Systèmes décentralisés/distribués
+    - Principes
+    - Problématiques
+      - Réplication
+      - Conflits
+      - Sécurité
+      - Droits d'accès
+    - Approches Leader-based systems vs. Learderless
+    - Complexités
+  - Ouverture
+    - Systèmes distribués alternatifs aux problèmes existants
+      - Peertube
+      - IPFS
+- Voir cours de Claudia et de Kleppman pour ressources
+  - Claudia : https://members.loria.fr/CIgnat/replication/
+  - Kleppman : https://www.cl.cam.ac.uk/teaching/2021/ConcDisSys/dist-sys-slides.pdf
+- Peut aussi ré-utiliser *Designing Data-Intensive Applications*
+**** TODO Papier : Effectuer corrections
+*** Done
+- Prog2 : Préparer TD4
+  - Revoir l'énoncé concernant le tri à bulle optimisé
+    - En vrai, plus intéressant d'un point de vue perf de réduire le nombre de comparaisons au fur et à mesure
+    - A ajouté ça à l'énoncé
+- AlgoDist : Préparer TD1
+  - A commencé à refaire la correction du TD1
+  - Vincent m'a aussi confirmé que c'est à moi de contextualiser le TD
+    - Et donc de faire une introduction aux systèmes distribués
+  - Viens de me rendre compte que j'ai que 6h avec les étudiants
+    - Voir pour planifier le déroulement de mes séances et le volume horaire que j'alloue à chaque notion
+      - Introduction aux systèmes distribués
+      - Élection de leader naive dans un anneau de taille connue
+      - Élection de leader naive dans un anneau dde taille inconnue
+      - Complexité des algorithmes distribués
+      - Algorithme de Lelann-Chang-Robert
+      - Algorithme de Hirschberg-Sinclair
+      - Élection de leader dans graphe
+      - Élection de leader dans réseau asynchrone
+      - Algorithme de Bellman-Ford
+    - Sachant que je dois enseigner forcément tout couvrir pour les TPs de Léo
+  - Vincent m'a indiqué qu'il se chargeait d'enseigner Bellman-Ford
+    - Ce qui va me faire gagner du temps
+  - Peut alors proposer le planning suivant
+    - Séance du 16/03
+      - Cours : Introduction aux systèmes distribués
+      - TD :
+	- Caractéristiques des systèmes distribués
+	- Élection de leader dans un réseau complet
+	- Élection de leader dans réseau en anneau de taille n
+	- Élection de leader dans réseau en anneau de taille inconnue
+	- Complexité des algorithmes distribués
+	- Début élection de leader dans réseau en anneau avec algo de Lelann-Chang-Robert
+    - Séance du 21/03
+      - TD :
+	- Suite élection de leader dans réseau en anneau avec algo de Lelann-Chang-Robert
+	- Élection de leader dans réseau en anneau avec algo de Hirschberg-Sinclair
+	- Bonus : Élection de leader dans réseau torique
+    - Séance du 25/03
+      - TD :
+	- Élection de leader dans réseau quelconque
+      - Cours : Modèle asynchrone et exécution
+      - TD :
+	- Élection de leader avec LCR dans système asynchrone
+	- Élection de leader (qui foire) dans réseau quelconque
+	  - Ouvrir sur Paxos/Raft
+- Prog2 : <2022-03-09 Wed> avec groupe TD3
+  - Absents
+    - Costanza
+    - Cuccu
+    - Da Baets
+    - Duez
+    - Gagneur
+    - Gondouin
+    - Hamant
+    - Lecomte
+- Prog2 : <2022-03-09 Wed> avec groupe TD1
+  - Absents
+    - Al Mansour
+    - Clement
+    - Lahmadi
+    - Makhfouli
+- AlgoDist : Réunion avec Vincent
+  - Questions
+    - [X] Est-ce qu'il y a un module Arche ?
+    - [X] Qu'est-ce que tu enseignes précisément ?
+    - [-] Comment tu enseignes Bellman-Ford si on a pas encore introduit la notion d'algo distribué ?
+    - [X] C'est quoi ce planning avec les 4A ?
+      - TD le <2022-03-29 Tue>
+      - Puis DS le <2022-04-01 Fri>
+      - Puis de nouveau TD <2022-04-05 Tue>
+    - [X] Ils sont 40 ou pas ?
+  - Réunion
+    - Rattrapage de BDD
+      - Vincent m'envoie des photos de la copie
+	- Correction pour <2022-03-16 Wed>
+	- Si honnête mais pas ouf, 10
+	- Si bossé, 14
+	- Sinon 4
+    - J'ai 3h en trop dans mon service
+      - Vincent me prend les DS
+      - Et me file une séance <2022-04-01 Fri> de 8h à 10
+      - On retombe sur le bon nombre
+      - Et ça me permet d'enseigner Bellman-Ford dans les 2 modules
+    - Y a 2h en moins dans le module que l'an dernier
+      - Probablement un des 2 algos d'élection de leader
+      - Voir lequel
+      - Prévenir Léo en fonction de ce que je fais
+    - Ils sont 40
+      - La A109 et A111 sont trop petites
+      - Demander F310
+      - Demander à Julia Hannequin Castelli
+    - Finalement c'est moi qui enseigne Bellman-Ford
+    - Vincent enseigne auparavant
+      - Structures de données pour les graphes
+	- Matrice d'adjacence
+	- Liste des voisins
+      - Broad-First Search, Dijkstra, introduction à Bellman-Ford
+      - Faire un rappel plutôt qu'autre chose
+    - Me charge de créer le module Arche
+    - Vincent me propose des contacts auprès de EuroInfo
+    - Vincent m'a informé qu'il y aura 3 ATERs l'an prochain
+      - Thématique Génie Logiciel (UML) avec alternants/continue (~100h)
+      - Possibilité de faire demi-ATER si Coast paie
 * Backlog
 * Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
