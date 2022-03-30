@@ -23550,6 +23550,8 @@ Failed to publish
 	- Élection de leader avec LCR dans système asynchrone
 	- Élection de leader (qui foire) dans réseau quelconque
 	  - Ouvrir sur Paxos/Raft
+  - Bon finalement c'est moi qui me retrouve à enseigner Bellman-Ford
+    - Même si les étudiants l'auront déjà vu avec Vincent
 - Prog2 : <2022-03-09 Wed> avec groupe TD3
   - Absents
     - Costanza
@@ -23589,13 +23591,14 @@ Failed to publish
       - On retombe sur le bon nombre
       - Et ça me permet d'enseigner Bellman-Ford dans les 2 modules
     - Y a 2h en moins dans le module que l'an dernier
+      - Voir pour retirer une partie du contenu
       - Probablement un des 2 algos d'élection de leader
       - Voir lequel
       - Prévenir Léo en fonction de ce que je fais
     - Ils sont 40
       - La A109 et A111 sont trop petites
       - Demander F310
-      - Demander à Julia Hannequin Castelli
+      - Demander à Julia Hennequin-Castelli
     - Finalement c'est moi qui enseigne Bellman-Ford
     - Vincent enseigne auparavant
       - Structures de données pour les graphes
@@ -23608,6 +23611,395 @@ Failed to publish
     - Vincent m'a informé qu'il y aura 3 ATERs l'an prochain
       - Thématique Génie Logiciel (UML) avec alternants/continue (~100h)
       - Possibilité de faire demi-ATER si Coast paie
+** Semaine du <2022-03-14 Mon> au <2022-03-18 Fri>
+*** Planned
+**** DONE AlgoDist : Préparer TD1
+- Porte sur l'élection de leader
+- Doit tenir sur 4h
+- A recontacté Vincent pour avoir la correction
+- Et savoir si je dois faire un point de cours en introduction
+**** DONE AlgoDist : Préparer cours sur DistSys
+- Ma partie du module porte sur les algos pour systèmes distribués
+- Mais il n'y a pas de cours introduisant cette notion pour le moment semblerait
+  - À voir si Vincent retrouve des ressources des années précédentes
+- Dans le doute, préparer un cours sur le sujet risque de s'avérer utile pour mieux lancer les étudiants sur le sujet en TD
+- 1er jet de plan
+  - Systèmes centralisés et limites
+    - Passage à l'échelle
+    - Disponibilité
+    - SPOF
+    - Confidentialité
+  - Systèmes décentralisés/distribués
+    - Principes
+    - Problématiques
+      - Réplication
+      - Conflits
+      - Sécurité
+      - Droits d'accès
+    - Approches Leader-based systems vs. Learderless
+    - Complexités
+  - Ouverture
+    - Systèmes distribués alternatifs aux problèmes existants
+      - Peertube
+      - IPFS
+- Voir cours de Claudia et de Kleppman pour ressources
+  - Claudia : https://members.loria.fr/CIgnat/replication/
+  - Kleppman : https://www.cl.cam.ac.uk/teaching/2021/ConcDisSys/dist-sys-slides.pdf
+- Peut aussi ré-utiliser *Designing Data-Intensive Applications*
+**** IN-PROGRESS Prog2 : Préparer CM4
+- Prévu le <2022-03-23 Wed>
+- Porte sur les structures de données
+- Plan
+  - Motiver l'utilisation des structures de données adaptées
+    - Opérations de base : rechercher, ajouter un élément, retirer un élément
+  - Tableau
+    - Ajouter des exemples d'insertion/suppression
+    - Donner cas d'utilisations
+  - Liste chainée
+    - Voir comment implémenter ça (utilisation de Sentinelle ou non?)
+  - Pile
+  - File
+  - Table de hachage
+- Remettre le tas ?
+- Le cours de Pierre me paraît pas adapté ici
+- Reprendre et développer celui de Charles
+**** TODO AlgoDist : Préparer TD sur Bellman-Ford
+- Séance de TD a lieu le <2022-03-25 Fri>
+- Modifier le sujet pour retirer la partie sur le modèle asynchrone
+- Se focaliser sur Bellman-Ford
+**** TODO Prog2 : Préparer DM2
+- Porte sur QuickSelect
+- Peut le donner à l'issue de la 2nde séance sur les tris du groupe 3, le <2022-03-24 Thu>
+- Peut sinon le donner la semaine du <2022-03-28 Mon>
+- Dans tous les cas, à rendre pour le <2022-04-10 Sun>
+- Peut aussi donner le TD4 à terminer comme DM
+**** TODO Prog2 : Préparer TD5
+- Ma 1ère séance a lieu le <2022-03-30 Wed>
+- Porte sur les structures de données
+- Le sujet de TD de l'an dernier me paraît pas mal
+- Revoir un peu le code, si y a des choses à modifier
+**** TODO Papier : Effectuer corrections
+*** Done
+- AlgoDist : Préparer TD1
+  - A fini de préparer le TD
+  - A fini de préparer le cours d'intro
+  - A mis le tout en ligne sur un module Arche
+  - A inscrit les étudiant-es, Vincent et Léo
+- Prog2 : Préparer CM4
+  - Peut implémenter File et Pile à capacité maximale à l'aide d'un tableau interne
+    - Pour Pile
+      - Un simple compteur /sommet/ permet de savoir où on en est
+      - Suffit de l'incrémenter et décrémenter en fonction des opérations
+      - Doit détecter quand sommet dépasse taille du tableau ou devient négatif pour déclencher message d'erreur
+      - Note : quand on dépile, pas besoin de supprimer la valeur, juste de déplacer /sommet/
+	- Le prochain /empiler(value)/ écrasera l'ancienne valeur
+    - Pour File
+      - Besoin alors de pointeurs pour savoir où est la tête de la File, où est la queue
+      - Utilise le tableau de manière circulairee
+      - Doit détecter lorsque tête et queue s'overlappent pour déclencher message d'erreur
+    - Peut proposer exercice demandant d'implémenter une File à l'aide de deux Piles
+    - Peut proposer exercice demandant d'implémenter une Pile à l'aide de deux Files
+    - Peut proposer exercice demandant de gérer la mémoire avec une liste des emplacements libres
+  - Peut insister sur la différence entre Abstract Data Types et Data Structures
+  - Plan
+    - [X] Types abstraits et de données et structures de données
+      - Algorithmes manipulent des données pour produire résultat, qui est une autre donnée
+      - Les données sont représentées à l'aide de structures de données
+      - Structures de données précisent comment sont stockées les données et comment on peut les manipuler (ses méthodes)
+      - Pour une même donnée (on parle de Type Abstrait de Données), on peut proposer plusieurs structures de données permettant de la représenter
+	- La représentation Type Abstrait de Données permet de définir son comportement d'un point de vue utilisateur
+	  - Est définition formelle/mathématique du type de données
+	  - Ne dépend pas d'un langage de programmation donnée
+	- La représentation Structure de Données permet de représenter la donnée du point de vue développeur
+	- Chacune de ces structures de données va proposer des performances différentes en stockage (mémoire utilisée) et en complexité en temps des opérations
+	  - Une structure de données est un compromis entre l'espace utilisé et le temps utilisé pour manipuler les données
+	- Les performances de nos algorithmes vont dépendre des structures de données qu'on utilise
+	- Doit donc réfléchir avec attention aux structures de données utilisées dans un programme/une application
+      - Exemple avec Collection
+	- Représente un ensemble de données
+	- Permet de
+	  - Créer une collection vide
+	  - Tester si une collection est vide
+	  - Lister les éléments de l'ensemble
+	  - Vérifier si un élément est dans l'ensemble
+	  - Ajouter un élément à l'ensemble
+	  - Retirer un élément à l'ensemble
+    - [X] Collection de taille fixe
+    - [X] Collection de taille variable via Tableau
+      - Peut proposer une structure de données qui utilise un tableau
+      - Utilise un tableau de taille n (avec n p-e plus grand que le nombre actuels d'éléments m)
+      - Garde n, la taille du tableau actuel
+      - Garde m, le nombre actuels d'éléments
+      - Lister les éléments : O(m)
+      - Ajouter un élément à la fin : O(1) si m + 1 < n, O(allouer tableau + n) sinon (doit créer un nouveau tableau, recopier le contenu de l'ancien tableau dedans, puis ajouter le nouvel élément)
+      - Ajouter un élément entre deux autres éléments : O(n) si m + 1 < n (doit décaler les valeurs suivantes du tableau), O(allouer tableau + n) sinon
+      - Retirer un élément : O(m) (doit supprimer la valeur, puis décaler les valeurs du tableau)
+      - C'est le fonctionnement de ArrayList en Java
+      - Inclure des diagrammes avec Arteoz
+    - [X] Collection de taille variable via Liste chaînée
+      - Une autre structure de données possible pour représenter une Collection est une liste chaînée
+    - [X] Piles et Files
+    - [X] Table de hachage
+    - [X] Récapitulatif
+      - Quelles structures de données en fonction du besoin ?
+	- Si collection de taille fixe => tableau
+	- Si collection de taille fixe, avec grand nombre de recherche par rapport aux modifications => tableau trié
+	- Si collection de taille dynamique, avec surtout ajout à la fin => tableau à taille variable
+	- Si collection de taille dynamique, avec ajout n'importe où => liste chaînée
+	- Si collection de taille dynamique, avec grand nombre de recherches par rapport aux ajouts, avec adressage direct => dictionnaire
+    - [?] Tas
+- AlgoDist : Déroulé TD1
+  - Pas trop mal passé j'ai l'impression
+  - Eu quelques questions/remarques intéressantes sur le cours
+    - Notamment remarque comme quoi un système avec leader est partiellement indisponible si leader rencontre une panne
+  - Leur a demandé de finir l'exo 2 pour la prochaine séance
+- Prog2 : Déroulé TD4
+  - Rencontré beaucoup de difficultés en amont de l'implémentation des algorithmes de tri
+    - La différence entre la déclaration et l'appel de méthodes n'est pas claire
+      - J'ai le sentiment qu'ils pensent que l'ordre de déclaration des méthodes correspond à leur ordre d'utilisation
+      - Ne voient pas de manière atomique chacune des méthodes
+      - Par exemple, essaient dans swap() d'accéder aux données de la méthode clone()
+    - La notion de this n'est pas maitrisée par beaucoup d'étudiant-es
+      - Ne voient pas à quoi ça correspond
+    - La notion de variable n'est pas maitrisée non plus
+      - Lorsque besoin de stocker une valeur, ne voient pas forcément comment faire
+    - Ont beaucoup de mal avec le type de retour aussi
+      - P-e une confusion entre MyArray et int[] dans le cadre de ce TD
+  - A seulement implémenté et corrigé bubbleSort()
+  - Leur a donné la signature de selectionSort() et insertionSort()
+  - Et leur a demandé de les implémenter pour la prochaine fois
+  - Planning pour la suite
+    - Reste
+      - 2 séances avant les vacances
+      - 3 séances après
+    - A prévu encore 1 séance sur les algos de tri
+    - 2 séances sur les listes chaînées, tables de hachage, pile & file
+    - 2 séances sur les arbres binaires de recherche
+    - À ce moment là, peut p-e donner le TD4 en DM
+      - Pour le <2022-04-10 Sun>
+** Semaine du <2022-03-21 Mon> au <2022-03-25 Fri>
+*** Planned
+**** DONE Prog2 : Préparer CM4
+- Prévu le <2022-03-23 Wed>
+- Porte sur les structures de données
+- Plan
+  - Motiver l'utilisation des structures de données adaptées
+    - Opérations de base : rechercher, ajouter un élément, retirer un élément
+  - Tableau
+    - Ajouter des exemples d'insertion/suppression
+    - Donner cas d'utilisations
+  - Liste chainée
+    - Voir comment implémenter ça (utilisation de Sentinelle ou non?)
+  - Pile
+  - File
+  - Table de hachage
+- Remettre le tas ?
+- Le cours de Pierre me paraît pas adapté ici
+- Reprendre et développer celui de Charles
+**** DONE AlgoDist : Préparer TD sur Bellman-Ford
+- Séance de TD a lieu le <2022-03-25 Fri>
+- Modifier le sujet pour retirer la partie sur le modèle asynchrone
+- Se focaliser sur Bellman-Ford
+**** TODO Prog2 : Préparer DM2
+- Porte sur QuickSelect
+- Peut le donner à l'issue de la 2nde séance sur les tris du groupe 3, le <2022-03-24 Thu>
+- Peut sinon le donner la semaine du <2022-03-28 Mon>
+- Dans tous les cas, à rendre pour le <2022-04-10 Sun>
+- Peut aussi donner le TD4 à terminer comme DM
+**** TODO Prog2 : Préparer TD5
+- Ma 1ère séance a lieu le <2022-03-30 Wed>
+- Porte sur les structures de données
+- Le sujet de TD de l'an dernier me paraît pas mal
+- Revoir un peu le code, si y a des choses à modifier
+**** TODO Papier : Effectuer corrections
+*** Done
+- AlgoDist : Préparer TD sur Bellman-Ford
+  - SSSP : Single-Source Shortest Path
+  - J'ai un problème avec l'algorithme présenté dans le sujet de TD : il ne s'agit pas de l'algo de Bellman-Ford IMO
+  - Notamment, plusieurs notions me paraissent manquantes
+    - Absence de poids sur les arêtes
+    - Absence de poids négatifs
+    - Absence de détection de cycle
+  - Donc c'est un algorithme qui permet effectivement pour chaque noeud de déterminer le plus court chemin vers un noeud donné
+    - Mais gros doute sur le fait qu'il s'agisse de la version distribuée de Bellman-Ford
+  - La page suivante décrit une version distribuée de Bellman-Ford
+    - https://www.lewuathe.com/illustration-of-distributed-bellman-ford-algorithm.html
+  - Plutôt cette version que je vais leur enseigner
+  - Ce qui n'est pas clair avec cette version
+    - Noeuds connaisssent taille du réseau ?
+    - Condition d'arrêt
+    - Mécanisme de détection des cycles négatifs
+    - Gestion de l'évolution du poids des arêtes
+  - Le blogpost mentionne /Network Warrior: Everything You Need to Know That Wasn't on the CCNA Exam/ comme référence pour en apprendre plus à ce sujet
+    - Dispo ici : https://doc.lagout.org/network/Network%20Warrior%2C%202nd%20Edition.pdf
+  - Condition d'arrêt
+    - Semble être tant que la table de routage est mise à jour
+    - Ce qui pose problème en cas de cycle négatif
+  - Cycle négatif
+    - Est-ce que c'est possible d'avoir un cycle négatif en pratique ?
+    - Question subsidiaire : comment on évalue le poids d'une arête en pratique ? (latence réseau ?)
+  - Notes /Network Warrior/
+    - Protocole RIP utilise le nombre de hop comme métrique pour déterminer le plus court chemin
+    - D'autres protocoles utilisent la bande-passante des liens (OSPF) ou la latence (EIGRP)
+    - RIP est un /distance-vector routing protocol/
+    - Ce type de protocole souffre du problème de /counting to infinity/
+      - Pour l'éviter, limite le nombre de hop effectué
+      - RIP stop l'exécution du protocole après 15 hops
+	- Donc ne gère pas les paths de 16+ hops
+      - RIPv2 augmente cette limite à 255
+	- Donc ne gère pas les paths de 256+ hops
+	- Moins gênant
+	- Par contre ne prend pas en compte les propriétés des liens du réseau
+	- Peut par exemple favoriser un chemin de 3 hops mais avec une bande passante de 1.5 Mbps à un chemin de 4 hops mais avec une bande passante de 1000 Mbps
+    - Les /link-state routing protocols/ prennent en compte cette donnée dans leur prise de décision
+    - /Poison reverse/
+      - Pour qu'un routeur informe un autre qu'une route n'est plus viable, utilise la méthode de /route poisoning/
+      - Consiste à envoyer une valeur aberrante par rapport à cette route de façon à condamner cette entrée
+      - Pour RIP par exemple, un routeur peut envoyer la valeur 16 (aberrante car normalement que 15 hops de permis) à un autre routeur
+      - À la reception d'un /route poisoning/, le routeur receveur renvoie à l'émetteur le /route poisoning/ : s'agit du /poison reverse/
+      - Méthode utilisée par les /distance vector routing protocols/
+    - /Split horizon/
+      - Technique utilisée pour détecter les boucles
+      - When split horizon is enabled, routes that the routing protocol learns are not advertised out the same interfaces from which they were learned.
+      - Comprend pas ce que ça veut dire
+      - À creuser
+    - Ne mentionne pas Bellman-Ford
+    - Ne rentre pas non plus dans le détail des algorithmes pour créer le /spanning tree/ sur un réseau ou pour créer la table de routage
+    - Voir pour une autre source
+  - L'article /On the Distributed Bellman-Ford Algorithm and the Looping Problem/ semble présenter la version distribuée de Bellman-Ford
+    - Et proposer des améliorations pour gérer l'évolution des poids des arêtes
+    - Dispo ici : https://dl.acm.org/doi/10.1287/ijoc.1060.0195
+  - A pu récupérer l'article
+  - Notes /On the Distributed Bellman-Ford Algorithm/
+    - Version distribuée décrite ci-dessous
+    - Chaque noeud maintient
+      - la liste des coûts des chemins entrants
+      - le noeud précédent (vers qui router) courant
+      - la distance actuelle de la source
+    - Lorsque reçoit une nouvelle distance d'un de ses voisins, compare par rapport à la distance actuelle
+    - Met à jour distance et noeud précédent si meilleure
+    - Algorithme s'interrompt si plus de mises à jour au niveau du réseau
+      - Comment détecte cela ?
+      - On sait que l'algo s'arrête au bout de n-1 itérations
+      - Mais besoin de connaître n dans ce cas
+    - Fonctionne
+  - Questions
+    - [X] Ça correspond à quoi un chemin négatif ?
+      - Aucun sens dans système distribué
+    - [X] Comment détecte fin de l'algo ?
+      - Peut soit boucler jusqu'à plus de modifications
+      - Mais incorrect si poids des arêtes peut évoluer
+      - Dans ce cas, doit boucler jusqu'à l'infini en fait
+      - En fait, si envoie des messages à chaque itération,
+    - [X] Comment gère mise à jour du coût des chemins ?
+      - Comment algo gère le fait que le plus court chemin n'existe plus ?
+      - Chaque noeud se souvient de son précédent
+      - Lorsque le précédent informe le noeud que sa distance a changé, le noeud se met à jour
+  - Plan du TD
+    - Leur fournir l'algorithme de Bellman-Ford en centralisé
+    - Les mener à une version distribué
+      - Quelles informations doit stocker chaque noeud ?
+      - Quel est le comportement du leader ?
+      - Quel est le comportement d'un follower ?
+      - Quelle est la condition d'arrêt ?
+    - Quel est l'impact d'un cycle négatif sur la version distribuée de l'algorithme de Bellman-Ford ?
+    - Un système distribué peut évoluer au cours du temps
+    - Cas 1 : On considère que le poids d'une arête peut diminuer
+      - Que se passe-t-il à ce moment ?
+      - Quelle modification peut-on apporter à l'algorithme pour pallier à ce problème ?
+    - Cas 2 : On considère que le poids d'une arête peut augmenter
+      - Notamment le poids d'une arête peut augmenter
+      - Quel est l'impact de l'augmentation du poids sur l'algorithme ?
+      - Comment modifier algorithme pour prendre en compte cette possibilité ?
+- Prog2 : Déroulé TD du <2022-03-24 Thu>
+  - Un peu laborieux
+  - Pas réussi à leur faire comprendre le rôle de /merge()/ avant un bon moment
+  - Dérouler un exemple lors des séances avec les autres groupes pour démarrer
+- Prog2 : Préparer TD5
+  - [ ] Linked-List
+    - Implémenter une classe *Node* qui possède une valeur et une ref au suivant
+    - Implémenter une classe *LinkedList* qui possède un *Node*
+    - Implémenter méthode *addHead()*
+    - Implémenter méthode *getSize()*
+    - Implémenter méthode *toString()*
+    - Implémenter méthode *has()*
+    - Implémenter méthode *removeHead()*
+    - Implémenter méthode *add()*
+    - Implémenter méthode *remove()*
+** Semaine du <2022-03-28 Mon> au <2022-04-01 Fri>
+*** Planned
+**** DONE Prog2 : Préparer DM2
+- Porte sur QuickSelect
+- Peut le donner à l'issue de la 2nde séance sur les tris du groupe 3, le <2022-03-24 Thu>
+- Peut sinon le donner la semaine du <2022-03-28 Mon>
+- Dans tous les cas, à rendre pour le <2022-04-10 Sun>
+- Peut aussi donner le TD4 à terminer comme DM
+**** DONE AlgoDist : Setup module Arche pour 4A
+**** DONE Prog2 : Préparer TD5
+- Ma 1ère séance a lieu le <2022-03-30 Wed>
+- Porte sur les structures de données
+- Le sujet de TD de l'an dernier me paraît pas mal
+- Revoir un peu le code, si y a des choses à modifier
+**** DONE Prog2 : Mettre en ligne correction du TD3 et du DM
+**** IN-PROGRESS Prog2 : Corriger DM1
+**** IN-PROGRESS Papier : Effectuer corrections
+- Les modifications suivantes sont à apporter suite à notre réunion de fin février avec Olivier & Gérald
+- Intro section 5
+  - Plutôt que d'introduire des notions supplémentaires (autorité centrale, organisation qui fournit le core...)
+  - Indiquer qu'on veut un système avec des noeuds égaux en droits et responsabilités
+- Intro section 7
+  - Indiquer qu'on ne se compare pas aux systèmes reposant sur un algorithme de consensus car visons des systèmes différents
+  - Mais que l'évaluation de RLS avec 1 seul bot qui effectue le renommage correspond aux performances de RLS dans de telles conditions, en omettant le coût e l'algorithme de consensus
+**** TODO AlgoDist : Préparer exercice DS
+*** Done
+- Prog2 : Préparer DM2
+  - Part sur finir le TD4 comme DM
+  - [X] Rédiger consignes
+    - Rendre classe *MyArray*
+    - Doit contenir
+      - Implémentation des différents algos de tri quadratiques
+      - Implémentation de /mergeSort()/
+      - Implémentation de /quickSort()/
+      - Implémentation de /quickSortOpt()/
+      - Implémentation de la comparaison
+  - [X] Créer dépôt
+- Prog2 : Préparer TD5
+  - [X] Linked-List
+    - Implémenter une classe *Node* qui possède une valeur et une ref au suivant
+    - Implémenter une classe *LinkedList* qui possède un *Node*
+    - Implémenter méthode *isEmpty()*
+    - Implémenter méthode *addHead()*
+    - Implémenter méthode *getSize()*
+    - Implémenter méthode *get()*
+    - Implémenter méthode *toString()*
+    - Implémenter méthode *has()*
+    - Implémenter méthode *removeHead()*
+    - Implémenter méthode *add()*
+    - Implémenter méthode *remove()*
+  - [X] HashTable
+    - Implémenter constructeurs (un de taille par défaut, par ex 26, l'autre de taille définie par l'utilisateur)
+    - Implémenter méthode de hash naive
+      - Peut convertir un caractère en entier en le castant => (int) s.charAt(0)
+    - Implémenter *add()*
+    - Implémenter *has()*
+    - Implémenter *toString()*
+    - Implémenter *remove()*
+    - Implémenter méthode hash moins naive
+    - Implémenter facteur de compression
+    - Implémenter *rehash()*
+  - A revu la partie sur HashTable pour leur faire implémenter une hiérarchie de classes
+- Prog2 : Corriger DM1
+  - A recréé les groupes de TD
+  - Manque les étudiants
+    - TD2 : Théo Debonnet
+    - TD2 : Emmanuel Viallet
+  - J'ai un étudiant d'inscrit au module qui n'apparait sur une aucune de mes listes : Nicolas Golik
+    - Voir à quel groupe de TD il appartient
+    - Il appartient au TD4 finalement
+  - Les a tous ajouté
+- Papier : Effectuer corrections
+  - [ ] Intro section 5
+  - [ ] Intro section 7
 * Backlog
 * Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
