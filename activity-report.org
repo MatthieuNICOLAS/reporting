@@ -23941,16 +23941,19 @@ Failed to publish
 - Le sujet de TD de l'an dernier me paraît pas mal
 - Revoir un peu le code, si y a des choses à modifier
 **** DONE Prog2 : Mettre en ligne correction du TD3 et du DM
-**** IN-PROGRESS Prog2 : Corriger DM1
-**** IN-PROGRESS Papier : Effectuer corrections
+**** DONE Papier : Effectuer corrections
 - Les modifications suivantes sont à apporter suite à notre réunion de fin février avec Olivier & Gérald
 - Intro section 5
   - Plutôt que d'introduire des notions supplémentaires (autorité centrale, organisation qui fournit le core...)
   - Indiquer qu'on veut un système avec des noeuds égaux en droits et responsabilités
 - Intro section 7
   - Indiquer qu'on ne se compare pas aux systèmes reposant sur un algorithme de consensus car visons des systèmes différents
-  - Mais que l'évaluation de RLS avec 1 seul bot qui effectue le renommage correspond aux performances de RLS dans de telles conditions, en omettant le coût e l'algorithme de consensus
-**** TODO AlgoDist : Préparer exercice DS
+  - Mais que l'évaluation de RLS avec 1 seul bot qui effectue le renommage correspond aux performances de RLS dans de telles conditions, en omettant le coût de l'algorithme de consensus
+- La lettre de réponse mentionne aussi l'ajout d'un paragraphe dans section 9.1
+  - Section concernant la discussion par rapport à core-nebula
+  - Voir ce qu'on devait reformuler ici
+**** DONE AlgoDist : Préparer exercice DS
+**** IN-PROGRESS Prog2 : Corriger DM1
 *** Done
 - Prog2 : Préparer DM2
   - Part sur finir le TD4 comme DM
@@ -23998,8 +24001,173 @@ Failed to publish
     - Il appartient au TD4 finalement
   - Les a tous ajouté
 - Papier : Effectuer corrections
-  - [ ] Intro section 5
-  - [ ] Intro section 7
+  - [X] Intro section 5
+  - [X] Intro section 7
+    - Pourquoi je n'ai pas envie de comparer RLS à core-nebula ?
+      - Principale différence entre les systèmes n'est pas quelque chose de mesurable : il s'agit des types de systèmes compatibles
+      - Pour une évaluation honnête, devrait ajouter et faire varier des paramètres ayant une influence sur l'exécution du protocole de consensus
+      - Revient finalement à évaluer le coût du protocole de consensus
+    - Suis parti sur l'argument : c'est une différence d'un point de vue system model, pas d'un point de vue performance
+    - Que la comparaison entre les deux approches se fait plutôt sous la forme d'une discussion du coup
+  - [X] Section 9.1
+    - Restait la question de la notion de /central authorities/
+      - Est-ce que je la laisse dans cette section ?
+- AlgoDist : Préparer exercice DS
+  - Qu'est-ce que je peux leur donner ?
+    - Peut leur redonner LCR à refaire
+      - Écrire algorithme, complexité en temps et messages
+    - Et un exercice où je leur donne un algo et où iels doivent représenter ses 1ères étapes
+    - Ou alors celui sur le réseau torique
+  - J'ai discuté avec Vincent
+  - Il est ok pour quelques questions de cours et l'exo sur LCR
+  - Je pars là-dessus
+** Semaine du <2022-04-04 Mon> au <2022-04-08 Fri>
+*** Planned
+**** DONE AlgoDist : Préparer correction
+- Vincent s'est proposé d'aussi corriger ma partie
+- Lui préparer au moins la correction
+**** DONE Papier : Soumettre nouvelle version
+**** IN-PROGRESS Prog2 : Corriger DM1
+**** IN-PROGRESS Prog2 : Préparer CM5
+- Porte sur les arbres
+**** TODO Polytech : Répondre à ASSAL
+- Me demande quelle école du réseau Polytech intégrer pour étudier l'info
+- Voir vers qui je peux le rediriger
+- Le classement peut être une bonne façon de viser sinon : https://www.letudiant.fr/palmares/liste-profils/palmares-des-ecoles-d-ingenieurs/palmares-general-des-ecoles-d-ingenieurs/home.html
+**** TODO Prog2 : Préparer TD6
+- Porte sur les arbres
+*** Done
+- Papier : Soumettre nouvelle version
+  - [X] Générer main de l'article (article sans annexes)
+  - [X] Générer lettre de réponse
+  - [X] Générer annexes de l'article
+  - [X] Générer diff-v2-v3 de l'article
+- Prog2 : Préparer CM5
+  - Manque d'une partie motivation dans le cours et d'une indication des cas d'usages
+  - Motivation
+  - Cas d'utilisations
+    - Ropes pour représenter les longues chaînes de caractères (éditeur de texte)
+      - Performances stables peu importe la taille de la chaîne de caractères
+	- Alors qu'utiliser un tableau aurait un coût de plus en plus important
+      - Ropes vs. linked list ?
+	- Permet une recherche plus rapide puisque dichotomique par essence
+	- Permet ainsi des opérations de manipulation plus rapide en milieu de chaîne
+    - Splay tree
+      - Arbre binaire de recherche "remontant" les éléments accédés récemment pour pouvoir y ré-accéder rapidement si besoin
+  - Plan
+    - Principes
+    - Représentation
+    - Vocabulaire (racine, noeud intermédiaire, feuille, profondeur, hauteur, degré)
+    - Différents types d'arbres
+      - Arbre de recherche
+      - Tas
+      - Arbre de décision
+    - S'intéresse à une structure particulière : arbre binaire de recherche
+    - Principes
+    - Différents types de parcours (infixe, préfixe, postfixe)
+    - Minimum et maximum
+    - Ajout
+    - Suppression
+    - Équilibre
+- Remarques cours ProgAlgo2
+  - Étudiant-es n'ont vraiment pas les bases
+  - Ne comprennent pas que définir une nouvelle classe, c'est définir un nouveau type
+    - Si créé une classe Point, n'arrive à utiliser cette classe dans autre classe Carre
+  - Ne connaissent pas this
+    - Ne se rendent pas compte qu'ils ont accès aux propriétés de l'instance sur laquelle la méthode est appelée dans la méthode
+  - Confondent variables et attributs
+    - À chaque fois que besoin d'une variable, définissent attribut
+  - Ne comprennent pas la différence entre déclaration de méthodes et appels de méthodes
+    - Ont l'air de penser que méthodes appelées dans leur ordre de déclaration
+  - Ne comprennent pas ce qu'est le type de retour
+  - Ne comprennent pas le principe de référence
+  - Ne connaissent pas getters et setters
+  - Ne connaissent pas la surcharge de méthode
+- Préparation réunion manuscrit
+  - Où est-ce que j'en étais ?
+    - Intro
+      - Rien fait
+    - État de l'art
+      - Systèmes distribués
+	- Seulement les grandes lignes
+      - Transformées opérationnelles
+	- Seulement les grandes lignes
+	- Manque encore TP1 et TP2
+      - Manque spécification faible et forte des séquences
+      - Sequence CRDTs
+	- A un peu plus détaillé cette section
+	- Principe des CRDTs
+	- Familles de CRDTs
+	  - Doit encore détailler State-based et Delta-based
+	- Adoption
+      - Reste encore à faire tout l'état de l'art sur les Sequence CRDTs
+	- Approche tombstone-based
+	- Approche identifier-based
+      - Partie sur LogootSplit assez détaillée
+	- Présente le modèle de données et les opérations définies dessus
+	- Présente le modèle de livraison
+	- Présente les limites
+      - Début d'une section sur les limites des Sequence CRDTs actuels
+    - RLS
+      - Avais traduit la 1ère version de l'article
+      - Avais commencé à ajouter des parties spécifiques à la thèse
+	- Analyse en complexité des opérations /insert/, /remove/, /naive rename/ et /rename/
+	- Définition d'autres relations de priorité pour minimiser les traitements
+	- Report de la transition vers la nouvelle epoch cible
+	- Utilisation de l'opération /rename/ comme mécanisme de compression de l'operation log
+	- Implémentation log-based
+      - Restait à traduire
+	- Stratégie pour la génération des opérations /rename/
+	- Related work
+      - Manque pistes de recherche
+	- De ce que je vois, à plutôt l'air de se mettre dans le chapitre Conclusion
+	  - Pourrait avoir une entrée pour chaque chapitre contribution (RLS et MUTE)
+	- Stratégies pour /rename/
+	- Autres relations /priority/
+	- Epoch-based Version Vector
+	  - Serait intéressant de creuser cette idée et de poser ses bases dans un document public
+	    - Et pas juste dans mes carnets de notes
+	  - Me donnerait l'occasion d'en discuter avec Gérald
+        - DFS/DVCS
+	  - Voir Memo
+    - MUTE
+      - Toujours du mal à voir c'est quoi l'angle de ce chapitre
+      - Avais commencé à détailler plan
+      - Présentais chacune des couches de l'appli
+	- Interface
+	- Réplication
+	- Sécurité
+	- Réseau
+      - Pour pistes de recherches
+	- Documents hierarchisés
+	  - Revoir travaux de Claudia, Luc et maintenant Peritext
+	    - https://www.inkandswitch.com/peritext/
+        - Droits d'accès
+	- Rôles et places des serveurs/bots dans systèmes collaboratifs
+    - Conclusion
+      - Rien fait
+    - Depuis, des ajouts et modifications ont été effectués dans l'article
+      - Contribution > annulation de l'opération de renommage
+      - Evaluation > pistes d'améliorations pour les perfs de l'opération /rename/
+      - Evaluation > temps pour rejeu de l'operation log
+      - Evaluation > analyse en complexité du mécanisme de GC des epochs
+  - Plan
+    - Finir chapitre RLS
+      - Mettre à jour le manuscrit par rapport à l'article
+      - Ajouter les parties manquantes
+    - Compléter chapitre État de l'art
+      - Rédiger partie sur CRDTs
+      - Rédiger partie sur systèmes distribués
+      - Ajouter partie sur spécification de la séquence répliquée
+      - Rédiger partie sur OT
+    - Chapitre MUTE
+      - Aurais tendance à le garder pour papillonner pendant que je rédige RLS, État de l'art et Intro
+- Réunion manuscrit
+  - Rendu du chapitre RLS : <2022-05-11 Wed>
+  - Rendu du chapitre MUTE : <2022-05-31 Tue>
+    - Uniquement descriptif
+  - Puis chapitre État de l'art
+    - Peut omettre partie sur OT dans 1ère version
 * Backlog
 * Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
