@@ -1,4 +1,3 @@
-
 #+STARTUP: inlineimages
 #+TODO: TODO IN-PROGRESS CANCELLED DONE
 
@@ -24027,13 +24026,13 @@ Failed to publish
 - Vincent s'est proposé d'aussi corriger ma partie
 - Lui préparer au moins la correction
 **** DONE Papier : Soumettre nouvelle version
-**** IN-PROGRESS Prog2 : Corriger DM1
-**** IN-PROGRESS Prog2 : Préparer CM5
+**** DONE Prog2 : Préparer CM5
 - Porte sur les arbres
-**** TODO Polytech : Répondre à ASSAL
+**** DONE Polytech : Répondre à ASSAL
 - Me demande quelle école du réseau Polytech intégrer pour étudier l'info
 - Voir vers qui je peux le rediriger
 - Le classement peut être une bonne façon de viser sinon : https://www.letudiant.fr/palmares/liste-profils/palmares-des-ecoles-d-ingenieurs/palmares-general-des-ecoles-d-ingenieurs/home.html
+**** IN-PROGRESS Prog2 : Corriger DM1
 **** TODO Prog2 : Préparer TD6
 - Porte sur les arbres
 *** Done
@@ -24058,17 +24057,17 @@ Failed to publish
     - Principes
     - Représentation
     - Vocabulaire (racine, noeud intermédiaire, feuille, profondeur, hauteur, degré)
-    - Différents types d'arbres
-      - Arbre de recherche
-      - Tas
-      - Arbre de décision
+    - Différents types de parcours (infixe, préfixe, postfixe)
     - S'intéresse à une structure particulière : arbre binaire de recherche
     - Principes
-    - Différents types de parcours (infixe, préfixe, postfixe)
     - Minimum et maximum
     - Ajout
     - Suppression
     - Équilibre
+    - Différents types d'arbres
+      - Arbre de recherche
+      - Tas
+      - Arbre de décision
 - Remarques cours ProgAlgo2
   - Étudiant-es n'ont vraiment pas les bases
   - Ne comprennent pas que définir une nouvelle classe, c'est définir un nouveau type
@@ -24168,7 +24167,189 @@ Failed to publish
     - Uniquement descriptif
   - Puis chapitre État de l'art
     - Peut omettre partie sur OT dans 1ère version
+** Semaine du <2022-04-25 Mon> au <2022-04-29 Fri>
+*** Planned
+**** DONE Thèse : Ajouter partie sur analyse complexité en temps du mécanisme de GC des époques
+- Nouvelle partie présente dans la version actuelle du papier
+- L'ajouter au manuscrit
+**** DONE Thèse : Ajouter partie sur évaluation temps de rejeu du log
+**** DONE Thèse : Ajouter partie sur évaluation impact de la fréquence du /rename/
+**** DONE Thèse : Traduire partie sur l'approche /core-nebula/
+**** DONE Prog2 : Préparer TD6
+- Porte sur les arbres
+**** DONE Prog2 : Proposer barème DM2
+- Voir pour proposer et convenir d'un barème avec Hans
+- Mettre l'accent sur /quickSort()/
+- De mémoire, Hans avait donné le code du benchmark à ses étudiants
+  - Peut prévoir des points dessus pour mes groupes
+  - Et lui permettre de les redistribuer à sa guise pour les siens
+- Décider si c'est /10 ou /15
+**** DONE Stage : Répondre à Bontemps
+- Un étudiant 2A de TN m'a contacté pour sa recherche de stage
+- Lui dire que je compte pas superviser de stage cette année
+- Mais que s'il me précise sa spé/ce qu'il recherche (dev, réseau, IA...) et me passe un CV
+- Peut le transmettre dans l'équipe ou à des personnes que je connais dans d'autres équipes du labo
+**** TODO Thèse : Traduire partie sur l'approche /LSEQ/
+**** IN-PROGRESS Prog2 : Corriger DM1
+**** TODO Thèse : Ré-écrire partie sur /revertRenameId/
+- La 1ère version à ce sujet du papier était imbitable
+- On l'avait amélioré
+- Voir pour mettre à jour la traduction dans le manuscrit
+**** TODO Thèse : Ajouter axes d'améliorations pour performances de /rename/ dans partie sur son évaluation
+- Avait traduit la 1ère version de cette partie
+- Faisait le constat des perfs, mais n'indiquait pas de moyen sur comment les améliorer
+- A ajouté des axes d'améliorations dans l'article
+- Traduire et ajouter le nouveau contenu
+- Voir comment insérer cela dans manuscrit
+  - Dans la partie /Évaluation/ ?
+  - Ou faire une partie /Améliorations/ avec le contenu de la partie /Discussion/ ?
+    - Mais dans ce cas, qu'est-ce que je peux mettre avec la partie sur stratégie pour /rename/ ?
+**** TODO Thèse : Ajouter partie sur stratégie pour /rename/
+- N'avait pas encore été traduit semblerait
+- Voir où l'insérer
+**** TODO Thèse : Rédiger partie sur complexité en temps de l'opération /rename/
+*** Done
+- Thèse : Traduire partie sur l'approche /core-nebula/
+  - Pose la question d'à quel moment je présente /core-nebula/
+    - Et ce que je présente à ce moment là
+  - Me parait pas déconnant d'avoir une présentation de /core-nebula/ dans l'état de l'art
+  - Mais devrait avoir une comparaison à la fin du chapitre sur RLS à mon sens
+  - Me souviens plus ce que l'on avait dit à ce sujet avec Gérald & Olivier
+  - Pour le moment, traduire le contenu de l'article à la fin du chapitre sur RLS
+  - Verra pour adapter le contenu au format du manuscrit ensuite
+- Prog2 : Préparer TD6
+  - A revu le code par rapport à celui de Charles
+    - L'a éclaté en plusieurs fichiers distincts (*Node*, *MyBinarySearchTree*, *Main*)
+  - A demandé des méthodes supplémentaires
+    - /getPredecessor()/, /getSuccessor()/
+  - Quelques difficultés pour /insert()/ et /remove()/
+    - /remove()/ s'écrit plus facilement en faisant une fonction qui retourne le noeud courant mis à jour
+      - Si c'est le noeud à supprimer, le met à jour avec une des 3 règles (null, fils, ou successeur)
+      - Sinon, le met à jour en mettant à jour son sous-arbre concerné par la suppression
+    - Me parait pas très intuitif comme manière de raisonner
+      - Voir comment je vais passer ça aux étudiant-es
+    - /insert()/ peut aussi s'implémenter façon simple de cette manière
+    - Mais me parait plus intuitif d'écrire un algo où c'est le parent qui vérifie si l'élément à insérer est son fils
+    - Me retrouve donc avec deux façons différentes de raisonner pour ces méthodes
+    - Voir si j'uniformise
+- Prog2 : Proposer barème DM2
+  - /selectionSort()/ : /1
+  - /insertionSort()/ : /1
+  - /bubbleSortOpt()/ : /1
+  - /partition()/ : /2
+  - /quickSort()/ : /1
+  - /quickSortOpt()/ : /2
+  - /benchmark/ : /2
+  - Avec un point de malus si le code n'est pas propre
+** Semaine du <2022-05-02 Mon> au <2022-05-06 Fri>
+*** Planned
+**** DONE Thèse : Ajouter partie sur stratégie pour /rename/
+- N'avait pas encore été traduit semblerait
+- Voir où l'insérer
+**** DONE Thèse : Ajouter axes d'améliorations pour performances de /rename/ dans partie sur son évaluation
+- Avait traduit la 1ère version de cette partie
+- Faisait le constat des perfs, mais n'indiquait pas de moyen sur comment les améliorer
+- A ajouté des axes d'améliorations dans l'article
+- Traduire et ajouter le nouveau contenu
+- Voir comment insérer cela dans manuscrit
+  - Dans la partie /Évaluation/ ?
+  - Ou faire une partie /Améliorations/ avec le contenu de la partie /Discussion/ ?
+    - Mais dans ce cas, qu'est-ce que je peux mettre avec la partie sur stratégie pour /rename/ ?
+**** DONE Thèse : Ré-écrire partie sur /revertRenameId/
+- La 1ère version à ce sujet du papier était imbitable
+- On l'avait amélioré
+- Voir pour mettre à jour la traduction dans le manuscrit
+**** DONE Thèse : Rédiger partie sur complexité en temps de l'opération /rename/
+**** DONE Thèse : Mettre à jour descriptions des figures
+- Les captions sont en anglais
+  - Directement tirées de l'article
+- Les traduire
+**** DONE Thèse : Fix les figures
+- Certaines figures présentent un décalage entre l'époque courante et le contenu de la séquence
+- Aussi, mettre en majuscules les lettres insérées par les opérations
+**** DONE Thèse : Mettre à jour les tableaux
+- J'ai modifié les tableaux de résultats dans l'article suite aux retours des reviewers
+- MàJ ceux de la thèse en conséquence
+**** DONE Thèse : Traduire partie sur l'approche /LSEQ/
+**** IN-PROGRESS Prog2 : Corriger DM1
+*** Done
+** Semaine du <2022-05-09 Mon> au <2022-05-13 Fri>
+*** Planned
+**** DONE Prog2 : Mettre à disposition le partiel de l'an dernier et le commenter
+- Voir quels exercices me paraissent intéressants et dont je vais m'inspirer
+- Indiquer les exercices qui, au contraire, ne me plaisent pas
+**** DONE Thèse : Développer explications mécanisme de compression de l'opération /rename/
+**** DONE Thèse : Définir noms pour autoref
+- Certains objets ne possèdent pas de noms pour autoref
+- Objets concernés
+  - Sous-figure
+  - Propriété
+  - Algorithme
+  - Annexe
+**** DONE Thèse : Uniformiser /vecteur d'état/ et /vecteur de version/
+- Utilise les deux à l'heure actuelle dans le texte
+- Trancher pour ne garder qu'un terme
+**** DONE Thèse : Remplacer les types par du texte
+- À plusieurs endroits, j'utilise le type dans du texte français
+  - Par exemple, /idInterval/
+- Remplacer par le type en fr
+**** TODO Thèse : Illustrer utilité de reporter transition vers nouvelle époque cible
+**** TODO Thèse : Ajout exemple pour /revertRenameId()/ nécessitant /MIN_TUPLE/ ou /MAX_TUPLE/
+*** Done
+- Prog2 : Mettre à disposition le partiel de l'an dernier et le commenter
+  - Complexités
+    1. Nope
+       - Me parait être des maths plutôt qu'autre chose
+       - Pas particulièrement intéressant
+    2. Oui
+       - Typiquement le genre d'exo de complexité que j'avais en tête
+  - Récurrences
+    1. Calcul de complexité par arbre de récurrence : ?
+       - Bonne question
+       - Me parait pas super intéressant
+       - Me parait pas compliqué non plus
+    2. Écrire algo récursif puis calculer sa complexité par arbre de récurrence
+       - Cool
+       - Mais on a pas eu l'occasion de faire ce type d'exercice en TD
+       - Devait le faire avec /mergeSort()/, mais pas eu le temps avec mes groupes en tout cas
+  - Tris
+    1. Questions de cours : Oui
+    2. Tri rapide : Oui
+    3. Tri par tas : Nope
+  - Structures de données
+    1. Table de hachage : Oui
+    2. File : Oui
+  - Arbres binaires
+    1. Dessin : Oui
+    2. PAC : Oui
 * Backlog
+** TODO Thèse : Ajouter algorithme de /getPathBetweenEpochs()/
+- Dans l'algorithme /insRemote()/, je décris comment on traite une insertion distante
+- Dans cet algorithme, j'utilise plusieurs fonctions helpers dont /getPathBetweenEpochs()/
+- Je me contente de décrire ce qu'elle fait dans le texte
+- N'ayant pas de contrainte de place, pourrait ajouter cet algorithme en annexe
+** TODO Thèse : Ajouter algorithme de /expand()/
+- Permet de convertir un *IdInterval* en *List<Id>*
+** TODO Thèse : Ajouter algorithme de /aggregate()/
+- Permet de convertir une *List<Id>* en *List<IdInterval>*
+** TODO Thèse : Ajouter algorithme de /gcEpochs()/
+** TODO Prog2 : Préparer sujet exam
+- Idées exercices
+  - Pile/File
+    - Demander de dessiner les schémas mémoires de programmes utilisant des piles et des files
+      - Peut avoir un parcours d'arbre binaire qui ajoute les noeuds dans chacune
+      - Et ensuite une boucle qui vide la pile
+      - Et une boucle qui vide qui vide la file
+      - P-e un peu lourd
+      - Peut plutôt partir d'une pile et d'une file pré-remplie
+  - Arbre binaire de recherche
+    - Écrire /getHauteur()/ qui renvoie la hauteur de l'arbre
+    - Écrire /toSortedList()/ qui renvoie une liste triée à partir de *MyBinarySearchTree*
+    - Leur fournir le code de la File et leur demander d'implémenter le parcours en largeur grâce à ça
+  - Schéma mémoire
+    - Idée de Hans
+    - Consiste à fournir le code d'une structure, un schéma mémoire
+    - Et leur demander de retrouver le main qui a mené au schéma mémoire
 * Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
