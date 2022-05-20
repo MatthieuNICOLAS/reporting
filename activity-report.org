@@ -24293,8 +24293,11 @@ Failed to publish
 - À plusieurs endroits, j'utilise le type dans du texte français
   - Par exemple, /idInterval/
 - Remplacer par le type en fr
-**** TODO Thèse : Illustrer utilité de reporter transition vers nouvelle époque cible
-**** TODO Thèse : Ajout exemple pour /revertRenameId()/ nécessitant /MIN_TUPLE/ ou /MAX_TUPLE/
+**** DONE Thèse : Ajout exemple pour /revertRenameId()/ nécessitant /MIN_TUPLE/ ou /MAX_TUPLE/
+**** IN-PROGRESS Thèse : Revoir plan du chapitre sur MUTE
+- J'étais parti pour présenter les différentes couches de MUTE, leurs objectifs et implémentations
+- Mais la discussion lors de la dernière réunion orientait plutôt vers une "simple description"
+- Voir pour réduire le scope de sections
 *** Done
 - Prog2 : Mettre à disposition le partiel de l'an dernier et le commenter
   - Complexités
@@ -24322,7 +24325,145 @@ Failed to publish
   - Arbres binaires
     1. Dessin : Oui
     2. PAC : Oui
+- Thèse : Ajout exemple pour /revertRenameId()/ nécessitant /MIN_TUPLE/ ou /MAX_TUPLE/
+  - Besoin de /MIN_TUPLE/ lorsque
+    - id ajouté causalement après l'opération /rename/
+    - et que /tail < predId/
+  - Mais besoin de montrer la nécessité d'utiliser /MIN_TUPLE/
+- Thèse : Revoir plan du chapitre sur MUTE
+  - Présentation
+    - Contexte
+      - Outils collaboratifs
+      - Éditeurs collaboratifs centralisés
+	- GoogleDoc, Etherpad
+      - Limite de ces éditeurs
+	- Scalabilité
+	- Confidentialité
+    - Nouvelle génération d'éditeurs collaboratifs
+      - Nouvelles technologies ont permis apparition de nouveaux éditeurs, décentralisés
+      - MUTE est l'un d'entre eux
+      - Développé dans équipe Coast, sert de plateforme de démos et d'expérimentations de l'équipe
+  - Objectifs
+    - Me parait ok en l'état
+  - Architecture
+    - Décomposer en 2 ? Système et logicielle ?
+    - Peut s'agir de sous-sections
+  - Couche éditeur de texte
+    - Actuellement, décrit l'éditeur de texte et MUTE d'un point de vue plus général
+    - Notamment, explique que c'est cette couche qui se charge de faire le lien entre toutes les couches
+    - Peut distinguer l'éditeur de cette autre partie
+    - Comment l'appeler ?
+      - Coordinateur dans mon rapport de stage
+  - Couche réplication
+    - La partie modèle de données du document texte me paraît pas mal
+    - À voir si je réduis le scope de la partie livraison des opérations
+      - Me paraît intéressante en l'état
+      - Mais trop détaillé par rapport au reste
+    - De même pour partie sur mécanisme d'anti-entropie
+    - De même pour partie sur collaborateurs
+** Semaine du <2022-05-16 Mon> au <2022-05-20 Fri>
+*** Planned
+**** DONE Thèse : Rédiger section livraison des opérations en exactement un exemplaire
+**** DONE Thèse : Rédiger section livraison de l'opération remove après insert
+**** DONE Thèse : Rédiger section livraison des opérations après opération rename
+**** DONE Thèse : Rédiger section mécanisme d'anti-entropie
+**** IN-PROGRESS Thèse : Rédiger section collaborateurs
+*** Done
+- Réunion thèse
+  - Retours
+    - Système modèle
+      - Ça va dépendre de ce que j'ai dit auparavant
+      - Mais p-e voir pour développer
+    - Hypothèses
+      - Pose plusieurs hypothèses à un moment du chapitre
+      - Voir pour en discuter
+	- Soit à ce moment
+	- Soit dans l'état de l'art
+      - Notamment hypothèses pour la complexité des opérations
+    - Propriétés du renommage
+      - Revoir propriétés pour définir les termes et pas juste dire comment l'opération /rename/ s'y réfère
+	- Par exemple dire ce qu'est le déterminisme avant de dire que l'opération /rename/ doit l'être
+      - Préciser les différences par rapport à [60]
+      - Les faire apparaître dans le fonctionnement du mécanisme
+    - Complexités
+      - Fournir un ordre de grandeur des différents paramètres
+      - Peut par exemple rajouter une colonne avec la formule simplifiée => n >>> reste
+    - Discussion
+      - Ajouter une synthèse
+      - Pour faire apparaitre le recul qu'on a sur la solution
+      - Et essayer de damer le commentaire "pourquoi pas fait?"
+- Réunion Netflux
+  - Questions
+    - hypercore-sdk
+      - Perennité du projet ?
+    - Utilisation de hypercore par Ink and Switch
+      - Comment ils font ?
+- Réflexions chapitre MUTE
+  - Section Discussion/Améliorations
+    - J'ai plusieurs pistes d'améliorations de MUTE que j'aimerais lister
+      - Lifeguard pour collaborateur
+      - Utiliser Interval Version Vector pour permettre la livraison /out of order/ des opérations
+      - Remplacer la topologie full-meshed par une topologie épidémique
+    - Me parait différent des perspectives
+      - Mettre en place contrôle d'accès
+      - Comparaison des différents mécanismes de synchronisation
+    - Améliorations = implémentation, Perspectives = recherche IMO
+    - Mettre en place une telle section pour pouvoir en parler ?
+- Thèse : Rédiger section collaborateurs
+  - Plan
+    - Rappeler nécessité d'établir liste des collaborateurs pour qualité de la collaboration
+    - Dire que c'est l'objectif des protocoles d'appartenance au réseau
+    - Spécifier nos requirements
+      - Besoin d'un mécanisme P2P
+      - Passant à l'échelle
+    - Choisi d'implémenter SWIM
+    - Distingue les 2 parties d'un protocole d'appartenance au réseau
+      - Mécanisme de détection des défaillances des pairs
+      - Mécanisme de dissémination des mises à jour du groupe (pairs qui ont rejoint et pairs qui ont quitté le groupe)
+    - Avons apporté modifications à l'ordre de priorité entre messages
+      - Dans version originale, un pair désigné comme défaillant l'est de manière irrévocable
+	- Alive/Suspect M inc = i < Confirm M inc = j pour tout i,j
+      - Pour re-rejoindre le groupe, le pair doit revenir sous une nouvelle identité
+      - Implique une croissance linéaire par rapport au nombre de connexions de la taille de la structure de données
+      - En modifiant l'ordre de précédence pour que ça soit le numéro d'incarnation qui prime, puis l'état
+      - Modifie la complexité spatiale pour qu'elle croit de manière linéaire par rapport au nombre de pairs à la place
+      - Et assure toujours la détection des pairs défaillants
+      - Mais peut allonger le temps nécessaire au protocole
+    - Avons aussi défini un mécanisme d'anti-entropie
+      - Le papier ne précise pas de procédure particulière lorsqu'un nouveau pair rejoint le groupe
+      - Pour obtenir la liste des collaborateurs, doit récupérer l'état courant de la liste de la part d'un autre pair
+      - Si s'agit d'une reconnexion, doit pas juste remplacer mais fusionner l'état de sa liste avec celle reçue
+      - Revient à définir une méthode de /merge/ entre deux états
+      - Dans les faits, avons transformé en Delta-base CRDT la liste des collaborateurs
+      - Déclenché de manière périodique pour pallier les aléas du réseau
+    - L'implémentation de ce protocole et structure nous permet
+      - Obtenir mécanisme compatible avec les systèmes en P2P
+      - Avec un coût en communication (outre synchro initiale) par noeud borné et indépendant du nombre de collaborateurs
+	- 2 messages par période (PING et ACK)
+	- Dont taille dépend du nombre d'évènements ajoutés pour leur dissémination
+	- Qui est un paramètre que l'on choisit
+      - Coût spatial linéaire par rapport au nombre de noeuds
+      - Complexité en temps
+	- Choix du pair aléatoire : constant
+	- Génération de la réponse au ping : constant
+	- Génération de la réponse au ping-req : constant
+	- Génération d'un message : linéaire du nombre d'évènements à propager
+	- Mise à jour de la liste : linéaire du nombre d'évènements propagés par message
+	- Synchro : linéaire au nombre de pairs
 * Backlog
+** TODO Thèse : Rédiger présentation de MUTE
+** TODO Thèse : Rédiger objectifs de MUTE
+** TODO Thèse : Rédiger architecture de MUTE
+** TODO Thèse : Rédiger présentation de la couche interface de MUTE
+** TODO Thèse : Rédiger section métadonnées
+** TODO Thèse : Rédiger section curseurs
+** TODO Thèse : Rédiger section Netflux
+** TODO Thèse : Rédiger section Pulsar
+** TODO Thèse : Rédiger section objectifs de couche sécurité
+** TODO Thèse : Rédiger section approche
+** TODO Thèse : Complexité opérations
+- Modifier complexités des opérations pour remplacer /k/ et /l/ par /h/
+** TODO Thèse : Illustrer utilité de reporter transition vers nouvelle époque cible
 ** TODO Thèse : Ajouter algorithme de /getPathBetweenEpochs()/
 - Dans l'algorithme /insRemote()/, je décris comment on traite une insertion distante
 - Dans cet algorithme, j'utilise plusieurs fonctions helpers dont /getPathBetweenEpochs()/
