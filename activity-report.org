@@ -24450,31 +24450,14 @@ Failed to publish
 	- Génération d'un message : linéaire du nombre d'évènements à propager
 	- Mise à jour de la liste : linéaire du nombre d'évènements propagés par message
 	- Synchro : linéaire au nombre de pairs
-* Backlog
-** TODO Thèse : Rédiger présentation de MUTE
-** TODO Thèse : Rédiger objectifs de MUTE
-** TODO Thèse : Rédiger architecture de MUTE
-** TODO Thèse : Rédiger présentation de la couche interface de MUTE
-** TODO Thèse : Rédiger section métadonnées
-** TODO Thèse : Rédiger section curseurs
-** TODO Thèse : Rédiger section Netflux
-** TODO Thèse : Rédiger section Pulsar
-** TODO Thèse : Rédiger section objectifs de couche sécurité
-** TODO Thèse : Rédiger section approche
-** TODO Thèse : Complexité opérations
-- Modifier complexités des opérations pour remplacer /k/ et /l/ par /h/
-** TODO Thèse : Illustrer utilité de reporter transition vers nouvelle époque cible
-** TODO Thèse : Ajouter algorithme de /getPathBetweenEpochs()/
-- Dans l'algorithme /insRemote()/, je décris comment on traite une insertion distante
-- Dans cet algorithme, j'utilise plusieurs fonctions helpers dont /getPathBetweenEpochs()/
-- Je me contente de décrire ce qu'elle fait dans le texte
-- N'ayant pas de contrainte de place, pourrait ajouter cet algorithme en annexe
-** TODO Thèse : Ajouter algorithme de /expand()/
-- Permet de convertir un *IdInterval* en *List<Id>*
-** TODO Thèse : Ajouter algorithme de /aggregate()/
-- Permet de convertir une *List<Id>* en *List<IdInterval>*
-** TODO Thèse : Ajouter algorithme de /gcEpochs()/
-** TODO Prog2 : Préparer sujet exam
+** Semaine du <2022-05-23 Mon> au <2022-05-25 Wed>
+*** Planned
+**** DONE Thèse : Rédiger section collaborateurs
+**** DONE Thèse : Rédiger section métadonnées
+**** DONE Thèse : Rédiger section curseurs
+**** DONE Thèse : Rédiger section Netflux
+**** CANCELLED Thèse : Rédiger section Pulsar
+**** IN-PROGRESS Prog2 : Préparer sujet exam
 - Idées exercices
   - Pile/File
     - Demander de dessiner les schémas mémoires de programmes utilisant des piles et des files
@@ -24491,6 +24474,149 @@ Failed to publish
     - Idée de Hans
     - Consiste à fournir le code d'une structure, un schéma mémoire
     - Et leur demander de retrouver le main qui a mené au schéma mémoire
+*** Done
+- Thèse : Rédiger section collaborateurs
+  - Mécanisme de détection des défaillances des pairs
+    - Besoin d'introduire la structure de données représentant la liste
+    - Besoin d'introduire l'ordre de précédence entre états
+      - Peut introduire le numéro d'incarnation au moment où je parle de Suspect
+	- Pour éviter qu'un ancien message Alive n'override le Suspect, besoin de déterminer quand celui-ci a été émis
+	- Ajout d'un numéro d'incarnation
+    - Besoin d'introduire le paramètre de fréquence du mécanisme de détection des défaillances
+      - Et son impact sur la précision du mécanisme
+	- Trop court => taux de faux positif augmente
+	- Trop long => délai de détection d'une défaillacee augmente
+  - Mécanisme de dissémination des mises à jour du groupe
+    - Besoin d'introduire le paramètre du nombre de mises à jour du groupe propagées par message
+- Thèse : Rédiger section Pulsar
+  - Finalement, s'inscrit assez mal dans le chapitre
+  - Présente MUTE comme un éditeur P2P
+  - Soudain parle d'une couche communication centralisée
+  - Apporte pas grand chose non plus IMO
+- Thèse : Rédiger section métadonnées
+  - Fusionner cette section avec la partie /Modèle de données du document texte/ ?
+  - Ce que j'ai à dire sur chaque métadonnée (titre, date de création, curseurs) me parait trop léger pour justifier une section dédiée
+- Thèse : Rédiger section Netflux
+  - Ce que je veux aborder
+    - Netflux, librairie permettant de mettre en place un réseau P2P entre navigateurs et bots
+    - WebRTC
+    - Websocket
+    - Topologie
+  - Un peu de mal à voir comment ordonner les différents éléments
+    - Est-ce que j'entre dans les détails du fonctionnement de WebRTC avant de parler des websockets par exemple ?
+      - Nécessité d'un serveur STUN
+      - Nécessité d'un serveur de signalement
+      - Nécessite d'un serveur TURN
+** Semaine du <2022-05-30 Mon> au <2022-06-03 Fri>
+*** Planned
+**** DONE Thèse : Rédiger section sécurité de MUTE
+**** DONE Thèse : Rédiger section conclusion de MUTE
+**** DONE Thèse : Rédiger présentation de la couche interface de MUTE
+**** DONE Thèse : Rédiger introduction chapitre MUTE
+**** DONE Thèse : Compléter partie sur SWIM
+- Ajouter propriétés intéressantes du protocole
+- Compléter mécanisme d'anti-entropie
+**** DONE Thèse : Compléter références liées à MUTE
+- Ajouter référence du papier démo sur MUTE
+- Ajouter référence CRATE
+- Ajouter liens de MUTE
+  - Site
+  - GitHub
+**** DONE Thèse : Ajouter figure sur architecture système pour WebRTC
+**** DONE Thèse : Ajouter figure sur architecture système pour Trusternity
+**** DONE Thèse : Ajouter figure sur architecture système de MUTE
+**** DONE Thèse : Ajouter figure sur architecture logicielle de MUTE
+**** DONE Thèse : Ajouter intro sur systèmes collaboratifs
+**** DONE Thèse : Relire chapitre
+**** CANCELLED Thèse : Rédiger présentation de MUTE
+**** CANCELLED Thèse : Rédiger objectifs de MUTE
+**** CANCELLED Thèse : Rédiger architecture de MUTE
+**** IN-PROGRESS Prog2 : Préparer sujet exam
+- Idées exercices
+  - Pile/File
+    - Demander de dessiner les schémas mémoires de programmes utilisant des piles et des files
+      - Peut avoir un parcours d'arbre binaire qui ajoute les noeuds dans chacune
+      - Et ensuite une boucle qui vide la pile
+      - Et une boucle qui vide qui vide la file
+      - P-e un peu lourd
+      - Peut plutôt partir d'une pile et d'une file pré-remplie
+  - Arbre binaire de recherche
+    - Écrire /getHauteur()/ qui renvoie la hauteur de l'arbre
+    - Écrire /toSortedList()/ qui renvoie une liste triée à partir de *MyBinarySearchTree*
+    - Leur fournir le code de la File et leur demander d'implémenter le parcours en largeur grâce à ça
+  - Schéma mémoire
+    - Idée de Hans
+    - Consiste à fournir le code d'une structure, un schéma mémoire
+    - Et leur demander de retrouver le main qui a mené au schéma mémoire
+*** Done
+- Thèse : Rédiger section sécurité de MUTE
+  - Questions
+    - Comment justifier l'utilisation d'un protocole alors que WebRTC est déjà secured par défaut ?
+    - Si signaling compromis, peut être victime d'une attaque man-in-the-middle
+    - Si réseau P2P composé d'autres noeuds que les collaborateurs, ces noeuds ne doivent pas pouvoir observer les messages transitant seulement par eux
+  - Intérêt d'avoir un réseau P2P pas seulement composé des collaborateurs
+    - Confidentialité des collaborations
+      - Cache l'arbre dans la forêt
+    - Disponibilité des pairs
+      - Plus facilement des pairs disponibles comme portes du réseau
+    - Permet de réutiliser les connexions d'un document à l'autre
+      - Pas besoin de se reconnecter à chaque document
+  - Chiffrement pour communication et chiffrement pour stockage
+    - À l'heure actuelle, dispose d'un chiffremeent uniquement pour les communications
+    - Mais pourrait avoir un autre chiffrement pour le stockage
+    - Permet d'avoir des propriétés différentes
+      - Dans le cadre de la communication, veut avoir backward et forward secrecies
+      - Dans le cadre du stockage, veut juste forward secrecy
+    - Consisterait à choisir des noeuds du réseau P2P n'appartenant pas à la collaboration et de leur envoyer les opérations chiffrées en utilisant la clé de stockage
+    - Reste à voir comment retrouver ces noeuds par la suite
+      - DHT?
+  - Plan
+    - Besoin d'assurer authenticité et confidentialité des messages
+    - Besoin d'un chiffrement bout en bout
+    - Utilise BD
+    - Besoin d'un PKI pour communiquer les clés publiques
+    - Besoin de vérifier bon comportement des PKIs
+    - Utilise Trusternity
+    - Mécanisme de chiffrement de bout en bout nous permet de garantir authenticité et confidentialité des communications
+    - Cette couche s'ajoute au chiffrement inhérent à WebRTC et nous offre de nouvelles possibilités
+    - Nous permet notamment de construire un réseau P2P unique au lieu de réseau pour chaque document
+    - Et de communiquer les messages par l'intermédiaire de noeuds extérieurs à la collaboration, sans fuite de données
+    - Inconvénient de cette approche est que la clé de chiffrement change à chaque modification du groupe
+    - Ne nous permet pas par exemple de stocker des messages chez des noeuds tiers
+- Thèse : Rédiger introduction chapitre MUTE
+  - Les applications collaboratives
+  - Plusieurs outils d'édition collaborative centralisés, basés sur l'approche OT, ont popularisé l'édition collaborative temps réel de texte
+  - Ces approches souffrent néanmoins de leur architecture centralisé
+  - Notamment, de par leur approche, ces solutions rencontrent des difficultés à passer à l'échelle et posent des problèmes de confidentialité
+  - L'approche CRDT offrant une meilleure capacité de passage à l'échelle et étant compatible avec une architecture pair-à-pair, de nombreux travaux ont été entrepris pour proposer une alternative distribuée répondant à ces limites
+  - De manière plus globale, ces travaux s'inscrivent dans le nouveau paradigme d'application des Local-First softwares
+  - Ce paradigme vise le développement de logiciels collaboratifs, p2p,
+  - De manière semblable, l'équipe Coast étudie les problèmes de recherche liés à ce type d'applications
+  - Elle développe MUTE depuis plusieurs années, un éditeur collaboratif P2P temps réel chiffré de bout en bout
+  - MUTE sert de plateforme d'expérimentation et de démonstration de l'équipe
+  - La figure X représente l'architecture système d'une collaboration utilisant MUTE
+  - MUTE étant une application web, chaque noeud représenté correspond à un navigateur
+  - Nous décrivons l'architecture logicielle d'un noeud dans la figure Y
+  - Dans ce chapitre, nous détaillons les différentes couches logicielles de MUTE, notamment celles correspondantes aux travaux présentés dans le chapitre 2
+  - De la même façon, nous précisons dans ce chapitre les différents services composant l'architecture système de MUTE autre que les pairs eux mêmes
+* Backlog
+** TODO Thèse : Lire *Internet encyclopaedis go head to head*
+- Papier cité par Nédelec pour justifier l'amélioration de la qualité des documents issus de collaborations
+** TODO Thèse : Lire *Empirical study on collaborative writing: What do co-authors do, use, and like?*
+- Papier cité par Nédelec pour justifier l'amélioration de la qualité des documents issus de collaborations
+** TODO Thèse : Complexité opérations
+- Modifier complexités des opérations pour remplacer /k/ et /l/ par /h/
+** TODO Thèse : Illustrer utilité de reporter transition vers nouvelle époque cible
+** TODO Thèse : Ajouter algorithme de /getPathBetweenEpochs()/
+- Dans l'algorithme /insRemote()/, je décris comment on traite une insertion distante
+- Dans cet algorithme, j'utilise plusieurs fonctions helpers dont /getPathBetweenEpochs()/
+- Je me contente de décrire ce qu'elle fait dans le texte
+- N'ayant pas de contrainte de place, pourrait ajouter cet algorithme en annexe
+** TODO Thèse : Ajouter algorithme de /expand()/
+- Permet de convertir un *IdInterval* en *List<Id>*
+** TODO Thèse : Ajouter algorithme de /aggregate()/
+- Permet de convertir une *List<Id>* en *List<IdInterval>*
+** TODO Thèse : Ajouter algorithme de /gcEpochs()/
 * Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
