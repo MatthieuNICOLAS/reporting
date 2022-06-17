@@ -24528,10 +24528,7 @@ Failed to publish
 **** DONE Thèse : Ajouter figure sur architecture logicielle de MUTE
 **** DONE Thèse : Ajouter intro sur systèmes collaboratifs
 **** DONE Thèse : Relire chapitre
-**** CANCELLED Thèse : Rédiger présentation de MUTE
-**** CANCELLED Thèse : Rédiger objectifs de MUTE
-**** CANCELLED Thèse : Rédiger architecture de MUTE
-**** IN-PROGRESS Prog2 : Préparer sujet exam
+**** DONE Prog2 : Préparer sujet exam
 - Idées exercices
   - Pile/File
     - Demander de dessiner les schémas mémoires de programmes utilisant des piles et des files
@@ -24548,6 +24545,13 @@ Failed to publish
     - Idée de Hans
     - Consiste à fournir le code d'une structure, un schéma mémoire
     - Et leur demander de retrouver le main qui a mené au schéma mémoire
+**** CANCELLED Thèse : Rédiger présentation de MUTE
+**** CANCELLED Thèse : Rédiger objectifs de MUTE
+**** CANCELLED Thèse : Rédiger architecture de MUTE
+**** DONE Thèse : Lire *Internet encyclopaedis go head to head*
+- Papier cité par Nédelec pour justifier l'amélioration de la qualité des documents issus de collaborations
+**** DONE Thèse : Lire *Moving from Closed to Open Source: Observations from Six Transitioned Projects to GitHub*
+**** IN-PROGRESS Thèse : Lire *Melda: a general purpose delta state JSON CRDT*
 *** Done
 - Thèse : Rédiger section sécurité de MUTE
   - Questions
@@ -24599,9 +24603,293 @@ Failed to publish
   - Nous décrivons l'architecture logicielle d'un noeud dans la figure Y
   - Dans ce chapitre, nous détaillons les différentes couches logicielles de MUTE, notamment celles correspondantes aux travaux présentés dans le chapitre 2
   - De la même façon, nous précisons dans ce chapitre les différents services composant l'architecture système de MUTE autre que les pairs eux mêmes
+- Prog2 : Préparer sujet exam
+  - A rédigé une 1ère version
+    - Me parait pas mal d'un point de vue contenu et durée
+    - Mais me manque un exercice à base de schéma mémoire
+  - A envoyé à Hans et Alex pour retours
+  - Pas de retours majeurs de leur part
+    - Juste indiquer que les fonctions de l'exo 1 sont censées être optimales
+  - [X] Prendre en compte les remarques
+  - [X] Décider d'un 1er barème
+- Thèse : Lire *Internet encyclopaedis go head to head*
+  - Date de 2005
+  - Indique qu'une étude a montré que la qualité des articles sur Wikipédia est comparable à celle de l'Encyclopaedia Britannica
+    - Un peu confus et moins précis, mais pas de manière significative d'après les reviewers des pages concernées par l'étude
+  - Étude a l'air d'avoir été conduite avant l'introduction d'un système d'évaluation de la qualité des articles
+    - Pareil, Wikipédia a l'air d'avoir avancé sur les questions de modération des pages depuis
+  - Voir si étude a été refaite depuis
+  - En cherchant les articles plus récents, tombe sur *Templates and Trust-o-meters: Towards a widely deployable indicator of trust in Wikipedia*
+    - Date de 2022
+    - Cite encore seulement cet article pour justifier la qualité de Wikipédia
+  - Thématiques liés que je pourrais explorer
+    - Open Source Software quality
+    - Wisdom of Crowds
+  - Ah ben y a une page dédiée pour Wikipédia: https://en.wikipedia.org/wiki/Reliability_of_Wikipedia#Comparative_studies
+    - Décembre 2007 : étude allemande évalue Wikipédia comme de meilleure qualité que Brockhaus Enzyklopädie
+    - 2012 : étude comparative entre Wikipédia et Encyclopaedia Britannica sur articles liées à la santé mentale indique que Wikipédia est de meilleure qualité
+      - *Quality of information sources about mental disorders: a comparison of Wikipedia with centrally controlled web and printed sources*
+    - 2017 : étude sur les articles Wiki liés à la politique US montre que la collaboration d'individus polarisés de manière contraire fournit articles de meilleure qualité
+      - *The wisdom of polarized crowds*
+  - Alex m'a recommandé *ORES: Lowering Barriers with Participatory Machine Learning in Wikipedia* concernant la collaboration menant à une meilleure qualité dans Wikipédia
+  - Concernant l'Open Source
+    - *Open source versus closed source: software quality in monopoly and competitive markets*
+    - *Moving from Closed to Open Source: Observations from Six Transitioned Projects to GitHub*
+      - Étude menée par Microsoft sur le passage de closed source à open source de 6 projets
+      - https://ieeexplore.ieee.org/abstract/document/8812899
+- Thèse : Lire *Moving from Closed to Open Source: Observations from Six Transitioned Projects to GitHub*
+  - Cite les articles suivants pour justifier raisons de ce genre de transition par les GAFAMs
+    - https://venturebeat.com/2015/06/12/facebooks-head-of-open-source-gives-3-reasons-why-the-company-open-sources-its-technology/
+    - https://www.zdnet.com/article/microsofts-open-sourcing-of-net-the-back-story/
+  - Intérêts de faire de l'open Source
+    - On fait des enquêtes auprès des devs de Microsoft qui contribuaient aux projets open source à ce moment
+      - 48 devs ont répondu à l'enquête et correspondaient aux critères
+    - Liste plusieurs raisons qui sont validées par les résultats de l'enquête
+      - Inclure la communauté et obtenir ses retours
+      - Établir une relation de confiance
+	- Les organisations/utilisateurs peuvent vérifier que l'appli fait que ce qui est attendue d'elle
+      - Développer une culture de l'open source
+	- Et notamment adopter des bonnes pratiques de travail/process/tooling issues de cet environnement
+	- Cite *Open source-style collaborative development practices in commercial projects using github* à ce sujet
+      - Obtenir des ressources supplémentaires
+	- Des devs gratuits pour faire avancer le projet et maintenir les outils
+      - Augmenter le nombre de bugs reportés
+      - Améliorer la qualité du code
+	- Cite *Social coding in github: Transparency and collaboration in an open software repository* à ce sujet qui a atteint les mêmes conclusions
+    - Liste d'autres raisons, qui elles n'ont pas l'air de convaincre d'après les résultats de l'enquête et semblent anecdotiques
+      - Devenir de meilleurs devs
+      - Trouver de nouveaux talents à recruter
+      - Trouver de nouvelles business opportunities
+  - Mentionne l'absence d'une organisation en oignon des contributeurs externes
+    - Idée est que les plus anciens contributeurs forment le core et ont la meilleure réputation
+    - Effectuent les modifs
+    - Tandis que les contributeurs plus récents rapportent des bugs, soumettent des patchs et font de la doc
+    - Cite *Two case studies of open source software development: Apache and Mozilla* à propos de ce modèle
+  - Dans le cas présent, ne retrouve donc pas ce modèle
+    - Cite *The onion patch: Migration in open source ecosystems* à ce sujet
+    - Suggère que l'absence d'un système de reconnaissance pour les contributeurs joue sur ce point
+      - N'importe qui peut se pointer un jour avec une PR effectuant des changements, celle-ci sera acceptée si elle est conforme aux attentes et appropriée pour le projet
+  - Dans Related Work, mentionne une étude sur ce qui fait que les devs contribuent à un projet open source
+    - *Carrots and rainbows: Motivation and social practice in open source software development*
+    - Étude indique que /peer review and quick feedback improves quality in OSS/
+    - À voir la dimension temporelle, mais pourrait être un argument en faveur du temps réel
+  - Dans Related Work, mentionne une étude sur la qualité du code qui a notamment étudié les projets Linux, Apache et GCC
+    - *An empirical study of open-source and closed-source software products*
+    - Résultats montre que ces projets ont généralement moins de bugs
+- Algo : DS
+  - Étudiant-es qui m'ont annoncé leur absence
+    - BRIGNOLI Clea
+    - CHAGNOT Marion (à distance)
+    - MAKHLOUFI Yanis
+  - [X] Envoyer le sujet à CHAGNOT Marion
+- Thèse : Lire *Melda: a general purpose delta state JSON CRDT*
+  - Dans /Related Work/, présente rapidement les différentes familles de CRDTs et leurs avantages/défauts respectifs
+    - Pour state-based CRDTs, indique /better suited for situations where updates are less frequent, communication is unreliable, or operations are not commutative/
+    - Je suis d'accord pour les 2 premiers points
+    - Mais du mal à voir ce qu'il a voulu dire
+    - Si les modifications ne sont pas commutatives, besoin de maintenir des métadonnées dans l'état pour gérer les conflits
+    - Dans ce cas, pourquoi la version op-based ne pourrait pas maintenir ces mêmes métadonnées ?
+** Semaine du <2022-06-07 Tue> au <2022-06-10 Fri>
+*** Planned
+**** DONE Thèse : Lire *Melda: a general purpose delta state JSON CRDT*
+**** IN-PROGRESS Prog2 : Corriger DS
+**** TODO Prog2 : Corriger DM1
+**** TODO Prog2 : Corriger DM2
+**** TODO Prog2 : Préparer rattrapage
+- Voir le nombre d'étudiant-es qui doivent rattraper
+- Voir si adapté à un oral ou si besoin de refaire un sujet
+**** TODO Thèse : Envoyer mail à CMI pour dire que ne compte pas se réinscrire
+*** Done
+- Thèse : Lire *Melda: a general purpose delta state JSON CRDT*
+  - Delta-based CRDT
+  - Consiste en un Grow-Only Set d'objets JSON
+  - Chaque objet est immutable
+    - Chaque modification, même partielle, donne lieu à une nouvelle version de l'objet
+  - Chaque version de chaque objet est stockée par le CRDT
+    - Calcule un digest pour chacune d'entre elle
+    - Une Map pour récupérer le contenu qui correspond à un digest
+  - Maintient un arbre des révisions par objet
+    - Chaque version de l'objet se voit attribuer
+      - Un index (sa profondeur dans l'arbre)
+      - Une chaîne de révision
+	- Pas clair comment cette dernière est formée
+    - Ce couple forme des identifiants pour chaque version
+      - Ex : /1-a, 2-a, 3-aa, 4-aa, 3-ab, 2-b, 3-b, 4-b/
+  - Utilise un ordre de précédence sur les identifiants pour déterminer la version courante d'un objet
+    - Utilise l'index en priorité
+    - Si plusieurs versions ont le même index, utilise l'ordre lexicographique sur les chaines de révisions pour départager
+  - Ne fusionne donc pas les modifications concurrentes d'un même champ
+  - Se contente d'en garder une de manière arbitraire mais déterministe
+  - Pour gérer les suppressions, utilise des tombstones
+  - Réflexions
+    - Propose un Delta CRDT pour JSON
+    - Mais ne s'agit pas d'une composition
+      - Propose et utilise seulement un algorithme de fusion pour les tableaux
+      - Le reste du temps, utilise seulement la règle de précédence définie pour déterminer quelle version utilisée
+      - Ne fusionne pas automatiquement les modifications concurrentes du contenu
+      - Sémantique viable ?
+    - JSON est une structure arborescente
+      - Quid des opérations de déplacement des noeuds dans l'arbre ?
+      - Est-ce que ça se fait ?
+      - Est-ce que ça vise à pouvoir être fait ?
+      - En relisant, semblerait que travaille pas directement sur le modèle
+	- Le modèle JSON doit être sérialisé et fourni en entrée à Melda
+	- Melda le flatten et travaille sur cette collection
+	- Puis reconstruit le modèle à partir de là
+    - Se compare expérimentalement à Automerge
+      - Automerge est écrit en JS
+      - Melda en Rust
+      - Doute que cette comparaison ait un sens
+    - Pas clair si le benchmark est complet dans le cas de Melda
+      - De ce que je comprends, benchmark uniquement des opérations "locales"
+      - Le programme Rust applique un batch de modifs, puis sérialise le texte
+      - Melda met à jour le JSON CRDT et génère les deltas à propager
+      - Mais pas d'évaluation du traitement pour regénérer le JSON à partir du CRDT ?
+      - Pas d'évaluation du processus de fusion /Meld/ aussi ?
+    - Ne se compare fonctionnellement pas à Automerge
+      - Y a-t-il des différences de fonctionnalités/d'objectifs entre les deux CRDTs ?
+      - Notamment, Melda a l'air de devoir être maintenu en parallèle du modèle JSON
+      - Est-ce le cas d'Automerge ?
+      - Ou Automerge remplace de manière transparente le modèle ?
+  - À voir la vidéo du talk le jour où elle sort
+    - P-e que des questions de l'audience permettent d'éclaircir ces points
+- Prog2 : Corriger DS
+  - Étudiant-es absent-es
+    - [-] BANFOU Ivan Christopher
+    - [-] BOREL STYVE Tankeu
+    - [X] BRIGNOLI Clea
+    - [-] BRUNET Arthur
+    - [X] CHAGNOT Marion
+    - [-] GOLIK Nicolas
+    - [X] HU Xinyu
+    - [-] KAKEU TCHKOGOUE Francis Cabrel
+    - [X] KHACHATRYAN Narek
+    - [-] KUATE SIMO Emmanuel Nelson
+    - [X] MAKHLOUFI Yanis
+    - [-] MEYNET Sebastien
+    - [-] NEMBOT NDEFFO Loic Harold
+    - [X] TERRIER Matteo
+      - Erreur de notre part, on a oublié de le faire signer la feuille
+    - [-] TOUKO EMOU Yvanna Carrelle
+    - [-] TOUSSILE NKENGUE Amandla Davila
+    - [-] TSAPY NINGAHI Simone Armandine
+  - Copies à surveiller
+    - STIEN Matthias regardait copie de BOUCHARD Dorian
+    - NEMSWERS Michel parlait avec GRATIUS Emma (doute ici)
+    - SONNY LAHMADI parlait avec DUBOST Clara
+  - J'ai une copie de HU Xinyu
+  - Le contacter pour lui demander une explication
+** Semaine du <2022-06-13 Mon> au <2022-06-17 Fri>
+*** Planned
+**** DONE Prog2 : Corriger DS
+**** DONE Prog2 : Préparer rattrapage
+- Voir le nombre d'étudiant-es qui doivent rattraper
+- Voir si adapté à un oral ou si besoin de refaire un sujet
+**** TODO Prog2 : Corriger DM1
+**** TODO Prog2 : Corriger DM2
+**** TODO Thèse : Envoyer mail à CMI pour dire que ne compte pas se réinscrire
+*** Done
+- Prog2 : Préparer rattrapage
+  - En faisant le décompte des étudiants, il me reste les étudiant-es suivant-es
+    - BRIGNOLI Clea (TD4, TP7)
+    - KHACHATRYAN Narek (TD4, TP8)
+    - MAKHLOUFI Yanis (TD1, TP1)
+  - Peut faire un oral individuel de 1h20-1h30
+  - A proposé plusieurs dates
+    - <2022-06-20 Mon> de 08h à 12h30
+    - <2022-06-23 Thu> de 08h à 12h30
+    - <2022-06-23 Thu> de 12h30 à 17h
+    - <2022-06-24 Fri> de 14h à 18h30
+  - A rédigé sujet
+- Thèse Victorien
+  - Page 31, BF2 : C'est pas A plutôt que E ?
+  - Page 33 : "Deux modèles de cohérence sont incompatibles si l'un n'est pas plus fort que l'autre"
+    - Un modèle de cohérence est plus fort qu'un autre s'il n'accepte qu'un sous-ensemble strict des exécutions abstraites acceptées par le premier
+      - i.e. l'intersection des exécutions abstraites acceptées par chacun retourne l'ensemble des exécutions abstraites acceptées par le 1er
+    - Si pas plus fort l'un que l'autre, chaque modèle accepte les mêmes exécutions
+    - Dans ce cas, c'est les deux mêmes modèles
+    - Sinon, chaque modèle accepte des exécutions que l'autre refuse
+    - Mais intersection des deux non-nulle
+    - Peut-on vraiment dire qu'ils sont incompatibles ?
+  - Page 35, dernier paragraphe : 1ère phrase étrange
+  - Page 47, dernier paragraphe : typo pour "s'appuieNT"
+- Réunion avec Claudia
+  - Monte actuellement des projets pour obtenir des financements de thèse, ingé et post-doc pour 2023
+  - Premier projet avec Hive
+    - Système de stockage de données sur réseau P2P
+    - Présentation dispo ici : https://www.bfmtv.com/economie/replay-emissions/tech-and-co/david-gurle-serial-entrepreneur-hive-est-un-cloud-alternatif-peer-to-peer-qui-exploite-la-capacite-inutilisee-des-ordinateurs-01-06_VN-202206010671.html
+    - Sujet de thèse tourne autour de données mutables sur IPFS
+  - Second projet avec Amadeus
+    - Entreprise de réservation de voyages
+      - https://fr.wikipedia.org/wiki/Amadeus_(entreprise)
+    - Consiste en la mise en commun/l'aggrégation de données d'entreprises différentes
+    - La mise à disposition de leurs données par les entreprises seraient régies par des contrats
+    - Ces contrats spécifient les actions que peuvent effectuer les autres sur ces données
+    - Correspond aux travaux de Claudia et Hien
+  - Si veut financement pour 2022, ça serait plutôt via les voies suivantes
+  - Fair & Smart
+    - Mais dans ce cas, doit faire un truc pour le projet
+    - Mais plutôt loin de mes compétences/connaissances
+    - Et m'a l'air plutôt confus
+  - Rallongement de thèse
+    - Dans ce cas doit proposer une idée de recherche qui motiverait le rallongement
+    - Claudia suggérait une collaboration avec Vic sur DottedLogootSplit
+      - Benchmarks
+	- Me demande si nécessaire
+	- Ou si ça ne suffirait pas de présenter une analyse en complexité en temps et en espace pour montrer que l'on approche de LS/RGA mais sans
+	  - Les requirements sur la couche réseau/la nécessité d'une couche de livraison des messages
+	  - La nécessité d'un mécanisme de synchro/d'anti-entropie qui oblige de maintenir les opérations
+      - Rédaction article
+    - PA parlait aussi de la volonté de Claudia d'un article sur MUTE pour EuroSys'23
+      - https://2023.eurosys.org/
+	- Titre et abstract pour <2022-10-12 Wed>
+	- Papier pour <2022-10-19 Wed>
+      - Faudrait voir angle et but du papier
+	- P-e moins innovant en 2022 qu'en 2014
+	- Qu'est-ce qu'on veut montrer ?
+	- Qu'est-ce qui nous manque pour cela ?
+      - Mais me permettrait p-e d'enrichir le chapitre MUTE de ma thèse
+	- Ajouter l'angle qui lui manque IMO
+	- Développer l'état de l'art
+      - Pose la question du double-blind
+	- Comment anonymiser le papier alors qu'il faudrait citer ECSCW'17 ?
+      - 12 pages, \documentclass[sigplan]
 * Backlog
-** TODO Thèse : Lire *Internet encyclopaedis go head to head*
-- Papier cité par Nédelec pour justifier l'amélioration de la qualité des documents issus de collaborations
+** TODO Thèse : Lire *Fallacies of distributed computing explained*
+- Disponible ici :  https://www.se.rit.edu/~se442/doc/fallacies.pdf
+- Whitepaper basé sur une série de blogposts sur les 8 fallacies des systèmes distribués
+** TODO Thèse : Lire *Optimistic Replication*
+- Disponible ici : https://dl.acm.org/doi/abs/10.1145/1057977.1057980
+** TODO Thèse : Lire *Session Guarantees for Weekly Consistent Replicated Data*
+- Disponible ici : https://ieeexplore.ieee.org/abstract/document/331722
+** TODO Thèse : Lire *Eventually consistent*
+- Disponible ici : https://dl.acm.org/doi/abs/10.1145/1435417.1435432
+** TODO Thèse : Lire *Defining Liveness*
+- Disponible ici : https://www.sciencedirect.com/science/article/pii/0020019085900560
+** TODO Thèse : Lire *Trade-offs in Replicated Systems*
+- Disponible ici : https://infoscience.epfl.ch/record/223701
+** TODO Thèse : Lire *Consistency, Availability, and Convergence*
+- Disponible ici : http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.359.5474
+** TODO Thèse : Lire *Principles of Eventual Consistency*
+- Disponible ici : https://ieeexplore.ieee.org/abstract/document/8187400
+** TODO Thèse : Lire *Proving the Correctness of Multiprocess Programs*
+- Disponible ici : https://ieeexplore.ieee.org/abstract/document/1702415
+** TODO Thèse : Lire *Time, Clocks, and the Ordering of Events in a Distributed System*
+- Disponible ici : https://dl.acm.org/doi/abs/10.1145/3335772.3335934
+** TODO Thèse : Lire *Writes : the dirty secret of causal consistency*
+- Disponible ici : http://sites.computer.org/debull/A17dec/p15.pdf
+- Sur l'effet de la livraison causale sur la propagation des modifications
+** TODO Thèse : Lire *Peritext*
+- CRDT pour Rich Text
+- Article de blog dispo ici : https://www.inkandswitch.com/peritext/
+- Me semble qu'avait été soumis à une conf/journal, faudrait voir si ça avait été accepté
+** TODO Thèse : Lire *CRDTs for truly concurrent file systems*
+- Disponible ici : https://dl.acm.org/doi/abs/10.1145/3465332.3470872
+- Publié à HotStorage'21
+  - Un workshop semblerait
+- Notamment par Dimitrios Vasilas, un doctorant de Shapiro
+- Réalisé en collaboration avec Scality
+  - https://www.scality.com
 ** TODO Thèse : Lire *Empirical study on collaborative writing: What do co-authors do, use, and like?*
 - Papier cité par Nédelec pour justifier l'amélioration de la qualité des documents issus de collaborations
 ** TODO Thèse : Complexité opérations
@@ -24617,6 +24905,10 @@ Failed to publish
 ** TODO Thèse : Ajouter algorithme de /aggregate()/
 - Permet de convertir une *List<Id>* en *List<IdInterval>*
 ** TODO Thèse : Ajouter algorithme de /gcEpochs()/
+** TODO Thèse : Proposer analyse en complexité du mécanisme de rebalancing de Marek
+- Pourrait être intéressant de se comparer à ce dernier
+- But serait de montrer que /renameId/ a complexité similaire
+- Et que /renameBlock/ achieve de meilleures performances grâce à la réduction du nombre de blocs
 * Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
