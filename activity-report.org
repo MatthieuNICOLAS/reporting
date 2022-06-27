@@ -24813,6 +24813,14 @@ Failed to publish
     - Peut-on vraiment dire qu'ils sont incompatibles ?
   - Page 35, dernier paragraphe : 1ère phrase étrange
   - Page 47, dernier paragraphe : typo pour "s'appuieNT"
+  - Page 51, avant dernier paragraphe
+    - alors o2 est supérieur ou égal à o1
+    - l'utilisation de /prepare/ me parait pas intuitive ici
+  - Page 54, 2nd paragraphe, dernière ligne : introduiTe
+  - Page 55, 2nd paragraphe : adéquat
+  - Page 55, dernier paragraphe : mécanismes de passage de messageS non-fiableS (?)
+  - Page 143, 2nde ligne : Ces deux positions liste <1,1,1> (manque des mots?)
+  - Page 146, définition 5.3 : Positions AgrégeableS
 - Réunion avec Claudia
   - Monte actuellement des projets pour obtenir des financements de thèse, ingé et post-doc pour 2023
   - Premier projet avec Hive
@@ -24854,6 +24862,80 @@ Failed to publish
       - Pose la question du double-blind
 	- Comment anonymiser le papier alors qu'il faudrait citer ECSCW'17 ?
       - 12 pages, \documentclass[sigplan]
+** Semaine du <2022-06-20 Mon> au <2022-06-24 Fri>
+*** Planned
+**** DONE Prog2 : Corriger DM1
+**** DONE Prog2 : Imprimer sujets rattrapage
+**** DONE Prog2 : Préparer feuilles de pompe à ramener
+- Penser à ajouter noms sur feuilles si besoin
+**** DONE Thèse : Envoyer mail à CMI pour dire que ne compte pas se réinscrire
+**** DONE Prog2 : Corriger DM2
+*** Done
+- Prog2 : Corriger DM1
+  - Groupe 1
+    - Lahmadia m'a rendu des .txt
+    - Nemsguers m'a rendu un zip non dézippable
+  - Groupe 2
+  - Groupe 3
+    - Duez et Gondouin ont fait le projet à deux
+    - Gillet a rendu des .class
+  - Rendus par mail
+    - Plusieurs étudiant-es ont rendu par mail leur DM
+    - Notamment un étudiant de Thomas à qui j'ai oublié de transférer
+    - Corriger
+  - La note de Meynet est manquante
+    - Démissionnaire
+- Prog2 : Corriger DM2
+  - Groupe 1
+    - Archive de Grandclaude vide
+    - Toletti m'a rendu des .class
+  - Groupe 2
+    - Rondeau m'a rendu un .docx
+  - Groupe 3
+    - Costanza m'a rendu des .class renommées en .java
+    - Zeng m'a rendu des .class
+- Prog2 : Préparer feuilles de pompe à ramener
+  - M'ont demandé leur feuille de pompe
+    - LHUILLER Enzo
+    - ROYET Céline
+    - PETT Pierre-Antoine
+- Prog2 : Rattrapage
+  - BRIGNOLI Cléa : 14
+  - KHACHATRYAN Narek : 13
+  - MAKHLOUFI Yanis : 13
+- Prog2 : Établir la moyenne
+  - Peut mettre en place la formule suivante
+    - Moyenne = (Meilleure note entre DMs ramenée sur 20 + Note DS) / 2
+  - Vu que je remarque beaucoup de DMs similaires, peut plutôt faire la note du DS coef 2
+** Semaine du <2022-06-27 Mon> au <2022-07-01 Fri>
+*** Planned
+**** IN-PROGRESS Prog2 : Corriger DM2 de CLEMENT et TOLETTI
+- M'ont tous les deux contactés vis-à-vis de leurs notes de DM
+- Dans le cas de CLEMENT
+  - L'archive du DM1 était vide
+  - Par contre l'archive DM2 a l'air d'être complète
+  - Alors que j'avais noté qu'elle était vide
+  - À corriger
+- Dans le cas de TOLETTI
+  - Avait eu 3.5/5 au DM1
+  - Mais 0 au DM2 car archive contenait que des fichiers .class
+  - En réponse à mon mail, m'a renvoyé une nouvelle archive contenant les fichiers Java
+  - À corriger
+**** TODO Thèse : Réunion
+- Voir pour jury de thèse
+  - François suggérait d'utiliser l'article de TPDS sinon pour sonder
+*** Done
+- Prog2 : Corriger DM2 de CLEMENT et TOLETTI
+  - CLEMENT
+    - A re-téléchargé l'archive
+    - Celle-ci contient de nouveau que le squelette des classes
+    - Je suis persuadé que j'avais un contenu différent quand j'ai vérifié ça jeudi soir sur ma machine perso
+    - À vérifier ce soir
+      - Me les renvoyer par mail si contenu différent
+  - TOLETTI
+    - A pu corriger son DM
+    - Une impression de déjà vu néanmoins
+    - Mais bon, ça ne va pas améliorer beaucoup sa moyenne dans tous les cas
 * Backlog
 ** TODO Thèse : Lire *Fallacies of distributed computing explained*
 - Disponible ici :  https://www.se.rit.edu/~se442/doc/fallacies.pdf
@@ -24879,6 +24961,21 @@ Failed to publish
 ** TODO Thèse : Lire *Writes : the dirty secret of causal consistency*
 - Disponible ici : http://sites.computer.org/debull/A17dec/p15.pdf
 - Sur l'effet de la livraison causale sur la propagation des modifications
+** TODO Thèse : Lire *Delta State Replicated Data Types*
+- Disponible ici : https://www.sciencedirect.com/science/article/pii/S0743731517302332?via%3Dihub
+- Introduit la notion de causal context
+** TODO Thèse : Lire *Efficient Synchronization of State-based CRDTs*
+- Disponible ici : https://ieeexplore.ieee.org/abstract/document/8731395
+- Introduit mécanismes de diffusion efficace des deltas
+** TODO Thèse : Lire *Specification and Complexity of Collaborative Text Editing*
+- Disponible ici : https://dl.acm.org/doi/10.1145/2933057.2933090
+- Introduit spécification faible et forte des séquences répliquées
+** TODO Thèse : Lire *Interleaving anomalies in collaborative text editors*
+- Disponible ici : https://dl.acm.org/doi/abs/10.1145/3301419.3323972
+- Introduit la spécification forte sans entrelacement des séquences répliquées
+** TODO Thèse : Lire *A string-wise CRDT for group editing*
+- Disponible ici : https://dl.acm.org/doi/abs/10.1145/2389176.2389198
+- 1er block-wise Sequence CRDT
 ** TODO Thèse : Lire *Peritext*
 - CRDT pour Rich Text
 - Article de blog dispo ici : https://www.inkandswitch.com/peritext/
