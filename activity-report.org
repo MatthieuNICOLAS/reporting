@@ -24909,7 +24909,7 @@ Failed to publish
   - Vu que je remarque beaucoup de DMs similaires, peut plutôt faire la note du DS coef 2
 ** Semaine du <2022-06-27 Mon> au <2022-07-01 Fri>
 *** Planned
-**** IN-PROGRESS Prog2 : Corriger DM2 de CLEMENT et TOLETTI
+**** DONE Prog2 : Corriger DM2 de CLEMENT et TOLETTI
 - M'ont tous les deux contactés vis-à-vis de leurs notes de DM
 - Dans le cas de CLEMENT
   - L'archive du DM1 était vide
@@ -24921,9 +24921,13 @@ Failed to publish
   - Mais 0 au DM2 car archive contenait que des fichiers .class
   - En réponse à mon mail, m'a renvoyé une nouvelle archive contenant les fichiers Java
   - À corriger
-**** TODO Thèse : Réunion
+**** DONE Thèse : Réunion
 - Voir pour jury de thèse
   - François suggérait d'utiliser l'article de TPDS sinon pour sonder
+**** IN-PROGRESS Thèse : Rédiger introduction des CRDTs
+**** TODO Thèse : Rédiger présentation des State-based CRDTs
+- Voir pour choisir l'exemple que j'utilise pour illustrer les différentes familles de CRDTs
+**** TODO Thèse : Rédiger présentation des Op-based CRDTs
 *** Done
 - Prog2 : Corriger DM2 de CLEMENT et TOLETTI
   - CLEMENT
@@ -24936,7 +24940,250 @@ Failed to publish
     - A pu corriger son DM
     - Une impression de déjà vu néanmoins
     - Mais bon, ça ne va pas améliorer beaucoup sa moyenne dans tous les cas
+- Presentation: Why and how to open your research data
+  - Par Étienne André et Florence Bouchet Moneret
+  - Slides dispos après la présentation
+  - Notes
+    - Données de recherche financées sur fonds publics doivent être ouvertes par défaut
+    - Données appartiennent aux employeurs/établissements de tutelle
+    - Pourquoi ouvrir données ?
+      - Conserver et sécuriser données
+      - Contribuer à la reproductibilité
+      - Oeuvrer pour la transparence
+    - Garder en tête ce qu'il advient des données
+      - Plutôt partager ses données plutôt que de les confier à un éditeur tiers
+      - Après, si je rend publiques mes données, un tiers peut les browse et effectuer les mêmes traitements que si je lui avais donné directement
+      - Me permet juste de garder un contrôle sur la disponibilité des données
+    - Où trouver des données ?
+      - Google Dataset Research
+	- https://datasetsearch.research.google.com
+      - OpenAIRE (filtre "Research Data")
+	- https://www.openaire.eu/
+    - Métadonnées sont importantes pour faciliter la recherche/l'utilisation des datasets, bien les renseigner
+    - Il n'y a pas de repo dédié pour datasets dans le domaine de l'informatique
+      - Zenodo (https://zenodo.org/) a l'air devenir le standard de la communauté
+    - UL propose un système de repos pour datasets : DOREL
+      - https://dorel.univ-lorraine.fr/
+    - UL propose aussi un site aidant à s'approprier les bonnes pratiques de l'open science
+      - http://scienceouverte.univ-lorraine.fr/
+  - Questions
+    - Présentation concerne services de l'UL, qui peut l'utiliser/gérer ?
+      - Seul le personnel de l'UL a le droit de déposer/gérer des datasets
+      - Le problème de la perte de son compte est en cours de réflexion par l'équipe
+    - Services d'interaction/d'export/import avec d'autres plateformes ?
+      - Oui, devrait être compatible avec French National Repository qui ouvre en juillet
+    - Si GitHub est la plateforme pour héberger du code, DOREL pour héberger des données, c'est quoi la plateforme pour les artefacts ?
+      - C'est pas parce qu'on a accès à mon code qu'on peut rebuild le soft (e.g. dépendance disparue)
+      - Y a un intérêt à mettre les exécutables le plus possible standalone à disposition
+      - Dans mon cas, s'agit d'images Docker
+	- Pourrait aussi s'agir directement d'exécutables/binaires
+      - Existe GitHub Packages qui a l'air de répondre à ma problématique
+	- https://github.com/features/packages
+      - Permet d'héberger les images Docker, entre autres, qui correspondent à un projet
+      - Gratuit pour repos Open-Source
+- Thèse : Réunion
+  - Questions
+    - C'est quoi la priorité ?
+      - Mon plan actuel est de me concentrer sur l'état de l'art
+	- CRDTs
+	- Systèmes distribués
+      - Mais avait rédigé les chapitres RLS et MUTE pour pouvoir démarcher le jury
+      - Intégrer vos retours sur ces chapitres en priorité ?
+      - On a jusqu'à quand pour démarcher ?
+  - Retours
+    - Globalement, au début de chaque grosse section, annoncer le plan
+    - Chapitre RLS
+      - 2.1 Présentation de l'approche
+	- Rappeler le problème pour motiver qu'on va essayer de l'adresser avec des renames
+	- Annoncer le plan du chapitre
+	  - Pas avec "Dans la section X, on va voir Y"
+	  - Mais plutôt de manière informelle
+      - 2.1.1 Modèle du système
+	- Définir clairement noeuds, messages, opérations
+	- Poser clairement toutes les hypothèses de RLS
+	- Au fur et à mesure du chapitre, relier ces hypothèses aux éléments qui nous ont fait les introduire
+      - Définition 13
+	- Une opération peut être délivrée à un noeud qu'à partir du moment où l'opération /rename/ qui a introduit son époque de génération a été délivrée à ce même noeud
+      - 2.2.1
+	- Je ne dis pas que l'opération rename incrémente le numéro de séquence
+	- Le faire apparaitre
+      - 2.2.2
+	- Ajouter noir sur blanc qu'on a pour hypothèse qu'on ne peut pas avoir de
+      - Définition 13
+	- Recreuser notion de causalité
+	- Voir quelle relation de causalité on a dans notre cas
+	  - Inserts ne sont pas causaux
+	  - Suppression causale à insert
+	  - Renames sont causaux aux inserts/removes mais on peut l'ignorer
+	  - Opérations sont causales aux inserts
+      - Définition 16 & 17
+	- Réutiliser le nom de la définition dans la définition
+      - 2.3
+	- Ajouter noir sur blanc qu'on lève l'hypothèse de l'absence de renommages concurrents et qu'on va m'intéresser à eux
+      - 2.3.1
+	- Reformuler plus précisément la phrase qui introduit la figure 2.6
+	- Dire directement qu'on étend la figure 2.3 avec une opération rename concurrente
+      - 2.3.3
+	- Structurer pour aider le lecteur
+	- Décomposer en paragraphes pour l'aider à s'y retrouver
+      - 2.3.5
+	- Ça marche seulement si on a une FIFO delivery
+	- Faudrait l'indiquer ou voir si on peut s'en passer
+    - Chapitre MUTE
+      - 3.2.2
+	- Annoncer clairement le plan de la section basé sur les contraintes du modèle de livraison
+- Thèse : Réflexion jury
+  - Commencer par reprendre les membres des jurys de Vic, Luc, Brice et Marek
+  - Voir lesquelles pourraient correspondre
+    - Thématiques que je souhaite : systèmes distribués, réplication de données
+  - Vic
+    - [-] Emmanuelle Anceaume
+    - [-] Pascal Molli
+    - [-] Esther Pacitti
+  - Luc
+    - [-] Nuno Preguiça
+    - [X] Sophie Chabridon
+      - A HDR
+    - [-] Guillaume Pierre
+  - Brice
+    - [-] Anne-Marie Kermarrec
+    - [-] Peter Van Roy
+    - [-] Marc Shapiro
+    - [-] Achour Mostéfaoui
+  - Marek
+    - A rédigé sa thèse en anglais
+    - Pas sur qu'il y ait de nouveaux francophones dans le tas
+    - [-] Luís Rodrigues
+    - [-] Carlos Baquero
+    - [-] Jerzy Brezezínski
+    - [-] Sebastian Burckhardt
+    - [-] Peter Dickman
+    - [-] Pierre Sens
+  - Autres
+  - Olivier nous a fait remarquer qu'on a déjà 3 hommes dans le jury avec Stephan, Gérald et lui
+  - Doit donc viser principalement des femmes pour composer le reste du jury
+- Thèse : Rédiger introduction des CRDTs
+  - Relis *Conflict-free Replicated Data Types* par Nuno & al. de 2018
+    - Dispo ici : https://arxiv.org/abs/1806.10254
+    - Identifie 2 composants clés qui constitue un CRDT
+      - Concurrency semantic
+	- La sémantique définie pour résoudre les conflits en cas d'opérations concurrentes
+      - Synchronisation model
+	- La méthode utilisée pour synchroniser les pairs
+    - Ces 2 points organisent la structure du document
+    - Pourrait reprendre cette organisation
+** Semaine du <2022-07-04 Mon> au <2022-07-08 Fri>
+*** Planned
+**** IN-PROGRESS Thèse : Rédiger introduction des CRDTs
+**** IN-PROGRESS Thèse : Rédiger présentation des State-based CRDTs
+- Voir pour choisir l'exemple que j'utilise pour illustrer les différentes familles de CRDTs
+**** TODO Thèse : Rédiger présentation des Op-based CRDTs
+**** TODO Thèse : Rédiger présentation des Delta-based CRDTs
+**** TODO Thèse : Rédiger synthèse des familles de CRDTs
+*** Done
+- Thèse : Rédiger présentation des State-based CRDTs
+  - Quel exemple utiliser ?
+  - Idée serait de faire comme Vic
+    - Choisir un type de données
+    - Représenter une exécution abstraite avec ce type
+    - Puis illustrer dans State-based, Op-based et Delta-based comment chaque type de CRDT se comporte
+  - Pensais prendre le Registre
+    - Permet de montrer que des CRDTs proposent des sémantiques et même des états (avec le MV-Register) qui sont spécifiques aux exécutions concurrentes
+    - Mais ne permet pas particulièrement de montrer les diffs entre les State-based, Op-based et Delta-based
+  - Gagnerais à prendre un type dont la taille croit avec les modifs
+    - Set
+    - Map
+  - Map p-e un peu compliquée
+    - Correspond à une composition de CRDTs
+    - Voir les refs suivantes pour voir si faisable
+      - https://arxiv.org/abs/1806.10254
+      - https://dl.acm.org/doi/abs/10.1145/2596631.2596633
+      - https://www.sciencedirect.com/science/article/pii/S0743731517302332
+    - Si a déjà introduit MV-Register au préalable, moins difficile à amener
+    - Dans *CRDTs: An Overview*, Nuno introduit la notion de /Map of literals/
+      - Définit comme un type de données associant à des clés des objets
+      - Propose l'interface suivante
+	- put(k,o) pour associer à la clé k l'objet o
+	- rmv(k) pour supprimer la clé k et l'objet associé, si existe
+      - Explique qu'il y a 2 choix à effectuer concernant la sémantique du type
+	- Sémantique en cas de put concurrents pour une même clé
+	  - Quelle valeur retourner ensuite ?
+	  - Peut adopter au choix la sémantique LWW ou la sémantique MV
+	- Sémantique en cas de put concurrents à un rmv pour une même clé
+	  - Conserver ou non la clé ?
+	  - Comme pour le Set, peut adopter au choix une sémantique /put-wins/ ou /remove-wins/
+      - Offre donc une matrice de Map CRDTs proposant chacun une combinaison de ces sémantiques
+      - Pourrait utiliser ce type pour l'exemple
+    - Introduit ensuite la notion de /Map of CRDTs/
+      - En plus de put et de rmv, type propose aussi upd(k, op)
+	- Permet d'appliquer op au CRDT associé à la clé k
+      - Redéfinit put(k, v) en upd(k, init(o))
+      - Pour modifications concurrentes à un même objet, se contente d'en déférer au CRDT pour les gérer
+      - Pose ensuite plusieurs questions spécifiques à cette nouvelle spécification
+      - Que faire quand plusieurs put assignent des objets de type différents à la même clé ?
+	- Présente l'approche de Riak comme solution : conserver l'ensemble des objets, un associé à chaque type de données
+	- Revient à modifier le système de clé de la map pour qu'une clé soit dorénavant composée du couple <clé, type>
+	- N'en parle pas, mais pourrait trancher et ne garder qu'un objet, à la manière d'un LWW
+      - Que faire quand a rmv concurrent à upd d'un objet (ou d'un de ses sous-objets) ?
+	- Présente ici plusieurs sémantiques
+	- *Remove-as-recursive-reset map*
+	  - Dans cette sémantique, considère rmv comme une opération reset de l'objet
+	    - Et si l'objet est une composition d'autres objets, reset aussi récursivement ces objets
+	  - L'opération reset consiste à attribuer la bottom value du type à l'objet
+	  - Gestion des upd et rmv concurrents de l'objet reviennent alors à gérer des upd concurrents
+	  - Repose alors sur la sémantique du type de l'objet
+	  - Objecte néanmoins que cette sémantique peut être confusante pour les types de données dont le bottom element est une valeur utilisée
+	    - Donne l'exemple du compteur avec la valeur 0
+	  - Dans ce cas, pas évident de déterminer si un objet a été supprimé ou si on lui a affecté le bottom element suite à des modifications
+	- *Remove-wins map*
+	  - Dans cette sémantique, considère rmv comme prioritaire sur upd
+	  - Dans ce cas, un rmv supersede les opérations précédentes et les upd concurrentes
+	- *Update-wins map*
+	  - Dans cette sémantique, considère upd comme prioritaire sur rmv
+	  - Dans ce cas, un upd "ressucite" un objet si celui-ci a été supprimé en concurrence
+	    - Ne précise pas la sémantique en cas d'objets nested
+	    - Si ne met à jour qu'un sous-objet, doit-on restaurer tout l'objet ?
+	  - Précise la sémantique du *update-wins map* pour éviter le cas suivant
+	    - Si deux sites A et B, en concurrence, rmv puis upd une même clé
+	    - Comme chaque upd est concurrent au rmv de l'autre, chaqque noeud devrait "ressuciter" l'objet puis appliquer l'upd de l'autre
+	      - Quid de l'upd de chacun qui suivait leur rmv respectif ?
+	  - Afin d'éviter ce cas, précise que les upd qui sont supersede par des rmv sur tous les noeuds deviennent sans effets
+	  - Dans le cadre d'objets composites, évite ainsi de faire revenir des champs qui ont été supprimés par tous les noeuds suite à des upd futures
 * Backlog
+** TODO Thèse : Dire les termes
+- À un moment donné dans la thèse, doit définir précisément les termes
+  - Noeud
+  - Concurrence
+  - Conflit
+  - Réception d'un message
+  - Livraison d'un message
+  - Dépendance
+  - Dépendance causale
+  - Modification locale
+  - Modification distante
+- Où ?
+  - État de l'art ?
+  - Au fil de l'eau ?
+** TODO Thèse : Reformuler mécanisme de GC
+- Pour définir les /potentielles époques courantes/, je repose sur la notion de stabilité causale
+  - Je prends l'opération rename maximale qui est causalement stable
+  - Et je compose l'ensemble des /potentielles époques courantes/ en ne conservant que l'époque de cette opération et les époques supérieures
+- Gérald m'a fait remarqué que si j'ai une livraison out-of-order, peut avoir une opération rename "causalement stable" mais pas toutes les opérations précédentes
+  - Dans le sens où cette opération rename a été observée par tout les noeuds
+  - Ils ne peuvent donc plus émettre d'opérations concurrentes à cette opération rename
+  - Mais en tant que noeud, je peux toujours recevoir une ancienne opération dont je n'avais pas encore connaissance et qui nécessite des époques antérieures pour être intégrée
+- Reformuler la définition des potentielles époques courantes pour indiquer qu'on prend comme base l'époque maximale pour laquelle
+  - L'opération rename associée est causalement stable
+  - Toutes les opérations antérieures et concurrentes à l'opération rename associée ont été livrées
+- Voir comment vérifier cette 2nde condition dans le cas d'une livraison out of order
+** TODO Thèse : Lire *Merkle Search Trees: Efficient State-Based CRDTs in Open Networks*
+- Disponible ici : https://ieeexplore.ieee.org/abstract/document/9049566/
+- Par Alex Auvolat et François Taïani en 2019
+- Propose d'encoder un State-based CRDT en Merkle Search Tree pour diffuser efficacement les modifications dans un réseau dynamique
+  - 66% de réduction de la consommation en bande-passante vis-à-vis d'une approche reposant sur une livraison causale des modifications
+- Pas sûr de piger : compare une implémentation State-based VS. Op-based d'un même CRDT ?
+- Est-ce que le State-based CRDT est un Merkle Search Tree ou est-il traduit en Merkle Search Tree pour la diffusion ?
+  - Dans ce cas, quel coût ?
 ** TODO Thèse : Lire *Fallacies of distributed computing explained*
 - Disponible ici :  https://www.se.rit.edu/~se442/doc/fallacies.pdf
 - Whitepaper basé sur une série de blogposts sur les 8 fallacies des systèmes distribués
@@ -24962,7 +25209,7 @@ Failed to publish
 - Disponible ici : http://sites.computer.org/debull/A17dec/p15.pdf
 - Sur l'effet de la livraison causale sur la propagation des modifications
 ** TODO Thèse : Lire *Delta State Replicated Data Types*
-- Disponible ici : https://www.sciencedirect.com/science/article/pii/S0743731517302332?via%3Dihub
+- Disponible ici : https://www.sciencedirect.com/science/article/pii/S0743731517302332
 - Introduit la notion de causal context
 ** TODO Thèse : Lire *Efficient Synchronization of State-based CRDTs*
 - Disponible ici : https://ieeexplore.ieee.org/abstract/document/8731395
@@ -24987,11 +25234,32 @@ Failed to publish
 - Notamment par Dimitrios Vasilas, un doctorant de Shapiro
 - Réalisé en collaboration avec Scality
   - https://www.scality.com
+** TODO Thèse : Lire *Logical Physical Clocks*
+- Présente les Hybrid Logical Clocks
+- Par Kulkarni et al. en 2014
+- Dispo ici : https://link.springer.com/chapter/10.1007/978-3-319-14472-6_2
+- Blogpost de Bartosz a l'air de présenter le sujet
+  - https://bartoszsypytkowski.com/hybrid-logical-clocks/
 ** TODO Thèse : Lire *Empirical study on collaborative writing: What do co-authors do, use, and like?*
 - Papier cité par Nédelec pour justifier l'amélioration de la qualité des documents issus de collaborations
 ** TODO Thèse : Complexité opérations
 - Modifier complexités des opérations pour remplacer /k/ et /l/ par /h/
 ** TODO Thèse : Illustrer utilité de reporter transition vers nouvelle époque cible
+** TODO Thèse : Mettre en forme données des benchmarks
+- Au fil des benchmarks, j'ai généré une quantité conséquente de traces d'édition
+- Voir quelles traces j'utilise dans mes stats
+- Voir quelles données j'utilise vraiment
+- Voir avec quelles configurations ces données ont été générées
+  - Version de mute-bot-random, nombre de renaming bots, CRDT utilisé
+- Voir les traitements qui ont été appliqués sur ces données
+- Ranger ça proprement
+** TODO Thèse : Mettre à disposition données des benchmarks sur DOREL
+- Permettrait de les rendre publiques, de pouvoir les référencer
+- Et assurerait leur pérennité
+** TODO Thèse : Mettre à disposition sur GitHub Packages l'exécutable de mute-bot-random
+- À l'heure actuelle, les images Docker de mute-bot-random sont seulement disponibles sur ma machine et les serveurs
+- Pour les rendre publiques et plus faciles d'accès, les release
+- GitHub Packages a l'air le service approprié
 ** TODO Thèse : Ajouter algorithme de /getPathBetweenEpochs()/
 - Dans l'algorithme /insRemote()/, je décris comment on traite une insertion distante
 - Dans cet algorithme, j'utilise plusieurs fonctions helpers dont /getPathBetweenEpochs()/
