@@ -25149,6 +25149,65 @@ Failed to publish
 	      - Quid de l'upd de chacun qui suivait leur rmv respectif ?
 	  - Afin d'éviter ce cas, précise que les upd qui sont supersede par des rmv sur tous les noeuds deviennent sans effets
 	  - Dans le cadre d'objets composites, évite ainsi de faire revenir des champs qui ont été supprimés par tous les noeuds suite à des upd futures
+- Thèse : Réunion avec Gérald
+  - Notes
+    - Mettre les numéros de page dans les refs lointaines
+    - Chapitre RLS
+      - Complexités
+	- Mettre le tableau en entrée
+	- Entre Table 2.1 & 2.2, /n/ ne désigne pas la même chose
+	  - Trouver une autre lettre
+	- Mettre des points dans les formules de complexité pour qu'on pense pas que /s/ est une fonction par exemple
+      - Simulations
+	- Expliciter bots et logs
+      - 2.5.4
+	- Rappeler propriétés de priority
+      - 2.3.2
+	- Ajouter la notion qu'une epoch fille doit être plus grande que son epoch parente dans la définition
+      - 2.5.6
+	- Si on envoie le dernier rename, comment on fait pour intégrer une opération venant d'une autre epoch non-prioritaire ?
+	- Doit plutôt envoyer le LCA des époques courantes potentielles
+      - 2.6
+	- Déplacer le gros de la section dans état de l'art
+	- Besoin de développer plus LSEQ
+	- Garder les parties sur la combinaison avec Core & Nebula et LSEQ pour la conclusion
+    - Chapitre MUTE
+      - Intro
+	- Insister sur cee que j'ai fait dans MUTE, i.e. couches réplication et delivery
+	- Préciser le system model de l'application et donc les contraintes réseau qui en découlent
+	- Décrire figure 3.2 et expliquer qu'on va présenter l'application couche par couche
+      - Figure 3.1
+	- Plus détailler /network services/ et /security/
+      - 3.2.1
+	- Ajouter une figure centrée sur l'insertion d'un caractère dans l'éditeur qui se transforme en opération texte transmise au modèle qui génère une opé RLS
+      - 3.2.2
+	- Fait ref au module /Sync/ qui a été rename dans Figure 3.2
+      - 3.2.3
+	- Mécanisme de dissémination
+	  - Pas clair comment le status d'un pair est mis à jour
+	  - À reformuler/repréciser
+	  - La formule est incomplète, quid de si i > j ?
+	- Modifications apportées
+	  - Pas clair dans le style qu'on a des paragraphes et qu'il s'agit pas de nouvelles sous-sections
+      - 3.3
+	- C'est bien beau mais on ne voit pas le P2P dans cette section
+	- Supprimer 3.3.1 et 3.3.2
+	- Faire une partie sur P2P en reprenant les éléments de la topologie
+	  - Voir pour développer
+	  - Remonter ça en début de section
+	  - Indiquer que c'est entre navigateurs, donc doit utiliser WebRTC
+	  - Insister sur le fait que WebRTC ne fait rien d'autre qu'établir entre 2 navigateurs
+      - Serveur de signalisation
+	- Préciser que le 1er noeud sert de relai pour les échanges d'offres/réponses avec les autres noeuds
+      - Serveur TURN
+	- Préciser qu'en raison de la topologie, essaie de se connecter directement avec tous les noeuds
+	- Dans d'autres topologies, rien n'empêcherait d'utiliser d'autres noeuds auxquels on a réussi à se connecter comme relais pour diffuser nos messages
+      - 3.4
+	- Besoin de définir ce qu'est une clé de groupe
+	- Préciser à ce moment là ce que l'on entend par groupe
+      - 3.5
+	- La couche Sync est passée à la trappe dans la conclusion
+	- Ajouter un paragraphe dessus
 * Backlog
 ** TODO Thèse : Dire les termes
 - À un moment donné dans la thèse, doit définir précisément les termes
