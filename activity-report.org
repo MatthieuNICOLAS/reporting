@@ -25072,14 +25072,22 @@ Failed to publish
 	- La méthode utilisée pour synchroniser les pairs
     - Ces 2 points organisent la structure du document
     - Pourrait reprendre cette organisation
+  - Quand définir la concurrence ?
+    - Peut évoquer le sujet sans définir précisément dans le cadre de l'intro, puis définir ça proprement une fois arrivée dans la section *Sémantique en cas de concurrence*
+    - Ou directement définir cela dans l'intro
+  - Comment définir la concurrence ?
+    - Habitude de voir ça avec la relation /happen-before/
+    - Mais pourquoi pas avec la relation /vis/ ?
+      - Dans ce cas, doit préciser qu'on considère que /vis/ est transitive
+      - Et qu'on considère que /return-before/ est instant et donc omise
 ** Semaine du <2022-07-04 Mon> au <2022-07-08 Fri>
 *** Planned
+**** DONE Thèse : Rédiger synthèse des familles de CRDTs
 **** IN-PROGRESS Thèse : Rédiger introduction des CRDTs
 **** IN-PROGRESS Thèse : Rédiger présentation des State-based CRDTs
 - Voir pour choisir l'exemple que j'utilise pour illustrer les différentes familles de CRDTs
 **** TODO Thèse : Rédiger présentation des Op-based CRDTs
 **** TODO Thèse : Rédiger présentation des Delta-based CRDTs
-**** TODO Thèse : Rédiger synthèse des familles de CRDTs
 *** Done
 - Thèse : Rédiger présentation des State-based CRDTs
   - Quel exemple utiliser ?
@@ -25208,7 +25216,200 @@ Failed to publish
       - 3.5
 	- La couche Sync est passée à la trappe dans la conclusion
 	- Ajouter un paragraphe dessus
+- Thèse : Rédiger introduction des CRDTs
+  - Sémantique en cas de concurrence
+    - À voir comment j'illustre cette partie
+    - Aurais tendance à faire un exemple d'un conflit dans l'intro de la section
+      - Sans répondre à ce stade à la question de l'état obtenu
+    - Est-ce qu'au fur et à mesure de la partie sémantique, je reprends cet exemple et complète l'état obtenu en justifiant ?
+    - Ou, comme Vic, je fais une seule figure récapitulative à la fin de la partie listant les résultats par sémantique ?
+  - États forment sup-demi-treillis
+    - Où en parler ?
+    - Généralement, le sujet semble abordé lorsque parle des State-based CRDTs
+    - Mais s'agit pas d'une caractéristique spécifique aux State-based et Delta-based CRDTs
+      - À moins qu'un treillis soit forcément équipé d'une fonction merge ?
+    - Si ce n'est pas le cas
+      - Si états des Op-based forment aussi un sup-demi-treillis
+      - Du mal à voir où aborder ce sujet
+    - La définition semble se contenter de spécifier des éléments suivants pour join-semi-lattice
+      - Ordre partiel sur les éléments/états de l'ensemble
+      - Chaque pair d'éléments/états possède une LUB
+    - Chaque famille de CRDTs me parait satisfaire cette définition
+    - Relis *Pure Op-based CRDTs* pour confirmer
+      - N'a pas l'air d'impliquer que les états doivent former un join-semi-lattice
+      - Concerne un sous-ensemble spécifique des Op-based CRDTs
+      - Ceux dont on a pas besoin de lire l'état pour générer le message correspondant à l'opération
+      - Les séquences répliquées à identifiants dense ne rentrent pas dans cette catégorie du coup
+      - À partir du moment où j'ai besoin d'une horloge logique pour le mécanisme de résolution de conflits, ne peut pas rentrer dans catégorie des pure Op-based CRDTs ?
+      - Effectivement
+        #+BEGIN_QUOTE
+we introduce pure op-based CRDTs.
+We show that data types whose operations are commutative are natively “pure”;
+whereas for other data types to be pure, they need to leverage some information channeled through the dissemination middleware.
+        #+END_QUOTE
+      - Mais est-ce que la combinaison du Pure Op-based CRDT avec sa couche de livraison ne correspond pas au join-semi-lattice ?
+** Semaine du <2022-07-11 Mon> au <2022-07-15 Fri>
+*** Planned
+**** DONE Thèse : Lire *Efficient Synchronization of State-based CRDTs*
+- Disponible ici : https://arxiv.org/abs/1803.02750
+- Par Enes, Almeida, Baquero et Leitão en 2019
+- Présente et ajoute la notion d'irreducible elements pour les Delta-based CRDTs
+**** IN-PROGRESS Thèse : Rédiger introduction des CRDTs
+**** IN-PROGRESS Thèse : Rédiger présentation des State-based CRDTs
+- Voir pour choisir l'exemple que j'utilise pour illustrer les différentes familles de CRDTs
+**** IN-PROGRESS Thèse : Rédiger présentation des Op-based CRDTs
+**** TODO Thèse : Rédiger présentation des Delta-based CRDTs
+**** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
+- Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
+- L'idée était de former un dataset
+- Me semble que la discussion était tombée à l'eau
+  - Problème pour anonymiser les données ?
+  - Problème d'utilisation des données pour un usage non-consenti par les utilisateur-rices au préalable ?
+- PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft
+*** Done
+- Thèse : Rédiger présentation des Op-based CRDTs
+  - Envie de dire intuitivement que les opérations correspondent à des irreducible elements
+    - Ou une accumulation d'irreducible elements dans certains cas
+    - Bon, seulement dans le cas où well-designed
+    - Mais ne me parait pas quelque chose d'avancé dans les présentations des Op-based CRDTs existantes
+  - Me permettrait de dire qu'effect correspond à une méthode de fusion entre un état et un autre état et produit la LUB
+  - Et d'introduire dès à présent la notion d'irreducible elements
+    - Ce qui sera repris pour la partie sur les Delta-based CRDTs
+  - Et rendrait évidente mon affirmation que les Op-based CRDTs sont aussi des join semi lattices
+- Clim
+  - <2022-07-13 Wed>
+    - A ouvert la fenêtre en arrivant, vers 7h20
+    - A fermé la fenêtre vers 11h30
+    - À 15h01, température dans bureau a bien monté
+      - Fait plus frais dans le couloir et bureaux de PA & Abir
+    - Mais clim refuse tjrs de se mettre en route
+** Semaine du <2022-07-18 Mon> au <2022-07-22 Fri>
+*** Planned
+**** DONE Thèse : Lire *Delta State Replicated Data Types*
+- Disponible ici : https://www.sciencedirect.com/science/article/pii/S0743731517302332
+- Introduit la notion de causal context
+**** DONE Thèse : Rédiger introduction des CRDTs
+**** DONE Thèse : Rédiger présentation de LWW
+**** DONE Thèse : Rédiger présentation de MV
+**** DONE Thèse : Rédiger présentation de AW
+**** DONE Thèse : Rédiger présentation de RW
+**** TODO Thèse : Rédiger présentation de CL
+**** IN-PROGRESS Thèse : Rédiger présentation des State-based CRDTs
+- Voir pour choisir l'exemple que j'utilise pour illustrer les différentes familles de CRDTs
+**** IN-PROGRESS Thèse : Rédiger présentation des Op-based CRDTs
+**** IN-PROGRESS Thèse : Rédiger présentation des Delta-based CRDTs
+**** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
+- Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
+- L'idée était de former un dataset
+- Me semble que la discussion était tombée à l'eau
+  - Problème pour anonymiser les données ?
+  - Problème d'utilisation des données pour un usage non-consenti par les utilisateur-rices au préalable ?
+- PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft
+*** Done
+- Thèse : Lire *Delta State Replicated Data Types*
+  - S'agit d'une version enhanced de *Efficient State-based CRDTs by Delta-Mutation*
+  - Ajoute quelques notations, une preuve et de nouveaux delta-CRDTs
 * Backlog
+** TODO Thèse : Chercher pistes pour post-doc
+- Serait intéressant de voir si y a des opportunités de post-doc
+- Pistes possibles
+  - [ ] Kleppmann mentionnait avoir obtenu des fonds pour travailler sur local-first software, Munich
+    - https://twitter.com/martinkl/status/1528767680500596737
+    - Voir s'il a toujours des liens avec Cambridge du coup
+  - [ ] Bieniusa, Kaiserslautern
+    - Fait partie du groupe AG Software Technology, à University of Kaiserslautern
+    - https://pl.cs.uni-kl.de/homepage/en/
+  - [ ] Équipe Delys, Paris
+    - Voir qui prend la relève de Shapiro
+    - https://team.inria.fr/delys/
+    - [[file:~/Downloads/delys_synthesis_report.pdf][Rapport d'activité]]
+  - [ ] Parallel and Dist-Sys Group, Telecom SudParis
+    - https://www.inf.telecom-sudparis.eu/pds/
+    - Affilié à l'équipe ACMES
+      - https://www.inf.telecom-sudparis.eu/acmes/
+    - Groupe dont fait partie Pierre Sutra
+      - https://sites.google.com/site/0track
+  - [ ] Équipe MYRIADS, Inria Rennes
+    - https://team.inria.fr/myriads/
+    - [[file:~/Downloads/myriads_synthesis_report.pdf][Rapport d'activité]]
+  - [ ] Équipe WIDE, Inria Rennes
+    - https://team.inria.fr/wide/
+    - [[file:~/Downloads/wide_synthesis_report.pdf][Rapport d'activité]]
+  - [ ] Institute for Software Research, Carnegie Mellon University, Pittsburgh, Pennsylvania
+    - Labo auquel appartiennent Miller, Meiklejohn et Weidner
+    - Page de Heather Miller
+      - https://heather.miller.am/
+    - A l'air de faire partie du groupe Big Data, ce qui me semble moins intéressant sur le papier
+      - Voir en détails pratiques
+  - [ ] Cloud and Large Scale computing group, UCL, Louvain
+    - Groupe de Etienne Rivière et de Guillaume Rosinosky
+    - À voir si peut m'inscrire dans leurs thématiques de recherche
+    - https://cloudlargescale-uclouvain.github.io/
+- Choisir les perspectives de recherche à mettre en avant
+- Je serais aussi intéressé par équipes méthodes formelles pour systèmes distribués
+  - Discuter avec Stephan ?
+  - Voir les équipes qui ont été évaluées avec Veridis ?
+- En discutant avec Claude, celui-ci m'a conseillé
+  - De voir où se trouve Stephane Weiss
+  - Que c'est plutôt les encadrants qui prennent contact normalement, sauf p-e dans les pays nordiques
+  - De voir avec Claudia
+** TODO Thèse : Creuser notion d'obsolescence partielle des opérations
+- Une amélioration possible des Op-based CRDTs est de définir une relation /obsolete/ sur les opérations
+  - Me semble est déjà proposé par Bauwens et Gonzalez Boix dans *Improving the Reactivity of Pure Op-based CRDTs*
+  - À vérifier
+  - À voir l'usage qui en est fait
+- L'idée est qu'une opération puisse rendre obsolète d'autres opérations, rendant dès lors leur diffusion et stockage inutiles
+- Marche bien dans l'exemple d'un Set ou KV-Store
+- Mais les opérations peuvent ne rendre obsolètes que partiellement d'autres opérations lorsque celles-ci ne sont pas atomiques
+  - e.g. suppression d'un élément d'un bloc inséré par une unique opération d'insertion dans LS
+- Peut-on proposer un mécanisme pour gérer ce cas ?
+- Doit-on éviter de générer des opérations non-atomiques ?
+  - Pourrait décomposer une opération non-atomique en plusieurs opérations atomiques,
+  - Reviendrait à faire de la join irredundant decomposition, non ?
+- Pourrait-on associer plusieurs dots à une opération non-atomique ?
+  - Dans ce cas, appliquer une opération /remove/ reviendrait à observer le dot associé à la partie de l'opération non-atomique
+  - Couche livraison devrait ensuite décomposer l'opération non-atomique en plusieurs opérations
+  - Très similaire à l'approche de Vic pour DottedLS
+  - CRDT devrait mettre à disposition de couche livraison une fonction de décomposition à partir d'un dot
+    - Peut être fonction identité si n'a aucun sens d'un point de vue application
+    - Genre un /remove/ ne sera jamais décomposé
+      - À moins qu'il y ait un mécanisme d'undo
+** TODO Thèse : Ajouter perspective *Étendre Pure-Op based CRDTs*
+- Papier de 2017 de Baquero introduit 2 contributions IMO
+  - Tagged Causal Stable Broadcast (TCSB)
+  - PO-Log CRDT
+- Pistes d'améliorations de TCSB
+  - Enforce Exactly-Once et Causal Delivery
+  - Toutes deux pas forcément nécessaires
+  - Serait intéressant que la spécification du CRDT permette d'exprimer plus finement les contraintes
+  - Que le modèle de livraison soit une stratégie
+  - Revoir *Improving the Reactivity of Pure Operation-Based CRDTs* à ce sujet
+    - https://dl.acm.org/doi/abs/10.1145/3447865.3457968
+- Pistes d'améliorations du PO-Log CRDT
+  - Structure de données génériques
+  - Nécessite de raisonner sur le log entier
+  - S'exprime correctement pour une structure simple
+    - MV-Register
+  - Déjà plus complexe pour les Ensembles
+    - AW-Set, RW-Set
+  - Quid de structures plus complexes ?
+    - Sequence, Tree
+  - Explique que mécanisme de stabilisation causale peut permettre de discard les opérations stables
+    - Mais ne concerne que les unlabelled CRDTs j'ai l'impression
+  - Ne permet pas de supprimer les opérations des labelled CRDTs
+    - Seulement leur information de causalité
+    - Est-ce la majeure source de métadonnées ?
+  - Est-ce qu'on peut permettre de raisonner sur une structure au choix sans perdre en généricité ?
+  - Non, revient à rendre spécifique
+    - Σ, le domaine des états
+    - prepare, la méthode pour générer l'opération
+    - effect, la méthode pour intégrer l'opération
+  - Est-ce qu'on peut permettre de raisonner sur plusieurs /derived views/ à ce moment là ?
+    - Par exemple une dédiée à l'intégration des opérations locales, une dédiée à l'intégration des opérations distantes, une pour l'anti-entropie
+- Autres
+  - Pas clair comment le mécanisme de stabilisation causale et de compaction sémantique sont compatibles avec le join d'un nouveau noeud
+    - Diffuse probablement le PO-Log et snapshot du TCSB
+    - Pourrait rendre l'expliciter
 ** TODO Thèse : Dire les termes
 - À un moment donné dans la thèse, doit définir précisément les termes
   - Noeud
@@ -25235,6 +25436,16 @@ Failed to publish
   - L'opération rename associée est causalement stable
   - Toutes les opérations antérieures et concurrentes à l'opération rename associée ont été livrées
 - Voir comment vérifier cette 2nde condition dans le cas d'une livraison out of order
+** TODO Thèse : Lire *Proving PACELC*
+- Disponible ici : https://dl.acm.org/doi/abs/10.1145/3197406.3197420
+- Par Golab en 2018
+- Prouve le théorème PACELC proposé par Abadi précédemment
+** TODO Thèse : Lire *Efficient reconciliation and flow control for anti-entropy protocols*
+- Disponible ici : https://dl.acm.org/doi/abs/10.1145/1529974.1529983
+- Par van Renesse, Dumitriu, Gough, Thomas en 2008
+- Propose Scuttlebutt, un mécanisme d'anti-entropie
+- A l'air de pas mal ressembler à celui présenté dans *Detection of Mutual Inconsistency in Distributed Systems*
+- À creuser pour déterminer différence
 ** TODO Thèse : Lire *Merkle Search Trees: Efficient State-Based CRDTs in Open Networks*
 - Disponible ici : https://ieeexplore.ieee.org/abstract/document/9049566/
 - Par Alex Auvolat et François Taïani en 2019
@@ -25267,12 +25478,6 @@ Failed to publish
 ** TODO Thèse : Lire *Writes : the dirty secret of causal consistency*
 - Disponible ici : http://sites.computer.org/debull/A17dec/p15.pdf
 - Sur l'effet de la livraison causale sur la propagation des modifications
-** TODO Thèse : Lire *Delta State Replicated Data Types*
-- Disponible ici : https://www.sciencedirect.com/science/article/pii/S0743731517302332
-- Introduit la notion de causal context
-** TODO Thèse : Lire *Efficient Synchronization of State-based CRDTs*
-- Disponible ici : https://ieeexplore.ieee.org/abstract/document/8731395
-- Introduit mécanismes de diffusion efficace des deltas
 ** TODO Thèse : Lire *Specification and Complexity of Collaborative Text Editing*
 - Disponible ici : https://dl.acm.org/doi/10.1145/2933057.2933090
 - Introduit spécification faible et forte des séquences répliquées
@@ -25319,6 +25524,18 @@ Failed to publish
 - À l'heure actuelle, les images Docker de mute-bot-random sont seulement disponibles sur ma machine et les serveurs
 - Pour les rendre publiques et plus faciles d'accès, les release
 - GitHub Packages a l'air le service approprié
+** TODO Thèse : Lire *Synthesizing CRDTs from Sequential Data Types with Verified Lifting*
+- Dispo ici : https://arxiv.org/abs/2205.12425
+- Publié à OOPSLA'22
+- Par Shadaj Laddad, Conor Power, Mae Milano, Alving Cheung, Joseph M. Hellerstein
+- Propose un outil permettant de générer un CRDT à partir d'un type de données séquentiel
+- Indique qu'instaure un ordre entre les opérations non-commutatives
+  - Voir comment cet ordre est créé
+  - Et comment il est utilisé
+- Voir sémantique proposée par le CRDT produit
+  - Si génère du LWW, c'est p-e limité pour un bon nombre de types
+- Indique que le CRDT produit est formellement vérifié
+  - Est-ce qu'on peut détourner leur outil pour vérifier un CRDT existant ?
 ** TODO Thèse : Ajouter algorithme de /getPathBetweenEpochs()/
 - Dans l'algorithme /insRemote()/, je décris comment on traite une insertion distante
 - Dans cet algorithme, j'utilise plusieurs fonctions helpers dont /getPathBetweenEpochs()/
