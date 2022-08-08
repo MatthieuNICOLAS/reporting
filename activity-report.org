@@ -25293,7 +25293,10 @@ whereas for other data types to be pure, they need to leverage some information 
 **** DONE Thèse : Rédiger présentation de MV
 **** DONE Thèse : Rédiger présentation de AW
 **** DONE Thèse : Rédiger présentation de RW
-**** TODO Thèse : Rédiger présentation de CL
+**** DONE Thèse : Rédiger présentation de CL
+**** DONE Thèse : Rédiger synthèse sémantiques
+**** DONE Thèse : Rédiger introduction sémantiques des CRDTs
+**** DONE Thèse : Rédiger introduction modèles de sync des CRDTs
 **** IN-PROGRESS Thèse : Rédiger présentation des State-based CRDTs
 - Voir pour choisir l'exemple que j'utilise pour illustrer les différentes familles de CRDTs
 **** IN-PROGRESS Thèse : Rédiger présentation des Op-based CRDTs
@@ -25309,7 +25312,218 @@ whereas for other data types to be pure, they need to leverage some information 
 - Thèse : Lire *Delta State Replicated Data Types*
   - S'agit d'une version enhanced de *Efficient State-based CRDTs by Delta-Mutation*
   - Ajoute quelques notations, une preuve et de nouveaux delta-CRDTs
+- Thèse : Rédiger introduction sémantiques des CRDTs
+  - Préciser qu'on ne représente pas ?
+    - Métadonnées introduites au mécanisme de résolution de conflits
+  - Pour quelles raisons ?
+    - Simplicité
+    - Clarté
+    - Implémentations différentes
+- Thèse : Rédiger introduction modèles de sync des CRDTs
+  - Introduire ici l'exemple utilisé tout au long de la section ?
+  - Peut être utile pour préciser que
+    - Scénario avec Ensemble CRDT
+    - Scénario sans conflits, i.e. la sémantique n'importe pas
+    - Ne représente pas les métadonnées
+** Semaine du <2022-07-26 Tue> au <2022-07-29 Fri>
+*** Planned
+**** DONE Thèse : Rédiger présentation des State-based CRDTs
+- Voir pour choisir l'exemple que j'utilise pour illustrer les différentes familles de CRDTs
+**** DONE Thèse : Rédiger présentation des Op-based CRDTs
+**** DONE Thèse : Rédiger présentation des Delta-based CRDTs
+**** DONE Thèse : Outliner partie introduction Sequence CRDTs
+**** IN-PROGRESS Thèse : Outliner partie sur WOOT
+- Pour cela, (re)lire papiers suivants
+  - *Data Consistency for P2P Collaborative Editing*
+    - Papier d'origine
+  - *Wooki: A P2P Wiki-based Collaborative Writing Tool*
+    - Me semble que propose une amélioration de l'algo de gestion des ins concurrents
+  - *Evaluating CRDTs for Real-time Document Editing*
+    - De même
+**** TODO Thèse : Rédiger adoption des CRDTs
+**** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
+- Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
+- L'idée était de former un dataset
+- Me semble que la discussion était tombée à l'eau
+  - Problème pour anonymiser les données ?
+  - Problème d'utilisation des données pour un usage non-consenti par les utilisateur-rices au préalable ?
+- PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft
+*** Done
+- Thèse : Outliner partie sur WOOT
+  - *Data Consistency for P2P Collaborative Editing*
+    - Insiste sur le coût des vecteurs d'horloge
+      - Que c'est la nécessité de vecteurs d'horloge pour chaque opérations qui empêche les algos d'OT d'être utilisable dans dist sys
+      - Pourrait rappeler cela dans ma présentation de RCB
+  - Plan
+    - Présentation de WOOT
+      - De manière rétro-active, WOOT se révèle être le 1er Op-based Sequence CRDT à notre connaissance
+      - Proposé pour l'édition collaborative
+	- En réponse aux limites de l'approche OT
+	- Notamment son inadéquation avec les systèmes P2P puisque les algorithmes reposent sur des vecteurs d'horloge
+    - Intuition de l'approche
+      - Ré-exprime ins(index, elt) sous la forme de ins(pred, elt, succ)
+      - Modifie sémantique ins : au lieu d'exprimer une position de l'elt  dans un état de la séquence, exprime une position relative aux autres elts
+      - Rend ainsi cette modification compatible, i.e. commutative avec les modifications concurrentes
+      - Exemple avec dOpt puzzle ?
+    - Besoin d'identifier de manière unique chaque élément
+    - Reste cependant des conflits à gérer
+      - ins/del
+	- Besoin de pouvoir insérer élément à sa position malgré la suppression de son pred et/ou succ
+	- Nécessite introduction de tombstones
+      - ins/ins entre mêmes éléments
+	- Besoin qu'ordre des éléments soit le même pour tous les noeuds
+	- Nécessite définition d'un ordre strict entre les éléments insérés en concurrence au même emplacement
+    - Modèle de livraison
+      - Repose sur la notion de /semantic causal dependency/ en place et lieu de /happen-before/
+      - Livraison causale de l'ins par rapport aux pred et succ
+      - Livraison causale de la del par rapport à l'elt supprimé
+** Semaine du <2022-08-01 Mon> au <2022-08-05 Fri>
+*** Planned
+**** DONE Thèse : Outliner partie sur WOOT
+- Pour cela, (re)lire papiers suivants
+  - *Data Consistency for P2P Collaborative Editing*
+    - Papier d'origine
+  - *Wooki: A P2P Wiki-based Collaborative Writing Tool*
+    - Me semble que propose une amélioration de l'algo de gestion des ins concurrents
+  - *Evaluating CRDTs for Real-time Document Editing*
+    - De même
+**** DONE Thèse : Relire rapport PA
+**** TODO Thèse : Outliner partie sur RGA
+- Pour cela, (re)lire papiers suivants
+  - *Replicated abstract data types: Building blocks for collaborative applications*
+  - *High Responsiveness for Group Editing CRDTs*
+**** TODO Thèse : Rédiger adoption des CRDTs
+**** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
+- Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
+- L'idée était de former un dataset
+- Me semble que la discussion était tombée à l'eau
+  - Problème pour anonymiser les données ?
+  - Problème d'utilisation des données pour un usage non-consenti par les utilisateur-rices au préalable ?
+- PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft
+*** Done
+- Thèse : Outliner partie sur WOOT
+  - Plan
+    - Des améliorations furent proposées
+      - WOOTO, dans *Wooki: a P2P Wiki-based Collaborative Writing Tool*
+	- Modifie composition même des identifiants pour réduire complexité de l'intégration des opérations ins
+      - WOOTH, dans *Evaluating CRDTs for Real-time Document Editing*
+	- Modifie structures de données utilisées pour réduire complexité de l'intégration des opérations
+    - Mais expériences de *Evaluating CRDTs for Real-time Document Editing* a cependant montré qu'approche non-viable pour édition collaborative temps réel
+      - En raison de ses temps d'intégration des opérations pouvant dépasser les 50ms
+  - Remarques sur évaluation expérimentale de *Evaluating CRDTs for Real-time Document Editing*
+    - Y a un détail qui me paraît troublant sur les résultats de cette évaluation
+    - Le papier indique que la famille d'algos WOOT n'est pas utilisable dans cadre d'édition collaborative car pas assez performante
+      - Temps d'inté des opés locales > 50ms parfois (tab 5, page 6)
+    - Inté des opés locales consiste à
+      - Générer l'opération distante
+      - L'appliquer
+    - Les temps d'intégration des opérations distantes sont raisonnables
+      - < 50ms tout le temps
+    - Pourquoi diable WOOTH atteint alors parfois 150ms pour intégrer une opération locale ?
+      - Vient de la génération de l'opération locale
+      - Même facteur dans ce cas que RGA, N, le nombre d'insertions
+    - Donc pourquoi RGA se porte bien en face ?
+    - Vient p-e du fait qu'une opé locale peut correspondre à plusieurs opés distantes
+    - Dans ce cas, peut facilement obtenir une opé locale dont le coût explose
+    - Mais surprenant que les autres CRDTs tiennent mieux le coup
+** Semaine du <2022-08-08 Mon> au <2022-08-12 Fri>
+*** Planned
+**** IN-PROGRESS Thèse : Outliner partie sur RGA
+- Pour cela, (re)lire papiers suivants
+  - *Replicated abstract data types: Building blocks for collaborative applications*
+  - *High Responsiveness for Group Editing CRDTs*
+**** TODO Thèse : Rédiger adoption des CRDTs
+**** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
+- Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
+- L'idée était de former un dataset
+- Me semble que la discussion était tombée à l'eau
+  - Problème pour anonymiser les données ?
+  - Problème d'utilisation des données pour un usage non-consenti par les utilisateur-rices au préalable ?
+- PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft
+*** Done
+- Thèse : Outliner partie sur RGA
+  - Pas de traces de RGA, autre qu'une citation, dans
+    - *Conflict-free Replicated Data Types*
+    - *Conflict-free Replicated Data Types: An Overview*
 * Backlog
+** TODO Thèse : Lire *RunTime-assisted convergence in replicated data types*
+- Dispo ici : https://dl.acm.org/doi/abs/10.1145/3519939.3523724
+- Par Kaki, Prahladan et Lewchenko en 2022
+- Article de workshop publié à PaPoC'22
+  - Dispo ici : https://gowthamk.github.io/docs/papoc22.pdf
+- Semble proposer mécanisme pour assurer convergence dans exécution distribuée
+  - Applicable à n'importe quel type séquentiel, sans conditions
+    - Pas besoin de commutativité ou d'idempotence
+- N'ajouterait aucun coût en disponibilité et latence
+** TODO Thèse : Lire *Self-compressing object sequence for consistency maintenance in co-editors*
+- Dispo ici : https://onlinelibrary.wiley.com/doi/full/10.1002/spe.3090
+- Par Cai, He, Yang, Lv et Cheng en 2022
+- Propose ASTO, une séquence répliquée qui s'auto-compresse
+  - Basée sur l'approche Address Space Transformation (AST)
+- Voir comment cela se compare à RLS
+** TODO Thèse : Lire *DSON: JSON CRDT using delta-mutations for document stores*
+- Dispo ici : https://dl.acm.org/doi/abs/10.14778/3510397.3510403
+- Par Rinberg, Solomon, Shlomo, Khazma, Lushi, Keidar et Ta-Shma en 2022
+- Propose un Delta-based CRDT pour JSON
+- Propose aussi un nouveau CRDT pour Séquence visant à améliorer le coût en métadonnées
+  - Obtient une complexité spatiale de O(k^2 * D + n * log n)
+  - Avec n le nombre de noeuds, D le nombre d'éléments dans la séquence, k le nombre de modifications concurrentes
+- Voir leur approche
+** TODO Thèse : Lire *Response time and display rate in human performance with computers*
+- Dispo ici : https://dl.acm.org/doi/abs/10.1145/2514.2517
+- Par Shneiderman en 1984
+- Détermine que délai doit être maintenu en-dessous de 50ms
+** TODO Thèse : Lire *Modeling the effects of delayed haptic and visual feedback in a collaborative virtual environment*
+- Dispo ici : https://dl.acm.org/doi/abs/10.1145/1275511.1275514
+- Par Jay, Glencross et Hubbold en 2007
+- Détermine que délai doit être maintenu en-dessous de 50ms
+** TODO Thèse : Lire *Tombstone Transformation Functions for Ensuring Consistency in Collaborative Editing Systems*
+- Dispo ici : https://ieeexplore.ieee.org/abstract/document/4207539
+- Par Oster, Molli, Urso et Imine en 2006
+- Propose fonctions de transformation pour édition collaborative basée sur l'utilisation de tombstones
+- Inspirera WOOT de mémoire
+** TODO Thèse : Lire *A partial persistent data structure to support consistency in real-time collaborative editing*
+- Dispo ici : https://ieeexplore.ieee.org/abstract/document/5447883
+- Par Wu, Pu et Ferreira en 2010
+- Propose un CRDT pour édition collaborative
+** TODO Thèse : Lire *Real-time collaborative editing behavior in USA and Japanese distributed teams*
+- Disponible ici : https://dl.acm.org/doi/abs/10.1145/1978942.1979109
+- Par Scissors, Sadat Shami, Ishihara, Rohall et Saito en 2011
+- Étudie les comportements adoptés dans le cadre de tâches d'édition collaborative
+** TODO Thèse : Lire *Collaborative Writing Is Hard to Support: A Field Study of Collaborative Writing*
+- Disponible ici : https://link.springer.com/article/10.1023/A:1008636321493
+- Par Tammaro, Mosier, Goodwin et Spitz en 1997
+- Justifie les bénéfices de l'édition collaborative
+  - Réduction du temps de complétion de la tâche
+  - Réduction des erreurs (nombre ? gravité ?)
+  - Obtention de plusieurs points de vues et compétences sur un sujet
+  - Amélioration de la précision du résultat
+** TODO Thèse : Lire *Lightweight probabilistic broadcast*
+- Disponible ici : https://dl.acm.org/doi/abs/10.1145/945506.945507
+- Par Eugster, Guerraoui, Handurukande, Kouznetsov et Kermarrec en 2003
+- Introduit un mécanisme /lightweight/ de diffusion probabiliste
+- À comparer à l'algo de diffusion de SWIM
+** TODO Thèse : Lire *Epidemic Information Dissemination in Distributed Systems*
+- Disponible ici : https://ieeexplore.ieee.org/abstract/document/1297243
+- Par Euster, Guerraoui, Kermarrec et Massoulie en 2004
+- Mécanisme de diffusion épidémique
+- Voir diff avec /lpbcast/
+- Pourquoi /Wooki/ utilise /lpbcast/ et pas ça à la place ?
+** TODO Thèse : Étudier entrelacements dans Logoot
+- Un reproche fait à l'approche Logoot par rapport à RGA est le problème d'entrelacements d'insertions concurrentes
+- Serait-il possible de résoudre ce problème avec une fonction d'allocation des ids plus intelligente ?
+  - E.g. si id précédent est le mien, pourrait réutiliser la même base, même si pas aggrégeable
+    - Mais solution limitée qu'aux modifications d'un seul noeud
+    - Je suppose que RGA n'a pas le problème même si sous-groupes effectuent modifications concurrentes
+    - À vérifier
+** TODO Thèse : Rédiger tombstones-based Sequence CRDTs
+** TODO Thèse : Rédiger dense identifiers-based Sequence CRDTs
+** TODO Thèse : Rédiger approches pour mitigation du surcoût des Sequence CRDTs
+** TODO Thèse : Rédiger présentation des systèmes distribués
+** TODO Thèse : Introduire notion /Livraison à terme/
+- Doit spécifier que le réseau doit fournir la livraison à terme pour que noeuds convergent à terme
+- Peut en profiter pour introduire la /Cohérence forte à terme/ et /Convergence unidirectionnelle/
+  - Revoir thèse Vic page 18
 ** TODO Thèse : Chercher pistes pour post-doc
 - Serait intéressant de voir si y a des opportunités de post-doc
 - Pistes possibles
@@ -25440,6 +25654,10 @@ whereas for other data types to be pure, they need to leverage some information 
 - Disponible ici : https://dl.acm.org/doi/abs/10.1145/3197406.3197420
 - Par Golab en 2018
 - Prouve le théorème PACELC proposé par Abadi précédemment
+** TODO Thèse : Lire *Providing high availability using lazy replication*
+- Disponible ici : https://dl.acm.org/doi/abs/10.1145/138873.138877
+- Par Ladin, Liskov, Shrira et Ghemawat en 1992
+- Définirait la notion de /semantic causal dependcy/
 ** TODO Thèse : Lire *Efficient reconciliation and flow control for anti-entropy protocols*
 - Disponible ici : https://dl.acm.org/doi/abs/10.1145/1529974.1529983
 - Par van Renesse, Dumitriu, Gough, Thomas en 2008
