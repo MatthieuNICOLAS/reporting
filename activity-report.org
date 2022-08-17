@@ -25428,10 +25428,11 @@ whereas for other data types to be pure, they need to leverage some information 
     - Mais surprenant que les autres CRDTs tiennent mieux le coup
 ** Semaine du <2022-08-08 Mon> au <2022-08-12 Fri>
 *** Planned
-**** IN-PROGRESS Thèse : Outliner partie sur RGA
+**** DONE Thèse : Outliner partie sur RGA
 - Pour cela, (re)lire papiers suivants
   - *Replicated abstract data types: Building blocks for collaborative applications*
   - *High Responsiveness for Group Editing CRDTs*
+  - *Interleaving anomalies in collaborative text editors*
 **** TODO Thèse : Rédiger adoption des CRDTs
 **** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
 - Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
@@ -25445,7 +25446,266 @@ whereas for other data types to be pure, they need to leverage some information 
   - Pas de traces de RGA, autre qu'une citation, dans
     - *Conflict-free Replicated Data Types*
     - *Conflict-free Replicated Data Types: An Overview*
+  - Propose un mécanisme de GC des tombstones
+    - Repose sur deux conditions
+      - Stabilité causale de l'opération /Del/
+      - Impossibilité de générer un *S4Vec* plus petit que l'élément suivant
+    - On constate cependant que la 1ère condition implique la 2nde
+      - Puisque étant donné 2 opés /o1/ et /o2/ telles que /o1 -> o2/, on a /sum(vecclock(o1)) < sum(vecclock(o2))/
+      - À moins que je loupe une subtilité des vecteurs d'horloges
+      - Ou que l'on a pas une livraison FIFO des opés par sites
+    - Sinon, voudrait dire que c'est possible d'être dans l'impossibilité d'insérer un élément entre le prédecesseur de /o1/ et /o1/ après avoir observé /o1/
+    - Maintient un ensemble de Queues pour référencer les tombstones
+      - Une par site
+      - Lors d'une suppression, la tombstone est ajoutée à la fin de Queue du site ayant effectué la suppression
+	- Pas de problème de convergence en cas de suppressions concurrentes d'un même élément
+	  - Tombstone sera purgée lorsqu'une des opérations sera causalement stable
+	  - À partir de là, tombstone ne peut plus être un cobject
+    - Mécanisme de purge
+      - Vérifie la 1ère tombstone de chaque Queue
+	- Comme repose sur livraison causale, la 1ère tombstone est forcément la 1ère GC-able de la Queue
+	- Si causalement stable, parcourt la Queue
+      - Chaque tombstone à purger nécessite de parcourir la liste chainée pour retrouver son prédecesseur
+      - De façon à MàJ la liste chainée et supprimer effectivement la tombstone
+      - Complexité du mécanisme en O(N * t)
+	- N nombre d'éléments dans la liste, t nombre de tombstones à purger
+  - Réflexion sur modèle de livraison
+    - WOOT et RGA peuvent adopter exactement le même modèle de livraison
+      - Exactement une fois
+      - /ins/ d'un elt après /ins/ de son predécesseur
+      - /rmv/ après /ins/ de l'elt
+    - Note livraison /rmv/ pour WOOT et RGA
+      - Pourrait en soi livrer une opération /rmv/ avant /ins/ correspondant
+      - Suffit juste de maintenir un ensemble des ids supprimés
+	- Déjà le cas pour RGA avec sa hashtable en vrai
+      - Et d'interrompre /ins/ si son id est déjà présent dans l'ensemble
+      - Pose un problème néanmoins
+      - Ne sait pas dans ce cas où se trouve l'id dans la seq
+      - Si id est le prédecesseur d'une /ins/ future, ne peut pas l'intégrer
+      - Pourrait enrichir /ins/ appliquée après /rmv/ pour simplement insérer tombstone et insérer sous-chaine construire à partir de lui
+      - Génère conflit néanmoins avec mécanisme de purge
+    - WOOT et RGA possèdent des opérations assez simples à rendre idempotente
+    - Pour WOOT, suffit de
+      - ne pas appliquer l'insertion en cas de présence de l'identifiant
+      - remove l'est déjà
+    - Pour RGA, suffit de
+      - ne pas appliquer l'insertion en cas de présence de l'identifiant
+      - ne pas appliquer l'update si s_p de l'élément est supérieur
+      - remove l'est déjà
+    - Le seul cas gênant est la gestion de l'insertion dans RGA si la tombstone a déjà été purgée
+    - Mais la question est, y a-t-il un intérêt à pouvoir supporter une livraison /au moins une fois/ plutôt que /exactement une fois/ ?
+  - Réflexion sur entrelacement dans Séquence CRDTs basés sur identifiants denséments ordonnés
+    - Problème de l'entracement me semble difficile à résoudre pour cette catégorie
+    - Peut réduire surface du problème en rendant plus intelligente la fonction d'allocation des ids
+      - Si identifiant précédent appartient au noeud, peut reprendre la même base
+      - Juste utiliser son nouveau numéro de séquence à la place
+    - Marche pour noeud isolé
+    - Mais comment éviter entrelacements dans cas où plusieurs sous-groupes composés de plusieurs noeuds travaillent de leur côté puis se sync ?
+    - Finalement, serait plus "simple" de faire un mécanisme de détection et d'highlight des éditions concurrentes
+    - Et en profiter pour renommer les contributions
+      - Une sorte de /rename/ avant intégration
+    - Hum, ça m'a l'air d'être tout sauf simple
+  - Plan
+    - RGA est le second CRDT appartenant à l'approche à pierres tombales.
+    - Spécifié dans le cadre d'un effort pour établir les principes nécessaires à la conception de Replicated Abstract Data Types (RADTs)
+    - Dans cet article, définissent et se basent sur 2 principes pour concevoir RADTs
+      - Operation Commutativity (OC)
+	- Toutes paires possibles d'opérations concurrentes est commutative
+	- Permet de garantir que l'intégration par des noeuds différents d'une même séquence d'opérations concurrentes, mais dans des ordres différents, produira un état équivalent
+      - Precedence Transitivity (PT)
+	- Relation de précédence - - > permet d'établir un ordre de priorité sur les intentions des opérations, pour déterminer laquelle conserver en cas de conflits.
+	- Precedence Transitivity définit que pour tout trio d'opérations a, b et c, si on a a - - > b et b - - > c, on a a - - > c
+    - À partir de ces principes, proposent plusieurs RADTs
+      - Replicated Fixed-Size Array (RFA)
+      - Replicated Hash Table (RFT)
+      - Replicated Growable Array (RGA), qui nous intéresse ici
+    - Comme WOOT, RGA repose sur un système d'identifiants qu'il associe aux éléments
+      - Nommé S4Vector, ces identifiants sont formés de
+	- ssid, identifiant de la session de collaboration
+	- sum, somme du vecteur d'horloges courant du noeud auteur de l'élément à son insertion
+	- ssn, identifiant du noeud auteur de l'élément
+	- seq, numéro de séquence de l'auteur de l'élément à son insertion
+      - /footnote/ : Dans présentation suivante de RGA, utilise horloge de Lamport /citation/ plutôt
+    - Définit une relation d'ordre strict total sur les identifiants
+      - Pour cela, se base sur l'ordre lexicographique sur ses éléments
+    - Définit intention de l'insertion comme insertion après un élément
+      - Utilise alors le couple <id du prédecesseur, id de l'élément> pour insérer de manière commutative
+    - Algorithme d'insertion procède de la manière suivante
+      - Trouve prédecesseur à partir de son id
+      - Mais ne peut pas insérer tout de suite après, puisque éléments peuvent avoir été insérés en concurrence à la même
+      - Besoin de définir un ordre strict total entre ces éléments de manière déterministe
+      - Repose pour cela sur leur id respectif
+      - Parcourt alors liste à partir du prédecesseur
+      - Compare le id de l'élément à insérer à l'élément suivant /next/
+      - Si l'id de l'élément à insérer a la précédence sur celui de l'élément suivant, i.e. elt_id > next_id
+	- Insère à cet emplacement l'élément
+      - Sinon continue le parcours
+    - De manière similaire à WOOT, besoin de tombstone en cas de suppression puisque insertion repose sur prédecesseur
+    - Figure
+    - À la différence de WOOT, juge le coût des tombstones trop élévé et propose un mécanisme de GC des tombstones
+      - Repose sur deux conditions
+	- Stabilité causale de l'opération /Del/
+	- Impossibilité de générer un *S4Vec* plus petit que l'élément suivant
+      - On constate cependant que la 1ère condition implique la 2nde
+	- Puisque étant donné 2 opés /o1/ et /o2/ telles que /o1 -> o2/, on a /sum(vecclock(o1)) < sum(vecclock(o2))/
+    - Algorithmes plus efficace que celui de WOOT en terme de complexité en temps
+      - Notamment sur l'intégration des opérations, i.e. des modifications distantes
+    - Concernant le modèle de livraison de RGA
+      - Repose sur une livraison causale
+      - /papier/ indique que ce modèle de livraison pourrait être relaxé pour se passer des vecteurs d'horloges
+      - Mais laisse cette piste comme future work
+      - À notre connaissance, n'a pas été creusé dans la littérature
+      - Dans /these-vic/, indique que pourrait adopter même modèle de livraison que WOOT, ce que nous secondons
+	- Insertion ne peut être livrée qu'après insertion du prédecesseur
+	- Suppression ne peut être livrée qu'après insertion de l'élément
+    - S'agit du CRDT implémenté dans Yjs et Automerge
+    - Dans /attiya/, a montré que RGA est optimal d'un point de vue métadonnées comme Séquence CRDT par élément basée sur l'approche pierres tombales
+    - Plusieurs extensions ont été proposées
+      - RGASplit
+	- Indique que les pauvres performances lors de l'intégration de modifications locales, par rapport aux approches précédentes, constituent une limite des CRDTs
+	  - S'agit des performances impactant le plus l'expérience utilisateur
+	- Souhaite donc réduire la complexité des modifications locales à une complexité logarithmique
+	- Propose /identifier structure/, une structure de données auxiliaire utilisable par les Sequence CRDTs pour améliorer complexité en temps des modifications locales
+	- Combine cette structure de données a un mécanisme d'aggrégation des éléments en blocs tels que proposés par /string-wise, ls/
+	- Permet de d'améliorer la complexité en temps des opérations locales, tout en réduisant le coût en métadonnées de la séquence répliquée.
+      - RGA sans entrelacements
+	- Dans /citation/, auteurs mettent en lumière un problème des CRDTs pour Séquence
+	- Lorsque des séquences de modifications sont effectuées en concurrence par des noeuds
+	  - CRDTs de la littérature assurent la convergence des répliques
+	  - Mais n'assurent pas la lisibilité du résultat
+	  - Notamment, il est possible que les éléments insérés en concurrence se retrouvent entrelacés
+	- Proposent une nouvelle spécification que doivent respecter les Séquences répliquées : la spécification forte sans entrelacement
+	  - Basée sur la spécification forte des Séquences répliquées spécifiée dans /attiya/
+	- Proposent une évolution de RGA
+	  - Ajoutent à l'opération /ins/ un paramètre, /samePredId/, correspondant à l'ensemble des identifiants ayant le même /predId/
+	  - Si deux /ins/ ayant le même /predId/ sont causalement liées, l'une apparaît dans le /samePredId/ de l'autre
+	  - Sinon, les deux /ins/ sont concurrentes et utilisent leur /samePredId/ respectif pour ordonner de manière déterministe les éléments
+	- Ne prouve cependant pas que cette extension empêche tout entrelacement
+	- /footnote/ : Draft semble indiquer que la dite extension n'empêche pas interleave RtL
+- EasyStore
+  - Le service technique à Vandoeuvre
+    - Dispo par téléphone au 03 83 27 57 33, seulement de 9h-12h
+  - Moi
+    - Acheté mon macbook pro 13" en 2017
+    - Plusieurs problèmes
+    - Problème principal est un problème de batterie
+      - J'ai l'icone /Service Battery/
+      - 273 cycles de charge
+      - PC est sur secteur, chargé à 100%
+      - Le débranche
+      - Au bout de 5min, des fois 1h, le PC s'éteint
+      - Ne veut plus redémarrer car batterie vide
+      - Une fois branché, redémarre
+      - Affiche le % de batterie avant sa coupure
+	- Peut être 100%, 54%
+      - Plutôt handicapant
+      - Et aléatoire
+	- Des fois, peut l'utiliser toute une matinée sans problème
+    - Second problème concerne le clavier
+      - Touche MAJ gauche ne fonctionne plus
+      - D'autres touches ont tendance à répéter 2-3 fois le caractère quand j'appuie dessus
+  - Abir
+    - Acheté son macbook pro 13" (modèle M1 2020) en décembre 2021
+      - Donc toujours sous garantie
+    - Auparavant avait une autonomie de 17h
+    - Là a fait le test hier, une autonomie d'environ 5h
+    - 11 cycles
+    - Assez fréquemment mais ça allait encore
+    - Mais 5h, ça devient handicapant
+    - Batterie toujours indiquée comme normale par le système
+      - Permettez-nous d'avoir des doutes
+    - 30min diagnostic, si pas de problème matériel, compter 24h
+    - Gratuit si problème matériel, m'a parlé d'un "petit forfait" si logiciel
+  - Questions
+    - Combien de temps ça prend ?
+      - S'agit de nos ordinateurs de travail, peut difficilement s'en passer longtemps
+      - 3-4j
+    - Frais de diagnostic
+      - Vois qu'il y a des frais de diagnostic de 39€
+      - Pour l'ordi sous garantie, comment ça se passe ?
+	- Doit les avancer et se faire rembourser ensuite ?
+	  - Comment ?
+	- Ou tout est pris en charge direct ?
+    - Frais pour changement de batterie et clavier ?
+      - 269€
+** Semaine du <2022-08-16 Tue> au <2022-08-19 Fri>
+*** Planned
+**** TODO Thèse : Outliner partie sur Treedoc
+- Pour cela, (re)lire papiers suivants
+  - *A commutative replicated data type for cooperative editing*
+**** TODO Thèse : Rédiger adoption des CRDTs
+**** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
+- Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
+- L'idée était de former un dataset
+- Me semble que la discussion était tombée à l'eau
+  - Problème pour anonymiser les données ?
+  - Problème d'utilisation des données pour un usage non-consenti par les utilisateur-rices au préalable ?
+- PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft
+*** Done
 * Backlog
+** TODO Thèse : Établir jury
+- Pistes
+  - [ ] Elisa Gonzalez Boix
+    - https://soft.vub.ac.be/disco/elisa/
+  - [ ] Aniette Bieniusa
+    - https://softech.informatik.uni-kl.de/homepage/de/staff/AnnetteBieniusa/
+** TODO Thèse : Chercher pistes pour post-doc
+- Serait intéressant de voir si y a des opportunités de post-doc
+- Pistes possibles
+  - [ ] Kleppmann mentionnait avoir obtenu des fonds pour travailler sur local-first software, Munich
+    - https://twitter.com/martinkl/status/1528767680500596737
+    - Voir s'il a toujours des liens avec Cambridge du coup
+  - [ ] Bieniusa, Kaiserslautern
+    - Fait partie du groupe AG Software Technology, à University of Kaiserslautern
+    - https://pl.cs.uni-kl.de/homepage/en/
+  - [ ] Équipe Delys, Paris
+    - Voir qui prend la relève de Shapiro
+    - https://team.inria.fr/delys/
+    - [[file:~/Downloads/delys_synthesis_report.pdf][Rapport d'activité]]
+  - [ ] Parallel and Dist-Sys Group, Telecom SudParis
+    - https://www.inf.telecom-sudparis.eu/pds/
+    - Affilié à l'équipe ACMES
+      - https://www.inf.telecom-sudparis.eu/acmes/
+    - Groupe dont fait partie Pierre Sutra
+      - https://sites.google.com/site/0track
+  - [ ] Équipe MYRIADS, Inria Rennes
+    - https://team.inria.fr/myriads/
+    - [[file:~/Downloads/myriads_synthesis_report.pdf][Rapport d'activité]]
+  - [ ] Équipe WIDE, Inria Rennes
+    - https://team.inria.fr/wide/
+    - [[file:~/Downloads/wide_synthesis_report.pdf][Rapport d'activité]]
+  - [ ] Institute for Software Research, Carnegie Mellon University, Pittsburgh, Pennsylvania
+    - Labo auquel appartiennent Miller, Meiklejohn et Weidner
+    - Page de Heather Miller
+      - https://heather.miller.am/
+    - A l'air de faire partie du groupe Big Data, ce qui me semble moins intéressant sur le papier
+      - Voir en détails pratiques
+  - [ ] Cloud and Large Scale computing group, UCL, Louvain
+    - Groupe de Etienne Rivière et de Guillaume Rosinosky
+    - À voir si peut m'inscrire dans leurs thématiques de recherche
+    - https://cloudlargescale-uclouvain.github.io/
+  - [ ] Distribution and Concurrency (DisCo), Software Languages Lab (SOFT), Vrije Universiteit Brussel (VUB)
+    - Groupe de Elisa Gonzalez Boix et Jim Bauwens
+    - https://soft.vub.ac.be/disco/
+    - Collabore avec Nuno
+  - [ ] Computer Systems Group, NOVA LINCS, Universidade NOVA de Lisboa
+    - Groupe de Nuno Perguiça, Albert van der Linde, Bernardo Ferreira
+    - https://nova-lincs.di.fct.unl.pt/research_areas/1#information
+    - https://asc.di.fct.unl.pt/~nmp/
+    - Recherche des post-docs dans le contexte du projet SAMOA et dans le groupe de recherche
+      - https://asc.di.fct.unl.pt/~nmp/samoa/samoa.html
+- Choisir les perspectives de recherche à mettre en avant
+- Je serais aussi intéressé par équipes méthodes formelles pour systèmes distribués
+  - Discuter avec Stephan ?
+  - Voir les équipes qui ont été évaluées avec Veridis ?
+- En discutant avec Claude, celui-ci m'a conseillé
+  - De voir où se trouve Stephane Weiss
+  - Que c'est plutôt les encadrants qui prennent contact normalement, sauf p-e dans les pays nordiques
+  - De voir avec Claudia
+- En discutant avec Claudia, celle-ci m'a
+  - Recommandé de contacter Kleppmann
+  - Indiqué que c'était avec Roman Vitenberg, à l'Université d'Oslo, que Weiss a fait son post-doc
+    - https://www.mn.uio.no/ifi/english/people/aca/romanvi/index.html
 ** TODO Thèse : Lire *RunTime-assisted convergence in replicated data types*
 - Dispo ici : https://dl.acm.org/doi/abs/10.1145/3519939.3523724
 - Par Kaki, Prahladan et Lewchenko en 2022
@@ -25509,6 +25769,29 @@ whereas for other data types to be pure, they need to leverage some information 
 - Mécanisme de diffusion épidémique
 - Voir diff avec /lpbcast/
 - Pourquoi /Wooki/ utilise /lpbcast/ et pas ça à la place ?
+** TODO Thèse : Creuser RenamableRGASplit
+- Voir si les fonctions de renommage ne serait pas vachement plus simples
+- Pour renommage
+  - On renomme de manière similaire
+  - Si id inséré en concurrence, juste besoin de trouver son prédecesseur dans former state
+    - Suffit de transformer l'ins pour utiliser le nouvel predId correspondant
+  - Si id supprimé en concurrence, pareil
+- Pour inversion de renommage
+  - On inverse de manière similaire
+    - Juste besoin d'inverser les ids présents dans la map
+    - Les ids insérés en concurrence/après sont automatiquement reliés via le prédecesseur existant à l'époque précédente
+- Reste juste à voir si on peut scrap les tombstones lors d'un renommage
+  - Si insertion en concurrence dépendant d'une tombstone
+  - Voir si on peut désigner un nouveau prédecesseur
+  - Tout en maintenant l'ordre
+- Devrait pouvoir proposer v1 se "contentant" de re-composer des blocs
+  - Voir comment RGASplit gère les tombstones/blocs de tombstones
+- v2 scrappant les tombstones de manière optimiste peut être plus difficile à concevoir
+** TODO Thèse : Regarder les vidéos du workshop *Programming Local-First Software* à ECOOP'22
+- Disponible ici : https://www.youtube.com/watch?v=hJQqjELPcOU
+  - Programme en description
+- Slides de Peter van Hardenberg sur *Path to LFS*
+  - https://docs.google.com/presentation/d/1xqvntURBEwCR-zsS0PP1DD_hdibU8rNJVCevqQeLb0c
 ** TODO Thèse : Étudier entrelacements dans Logoot
 - Un reproche fait à l'approche Logoot par rapport à RGA est le problème d'entrelacements d'insertions concurrentes
 - Serait-il possible de résoudre ce problème avec une fonction d'allocation des ids plus intelligente ?
@@ -25516,57 +25799,29 @@ whereas for other data types to be pure, they need to leverage some information 
     - Mais solution limitée qu'aux modifications d'un seul noeud
     - Je suppose que RGA n'a pas le problème même si sous-groupes effectuent modifications concurrentes
     - À vérifier
-** TODO Thèse : Rédiger tombstones-based Sequence CRDTs
-** TODO Thèse : Rédiger dense identifiers-based Sequence CRDTs
-** TODO Thèse : Rédiger approches pour mitigation du surcoût des Sequence CRDTs
-** TODO Thèse : Rédiger présentation des systèmes distribués
+- Peut aborder le problème d'une autre manière
+  - Pas grave si identifiants d'origine provoqueraient un entrelacement
+  - Ce qu'il faut, c'est détecter l'entrelacement
+  - Et renommer les identifiants pour s'en prémunir
+  - Nécessite
+    - Mécanisme de détection
+      - Rejoint mécanisme d'awareness lorsque fusion automatique de contenu conséquente
+    - Mécanisme de renommage partiel
+      - Ajoute de nouvelles problématiques
+	- Nouveaux scénarios de conflits, notamment en cas de renommages qui s'overlappent
+      - Multiplication des époques
+	- Comment détecter les modifications à transformer par rapport aux effets d'un renommage ?
+	- Quelles métadonnées attacher aux opérations pour le permettre ?
+  - Le mécanisme de détection est déjà une contribution en soi
+    - Permettrait de mettre en place un mécanisme d'awareness demandant aux utilisateur-rices de vérifier la fusion automatique
+    - En plus d'highlight le potentiel problème d'entrelacement, highlighterais le potentiel problème de sémantique
+      - Répétition, contradiction
+- Devrait déjà lire *There Are No Doubly Non-Interleaving List CRDTs* avant de me lancer dedans
+  - https://mattweidner.com/assets/pdf/List_CRDT_Non_Interleaving.pdf
 ** TODO Thèse : Introduire notion /Livraison à terme/
 - Doit spécifier que le réseau doit fournir la livraison à terme pour que noeuds convergent à terme
 - Peut en profiter pour introduire la /Cohérence forte à terme/ et /Convergence unidirectionnelle/
   - Revoir thèse Vic page 18
-** TODO Thèse : Chercher pistes pour post-doc
-- Serait intéressant de voir si y a des opportunités de post-doc
-- Pistes possibles
-  - [ ] Kleppmann mentionnait avoir obtenu des fonds pour travailler sur local-first software, Munich
-    - https://twitter.com/martinkl/status/1528767680500596737
-    - Voir s'il a toujours des liens avec Cambridge du coup
-  - [ ] Bieniusa, Kaiserslautern
-    - Fait partie du groupe AG Software Technology, à University of Kaiserslautern
-    - https://pl.cs.uni-kl.de/homepage/en/
-  - [ ] Équipe Delys, Paris
-    - Voir qui prend la relève de Shapiro
-    - https://team.inria.fr/delys/
-    - [[file:~/Downloads/delys_synthesis_report.pdf][Rapport d'activité]]
-  - [ ] Parallel and Dist-Sys Group, Telecom SudParis
-    - https://www.inf.telecom-sudparis.eu/pds/
-    - Affilié à l'équipe ACMES
-      - https://www.inf.telecom-sudparis.eu/acmes/
-    - Groupe dont fait partie Pierre Sutra
-      - https://sites.google.com/site/0track
-  - [ ] Équipe MYRIADS, Inria Rennes
-    - https://team.inria.fr/myriads/
-    - [[file:~/Downloads/myriads_synthesis_report.pdf][Rapport d'activité]]
-  - [ ] Équipe WIDE, Inria Rennes
-    - https://team.inria.fr/wide/
-    - [[file:~/Downloads/wide_synthesis_report.pdf][Rapport d'activité]]
-  - [ ] Institute for Software Research, Carnegie Mellon University, Pittsburgh, Pennsylvania
-    - Labo auquel appartiennent Miller, Meiklejohn et Weidner
-    - Page de Heather Miller
-      - https://heather.miller.am/
-    - A l'air de faire partie du groupe Big Data, ce qui me semble moins intéressant sur le papier
-      - Voir en détails pratiques
-  - [ ] Cloud and Large Scale computing group, UCL, Louvain
-    - Groupe de Etienne Rivière et de Guillaume Rosinosky
-    - À voir si peut m'inscrire dans leurs thématiques de recherche
-    - https://cloudlargescale-uclouvain.github.io/
-- Choisir les perspectives de recherche à mettre en avant
-- Je serais aussi intéressé par équipes méthodes formelles pour systèmes distribués
-  - Discuter avec Stephan ?
-  - Voir les équipes qui ont été évaluées avec Veridis ?
-- En discutant avec Claude, celui-ci m'a conseillé
-  - De voir où se trouve Stephane Weiss
-  - Que c'est plutôt les encadrants qui prennent contact normalement, sauf p-e dans les pays nordiques
-  - De voir avec Claudia
 ** TODO Thèse : Creuser notion d'obsolescence partielle des opérations
 - Une amélioration possible des Op-based CRDTs est de définir une relation /obsolete/ sur les opérations
   - Me semble est déjà proposé par Bauwens et Gonzalez Boix dans *Improving the Reactivity of Pure Op-based CRDTs*
