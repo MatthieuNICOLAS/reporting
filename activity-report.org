@@ -25630,9 +25630,10 @@ whereas for other data types to be pure, they need to leverage some information 
       - 269€
 ** Semaine du <2022-08-16 Tue> au <2022-08-19 Fri>
 *** Planned
-**** TODO Thèse : Outliner partie sur Treedoc
+**** DONE Thèse : Outliner partie sur Treedoc
 - Pour cela, (re)lire papiers suivants
   - *A commutative replicated data type for cooperative editing*
+  - *Designing a commutative replicated data type*
 **** TODO Thèse : Rédiger adoption des CRDTs
 **** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
 - Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
@@ -25642,6 +25643,69 @@ whereas for other data types to be pure, they need to leverage some information 
   - Problème d'utilisation des données pour un usage non-consenti par les utilisateur-rices au préalable ?
 - PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft
 *** Done
+- Thèse : Outline partie sur Treedoc
+  - Est-ce que Treedoc assure la convergence ?
+    - Dans Treedoc, plusieurs éléments insérés en concurrence peuvent avoir le même chemin
+    - Introduit alors des disambiguators pour identifier chaque élément
+    - Treedoc fait des efforts d'optimisation pour réduire la taille de ses ids
+    - Notamment, ajoute le disambiguator seulement quand nécessaire
+    - Ce qui correspondant d'après le papier à
+      1. Dernier élément de l'id, i.e. de l'élément qu'on ajoute
+      2. Id suit un mini-node de manière explicite
+    - Mais comment ça se passe si un noeud doit intégrer un elt dont l'id passe par un super-node sans préciser quel mini-node suivre ?
+    - Alors oui converge
+    - Mais peut résulter en entrelacement, en fonction de l'ordre sur les disambiguators
+  - Est-ce que Treedoc impose vraiment la structure ?
+    - Victorien clame cela dans sa thèse
+    - Mais est-ce vraiment le cas ?
+    - Les identifiants correspondent effectivement logiquement aux chemins d'un arbre binaire
+    - Mais pourquoi pas pourrait représenter la séquence avec une autre structure ?
+      - Le papier propose justement un ensemble de (id, elt)
+    - Ah, Victorien parle seulement de la structure de ses identifiants
+  - Plan
+    - Propose une nouvelle approche pour CRDTs pour Séquence
+    - Se base sur des identifiants de position, respectant les propriétés suivantes
+      1. Chaque élément se voit attribuer un identifiant
+      2. Aucune paire d'éléments ne partage le même identifiant
+      3. L'identifiant d'un élément est immuable
+      4. Il existe un ordre total strict sur les identifiants, <id, cohérent avec l'ordre des éléments dans la séquence
+      5. Les identifiants sont tirés d'un ensemble dense
+    - La propriété 5 signifie que pour toute paire d'identifiants (/predId, succId/), il existe /id/ tel que /predId < id < succId/
+      - Des exemples d'ensembles denses sont les nombres réels
+      - Mais nécessitent une précision infinie
+      - En pratique, émule donc un tel ensemble avec un type dédié
+    - L'utilisation d'ids densément ordonnés permet de redéfinir les modifications
+      - /ins(pred < elt < succ)/ en /ins(id, elt)/, avec /predId < id < succId/
+      - /rmv(elt)/ en /rmv(id)/
+    - Offre ainsi une séquence répliquée avec des opérations commutatives
+    - Propose Treedoc, un CRDT mettant en oeuvre ces principes
+    - Pour générer les ids, utilise un arbre binaire
+      - Racine de l'arbre binaire correspondant à l'identifiant du 1er élement de la séquence, noté, l'identifiant vide
+      - Pour générer l'identifiant d'un nouvel élément à droite (resp. gauche) d'un noeud de l'arbre binaire, concatène un 1 (resp. 0) à /id/
+      - Exemple d'ids
+    - Étend l'arbre binaire pour éviter ambiguité
+      - En effet, plusieurs noeuds peuvent en concurrence insérer un élément à la même position, i.e. avec le même identifiant
+      - Pour les distinguer et les ordonner de manière déterministe, ajoute un désambiguateur lorsque nécessaire
+	- Propose d'utiliser un Dot pour cela
+      - Noeuds de l'arbre binaire peuvent donc contenir une liste d'identifiants
+      - Désambiguateur est précisé dans id seulement
+	1. Fin de l'id
+	2. Composant intermédiaire de l'id nécessite désambiguation
+      - Exemple de désambiguation
+    - Exemple d'édition collaborative
+    - Modèle de livraison de Treedoc
+      - Présente modèle de livraison causale
+      - Mais en pratique, peut relaxer modèle de livraison comme expliqué dans /these-vic/
+	- Insertions dans n'importe quel ordre
+	- Suppression après insertion
+    - En cas de suppression, doit conserver le noeud correspondant à l'id si celui-ci contient encore un id (ambiguité) ou possède des enfants
+      - Ainsi, présence de tombstones
+      - GC ne repose pas sur la stabilité causale, mais sur le statut du noeud de l'arbre, ie s'il s'agit d'une feuille
+    - Limites
+      - Arbre des identifiants déséquilibré, puisque comportements utilisateur-rices consistent généralement à insérer de manière séquentielle, i.e. toujours dans le sens de l'écriture de la langue utilisée
+      - Malgré temporarité des tombstones, observe une proportion non-négligeable de noeuds tombstones dans l'arbre des ids
+	- Leur propre évaluation indique jusqu'à 95% de tombstones
+      - Souffre du problème de l'entrelacement
 * Backlog
 ** TODO Thèse : Établir jury
 - Pistes
