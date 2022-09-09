@@ -25433,6 +25433,9 @@ whereas for other data types to be pure, they need to leverage some information 
   - *Replicated abstract data types: Building blocks for collaborative applications*
   - *High Responsiveness for Group Editing CRDTs*
   - *Interleaving anomalies in collaborative text editors*
+**** DONE Thèse : Lire *Interleaving anomalies in collaborative text editors*
+- Disponible ici : https://dl.acm.org/doi/abs/10.1145/3301419.3323972
+- Introduit la spécification forte sans entrelacement des séquences répliquées
 **** TODO Thèse : Rédiger adoption des CRDTs
 **** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
 - Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
@@ -25706,6 +25709,347 @@ whereas for other data types to be pure, they need to leverage some information 
       - Malgré temporarité des tombstones, observe une proportion non-négligeable de noeuds tombstones dans l'arbre des ids
 	- Leur propre évaluation indique jusqu'à 95% de tombstones
       - Souffre du problème de l'entrelacement
+** Semaine du <2022-08-22 Mon> au <2022-08-26 Fri>
+*** Planned
+**** IN-PROGRESS Thèse : Outliner partie sur Logoot
+- Pour cela, (re)lire papiers suivants
+  - *Logoot : a Scalable Optimistic Replication Algorithm for Collaborative Editing on P2P Networks*
+  - *Logoot-Undo Distributed Collaborative Editing System*
+**** TODO Thèse : Rédiger adoption des CRDTs
+**** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
+- Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
+- L'idée était de former un dataset
+- Me semble que la discussion était tombée à l'eau
+  - Problème pour anonymiser les données ?
+  - Problème d'utilisation des données pour un usage non-consenti par les utilisateur-rices au préalable ?
+- PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft
+*** Done
+- Thèse : Outliner partie sur Logoot
+  - Remarque sur *Logoot*
+    - Utilise causal delivery
+      - Clame proposer une séquence répliquée adaptée aux systèmes P2P
+      - Mais repose sur une livraison causale
+	- Pas par excès de zèle, mais car nécessaire étant donné l'algo utilisé pour recherche d'index à partir d'une position
+	- N'utilise pas le seq number de la position
+	- Peut donc avoir plusieurs fois la même position, à l'exception de leur seq number, avec une suppr intermédiaire
+	- Doit garantir
+      - Livraison causale implique l'association d'un VC à chaque modif
+	- Taille croissante avec le nombre de noeuds
+      - S'en sort en remplaçant VC par Causal Barrier
+	- Métadonnées par message en fonction de la concurrence
+      - Mais omet que Causal Barrier nécessite accumulation de métadonnées localement
+      - Besoin de causal stability pour tronquer ces métadonnées
+      - Causal stability pas adaptée à système avec churn
+  - Plan
+- Répétition Démo
+  - <2022-08-25 Thu>, a répété la démo avec Baptiste et PA
+    - Réseau 1 & 2 connectés via cable ethernet
+    - Baptiste, chromebook et Raspberry sur réseau 1, PA et moi sur réseau 2
+    - On ouvre un document et se connecte
+    - On collabore, obtient même digest
+    - Déconnecte cable ethernet
+    - Baptiste reste connecté avec chromebook, PA et moi restons connectés
+    - Collaboration en sous-groupe, obtient même digest par sous-groupe
+    - Reconnecte cable ethernet
+    - Une fois reconnectés au serveur de signaling, sous-groupes fusionne, obtient même digest
+  - <2022-08-26 Fri>, a répété la démo avec Claudia, Baptiste, Gérald et PA
+    - Pas réussi à reproduire le scénario
+  - Bugs détectés
+    - Adresse IP non-fixe
+    - Perte du réseau Wifi
+    - Liste des collaborateurs incorrecte
+      - Un pair peut disparaître de la liste des collaborateurs
+      - Mais afficher la liste des pairs avec /wg.members/ indique toujours sa présence
+    - Digests différents
+  - <2022-08-26 Fri> aprem, a répété la démo avec Baptiste, Gérald et PA
+    - Gérald a modifié la configuration des routeurs depuis le matin
+    - A réussi à reproduire le scénario plusieurs fois ce coup-ci
+    - Problème de débit réseau
+      - L'application met de longues secondes à charger
+      - En modification la configuration des channels (6 -> auto), a constaté une nette amélioration
+    - Problème de convergence réseau
+      - Après une résolution de partition, les deux sous-groupes n'ont pas exactement fusionnés
+	- Je (AP2) voyais tout le monde
+	- Gérald (AP1) et Baptiste HP (AP2) ne se voyaient pas mutuellement
+	- Baptiste Dell et Baptiste HP ne voyaient pas mutuellement
+      - Moi & Gérald avons écrit, document convergait mais pas réseau
+      - Bien plus tard, Baptiste HP a écrit, document a convergé mais pas réseau
+      - Peu de temps après, réseau a convergé
+      - Voir dans Netflux le protocole d'anti-entropie pour réduire délai d'activation
+** Semaine du <2022-08-29 Mon> au <2022-09-02 Fri>
+*** Planned
+**** DONE Thèse : Outliner partie sur Logoot
+- Pour cela, (re)lire papiers suivants
+  - *Logoot : a Scalable Optimistic Replication Algorithm for Collaborative Editing on P2P Networks*
+  - *Logoot-Undo Distributed Collaborative Editing System*
+**** DONE Thèse : Rédiger intro Sequence CRDTs
+**** DONE Thèse : Rédiger WOOT
+**** TODO Thèse : Rédiger adoption des CRDTs
+**** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
+- Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
+- L'idée était de former un dataset
+- Me semble que la discussion était tombée à l'eau
+  - Problème pour anonymiser les données ?
+  - Problème d'utilisation des données pour un usage non-consenti par les utilisateur-rices au préalable ?
+- PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft
+*** Done
+- Thèse : Outliner partie sur Logoot
+  - Algo /generateId/
+    - Compliqué au possible dans les versions présentés dans les articles
+      - Cherche vraiment à combler le moindre interval entre des identifiants
+      - Et génère plusieurs formes d'identifiants possibles pour une même situation
+      - Si ins 8+ éléments entre [<2,4>][<10,5>,<20,3>], insère des identifiants
+	- [<2,4>,<x, s>] avec x entre [0, MAXINT]
+	- [<y,s>,<x,s>] avec y entre ]2,10[, x entre [0,MAXINT]
+	- [<10,5>,<x,s>] avec x entre [0,20[
+      - Achieve cela à l'aide d'opérations sur des nombres en base MAXINT
+    - Basculer sur une version simplifiée pour la présentation de la thèse ?
+      - Oui
+  - Réflexions Treedoc vs. Logoot
+    - Quelle différence finalement au niveau de leurs identifiants respectifs ?
+    - Logoot n'est-il pas une généralisation des identifiants de position pour arbres n-aires ?
+    - Juste qu'on précise le désambiguateur à chaque fois
+    - Pas exactement
+    - Leur relations d'ordre respectives diffèrent
+      - Dans Treedoc, on a /0 < epsilon < 1/
+      - Dans Logoot, on a /epsilon < 0 < 1/
+    - Nécessite fonctions d'allocation des ids différentes
+  - Plan
+    - En parallèle à Treedoc, /auteurs/ proposent Logoot
+    - Repose sur idée similaire à celle de Treedoc
+      - Associer identifiants de position à chaque élément de la séquence
+      - Identifiants provenant d'un espace dense
+    - Dans /original/, positions de la forme suivante
+      - <tuples, seq> avec
+	- tuples une liste de paires <pos, site> avec
+	  - pos un entier
+	  - site l'identifiant de site
+    - Par la suite /logoot-undo/, re-spécifie les identifiants de positions de la manière suivante
+      - liste de tuples avec chaque tuple un triplet <pos, site, seq> avec
+	- pos un entier
+	- site l'identifiant de site
+	- seq le numéro de séquence du site à l'ins de l'élément
+      - Utilisons cette spécification dans le cadre de cette section
+      - Et notons chaque tuple de la manière suivante /pos^site seq/
+    - Définit un ordre strict total <_id sur les identifiants de position de façon à pouvoir les ordonner relativement les uns aux autres
+      - En se basant sur l'ordre lexicographique
+    - Et définit une fonction generateId(predId, nextId, nbIds, site) qui retourne un id tel que predId < id < nextId
+      - Nous présentons ici une version naive de cet algorithme
+	- Travaille sur predId et nextId, transformée en chaîne infinie
+	- Consiste à comparer séquentiellement les tuples de predId et de nextId et à les recopier tant qu'il s'agit de leur préfixe commun
+	- Une fois une différence détectée, vérifie si intervalle suffisament grand pour insérer nbIds
+	- Si ce n'est pas le cas, concatène tuple de predId, passe au tuple suivant et "épuise" nextId
+	- Puis divise l'intervalle entre predTuple.pos et nextTuple.pos en N sous-intervalles
+	- Pour chaque élément, concatène au préfixe un nouveau tuple <pos,site,seq> avec pos une valeur aléatoire du sous-intervalle
+      - Notons que MINPOS, la plus petite valeur de pos possible doit être réservée pour des tuples intermédiaires uniquement, de façon à garantir l'espace dense
+      - Exemple
+	- <e^A1> et <f^B1> => <e^A1,l^C1>
+	- bot et <b^A1> => <a^bot,l^C1>
+    - À partir de là, re-spécifie l'ins de la manière suivante
+      - ins(pred < elt < succ) -> ins(predId < <id, elt> < succId) avec
+      - id généré en utilisant generateId
+    - Et rmv de la manière suivante
+      - rmv(elt) -> rmv(id)
+    - Exemple
+    - Si on compare à Treedoc
+      - Constate que Logoot est une généralisation des identifiants de position à partir d'un arbre n-aire
+      - Ici, repose de manière implicite sur l'arbre des positions, à l'inverse de de Treedoc
+      - Propose une fonction d'allocation des identifiants adaptée à cette nouvelle arité
+      - Par contre, inclut le désambiguateur dans les identifiants à chaque tuple, même si non nécessaire
+    - Modèle de livraison
+      - Repose sur le modèle de livraison causal
+      - Constate cependant que
+	- ins peuvent être délivrées dans le désordre
+	- rmv peuvent être délivrées après les opérations ins correspondantes
+    - Plusieurs extensions
+    - Logoot-Undo
+      - Introduit nouvelle stratégie d'allocation des identifiants
+	- Plutôt que de répartir les identifiants sur l'ensemble de l'intervalle entre predId et nextId
+	- Propose une stratégie limitant la distance entre deux identifiants insérés au cours de la même insertion
+	- Permet de regrouper dans l'espace des identifiants les éléments insérés par la même modif
+	- Et de laisser une partie plus conséquente de l'espace à disposition pour les insertions futures
+	- Réduit ainsi la vitesse de croissance des identifiants
+      - Introduit mécanisme d'undo
+	- Introduit une nouvelle modification, undo, permettant d'annuler l'effet d'une modification ins, rmv ou undo
+	- Designe cette modification pour être commutative avec toutes autres opérations concurrentes
+	- Pour cela, introduit notamment une notion de degrée de visibilité d'un élément
+	- Permet de déterminer si l'élément doit être affiché ou non
+	- Maintient pour cela une structure auxiliaire, le cimetière, qui référence l'ensemble des identifiants des éléments dont le degrée < 0
+	- Permet de maintenir un nombre réduit de tombstones, et qui plus est en dehors de la structure principale représentant la séquence
+	- Exemple
+    - LogootSplit
+      - Inspiré par /string-wise/
+      - Introduit un mécanisme d'aggrégation dynamique des éléments en blocs, pour réduire surcoût de la structure de données (CPU, RAM)
+      - Décrit plus en détails dans /section/
+- Thèse : Rédiger intro Sequence CRDTs
+  - Plan
+    - Introduction du type abstrait
+    - Formalisation du type séquentiel
+    - Présentation de conflits
+      - ins/ins
+      - ins/rmv
+      - ins/rmv d'un même élément
+** Semaine du <2022-09-05 Mon> au <2022-09-09 Fri>
+*** Planned
+**** DONE Thèse : Rédiger RGA
+**** DONE Thèse : Rédiger Treedoc
+**** DONE Thèse : Rédiger Logoot
+**** DONE Thèse : Rédiger Synthèse des Seq CRDTs
+**** IN-PROGRESS Thèse : Rédiger Identifiants
+**** TODO Thèse : Rédiger adoption des CRDTs
+**** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
+- Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
+- L'idée était de former un dataset
+- Me semble que la discussion était tombée à l'eau
+  - Problème pour anonymiser les données ?
+  - Problème d'utilisation des données pour un usage non-consenti par les utilisateur-rices au préalable ?
+- PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft
+*** Done
+- Réunion
+  - De mon côté
+    - A fini de rédiger section /Types de données répliquées sans conflits/ (14 pages)
+    - En cours de rédaction de section /Séquences répliquées sans conflits/ (16+ pages)
+    - Section /LogootSplit/ date, doit repasser dessus pour harmoniser avec le reste
+    - A semi-rédigé sections de /Mitigation du surcoût/ jusqu'à /Proposition/
+    - Reste par contre à planifier et rédiger /Systèmes distribués/
+    - Pense finir chap pour le <2022-09-16 Fri>
+  - Questions
+    - On en est où dans le jury ?
+    - Comprends pas assez l'algo d'intégration de WOOT
+      - Notamment, est-ce que WOOT souffre d'entrelacements ?
+      - D'après le travail en cours de Matthew Weidner, devrait
+      - Exemple ?
+    - Comprends pas trop l'évolution de WOOT à Logoot
+      - WOOT cherche à scale, i.e. ne pas être impacté par le nombre de pairs
+	- Revient à se débarrasser des vecteurs d'horloges de la livraison causale
+      - Logoot explique continuer dans cette voie
+      - Mais repose sur un livraison causale
+	- Suggère causal barrier pour l'implem
+	  - OK pour les messages
+	  - Mais nécessite de maintenir un DAG des opérations au lieu d'un log
+	  - C'est quoi le coût en temps et en espace ?
+	- Explique ne pas nécessiter membership, ni consensus
+	  - Du coup, pas moyen de reposer sur stabilité causale pour tronquer DAG des opérations
+	- Comment effectue l'anti-entropy à ce moment là ?
+	  - Merkle-Tree based ?
+  - Discussion
+    - Introduction peut mener jusqu'à réplication optimiste
+      - Réplication pessimiste
+      - Problème de la coordination
+      - Transition vers réplication optimiste
+    - À ce moment là, l'état démarrerait d'ici
+      - Revient à faire passer ce que j'avais prévu en 1ère section de l'état de l'art en intro
+    - Démarrer état de l'art par système modèle
+    - Section 2 de l'intro
+      - Remonter les paragraphes remise contexte dans contexte
+    - Concernant TTF, s'agit des seules transformées vérifiant TP1 et TP2 publiées
+    - Plan
+      1. Finir état de l'art courant semaine pro
+      2. Apporter modifications
+      3. Conclusion
+      4. Intro
+- Discussion Claudia
+  - Situation d'Alex compliquée, donnant l'impression de se dégrader
+    - Présence aléatoire
+    - Amplitude d'états
+      - Soit très motivé, soit mort
+    - Parler de plus en plus de dépression et de traitement, sans agir
+  - Situation des futur-es concerné-es préocuppante
+    - Constate qu'on a plusieurs personnes dans l'équipe pour qui la thèse fut (très) difficile, en partie à cause de l'encadrement
+    - N'observe qu'un soutien très limité dans l'équipe dans ces situations
+    - Ne vois pas par contre d'améliorations sur cet aspect
+    - Au contraire, vois une détérioration
+      - Olivier qui se retire si bien pigé
+    - Me paraît nécessaire d'ouvrir une discussion sur ce sujet
+* Backlog-manuscrit
+** TODO Thèse : Rédiger Aggrégation dynamique d'éléments en blocs
+** TODO Thèse : Rédiger Modèle de données
+** TODO Thèse : Rédiger Modèle de livraison
+** TODO Thèse : Rédiger Limites
+** TODO Thèse : Rédiger Système modèle
+** TODO Thèse : Introduire notion /Livraison à terme/
+- Doit spécifier que le réseau doit fournir la livraison à terme pour que noeuds convergent à terme
+- Peut en profiter pour introduire la /Cohérence forte à terme/ et /Convergence unidirectionnelle/
+  - Revoir thèse Vic page 18
+** TODO Thèse : Ajouter perspective *Étendre Pure-Op based CRDTs*
+- Papier de 2017 de Baquero introduit 2 contributions IMO
+  - Tagged Causal Stable Broadcast (TCSB)
+  - PO-Log CRDT
+- Pistes d'améliorations de TCSB
+  - Enforce Exactly-Once et Causal Delivery
+  - Toutes deux pas forcément nécessaires
+  - Serait intéressant que la spécification du CRDT permette d'exprimer plus finement les contraintes
+  - Que le modèle de livraison soit une stratégie
+  - Revoir *Improving the Reactivity of Pure Operation-Based CRDTs* à ce sujet
+    - https://dl.acm.org/doi/abs/10.1145/3447865.3457968
+- Pistes d'améliorations du PO-Log CRDT
+  - Structure de données génériques
+  - Nécessite de raisonner sur le log entier
+  - S'exprime correctement pour une structure simple
+    - MV-Register
+  - Déjà plus complexe pour les Ensembles
+    - AW-Set, RW-Set
+  - Quid de structures plus complexes ?
+    - Sequence, Tree
+  - Explique que mécanisme de stabilisation causale peut permettre de discard les opérations stables
+    - Mais ne concerne que les unlabelled CRDTs j'ai l'impression
+  - Ne permet pas de supprimer les opérations des labelled CRDTs
+    - Seulement leur information de causalité
+    - Est-ce la majeure source de métadonnées ?
+  - Est-ce qu'on peut permettre de raisonner sur une structure au choix sans perdre en généricité ?
+  - Non, revient à rendre spécifique
+    - Σ, le domaine des états
+    - prepare, la méthode pour générer l'opération
+    - effect, la méthode pour intégrer l'opération
+  - Est-ce qu'on peut permettre de raisonner sur plusieurs /derived views/ à ce moment là ?
+    - Par exemple une dédiée à l'intégration des opérations locales, une dédiée à l'intégration des opérations distantes, une pour l'anti-entropie
+- Autres
+  - Pas clair comment le mécanisme de stabilisation causale et de compaction sémantique sont compatibles avec le join d'un nouveau noeud
+    - Diffuse probablement le PO-Log et snapshot du TCSB
+    - Pourrait rendre l'expliciter
+** TODO Thèse : Dire les termes
+- À un moment donné dans la thèse, doit définir précisément les termes
+  - Noeud
+  - Concurrence
+  - Conflit
+  - Réception d'un message
+  - Livraison d'un message
+  - Dépendance
+  - Dépendance causale
+  - Modification locale
+  - Modification distante
+- Où ?
+  - État de l'art ?
+  - Au fil de l'eau ?
+** TODO Thèse : Reformuler mécanisme de GC
+- Pour définir les /potentielles époques courantes/, je repose sur la notion de stabilité causale
+  - Je prends l'opération rename maximale qui est causalement stable
+  - Et je compose l'ensemble des /potentielles époques courantes/ en ne conservant que l'époque de cette opération et les époques supérieures
+- Gérald m'a fait remarqué que si j'ai une livraison out-of-order, peut avoir une opération rename "causalement stable" mais pas toutes les opérations précédentes
+  - Dans le sens où cette opération rename a été observée par tout les noeuds
+  - Ils ne peuvent donc plus émettre d'opérations concurrentes à cette opération rename
+  - Mais en tant que noeud, je peux toujours recevoir une ancienne opération dont je n'avais pas encore connaissance et qui nécessite des époques antérieures pour être intégrée
+- Reformuler la définition des potentielles époques courantes pour indiquer qu'on prend comme base l'époque maximale pour laquelle
+  - L'opération rename associée est causalement stable
+  - Toutes les opérations antérieures et concurrentes à l'opération rename associée ont été livrées
+- Voir comment vérifier cette 2nde condition dans le cas d'une livraison out of order
+** TODO Thèse : Complexité opérations
+- Modifier complexités des opérations pour remplacer /k/ et /l/ par /h/
+** TODO Thèse : Illustrer utilité de reporter transition vers nouvelle époque cible
+** TODO Thèse : Ajouter algorithme de /getPathBetweenEpochs()/
+- Dans l'algorithme /insRemote()/, je décris comment on traite une insertion distante
+- Dans cet algorithme, j'utilise plusieurs fonctions helpers dont /getPathBetweenEpochs()/
+- Je me contente de décrire ce qu'elle fait dans le texte
+- N'ayant pas de contrainte de place, pourrait ajouter cet algorithme en annexe
+** TODO Thèse : Ajouter algorithme de /expand()/
+- Permet de convertir un *IdInterval* en *List<Id>*
+** TODO Thèse : Ajouter algorithme de /aggregate()/
+- Permet de convertir une *List<Id>* en *List<IdInterval>*
+** TODO Thèse : Ajouter algorithme de /gcEpochs()/
+** TODO Thèse : Proposer analyse en complexité du mécanisme de rebalancing de Marek
+- Pourrait être intéressant de se comparer à ce dernier
+- But serait de montrer que /renameId/ a complexité similaire
+- Et que /renameBlock/ achieve de meilleures performances grâce à la réduction du nombre de blocs
 * Backlog
 ** TODO Thèse : Établir jury
 - Pistes
@@ -25770,6 +26114,37 @@ whereas for other data types to be pure, they need to leverage some information 
   - Recommandé de contacter Kleppmann
   - Indiqué que c'était avec Roman Vitenberg, à l'Université d'Oslo, que Weiss a fait son post-doc
     - https://www.mn.uio.no/ifi/english/people/aca/romanvi/index.html
+** TODO Thèse : Lire *Undo in Peer-to-peer Semantic Wikis*
+- Dispo ici : https://hal.inria.fr/inria-00366317/
+- Par Rahhal, Weiss, Skaf-Molli, Urso, Molli en 2009
+- Propose mécanisme d'undo pour WOOKI
+** TODO Thèse : Lire *An optimized RGA supporting selective undo for collaborative text editing systems*
+- Dispo ici : https://www.researchgate.net/publication/333326426_An_optimized_RGA_supporting_selective_undo_for_collaborative_text_editing_systems
+- Par Lv, He, Cai, Cheng en 2019
+- Publié à Journal of Parallel and Distributed Computing
+- Propose un framework pour undo/redo pour CRDTs
+** TODO Thèse : Lire *Self-compressing object sequence for consistency maintenance in co-editors*
+- Dispo ici : https://onlinelibrary.wiley.com/doi/full/10.1002/spe.3090
+- Par Cai, He, Yang, Lv et Cheng en 2022
+- Publié à Software: Pratice and Experience
+- Propose ASTO, une séquence répliquée qui s'auto-compresse
+  - Basée sur l'approche Address Space Transformation (AST)
+- Voir comment cela se compare à RLS
+** TODO Thèse : Lire *A survey of peer-to-peer content distribution technologies*
+- Dispo ici : https://dl.acm.org/doi/abs/10.1145/1041680.1041681
+- Par Androutsellis-Theotokis, Spinellis en 2004
+- Étudie les applications P2P de l'époque d'un point de vue
+  - Distributed object location and routing mechanisms
+  - Content replication, caching and migration
+  - Support for encryption, access control, authentication and identity, anonymity, deniability, accountability and reputation
+  - Resource trading and management schemes
+- Faudrait si quelqu'un-e a actualisé le survey depuis
+** TODO Thèse : Lire *Multi-core accelerated CRDT for large-scale and dynamic collaboration*
+- Dispo ici : https://link.springer.com/article/10.1007/s11227-022-04308-7
+- Par Cai, He, Lv en 2022
+- Publié à Journal of Supercomputing
+- Prouve condition générale de commutativité des opérations de CRDTs
+- Utilise cela pour proposer Parallel RGA
 ** TODO Thèse : Lire *RunTime-assisted convergence in replicated data types*
 - Dispo ici : https://dl.acm.org/doi/abs/10.1145/3519939.3523724
 - Par Kaki, Prahladan et Lewchenko en 2022
@@ -25779,12 +26154,6 @@ whereas for other data types to be pure, they need to leverage some information 
   - Applicable à n'importe quel type séquentiel, sans conditions
     - Pas besoin de commutativité ou d'idempotence
 - N'ajouterait aucun coût en disponibilité et latence
-** TODO Thèse : Lire *Self-compressing object sequence for consistency maintenance in co-editors*
-- Dispo ici : https://onlinelibrary.wiley.com/doi/full/10.1002/spe.3090
-- Par Cai, He, Yang, Lv et Cheng en 2022
-- Propose ASTO, une séquence répliquée qui s'auto-compresse
-  - Basée sur l'approche Address Space Transformation (AST)
-- Voir comment cela se compare à RLS
 ** TODO Thèse : Lire *DSON: JSON CRDT using delta-mutations for document stores*
 - Dispo ici : https://dl.acm.org/doi/abs/10.14778/3510397.3510403
 - Par Rinberg, Solomon, Shlomo, Khazma, Lushi, Keidar et Ta-Shma en 2022
@@ -25882,10 +26251,6 @@ whereas for other data types to be pure, they need to leverage some information 
       - Répétition, contradiction
 - Devrait déjà lire *There Are No Doubly Non-Interleaving List CRDTs* avant de me lancer dedans
   - https://mattweidner.com/assets/pdf/List_CRDT_Non_Interleaving.pdf
-** TODO Thèse : Introduire notion /Livraison à terme/
-- Doit spécifier que le réseau doit fournir la livraison à terme pour que noeuds convergent à terme
-- Peut en profiter pour introduire la /Cohérence forte à terme/ et /Convergence unidirectionnelle/
-  - Revoir thèse Vic page 18
 ** TODO Thèse : Creuser notion d'obsolescence partielle des opérations
 - Une amélioration possible des Op-based CRDTs est de définir une relation /obsolete/ sur les opérations
   - Me semble est déjà proposé par Bauwens et Gonzalez Boix dans *Improving the Reactivity of Pure Op-based CRDTs*
@@ -25907,68 +26272,6 @@ whereas for other data types to be pure, they need to leverage some information 
     - Peut être fonction identité si n'a aucun sens d'un point de vue application
     - Genre un /remove/ ne sera jamais décomposé
       - À moins qu'il y ait un mécanisme d'undo
-** TODO Thèse : Ajouter perspective *Étendre Pure-Op based CRDTs*
-- Papier de 2017 de Baquero introduit 2 contributions IMO
-  - Tagged Causal Stable Broadcast (TCSB)
-  - PO-Log CRDT
-- Pistes d'améliorations de TCSB
-  - Enforce Exactly-Once et Causal Delivery
-  - Toutes deux pas forcément nécessaires
-  - Serait intéressant que la spécification du CRDT permette d'exprimer plus finement les contraintes
-  - Que le modèle de livraison soit une stratégie
-  - Revoir *Improving the Reactivity of Pure Operation-Based CRDTs* à ce sujet
-    - https://dl.acm.org/doi/abs/10.1145/3447865.3457968
-- Pistes d'améliorations du PO-Log CRDT
-  - Structure de données génériques
-  - Nécessite de raisonner sur le log entier
-  - S'exprime correctement pour une structure simple
-    - MV-Register
-  - Déjà plus complexe pour les Ensembles
-    - AW-Set, RW-Set
-  - Quid de structures plus complexes ?
-    - Sequence, Tree
-  - Explique que mécanisme de stabilisation causale peut permettre de discard les opérations stables
-    - Mais ne concerne que les unlabelled CRDTs j'ai l'impression
-  - Ne permet pas de supprimer les opérations des labelled CRDTs
-    - Seulement leur information de causalité
-    - Est-ce la majeure source de métadonnées ?
-  - Est-ce qu'on peut permettre de raisonner sur une structure au choix sans perdre en généricité ?
-  - Non, revient à rendre spécifique
-    - Σ, le domaine des états
-    - prepare, la méthode pour générer l'opération
-    - effect, la méthode pour intégrer l'opération
-  - Est-ce qu'on peut permettre de raisonner sur plusieurs /derived views/ à ce moment là ?
-    - Par exemple une dédiée à l'intégration des opérations locales, une dédiée à l'intégration des opérations distantes, une pour l'anti-entropie
-- Autres
-  - Pas clair comment le mécanisme de stabilisation causale et de compaction sémantique sont compatibles avec le join d'un nouveau noeud
-    - Diffuse probablement le PO-Log et snapshot du TCSB
-    - Pourrait rendre l'expliciter
-** TODO Thèse : Dire les termes
-- À un moment donné dans la thèse, doit définir précisément les termes
-  - Noeud
-  - Concurrence
-  - Conflit
-  - Réception d'un message
-  - Livraison d'un message
-  - Dépendance
-  - Dépendance causale
-  - Modification locale
-  - Modification distante
-- Où ?
-  - État de l'art ?
-  - Au fil de l'eau ?
-** TODO Thèse : Reformuler mécanisme de GC
-- Pour définir les /potentielles époques courantes/, je repose sur la notion de stabilité causale
-  - Je prends l'opération rename maximale qui est causalement stable
-  - Et je compose l'ensemble des /potentielles époques courantes/ en ne conservant que l'époque de cette opération et les époques supérieures
-- Gérald m'a fait remarqué que si j'ai une livraison out-of-order, peut avoir une opération rename "causalement stable" mais pas toutes les opérations précédentes
-  - Dans le sens où cette opération rename a été observée par tout les noeuds
-  - Ils ne peuvent donc plus émettre d'opérations concurrentes à cette opération rename
-  - Mais en tant que noeud, je peux toujours recevoir une ancienne opération dont je n'avais pas encore connaissance et qui nécessite des époques antérieures pour être intégrée
-- Reformuler la définition des potentielles époques courantes pour indiquer qu'on prend comme base l'époque maximale pour laquelle
-  - L'opération rename associée est causalement stable
-  - Toutes les opérations antérieures et concurrentes à l'opération rename associée ont été livrées
-- Voir comment vérifier cette 2nde condition dans le cas d'une livraison out of order
 ** TODO Thèse : Lire *Proving PACELC*
 - Disponible ici : https://dl.acm.org/doi/abs/10.1145/3197406.3197420
 - Par Golab en 2018
@@ -26018,9 +26321,6 @@ whereas for other data types to be pure, they need to leverage some information 
 ** TODO Thèse : Lire *Specification and Complexity of Collaborative Text Editing*
 - Disponible ici : https://dl.acm.org/doi/10.1145/2933057.2933090
 - Introduit spécification faible et forte des séquences répliquées
-** TODO Thèse : Lire *Interleaving anomalies in collaborative text editors*
-- Disponible ici : https://dl.acm.org/doi/abs/10.1145/3301419.3323972
-- Introduit la spécification forte sans entrelacement des séquences répliquées
 ** TODO Thèse : Lire *A string-wise CRDT for group editing*
 - Disponible ici : https://dl.acm.org/doi/abs/10.1145/2389176.2389198
 - 1er block-wise Sequence CRDT
@@ -26043,9 +26343,6 @@ whereas for other data types to be pure, they need to leverage some information 
   - https://bartoszsypytkowski.com/hybrid-logical-clocks/
 ** TODO Thèse : Lire *Empirical study on collaborative writing: What do co-authors do, use, and like?*
 - Papier cité par Nédelec pour justifier l'amélioration de la qualité des documents issus de collaborations
-** TODO Thèse : Complexité opérations
-- Modifier complexités des opérations pour remplacer /k/ et /l/ par /h/
-** TODO Thèse : Illustrer utilité de reporter transition vers nouvelle époque cible
 ** TODO Thèse : Mettre en forme données des benchmarks
 - Au fil des benchmarks, j'ai généré une quantité conséquente de traces d'édition
 - Voir quelles traces j'utilise dans mes stats
@@ -26073,20 +26370,6 @@ whereas for other data types to be pure, they need to leverage some information 
   - Si génère du LWW, c'est p-e limité pour un bon nombre de types
 - Indique que le CRDT produit est formellement vérifié
   - Est-ce qu'on peut détourner leur outil pour vérifier un CRDT existant ?
-** TODO Thèse : Ajouter algorithme de /getPathBetweenEpochs()/
-- Dans l'algorithme /insRemote()/, je décris comment on traite une insertion distante
-- Dans cet algorithme, j'utilise plusieurs fonctions helpers dont /getPathBetweenEpochs()/
-- Je me contente de décrire ce qu'elle fait dans le texte
-- N'ayant pas de contrainte de place, pourrait ajouter cet algorithme en annexe
-** TODO Thèse : Ajouter algorithme de /expand()/
-- Permet de convertir un *IdInterval* en *List<Id>*
-** TODO Thèse : Ajouter algorithme de /aggregate()/
-- Permet de convertir une *List<Id>* en *List<IdInterval>*
-** TODO Thèse : Ajouter algorithme de /gcEpochs()/
-** TODO Thèse : Proposer analyse en complexité du mécanisme de rebalancing de Marek
-- Pourrait être intéressant de se comparer à ce dernier
-- But serait de montrer que /renameId/ a complexité similaire
-- Et que /renameBlock/ achieve de meilleures performances grâce à la réduction du nombre de blocs
 * Older Backlog
 ** TODO MUTE : Rédiger une issue sur le problème de divergence suivant
 - Dans MUTE, quand une modification est effectuée, son traitement est le suivant
@@ -26217,6 +26500,15 @@ whereas for other data types to be pure, they need to leverage some information 
 - Après la suppression du bloc inséré, on pourrait fusionner les deux parties du bloc initial pour le recréer
 - Ceci permettrait de rendre commutatif ce scénario d'opérations : /insertion-split-deletion/
 ** TODO CRDT : Lire *Kaleido*
+* Liens utiles
+- Ranking des journaux
+  - http://portal.core.edu.au/jnl-ranks/
+- Liste des journaux prédateurs
+  - https://beallslist.net/
+- Recherche d'emploi
+  - http://jobs.eurosys.org/
+- Application pour prendre des notes handwritten
+  - https://xournalpp.github.io/
 * Commandes utiles
 - Obtenir la taille d'un dossier
   - /du -h -d 0 <path>/
