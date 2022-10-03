@@ -25896,6 +25896,7 @@ whereas for other data types to be pure, they need to leverage some information 
 **** DONE Thèse : Rédiger Logoot
 **** DONE Thèse : Rédiger Synthèse des Seq CRDTs
 **** IN-PROGRESS Thèse : Rédiger Identifiants
+**** TODO Thèse : Relire papier LogootSplit
 **** TODO Thèse : Rédiger adoption des CRDTs
 **** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
 - Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
@@ -25961,17 +25962,68 @@ whereas for other data types to be pure, they need to leverage some information 
     - Au contraire, vois une détérioration
       - Olivier qui se retire si bien pigé
     - Me paraît nécessaire d'ouvrir une discussion sur ce sujet
-* Backlog-manuscrit
-** TODO Thèse : Rédiger Aggrégation dynamique d'éléments en blocs
-** TODO Thèse : Rédiger Modèle de données
-** TODO Thèse : Rédiger Modèle de livraison
-** TODO Thèse : Rédiger Limites
-** TODO Thèse : Rédiger Système modèle
-** TODO Thèse : Introduire notion /Livraison à terme/
+- Discussion avec Claudia & Gérald
+  - Vise pour le moment à finir le manuscrit de thèse sans demander d'extension et faire de break
+  - A rediscuté de la méthode de travail
+    - On s'est mis d'accord avec Gérald pour intégrer collaborativement des retours lors de réunions
+    - Permet de réduire ma charge de travail
+      - Permet de me focaliser sur les commentaires sur le fond, où on peut difficilement aider
+      - Et de faire une passe sur les commentaires pour déterminer lesquels on peut laisser en suspens pour le moment
+  - Réflexion a posteriori
+    - Burn-out s'est pas fait sur 4 mois
+    - En marche de la mort de septembre 2020 à mars 2O22
+      - Début de l'article de conf pour Eurosys/ICDCS (septembre 2020-janvier 2021)
+      - Puis évolution en article de journal pour TPDS (janvier 2021-mars 2022)
+      - Tout en gérant demi-ATER puis ATER à côté
+      - Confinement de début 2021 m'a aussi bien atteint et fragilisé
+- Discussion avec Vic
+  - Les identifiants de l'approche à pierres tombales forment un arbre
+  - Donc finalement, les identifiants de chaque approche proviennent du même domaine
+  - C'est juste une question de représentation/implémentation
+    - Référencer juste un parent
+    - Référencer tout le path
+** Semaine du <2022-09-12 Mon> au <2022-09-16 Fri>
+*** Planned
+**** DONE Thèse : Relire papier LogootSplit
+**** DONE Thèse : Rédiger Identifiants
+**** DONE Thèse : Rédiger Aggrégation dynamique d'éléments en blocs
+**** DONE Thèse : Rédiger Modèle de données
+**** DONE Thèse : Rédiger Modèle de livraison
+**** DONE Thèse : Rédiger Limites
+**** DONE Thèse : Rédiger Mitigation du surcoût des séquences répliquées sans conflits
+**** DONE Thèse : Rédiger Synthèse
+**** DONE Thèse : Proposition
+**** DONE Thèse : Introduire notion /Livraison à terme/
 - Doit spécifier que le réseau doit fournir la livraison à terme pour que noeuds convergent à terme
 - Peut en profiter pour introduire la /Cohérence forte à terme/ et /Convergence unidirectionnelle/
   - Revoir thèse Vic page 18
-** TODO Thèse : Ajouter perspective *Étendre Pure-Op based CRDTs*
+**** DONE Thèse : Dire les termes
+- À un moment donné dans la thèse, doit définir précisément les termes
+  - Noeud
+  - Concurrence
+  - Conflit
+  - Réception d'un message
+  - Livraison d'un message
+  - Dépendance
+  - Dépendance causale
+  - Modification locale
+  - Modification distante
+- Où ?
+  - État de l'art ?
+  - Au fil de l'eau ?
+**** DONE Thèse : Rédiger Système modèle
+**** DONE Thèse : Rédiger synthèse modèles de synchro
+**** DONE Thèse : Corriger définitions de /ins/ et /rmv/ dans intro des Seq CRDTs
+- Problème d'indice pour insérer/supprimer le dernier élément j'ai l'impression
+**** DONE Thèse : Corriger définition de /contigus/
+- Faudrait ajouter test /offset - 1 = offset'/ aussi
+**** DONE Thèse : Ajouter spécification algébrique de l'Ensemble
+- Permet d'introduire le formalisme
+- Permet d'indiquer qu'on considère dans nos exécutions que toute modification est suivie par une lecture implicite
+  - Comme ça on rentre bien dans les modèles de cohérence
+**** DONE Thèse : Relire état de l'art
+**** CANCELLED Thèse : Rédiger adoption des CRDTs
+**** IN-PROGRESS Thèse : Ajouter perspective *Étendre Pure-Op based CRDTs*
 - Papier de 2017 de Baquero introduit 2 contributions IMO
   - Tagged Causal Stable Broadcast (TCSB)
   - PO-Log CRDT
@@ -26007,20 +26059,375 @@ whereas for other data types to be pure, they need to leverage some information 
   - Pas clair comment le mécanisme de stabilisation causale et de compaction sémantique sont compatibles avec le join d'un nouveau noeud
     - Diffuse probablement le PO-Log et snapshot du TCSB
     - Pourrait rendre l'expliciter
-** TODO Thèse : Dire les termes
-- À un moment donné dans la thèse, doit définir précisément les termes
-  - Noeud
-  - Concurrence
-  - Conflit
-  - Réception d'un message
-  - Livraison d'un message
-  - Dépendance
-  - Dépendance causale
-  - Modification locale
-  - Modification distante
-- Où ?
-  - État de l'art ?
-  - Au fil de l'eau ?
+**** TODO Thèse : Rédiger /generateId()/
+- Pourrait MàJ /generateId()/ pour LogootSplit dans section *blocs*
+- Après avoir introduit notion d'intervalles d'identifiants
+**** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
+- Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
+- L'idée était de former un dataset
+- Me semble que la discussion était tombée à l'eau
+  - Problème pour anonymiser les données ?
+  - Problème d'utilisation des données pour un usage non-consenti par les utilisateur-rices au préalable ?
+- PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft
+*** Done
+- Thèse : Rédiger Système modèle
+  - Système P2P dynamique
+    - Noeuds peuvent joindre et se déconnecter à tout moment.
+    - Possible qu'un noeud se déconnecte de manière définitive, sans indication préalable
+  - Chaque noeud possède une copie de la donnée à répliquer
+    - Noeuds et clients confondus
+      - Considérons qu'un-e même utilisateur-rice peut prendre part au système au travers de différents appareils
+      - Considérons chaque appareil comme un noeud distinct
+    - Peuvent consulter et éditer leur copie sans se coordonner
+    - Modifications appliquées à la copie immédiatement
+    - Puis transmise sous la forme de messages aux autres noeuds, de manière asynchrone
+  - Noeuds communiquent par l'intermédiaire d'un réseau P2P non-fiable
+    - Messages peuvent être perdus, ré-ordonnés ou reçus en plusieurs exemplaires
+    - Réseau sujet à des partitions, séparant les noeuds en des groupes disjoints
+    - Noeuds peuvent aussi être à l'origine de partitions : groupes de noeuds peuvent décider de travailler de manière isolée pendant une certaine durée, avant de re-rejoindre le réseau
+  - Pour compenser les limitations du réseau, les noeuds reposent sur une couche de livraison de message.
+    - Couche permet de garantir un modèle de livraison de donné des messages.
+    - Cette couche peut donc ré-échanger des messages perdus, ré-ordonner les messages reçus avant de les livrer à l'application et dé-dupliquer des messages, en fonction des garanties du modèle de livraison.
+    - Garantit à minima la livraison à terme
+  - Supposons noeuds honnêtes
+    - Ne peuvent pas dévier du protocole de la couche de livraison ou de l'application
+    - Peuvent cependant rencontrer des défaillances
+    - Suppose que les noeuds disposent d'une mémoire durable leur permettant de restaurer à leur dernier état valide connu
+    - Suppose que noeuds peuvent rencontrer une défaillance définitive
+    - Considère alors que l'appareil peut revenir dans le système, mais sous une identité distincte
+- Thèse : Rédiger adoption des CRDTs
+  - Me paraît pas super intéressante comme section
+  - Voir pour faire la transition différemment entre CRDTs et CRDTs pour Séquence
+** Semaine du <2022-09-19 Mon> au <2022-09-23 Fri>
+*** Planned
+**** DONE Thèse : Établir jury
+- Pistes
+  - [-] Elisa Gonzalez Boix
+    - https://soft.vub.ac.be/disco/elisa/
+  - [-] Aniette Bieniusa
+    - https://softech.informatik.uni-kl.de/homepage/de/staff/AnnetteBieniusa/
+**** IN-PROGRESS Thèse : Rédiger perspective *Relations de priorité alternative*
+**** IN-PROGRESS Thèse : Ajouter perspective *Étendre Pure-Op based CRDTs*
+- Papier de 2017 de Baquero introduit 2 contributions IMO
+  - Tagged Causal Stable Broadcast (TCSB)
+  - PO-Log CRDT
+- Pistes d'améliorations de TCSB
+  - Enforce Exactly-Once et Causal Delivery
+  - Toutes deux pas forcément nécessaires
+  - Serait intéressant que la spécification du CRDT permette d'exprimer plus finement les contraintes
+  - Que le modèle de livraison soit une stratégie
+  - Revoir *Improving the Reactivity of Pure Operation-Based CRDTs* à ce sujet
+    - https://dl.acm.org/doi/abs/10.1145/3447865.3457968
+- Pistes d'améliorations du PO-Log CRDT
+  - Structure de données génériques
+  - Nécessite de raisonner sur le log entier
+  - S'exprime correctement pour une structure simple
+    - MV-Register
+  - Déjà plus complexe pour les Ensembles
+    - AW-Set, RW-Set
+  - Quid de structures plus complexes ?
+    - Sequence, Tree
+  - Explique que mécanisme de stabilisation causale peut permettre de discard les opérations stables
+    - Mais ne concerne que les unlabelled CRDTs j'ai l'impression
+  - Ne permet pas de supprimer les opérations des labelled CRDTs
+    - Seulement leur information de causalité
+    - Est-ce la majeure source de métadonnées ?
+  - Est-ce qu'on peut permettre de raisonner sur une structure au choix sans perdre en généricité ?
+  - Non, revient à rendre spécifique
+    - Σ, le domaine des états
+    - prepare, la méthode pour générer l'opération
+    - effect, la méthode pour intégrer l'opération
+  - Est-ce qu'on peut permettre de raisonner sur plusieurs /derived views/ à ce moment là ?
+    - Par exemple une dédiée à l'intégration des opérations locales, une dédiée à l'intégration des opérations distantes, une pour l'anti-entropie
+- Autres
+  - Pas clair comment le mécanisme de stabilisation causale et de compaction sémantique sont compatibles avec le join d'un nouveau noeud
+    - Diffuse probablement le PO-Log et snapshot du TCSB
+    - Pourrait rendre l'expliciter
+**** IN-PROGRESS Thèse : Rédiger perspective *Détection et fusion manuelle ou fork de versions distantes*
+- Peut amener grâce à deux aspects
+  - Noeuds déconnectés empêche la progression de la stabilité causale
+    - Empêche les protocoles de réplication optimistes de tronquer des métadonnées
+      - Car besoin potentiellement de ces métadonnées pour intégrer des modifications de ces noeuds s'ils reviennent un jour
+    - Pénalise ainsi les noeuds actifs du système
+    - Dans système P2P à large échelle, conjecture que nous avons un petit noyau de noeuds actifs sur le long terme, et une grande quantité de noeuds éphémères
+  - Mécanismes de résolution de conflits automatiques assurent la convergence à terme mais pas l'intention
+    - Possède une définition sommaire de l'intention
+      - Ordre des éléments cohérent
+      - Mais ignore aspect sémantique
+    - Résultat de la fusion automatique de plus en plus propice à être insatisfaisant
+      - Entrelacement
+      - Duplication de contenu
+      - Inadéquation de contenu
+**** IN-PROGRESS Thèse : Rédiger perspective *Étude comparative des modèles de sync des CRDTs*
+*** Done
+- Réunion d'équipe
+  - Présentation Claudia
+    - Claudia a déposé le nouveau projet d'équipe fin août
+      - En cours d'évaluation/validation
+      - 3/4 mois de délai normalement
+    - Conserve aspect service dans Loreley
+      - Moins important néanmoins
+      - Pour si Olivier ou François souhaitent continuer de travailler dessus
+      - Olivier ne s'arrêtait pas ?
+    - Projet avec Hive
+      - But est de travailler sur CRDTs fragmentés et chiffrés
+      - Stockage cloud P2P
+      - Met une partie de son espace disque dans un pool commun de façon à profiter de services du pool
+    - Axe réplications de données
+      - Évaluation des mécanismes de résolution de conflits automatiques
+      - Composition de CRDTs
+      - Contraintes d'intégrité dans BDD
+      - Travaille sur CRDTs fragmentés et chiffrés
+      - Placement des ressources dans réseau edge
+    - Axe sécurité
+      - Droits d'accès distribués
+      - Gestion de clés de groupe
+      - Systèmes BFT en collab avec Wide et Hive
+      - Blockchain, ou méthodes alternatives de consensus
+    - Axe confiance entre utilisateurs et services
+      - Comment faire confiance en la plateforme ?
+      - Comment faire confiance en les collaborateurs ?
+    - Nouveau format des réunions
+      - Une fois par mois
+      - Présentation des nouvelles
+      - Chaque PhD/postdoc/ingé/stagiaire présente 2-3 slides sur sa progression en 5min
+      - De manière moins fréquente
+	- Présentation des papiers acceptés/soutenances blanches
+	- Focus sur un travail en cours
+      - HCERES
+	- <2022-09-27 Tue>
+	  - 9h15-10h50 : Présentation du bilan LORIA
+	  - 18h-21h : Démos autour d'un apéritif dinatoire
+	- <2022-09-28 Wed>
+	  - 13h05-14h25 : Présentation département 3
+  - Évolution de l'équipe
+    - Hive
+      - 2 thèses dans l'équipe
+      - 2 thèses co-encadrées par l'équipe
+      - Ingénieur-es en fin de projet
+    - Amadeus
+      - 1 thèse
+      - 2 thèses de co-encadré
+    - PEPR
+      - 4 sujets de thèse
+  - Réunion
+    - Thomas
+      - Du mal à trouver des candidats pour le sujet de thèse avec Chadi
+      - Papier sur applications sur graphes genre PageRank mais lorsque données sont situées dans d'autres pays avec législation sur données différentes
+** Semaine du <2022-09-26 Mon> au <2022-09-30 Fri>
+*** Planned
+**** DONE Thèse : Rédiger résumé contribution RLS
+**** DONE Thèse : Rédiger résumé contribution MUTE
+**** DONE Thèse : Rédiger perspective *Relations de priorité alternative*
+**** DONE Thèse : Rédiger perspective *Détection et fusion manuelle ou fork de versions distantes*
+- Peut amener grâce à deux aspects
+  - Noeuds déconnectés empêche la progression de la stabilité causale
+    - Empêche les protocoles de réplication optimistes de tronquer des métadonnées
+      - Car besoin potentiellement de ces métadonnées pour intégrer des modifications de ces noeuds s'ils reviennent un jour
+    - Pénalise ainsi les noeuds actifs du système
+    - Dans système P2P à large échelle, conjecture que nous avons un petit noyau de noeuds actifs sur le long terme, et une grande quantité de noeuds éphémères
+  - Mécanismes de résolution de conflits automatiques assurent la convergence à terme mais pas l'intention
+    - Possède une définition sommaire de l'intention
+      - Ordre des éléments cohérent
+      - Mais ignore aspect sémantique
+    - Résultat de la fusion automatique de plus en plus propice à être insatisfaisant
+      - Entrelacement
+      - Duplication de contenu
+      - Inadéquation de contenu
+**** DONE Thèse : Rédiger perspective *Étude comparative des modèles de sync des CRDTs*
+**** DONE Thèse : Ajouter perspective *Étendre Pure-Op based CRDTs*
+- Papier de 2017 de Baquero introduit 2 contributions IMO
+  - Tagged Causal Stable Broadcast (TCSB)
+  - PO-Log CRDT
+- Pistes d'améliorations de TCSB
+  - Enforce Exactly-Once et Causal Delivery
+  - Toutes deux pas forcément nécessaires
+  - Serait intéressant que la spécification du CRDT permette d'exprimer plus finement les contraintes
+  - Que le modèle de livraison soit une stratégie
+  - Revoir *Improving the Reactivity of Pure Operation-Based CRDTs* à ce sujet
+    - https://dl.acm.org/doi/abs/10.1145/3447865.3457968
+- Pistes d'améliorations du PO-Log CRDT
+  - Structure de données génériques
+  - Nécessite de raisonner sur le log entier
+  - S'exprime correctement pour une structure simple
+    - MV-Register
+  - Déjà plus complexe pour les Ensembles
+    - AW-Set, RW-Set
+  - Quid de structures plus complexes ?
+    - Sequence, Tree
+  - Explique que mécanisme de stabilisation causale peut permettre de discard les opérations stables
+    - Mais ne concerne que les unlabelled CRDTs j'ai l'impression
+  - Ne permet pas de supprimer les opérations des labelled CRDTs
+    - Seulement leur information de causalité
+    - Est-ce la majeure source de métadonnées ?
+  - Est-ce qu'on peut permettre de raisonner sur une structure au choix sans perdre en généricité ?
+  - Non, revient à rendre spécifique
+    - Σ, le domaine des états
+    - prepare, la méthode pour générer l'opération
+    - effect, la méthode pour intégrer l'opération
+  - Est-ce qu'on peut permettre de raisonner sur plusieurs /derived views/ à ce moment là ?
+    - Par exemple une dédiée à l'intégration des opérations locales, une dédiée à l'intégration des opérations distantes, une pour l'anti-entropie
+- Autres
+  - Pas clair comment le mécanisme de stabilisation causale et de compaction sémantique sont compatibles avec le join d'un nouveau noeud
+    - Diffuse probablement le PO-Log et snapshot du TCSB
+    - Pourrait rendre l'expliciter
+**** DONE Thèse : Rédiger *Publications*
+**** DONE Thèse : Rédiger *Plan du manuscrit*
+**** DONE Thèse : Rédiger *Questions de recherche et contributions*
+**** DONE Thèse : Établir plan de *Contexte*
+*** Done
+- Thèse : Rédiger contribution MUTE
+  - Contexte
+    - Applications collaboratives
+    - Applications historiquement centralisées, pose problèmes de souveraineté, confidentialité, pérrennité
+    - Souhaite proposer une alternative distribuée, local-first software
+    - Souhaite de cette manière nous familiariser avec l'état de l'art et en proposer un POC
+  - Contribution
+    - Propose MUTE, éditeur de texte web P2P chiffré de bout en bout
+    - Présente un tour d'horizon des différentes briques permettant de concevoir une application Local-First
+    - Nous permet de présenter les travaux de cette thèse au niveau types de données répliquées
+    - Permet à l'équipe de présenter ses travaux au niveau authentification dans un système distribué
+    - Nous a permis de nous familiariser et de présenter les travaux existants au niveau
+      - Protocole d'appartenance au groupe
+      - Anti-entropie
+      - Clé de chiffrement de groupe
+      - Mécanisme de conscience de groupe
+  - Limites
+    - Environnement web
+    - Utilisabilité des systèmes P2P
+- Thèse : Rédiger *Publication*
+  - Vic a rédigé cette partie à la main
+  - Voir pour faire de même
+- Thèse : Établir plan de *Contexte*
+  - Plan
+    - Systèmes collaboratifs/communautaires et intérêts
+    - Adoption de l'architecture décentralisé pour répondre aux problèmes techniques
+    - Mais ce type de systèmes pose toujours des problèmes d'un point de vue utilisateur
+      - Dépendance envers autorités centrales
+      - Confidentialité des données et des interactions
+      - Pérennité du service et du travail réalisé
+    - Besoin d'une alternative à ce type de systèmes
+      - Mouvance LFS
+    - Pour aller plus loin, proposons d'adopter une architecture P2P sans autorités centrales
+    - De ce changement de paradigme découle un ensemble de problématiques
+      - Réplication de données mutables
+      - Passage à l'échelle
+      - Tolérance au churn
+      - Sécurité
+      - Utilisabilité
+    - Dans le cadre de cette thèse, nous nous intéressons à la réplication de données mutables
+    - Réplication de données mutables
+      - Réplication de données permet d'améliorer disponibilité et tolérance aux pannes en introduisant de la redondance dans le système
+      - Techniques de réplications peuvent être classées en deux catégories, réplication pessimiste et réplication optimiste
+      - Ces deux catégories offrent des compromis différents par rapport aux propriétés introduites par les théorèmes CAP et PACELC
+      - Réplication pessimiste
+	- Techniques de réplication pessimiste privilègie la cohérence des données
+	- Notamment, empêche les modifications en concurrence d'une même donnée
+	- Pour cela, plusieurs approches possibles
+	  - Utilisation d'un protocole de consensus pour décider de la prochaine modification (SMR)
+	  - Élection d'un leader
+	- Ce choix a cependant des conséquences sur la disponibilité, la latence et la tolérance aux pannes du système
+	- Par exemple, si le leader élu rencontre une panne, les modifications de la données sont mises en attente le temps que la panne soit détectée et qu'un nouveau leader soit élu
+      - Réplication optimiste
+	- À l'inverse, techniques de réplication optimiste jugent acceptable de relâcher la propriété de cohérence
+	- Dans ce paradigme, chaque noeud possédant une copie de la donnée peut la consulter et la modifier, sans coordination préalable avec les autres noeuds
+	- Ils sont ainsi autoriser à diverger temporairement
+	- Leurs modifications respectives sont ensuite diffusées pour qu'elles soient intégrées par les autres noeuds et converger, ie atteindre de nouveau des états équivalents
+	- Cependant, certaines modifications effectuées en concurrence par des noeuds peuvent provoquer des conflits
+	- Des mécanismes de résolution de conflits, potentiellement automatiques, sont alors requis pour permettre aux noeuds de converger à terme
+	- Cette approche permet donc de privilégier la disponibilité, la latence et la tolérance aux pannes du système en échange d'une cohérence forte
+	- Dans le cadre de cette thèse, nous nous intéressons à cette famille d'algorithmes
+** Semaine du <2022-10-03 Mon> au <2022-10-07 Fri>
+*** Planned
+**** DONE Thèse : Trouver sources attestant des problèmes posés par les GAFAM
+**** IN-PROGRESS Thèse : Trouver sources attestant des bienfaits offerts par les plateformes communautaires/collaboratives
+**** TODO Thèse : Lire rapport d'Amnesty International sur GAFAM vs. droits humains
+- Dispo ici : https://www.amnesty.org/en/documents/pol30/1404/2019/en/
+**** TODO Thèse : Lire rapport d'Amnesty International sur harcèlement des femmes sur Twitter
+- Dispo ici : https://www.amnesty.org/en/documents/act30/8070/2018/en/
+**** TODO Thèse : Lire enquête du Wall Street Journal sur impact d'Instagram sur adolescentes
+- Dispo ici : https://www.nytimes.com/2021/11/18/technology/meta-instagram-investigation-teens.html
+- A noter qu'a donné lieu à l'ouverture d'une enquête sur l'(in)action de Facebook
+  - https://www.nytimes.com/2021/11/18/technology/meta-instagram-investigation-teens.html
+**** TODO Thèse : Lire enquête du Wall Street Journal sur effet délétère de l'algorithme de FB
+- Dispo ici : https://www.wsj.com/articles/facebook-algorithm-change-zuckerberg-11631654215
+**** TODO Thèse : Lire *Algorithms of Oppression*
+**** TODO Thèse : Lire *Review of social influence in crisis communications and evacuation decision-making*
+- Dispo ici : https://www.sciencedirect.com/science/article/pii/S2590198221000324
+**** TODO Thèse : Lire *The Role of Social Media during Social Movements – Observations from the #metoo Debate on Twitter*
+- Dispo ici : https://aisel.aisnet.org/hicss-53/dsm/collective_intelligence/3/
+*** Done
+- Thèse : Trouver sources attestant des problèmes posés par les GAFAM
+  - Rapport sur comment le business model des GAFAM menacent les droits humains
+    - Par Amnesty International, 21/11/2019
+    - Dispo ici : https://www.amnesty.org/en/documents/pol30/1404/2019/en/
+  - Rapport sur le harcèlement que subissent les femmes sur Twitter
+    - Par Amnesty International, 21/03/2018
+    - Dispo ici : https://www.amnesty.org/en/documents/act30/8070/2018/en/
+  - Enquête sur l'impact négatif d'Instagram sur les adolescentes
+    - Par The Wall Street Journal, 14/09/2021
+    - Dispo ici : https://www.wsj.com/articles/facebook-knows-instagram-is-toxic-for-teen-girls-company-documents-show-11631620739
+  - Enquête sur la favorisation de contenus clivants par l'algo de FB
+    - Par The Wall Street Journal, 15/09/2021
+    - Dispo ici : https://www.wsj.com/articles/facebook-algorithm-change-zuckerberg-11631654215
+  - Livre *Algorithms of Oppression*
+    - Par Safiya Umoja Noble, 2018
+    - Récupéré
+- Thèse : Trouver sources attestant des bienfaits offerts par les plateformes communautaires/collaboratives
+  - Souhaiterais illustrer les bienfaits suivants
+    - Qualité de l'information
+      - Le fait que tout le monde puisse contribuer permet, par débat, d'atteindre une version de meilleure qualité de la ressource que si un-e auteur-rice
+      - Peut reprendre l'exemple de Wikipédia
+      - Serait intéressant de voir si retrouve qqch de similaire avec d'autres plateformes
+	- YT
+	- Stack overflow et ses dérivés
+    - Diffusion de l'information
+      - Le fait que tout le monde puisse communiquer et relayer la parole permet de plus facilement et plus rapidement transmettre une information
+      - Exemple de crise ?
+    - Libération de la parole
+      - Le fait que tout le monde puisse participer permet aux voix ignorées jusque là de se entendre et de porter ses messages
+      - Voir exemples de
+	- #MeToo
+	- Mouvements sociaux
+	  - Arab Spring
+	  - Hong Kong Umbrella Movement
+	  - Gilets Jaunes
+        - Fandoms et sous-cultures
+  - *Review of social influence in crisis communications and evacuation decision-making*
+    - A l'air d'aborder l'effet des réseaux sociaux sur les comportements lors de crises naturelles
+    - Dispo ici : https://www.sciencedirect.com/science/article/pii/S2590198221000324
+    - Par Arif Mohaimin Sadri, Satish V. Ukkusuri, Md Ashraf Ahmed en 2021
+  - *The Role of Social Media during Social Movements – Observations from the #metoo Debate on Twitter*
+    - A l'air d'aborder l'effet des réseaux sociaux dans le mouvement #metoo, et notamment que le mouvement est né en ligne
+    - Par Felix Brünker, Magdalena Wischnewski, Milad Mirbabaie, Judith Meinert en 2020
+    - Dispo ici : https://aisel.aisnet.org/hicss-53/dsm/collective_intelligence/3/
+  - *Rape culture and social media: young critics and a feminist counterpublic*
+    - A l'air d'aborder le fait que les réseaux sociaux sont des espaces où l'on retrouve les préjudices, mais qu'ils peuvent aussi servir de safe spaces et lieux d'éducation
+    - Par Sophie Sills, Chelsea Pickens, Karishma Beach, Lloyd Jones, Octavia Calder-Dawe, Paulette Benton-Greig et Nicola Gavey en 2015
+    - Dispo ici : https://www.tandfonline.com/doi/full/10.1080/14680777.2015.1137962
+  - *Finding high-quality content in social media*
+    - A l'air d'aborder le fait qu'on peut trouver du contenu de qualité sur les réseaux sociaux, propose comment le trouver automatiquement
+    - Par Eugene Agichtein, Carlos Castillo, Debora Donato, Aristides Gionis et Gilad Mishne en 2008
+    - Dispo ici : https://dl.acm.org/doi/abs/10.1145/1341531.1341557
+    - Voir si donne des applications ou si a été réutilisé
+* Backlog-manuscrit
+** TODO Thèse : Ajouter partie *Présentation* de MUTE
+- Pourrait aborder ses :
+  - Objectifs
+  - Fonctionnalités
+- Et introduire les architectures logicielles et systèmes à cet endroit
+** TODO Thèse : Rédiger /generateId()/
+- Pourrait MàJ /generateId()/ pour LogootSplit dans section *blocs*
+- Après avoir introduit notion d'intervalles d'identifiants
+** TODO Thèse : Contacter Quentin à propos de l'obtention de traces de collaboration via Framasoft
+- Il me semble qu'à une époque, Quentin était en contact avec des gens de Framasoft pour récupérer des traces d'édition collaborative
+- L'idée était de former un dataset
+- Me semble que la discussion était tombée à l'eau
+  - Problème pour anonymiser les données ?
+  - Problème d'utilisation des données pour un usage non-consenti par les utilisateur-rices au préalable ?
+- PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft**** TODO Thèse : Rédiger /generateId()/
+- Pourrait MàJ /generateId()/ pour LogootSplit dans section *blocs*
+- Après avoir introduit notion d'intervalles d'identifiants
 ** TODO Thèse : Reformuler mécanisme de GC
 - Pour définir les /potentielles époques courantes/, je repose sur la notion de stabilité causale
   - Je prends l'opération rename maximale qui est causalement stable
@@ -26051,12 +26458,6 @@ whereas for other data types to be pure, they need to leverage some information 
 - But serait de montrer que /renameId/ a complexité similaire
 - Et que /renameBlock/ achieve de meilleures performances grâce à la réduction du nombre de blocs
 * Backlog
-** TODO Thèse : Établir jury
-- Pistes
-  - [ ] Elisa Gonzalez Boix
-    - https://soft.vub.ac.be/disco/elisa/
-  - [ ] Aniette Bieniusa
-    - https://softech.informatik.uni-kl.de/homepage/de/staff/AnnetteBieniusa/
 ** TODO Thèse : Chercher pistes pour post-doc
 - Serait intéressant de voir si y a des opportunités de post-doc
 - Pistes possibles
