@@ -25181,7 +25181,7 @@ Failed to publish
 	- Garder les parties sur la combinaison avec Core & Nebula et LSEQ pour la conclusion
     - Chapitre MUTE
       - Intro
-	- Insister sur cee que j'ai fait dans MUTE, i.e. couches réplication et delivery
+	- Insister sur ce que j'ai fait dans MUTE, i.e. couches réplication et delivery
 	- Préciser le system model de l'application et donc les contraintes réseau qui en découlent
 	- Décrire figure 3.2 et expliquer qu'on va présenter l'application couche par couche
       - Figure 3.1
@@ -26340,22 +26340,30 @@ whereas for other data types to be pure, they need to leverage some information 
 ** Semaine du <2022-10-03 Mon> au <2022-10-07 Fri>
 *** Planned
 **** DONE Thèse : Trouver sources attestant des problèmes posés par les GAFAM
-**** IN-PROGRESS Thèse : Trouver sources attestant des bienfaits offerts par les plateformes communautaires/collaboratives
+**** DONE Thèse : Lire enquête du Wall Street Journal sur impact d'Instagram sur adolescentes
+- Dispo ici :  https://www.wsj.com/articles/facebook-knows-instagram-is-toxic-for-teen-girls-company-documents-show-11631620739
+- A noter qu'a donné lieu à l'ouverture d'une enquête sur l'(in)action de Facebook
+  - https://www.nytimes.com/2021/11/18/technology/meta-instagram-investigation-teens.html
+- Accès libre via ce lien : https://t.co/JAvzKFc61q
+**** DONE Thèse : Lire enquête du Wall Street Journal sur effet délétère de l'algorithme de FB
+- Dispo ici : https://www.wsj.com/articles/facebook-algorithm-change-zuckerberg-11631654215
+- Accès libre via ce lien : https://t.co/P6JohMdhQE
+**** DONE Thèse : Lire *How Trump Consultants Exploited the Facebook Data of Millions*
+- Dispo ici : https://www.nytimes.com/2018/03/17/us/politics/cambridge-analytica-trump-campaign.html
+**** DONE Thèse : Lire *The Role of Social Media during Social Movements – Observations from the #metoo Debate on Twitter*
+- Dispo ici : https://aisel.aisnet.org/hicss-53/dsm/collective_intelligence/3/
+**** DONE Thèse : Trouver sources attestant des bienfaits offerts par les plateformes communautaires/collaboratives
+**** TODO Thèse : Lire *Knowledge sharing and yahoo answers: everyone knows something*
+- Dispo ici : https://dl.acm.org/doi/abs/10.1145/1367497.1367587
+**** TODO Thèse : Lire *Evaluating the Quality of Educational Answers in Community Question-Answering*
+- Dispo ici : https://ieeexplore.ieee.org/abstract/document/7559575
 **** TODO Thèse : Lire rapport d'Amnesty International sur GAFAM vs. droits humains
 - Dispo ici : https://www.amnesty.org/en/documents/pol30/1404/2019/en/
 **** TODO Thèse : Lire rapport d'Amnesty International sur harcèlement des femmes sur Twitter
 - Dispo ici : https://www.amnesty.org/en/documents/act30/8070/2018/en/
-**** TODO Thèse : Lire enquête du Wall Street Journal sur impact d'Instagram sur adolescentes
-- Dispo ici : https://www.nytimes.com/2021/11/18/technology/meta-instagram-investigation-teens.html
-- A noter qu'a donné lieu à l'ouverture d'une enquête sur l'(in)action de Facebook
-  - https://www.nytimes.com/2021/11/18/technology/meta-instagram-investigation-teens.html
-**** TODO Thèse : Lire enquête du Wall Street Journal sur effet délétère de l'algorithme de FB
-- Dispo ici : https://www.wsj.com/articles/facebook-algorithm-change-zuckerberg-11631654215
 **** TODO Thèse : Lire *Algorithms of Oppression*
 **** TODO Thèse : Lire *Review of social influence in crisis communications and evacuation decision-making*
 - Dispo ici : https://www.sciencedirect.com/science/article/pii/S2590198221000324
-**** TODO Thèse : Lire *The Role of Social Media during Social Movements – Observations from the #metoo Debate on Twitter*
-- Dispo ici : https://aisel.aisnet.org/hicss-53/dsm/collective_intelligence/3/
 *** Done
 - Thèse : Trouver sources attestant des problèmes posés par les GAFAM
   - Rapport sur comment le business model des GAFAM menacent les droits humains
@@ -26373,6 +26381,10 @@ whereas for other data types to be pure, they need to leverage some information 
   - Livre *Algorithms of Oppression*
     - Par Safiya Umoja Noble, 2018
     - Récupéré
+  - Cambridge Analytica
+    - Révélation de l'affaire : https://www.nytimes.com/2018/03/17/us/politics/cambridge-analytica-trump-campaign.html
+    - Récapitulatif de l'affaire : https://www.lemonde.fr/pixels/article/2018/03/22/ce-qu-il-faut-savoir-sur-cambridge-analytica-la-societe-au-c-ur-du-scandale-facebook_5274804_4408996.html
+    - Ingérence russe : https://www.lemonde.fr/pixels/article/2018/04/09/ingerence-dans-les-elections-facebook-va-mettre-en-place-une-commission-independante_5283081_4408996.html
 - Thèse : Trouver sources attestant des bienfaits offerts par les plateformes communautaires/collaboratives
   - Souhaiterais illustrer les bienfaits suivants
     - Qualité de l'information
@@ -26410,12 +26422,236 @@ whereas for other data types to be pure, they need to leverage some information 
     - Par Eugene Agichtein, Carlos Castillo, Debora Donato, Aristides Gionis et Gilad Mishne en 2008
     - Dispo ici : https://dl.acm.org/doi/abs/10.1145/1341531.1341557
     - Voir si donne des applications ou si a été réutilisé
-* Backlog-manuscrit
-** TODO Thèse : Ajouter partie *Présentation* de MUTE
+  - *The Wisdom of Crowds*
+    - A l'air d'indiquer que la décision collective d'une foule est généralement meilleure que chaque décision individuelle
+    - Par James Surowiecki en 2004
+    - Page wiki sur le sujet : https://en.wikipedia.org/wiki/The_Wisdom_of_Crowds
+    - Un livre à l'origine
+  - *Knowledge sharing and yahoo answers: everyone knows something*
+    - A l'air de s'intéresser à la qualité des réponses sur un forum de Q&A
+    - Par Lada A. Adamic, Jun Zhang, Eytan Bakshy et Mark S. Ackerman en 2008
+    - Dispo ici : https://dl.acm.org/doi/abs/10.1145/1367497.1367587
+  - *Evaluating the Quality of Educational Answers in Community Question-Answering*
+    - A l'air de proposer système pour évaluer qualité des réponses pour systèmes de Q&A
+    - Par Long T. Le, Chirag Shah et Erik Choi en 2016
+    - Dispo ici : https://ieeexplore.ieee.org/abstract/document/7559575
+- Thèse : Lire enquête du Wall Street Journal sur impact d'Instagram sur adolescentes
+  - Facebook a conduit des recherches sur l'impact d'Instagram sur ses utilisateur-rices de 2019 à 2021
+  - A donné les résultats suivants
+    - Plusieurs impacts négatifs sur la santé mentale sont liés à Insta et non pas les réseaux sociaux en général
+      - Notamment /social comparison/
+    - N'impacte pas tous-tes de la même manière
+      - Bénéfices outperform inconvénients dans des cas
+      - /fun way to express themselves and connect with friends/ vs. /negative social comparison/
+    - 40% de celleux qui se trouvent unattractive ont vu ce sentiment naitre sur Insta
+    - De même pour 25% de ceux qui se trouvent /not good enough/
+    - Retrouve notion de doomscrolling
+      - /wanting to spend less time on Insta, but lacked self control to do so/
+    - Diffusion de tips associés aux eating-disorders sur Insta
+    - Problème d'over-sexualisation des filles
+    - Touche aussi garçons
+      - 14% disent se sentir pire à cause d'insta
+      - 40% ont negative social comparison
+  - Résultats communiqués aux executives, sans réponse
+    - Plutôt downplayed par Zuckerberg même
+    - Réponse d'executive indiquant que la compétition de beauté est le fun d'Insta
+- Thèse : Lire enquête du Wall Street Journal sur effet délétère de l'algorithme de FB
+  - Démarre avec executive de BuzzFeed qui maile Facebook pour se plaindre de l'algo, automne 2018
+    - Contenu clivant relayé par FB, pas le contenu positif
+    - Incentive à être clivant pour survivre financièrement
+  - Vais suite à un rework de l'algo en 2018
+  - Rework en réponse à enquête interne sur impact de FB sur santé mentale
+    - Consommé contenu pro semblait mauvais pour santé mentale
+    - Souhaitait orienter actions des utilisateur-rices vers interactions entre proches
+    - Link vers *Facebook acknowledged some social-media use can be harmful to mental health*
+      - Dispo ici : https://t.co/fDffYkaean
+  - 1ers retours des employés et chercheurs de la plateforme signalaient augmentation des interactions négatives
+  - Et que médias et politiques s'adaptaient en proposant du contenu clivant
+  - Ont conclut quee le nouvel algo favorisait le contenu toxique
+    - "Misinformation, toxicity, and violent content are inordinately prevalent among reshares"
+    - "Many parties, including those that have shifted to the negative, worry about the long term effects on democracy"
+  - Plusieurs fixs proposés par l'équipe d'intégrité
+  - Mais partiellement refusés par Zuckerberg par crainte d'entraver l'engagement des utilisateur-rices
+    - "We wouldn’t launch if there was a material tradeoff with Meaningful Social Interactions impact."
+  - Make sense puisqu'une raison du changement était la diminution de l'engagement des utilisateur-rices
+    - Comments, likes and reshares declined en 2017
+  - User surveys ont rapporté dès été 2018 une perte en qualité du feed
+  - Médias et politiques ont aussi remonté le problème d'après documents internes de FB
+  - Changements finalement apportés en printemps 2020
+- Thèse : Lire *The Role of Social Media during Social Movements – Observations from the #metoo Debate on Twitter*
+  - Son état de l'art liste plusieurs travaux illustrant des propriétés qui m'intéressent
+  - "Lowering individual coasts of participating, increasing general accessibility of information", "Increasing the chances that people participate"
+    - Par David Meek en 2011
+    - Dispo ici : https://onlinelibrary.wiley.com/doi/full/10.1111/j.1467-8330.2011.00942.x
+  - "Fostering connectivity between users"
+    - Par José van Dijck et Thomas Poell en 2013
+    - Dispo ici : https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2309065
+  - "Creating a platform where users can generate content themselves"
+    - Par Sadaf R Ali et Shahira Fahmy en 2013
+    - Dispo ici : https://journals.sagepub.com/doi/abs/10.1177/1750635212469906
+  - "Social movements became much more self-organized and leaderless"; "Facilitated coordination of protests"
+    - Par Dustin Kidd et Keith McIntosh en 2016
+    - Dispo ici : https://compass.onlinelibrary.wiley.com/doi/full/10.1111/soc4.12399
+  - "Was found that these can contribute to a movement's success both online and offline"
+    - Par Manaf Bashir en 2012
+    - Dispo ici : https://informationethics.ca/index.php/irie/article/view/305
+  - "Helped to popularize the cause and broaden the call for the public to engage"
+    - Par Yannis Theocharis
+    - Dispo ici : https://www.tandfonline.com/doi/full/10.1080/19331681.2012.701106
+- Réunion Gérald
+  - Préparation
+    - A relu les commentaires sur le chapitre RLS
+      - Pas compris le commentaire de Gérald page 33 à propos d'hypothèse
+      - En vrai, pas grand chose en l'état
+      - Serait curieux de nouveaux retours maintenant qu'il y a l'état de l'art
+    - A relu les commentaires sur le chapitre MUTE
+      - Comprends pas absence de plusieurs commentaires
+	- Présentation de l'outil
+	  - But
+	  - Fonctionnalités
+	    - Matrice des modes de collaboration
+	- État de l'art
+	  - Si présente MUTE comme POC des LFS P2P le plus complet, devrait IMO présenter d'autres travaux
+  - Discussion
+    - Relation de priorité
+      - Commentaire dans le sens où on se base sur cette propriété de la relation /priority/ pour définir revertRenameId
+      - Rajouterait un truc sur cette limitation dans la conclusion du chapitre
+    - Chapitre MUTE
+      - Pourrait ajouter une introduction sur
+	- Vision
+	- Modes de collaboration supportés
+      - État de l'art
+	- Effectivement, manquant et sources potentielles de question
+	- Pourrait se comparer rapidement à GDocs, Etherpad, Cryptpad, Peerpad
+      - Conclusion
+	- Ajouter perspectives features change awareness
+	  - Conscience de l'intégration des modifications en temps réel
+	  - Conscience des modifications en asynchrone, avec fonctionnalité historique
+	- Ajouter features group awareness
+	  - Comment gérer group awareness lorsque échelle contient des milliers
+    - État de l'art
+      - Manque de grilles de lecture
+	- Modèles de synchronisation
+	- Seq CRDTs
+      - Lit beaucoup de choses mais sans savoir ce que l'on doit retenir
+      - Dur à lire
+      - Pourrait annoncer la grille de lecture en intro pour préparer le lecteur
+      - Et préciser qu'on en profite pour faire une réflexion sur l'état de l'art pour aborder ses limites
+	- Faudrait rajouter ce point là dans les contributions en conclusion du manuscrit
+    - Conclusion
+      - RLS
+	- Manque partie sur validation expérimentale
+      - MUTE
+	- Trop rapide la partie sur la nécessité des serveurs relays
+	  - Devrait dire que nécessaire et que veut pas reposer uniquement sur ceux de Google
+	- Pareil pour la partie utilisabilité
+	  - Préciser ce qu'on entend par système de chiffrement additionnel
+    - Perspectives
+      - Priority
+	- Préciser qu'après le rename, on va avoir toutes les opérations concurrentes qui vont être appliquées à l'état
+	- Et que donc le résultat ne sera pas forcément mieux que l'état actuel
+      - Fusion manuelle
+	- Pas clair à l'heure actuelle
+	- Plus simple de
+	  - Prendre exemple de RLS
+	  - Reçoit une opération d'un noeud qui provient d'une époque dont on a GC les données
+	  - Plus moyen de l'intégrer
+	  - Peut alors lancer protocole de fusion manuelle
+	  - Demande au noeud son état
+	  - Fait un diff entre états et demande aux noeuds de faire une fusion
+	  - Rattacher avec intérêts des utilisateur-rices
+      - Modèles de synchronisation
+	- Indiquer dès le début le but de cette perspective
+      - Pure-Op Based
+	- Formuler ça en "veut proposer un framework pour Op-based"
+	- Indiquer qu'utilisateur-rices habitués à modèle de cohérence causale
+** Semaine du <2022-10-10 Mon> au <2022-10-14 Fri>
+*** Planned
+**** DONE PoleEmploi : Préparer CV
+- Mettre à jour CV avec expérience d'ATER et publi
+**** DONE Thèse : Rédiger *Contexte* de l'introduction
+**** DONE Thèse : Préciser grille de lecture en intro du chapitre *Etat de l'art*
+- Beaucoup de choses dans tous les sens dans l'état de l'art
+- Serait cool d'annoncer à priori ce que la-e lecteur-rice doit retenir
+- Et spécifier qu'on en profite pour proposer une réflexion sur l'état l'art des
+  - Modèles de synchronisation
+  - CRDTs pour type Séquence
+**** DONE Thèse : Ajouter réflexion sur l'état de l'art en contribution du manuscrit dans chapitre *Conclusion*
+- Réflexion sur
+  - Modèles de synchronisation
+  - CRDTs pour type Séquence
+**** DONE Thèse : Ajouter paragraphe sur validation expérimentale dans chapitre *Conclusion - RLS*
+**** DONE Thèse : Expliciter intention de *Perspective - Fusion manuelle*
+- Changer titre
+- Dire d'entrée qu'on identifie 2 problèmes des mécanismes de résolution conflits automatiques
+  - Croissance continue du surcoût lié au contexte causal
+  - Perte intention
+- Prendre exemple avec RLS
+  - Des noeuds considérés trop distants ne sont plus considérés pour le calcul de la stabilité causale
+  - Permet de faire progresser la stabilité causale, d'identifier un nouveau PPAC, et de GC les époques et anciens états obsolètes
+  - À la reconnexion d'un de ces noeuds, si celui-ci envoie une modification
+  - Noeud détecte qu'il ne peut pas l'intégrer (absence de l'époque dans l'arbre)
+  - Enclenche alors mécanisme de résolution de conflits manuel
+    - Demande au noeud état
+    - Calcule diff
+    - ???
+    - Présente versions à utilisateur-rice
+**** DONE Thèse : Expliciter intention de *Perspective - Modèle de synchronisation*
+- Expliciter dès le début qu'on veut déterminer si tjrs un intérêt à faire des CRDTs autre que Delta-based
+**** DONE Thèse : Expliciter intention de *Prespective - Better Pure-Op*
+- Changer titre pour *Framework Op-based CRDTs*
+- Expliquer motivations
+  - Présence d'un framework pour State-based et Delta-based basé sur théorie des sup-demi-treillis
+  - Présence du framework Pure-Op Based
+  - Mais celui-ci pas assez générique
+- Pas clair la partie sur l'ajustement du modèle de cohérence, et donc de livraison, en fct de l'état du système
+*** Done
+- Réunion Olivier
+  - État art
+    - p27-28
+      - Dans un cas, concerne ins concurrentes à des positions différentes
+      - Dans autre cas, concerne ins concurrentes à la même position
+** Semaine du <2022-10-17 Mon> au <2022-10-21 Fri>
+*** Planned
+**** DONE Thèse : Ajouter partie *Présentation* de MUTE
 - Pourrait aborder ses :
+  - Vision
   - Objectifs
   - Fonctionnalités
 - Et introduire les architectures logicielles et systèmes à cet endroit
+**** IN-PROGRESS Thèse : Rework figures chapitre *RLS*
+- Mettre à jour les figures avec le formalisme utilisé pour état de l'art
+**** TODO Thèse : Ajouter partie sur *Change Awareness* dans *Conclusion* de MUTE
+- Peut distinguer deux types de change awareness
+- En temps réel
+  - Comment faire prendre conscience aux utilisateur-rices des modifications intégrées en temps réel sans surcharger ?
+- En temps asynchrone
+  - Comment proposer une fonctionnalité d'historique ayant du sens lorsqu'il n'y a plus qu'un seul historique, mais une multitude
+  - Et que donc l'historique d'un document est différent d'utilisateur-rice en utilisateur-rice
+**** TODO Thèse : Ajouter partie sur *Groupe Awareness* dans *Conclusion* de MUTE
+- Comment gérer la conscience de groupe lorsque nombre d'utilisateur-rices se compte en milliers
+  - Les utilisateur-rices connecté-es
+  - Les utilisateur-rices déconnecté-es
+**** TODO Thèse : Développer *Conclusion - MUTE*
+- Pas claire la partie sur la nécessité des serveurs de relais
+  - Exprimer plus clairement pourquoi on veut une infrastructure publique de serveurs de relais
+- De même, pas claire la partie sur l'utilisation de noeuds de stockage
+  - Expliquer plus clairement pourquoi on aurait besoin d'un autre mécanisme de chiffrement pour ces noeuds
+**** TODO Thèse : Expliciter pourquoi rename peut ne pas être rentable dans *Perspective - Alt Priority*
+- Préciser qu'à l'état issu du renommage on va appliquer l'ensemble des opérations concurrentes
+- Si grand nombre d'éléments insérés par rapport à état renommé, pas rentable
+**** TODO Thèse : Complexité opérations
+- Modifier complexités des opérations pour remplacer /k/ et /l/ par /h/
+**** TODO Thèse : Retravailler
+**** TODO Thèse : Rework figures chapitre *MUTE*
+- Mettre à jour les figures avec le formalisme utilisé pour état de l'art
+**** TODO Thèse : Rédiger annexe *Entrelacement d'insertions concurrentes dans Treedoc*
+**** TODO Thèse : Rédiger annexe *Algorithmes renameId*
+**** TODO Thèse : Rédiger annexe *Algorithmes revertRenameId*
+*** Done
+* Backlog-manuscrit
+** TODO Thèse : Ajouter partie *État de l'art* de MUTE
+- Pourrait se comparer rapidement à GDocs, Etherpad, Cryptpad, Serenity Notes
 ** TODO Thèse : Rédiger /generateId()/
 - Pourrait MàJ /generateId()/ pour LogootSplit dans section *blocs*
 - Après avoir introduit notion d'intervalles d'identifiants
@@ -26440,8 +26676,6 @@ whereas for other data types to be pure, they need to leverage some information 
   - L'opération rename associée est causalement stable
   - Toutes les opérations antérieures et concurrentes à l'opération rename associée ont été livrées
 - Voir comment vérifier cette 2nde condition dans le cas d'une livraison out of order
-** TODO Thèse : Complexité opérations
-- Modifier complexités des opérations pour remplacer /k/ et /l/ par /h/
 ** TODO Thèse : Illustrer utilité de reporter transition vers nouvelle époque cible
 ** TODO Thèse : Ajouter algorithme de /getPathBetweenEpochs()/
 - Dans l'algorithme /insRemote()/, je décris comment on traite une insertion distante
