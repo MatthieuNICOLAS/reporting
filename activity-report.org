@@ -26619,8 +26619,35 @@ whereas for other data types to be pure, they need to leverage some information 
   - Objectifs
   - Fonctionnalités
 - Et introduire les architectures logicielles et systèmes à cet endroit
-**** IN-PROGRESS Thèse : Rework figures chapitre *RLS*
-- Mettre à jour les figures avec le formalisme utilisé pour état de l'art
+**** DONE Thèse : Ajouter partie sur *Awareness* dans *UI* de *MUTE*
+- Ne mentionne aucune limite et perspective pour la couche UI de MUTE
+- Peut introduire dès lors l'absence de *Change Awareness* et de *Group Awareness*
+**** DONE Thèse : Retravailler couche *Livraison* de *MUTE*
+- Actuellement, aborde cette couche dans le cadre de la couche réplication
+  - Why ?
+- Utilise le nom de *Sync* au lieu de *Livraison* dans le texte
+  - À définir/éclaircir
+- Utilise plusieurs niveaux de sections ayant le même visuel
+  - /subsubsection/ et /paragraph/
+  - Voir pour distinguer les deux
+**** DONE Thèse : Retravailler couche *Sécurité* de *MUTE*
+- Actuellement, la limite et perspective de cette section est expédiée
+- Détailler problème du stockage chez tiers et problème du churn
+**** DONE Thèse : Envoyer mail aux membres du jury
+**** CANCELLED Thèse : Retravailler *Related work* dans chapitre RLS
+**** CANCELLED Thèse : Complexité opérations
+- Modifier complexités des opérations pour remplacer /k/ et /l/ par /h/
+**** IN-PROGRESS Thèse : Retravailler intro
+- Remplacer réseaux sociaux par systèmes collaboratifs
+- Insister sur ce que propose LFS
+  - Les nouvelles fonctionnalités offertes par les applications cloud, notamment collaboration
+  - Mais qu'on perd plusieurs aspects : pérennité, confidentialité, souveraineté
+  - Souhaite proposer des applications offrant le meilleur des deux mondes
+- Reprendre/remonter les idées présenter dans la section problématique MUTE
+**** TODO Thèse : Trancher dans les perspectives
+- Perspectives trop détaillées
+- Réduire perspective sur fusion manuelle
+- Réduire perspective sur framework op-based
 **** TODO Thèse : Ajouter partie sur *Change Awareness* dans *Conclusion* de MUTE
 - Peut distinguer deux types de change awareness
 - En temps réel
@@ -26628,7 +26655,7 @@ whereas for other data types to be pure, they need to leverage some information 
 - En temps asynchrone
   - Comment proposer une fonctionnalité d'historique ayant du sens lorsqu'il n'y a plus qu'un seul historique, mais une multitude
   - Et que donc l'historique d'un document est différent d'utilisateur-rice en utilisateur-rice
-**** TODO Thèse : Ajouter partie sur *Groupe Awareness* dans *Conclusion* de MUTE
+**** TODO Thèse : Ajouter partie sur *Group Awareness* dans *Conclusion* de MUTE
 - Comment gérer la conscience de groupe lorsque nombre d'utilisateur-rices se compte en milliers
   - Les utilisateur-rices connecté-es
   - Les utilisateur-rices déconnecté-es
@@ -26640,15 +26667,108 @@ whereas for other data types to be pure, they need to leverage some information 
 **** TODO Thèse : Expliciter pourquoi rename peut ne pas être rentable dans *Perspective - Alt Priority*
 - Préciser qu'à l'état issu du renommage on va appliquer l'ensemble des opérations concurrentes
 - Si grand nombre d'éléments insérés par rapport à état renommé, pas rentable
-**** TODO Thèse : Complexité opérations
-- Modifier complexités des opérations pour remplacer /k/ et /l/ par /h/
-**** TODO Thèse : Retravailler
+**** TODO Thèse : Unifier l'utilisation de /nodeSeq/
+- Dans ma définition des structures de données, utilise généralement /seq/
+- Dans le texte, utilise généralement /nodeSeq/
+- À vérifier et unifier
+- Je pense sur /nodeSeq/ pour plus de clarté
+**** TODO Thèse : Rework figures chapitre *RLS*
+- Mettre à jour les figures avec le formalisme utilisé pour état de l'art
 **** TODO Thèse : Rework figures chapitre *MUTE*
 - Mettre à jour les figures avec le formalisme utilisé pour état de l'art
 **** TODO Thèse : Rédiger annexe *Entrelacement d'insertions concurrentes dans Treedoc*
 **** TODO Thèse : Rédiger annexe *Algorithmes renameId*
 **** TODO Thèse : Rédiger annexe *Algorithmes revertRenameId*
 *** Done
+- Réunion thèse
+  - Préparation
+    - Nouvelle version du manuscrit
+      - Ajouté intro au chapitre état de l'art pour donner le plan (page 11)
+      - Retravaillé le chapitre MUTE
+	- Ajout d'une présentation du projet (objectifs, fonctionnalités, architecture système et logicielle) (page 114)
+	- Ajouté une partie sur la conscience des changements et de groupe à la section UI (page 120)
+	- Déplacement de la partie consacrée à l'implémentation du modèle de livraison dans sa propre section (page 126)
+	- Développement la partie limites de la section dédiée à la sécurité (page 137)
+      - Apporté quelques modifications au chapitre Conclusion
+	- Ajout des réflexions présentées dans l'état de l'art comme contribution (page 139)
+	- Ajout d'une mention à l'évaluation expérimentale dans le résumé de la contribution RLS (142)
+	- Ajout d'un plan/annonce du but en début de perspectives (page 146, 150 et 151)
+    - Reste à faire
+      - RLS
+	- Modifier la section sur les complexités
+	- Retravailler la section sur les related work
+      - MUTE
+	- Retravailler conclusion de MUTE, notamment ses limites et perspectives
+      - Annexes
+	- Les rédiger
+      - Abstract/Résumé
+	- Rédiger
+      - Global
+	- Typos
+	- Unifier figures
+  - Discussion
+    - Retours
+      - Introduction
+	- Retravailler toute intro
+	  - Partir sur applications principales
+	  - Besoin d'adopter architecture décentralisée pour tenir la charge
+	  - Mais pose des problèmes par rapport aux coûts de déploiement et de maintenance de telles infrastructures, ainsi que par aux propriétés que nous jugeons fondamentales
+	  - Une solution possible est de proposer une alternative distribuée, ie P2P de ces applications
+	- Serait cool d'ajouter deux figures
+	  - Architecture décentralisée
+	  - Architecture P2P
+	  - De façon à pouvoir opposer les deux
+	- LFS
+	  - Préciser que le but est de fournir des applications autonomes, ie capable de fonctionner de manière offline, tout en offrant les fonctionnalités jusqu'alors offertes par le cloud lorsque une connexion est disponible, eg synchronisation entre devices, collaboration
+	  - Remplacer fig par table 1 du papier
+	  - Préciser que nous, on veut tout cocher
+	- P2P
+	  - Expliquer plus clairement pourquoi LFS peuvent fonctionner en P2P
+	  - Mentionner que qui peut le moins le plus
+        - Nombre non-bornée de noeuds
+	  - Remettre sur le tapis la large échelle des systèmes que nous visons
+	- Déplacer Publis en annexe
+	  - Liste des publications
+    - Plan
+      - Envoyer mail à rapporteurs et un autre aux examinateurs
+        #+BEGIN_NOTE
+Tout d'abord, je vous remercie pour avoir accepté de faire partie de mon jury de thèse.
+Pour votre information, voici la composition complète jury :
+
+Rapporteurs :
+* Hanifa Boucheneb, Professeure, Polytechnique Montréal
+* Davide Frey, Chargé de recherche, HdR, Inria Rennes Bretagne-Atlantique
+
+Examinateurs :
+* Hala Skaf-Molli, Maîtresse de conférences, HdR, Nantes Université
+* Stephan Merz, Directeur de Recherche, Inria Nancy - Grand Est
+
+Encadrants :
+* Olivier Perrin Professeur des Universités, Universit de Lorraine, LORIA
+* Gérald Oster, Maître de conférences, Université de Lorraine, LORIA
+
+Pour des raisons administratives, je dois déposer mon manuscrit ce vendredi 21/10 auprès de l'école doctorale.
+
+À cette occasion je dois fournir une date prévisionnelle pour la soutenance.
+Nous comptons donc indiquer la date du 16 décembre.
+Je vous prie de ne pas en tenir compte.
+Nous prévoyons d'organiser la soutenance entre le 12 et le 23 décembre.
+Afin d'indiquer les disponibilités de chacun et de convenir de la date de la soutenance, voici un framadate à compléter :
+La soutenance aura lieu à partir de 14h00 (heure de Paris), et vous pourrez y participer en visio.
+
+Une fois mon jury de thèse validé par l'école doctoral, vous recevrez automatiquement la version du manuscrit que je dépose ce vendredi.
+Cette version n'inclura pas mes dernières modifications et les derniers retours de mes encadrants, je vous prie de ne pas en tenir compte.
+Je m'engage à vous faire parvenir la version finale du manuscrit d'ici vendredi 28/10.
+Souhaitez-vous une version manuscrite du document ?
+
+En vous souhaitant une bonne journée,
+
+Cordialement,
+Matthieu Nicolas
+        #+END_NOTE
+      - Renvoyer pour <2022-10-20 Thu>
+	- Introduction
+	- Perspectives
 * Backlog-manuscrit
 ** TODO Thèse : Ajouter partie *État de l'art* de MUTE
 - Pourrait se comparer rapidement à GDocs, Etherpad, Cryptpad, Serenity Notes
