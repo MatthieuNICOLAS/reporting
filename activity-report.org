@@ -26637,48 +26637,68 @@ whereas for other data types to be pure, they need to leverage some information 
 **** CANCELLED Thèse : Retravailler *Related work* dans chapitre RLS
 **** CANCELLED Thèse : Complexité opérations
 - Modifier complexités des opérations pour remplacer /k/ et /l/ par /h/
-**** IN-PROGRESS Thèse : Retravailler intro
+**** DONE Thèse : Retravailler intro
 - Remplacer réseaux sociaux par systèmes collaboratifs
 - Insister sur ce que propose LFS
   - Les nouvelles fonctionnalités offertes par les applications cloud, notamment collaboration
   - Mais qu'on perd plusieurs aspects : pérennité, confidentialité, souveraineté
   - Souhaite proposer des applications offrant le meilleur des deux mondes
 - Reprendre/remonter les idées présenter dans la section problématique MUTE
-**** TODO Thèse : Trancher dans les perspectives
+**** DONE Thèse : Trancher dans les perspectives
 - Perspectives trop détaillées
 - Réduire perspective sur fusion manuelle
+  - La retirer ?
 - Réduire perspective sur framework op-based
-**** TODO Thèse : Ajouter partie sur *Change Awareness* dans *Conclusion* de MUTE
-- Peut distinguer deux types de change awareness
-- En temps réel
-  - Comment faire prendre conscience aux utilisateur-rices des modifications intégrées en temps réel sans surcharger ?
-- En temps asynchrone
-  - Comment proposer une fonctionnalité d'historique ayant du sens lorsqu'il n'y a plus qu'un seul historique, mais une multitude
-  - Et que donc l'historique d'un document est différent d'utilisateur-rice en utilisateur-rice
-**** TODO Thèse : Ajouter partie sur *Group Awareness* dans *Conclusion* de MUTE
-- Comment gérer la conscience de groupe lorsque nombre d'utilisateur-rices se compte en milliers
-  - Les utilisateur-rices connecté-es
-  - Les utilisateur-rices déconnecté-es
-**** TODO Thèse : Développer *Conclusion - MUTE*
+**** DONE Thèse : Intégrer retours de G&O
+- M'ont envoyé leurs retours sur intro & conclusion de <2022-10-19 Wed>
+- Les intégrer
+**** DONE Thèse : Expliciter pourquoi rename peut ne pas être rentable dans *Perspective - Alt Priority*
+- Préciser qu'à l'état issu du renommage on va appliquer l'ensemble des opérations concurrentes
+- Si grand nombre d'éléments insérés par rapport à état renommé, pas rentable
+**** DONE Thèse : Développer *Conclusion - MUTE*
 - Pas claire la partie sur la nécessité des serveurs de relais
   - Exprimer plus clairement pourquoi on veut une infrastructure publique de serveurs de relais
 - De même, pas claire la partie sur l'utilisation de noeuds de stockage
   - Expliquer plus clairement pourquoi on aurait besoin d'un autre mécanisme de chiffrement pour ces noeuds
-**** TODO Thèse : Expliciter pourquoi rename peut ne pas être rentable dans *Perspective - Alt Priority*
-- Préciser qu'à l'état issu du renommage on va appliquer l'ensemble des opérations concurrentes
-- Si grand nombre d'éléments insérés par rapport à état renommé, pas rentable
+**** DONE Thèse : Retirer noms des noeuds dans figures architecture système de *MUTE*
+**** DONE Thèse : Rédiger *Résumé*
+**** DONE Thèse : Rédiger *Abstract*
+**** DONE Thèse : Déposer manuscrit
+**** DONE Thèse : Préparer slides pour réunion de <2022-10-21 Fri>
+- 2-3 slides pour présenter travail depuis le <2022-09-23 Fri>
+**** IN-PROGRESS Thèse : Retravailler *Conclusion* du chapitre *MUTE*
+- Reformuler résumé du chapitre et refaire apparaître mes contributions
+- Présenter plusieurs limites et perspectives
+  - Conscience de groupe/changement
+  - Droits d'accès
+**** TODO Thèse : Retravailler *Modèle de données du document texte*
+- Pas clair que le titre soit un CRDT synchronisé par opérations
+  - Et pas état ?
+- Pas clair que la date soit aussi un CRDT synchronisé par opérations
+  - Et pas état ?
+- Absence de limites/perspectives
+  - Ajouter support de Rich Text à la Peritext
+    - Markdown limité (image ? mise en page ?)
+    - Langage à balises, modifications concurrentes peuvent produire un entrelacement invalide de balises
+  - Document multimédia
+    - Texte n'est qu'un format de document
+    - Pourrait permettre d'intégrer d'autres types de document
+      - TODO list
+      - Sondage
+      - Figure
+      - Code
 **** TODO Thèse : Unifier l'utilisation de /nodeSeq/
 - Dans ma définition des structures de données, utilise généralement /seq/
 - Dans le texte, utilise généralement /nodeSeq/
 - À vérifier et unifier
 - Je pense sur /nodeSeq/ pour plus de clarté
+**** TODO Thèse : Rédiger annexe *Entrelacement d'insertions concurrentes dans Treedoc*
+**** TODO Thèse : Rédiger annexe *Algorithmes renameId*
+**** TODO Thèse : Rédiger annexe *Algorithmes revertRenameId*
 **** TODO Thèse : Rework figures chapitre *RLS*
 - Mettre à jour les figures avec le formalisme utilisé pour état de l'art
 **** TODO Thèse : Rework figures chapitre *MUTE*
 - Mettre à jour les figures avec le formalisme utilisé pour état de l'art
-**** TODO Thèse : Rédiger annexe *Entrelacement d'insertions concurrentes dans Treedoc*
-**** TODO Thèse : Rédiger annexe *Algorithmes renameId*
-**** TODO Thèse : Rédiger annexe *Algorithmes revertRenameId*
 *** Done
 - Réunion thèse
   - Préparation
@@ -26736,16 +26756,15 @@ Tout d'abord, je vous remercie pour avoir accepté de faire partie de mon jury d
 Pour votre information, voici la composition complète jury :
 
 Rapporteurs :
-* Hanifa Boucheneb, Professeure, Polytechnique Montréal
-* Davide Frey, Chargé de recherche, HdR, Inria Rennes Bretagne-Atlantique
-
+Hanifa Boucheneb, Professeure, Polytechnique Montréal
+Davide Frey, Chargé de recherche, HdR, Inria Rennes Bretagne-Atlantique
 Examinateurs :
-* Hala Skaf-Molli, Maîtresse de conférences, HdR, Nantes Université
-* Stephan Merz, Directeur de Recherche, Inria Nancy - Grand Est
+Hala Skaf-Molli, Maîtresse de conférences, HdR, Nantes Université
+Stephan Merz, Directeur de Recherche, Inria Nancy - Grand Est
 
 Encadrants :
-* Olivier Perrin Professeur des Universités, Universit de Lorraine, LORIA
-* Gérald Oster, Maître de conférences, Université de Lorraine, LORIA
+Olivier Perrin Professeur des Universités, Universit de Lorraine, LORIA
+Gérald Oster, Maître de conférences, Université de Lorraine, LORIA
 
 Pour des raisons administratives, je dois déposer mon manuscrit ce vendredi 21/10 auprès de l'école doctorale.
 
@@ -26769,6 +26788,202 @@ Matthieu Nicolas
       - Renvoyer pour <2022-10-20 Thu>
 	- Introduction
 	- Perspectives
+- Thèse : Intégrer retours de G&O
+  - "Qui connait l'article sur LFS ?"
+    - Organisation d'un workshop *Programming Local-First Software* à ECOOP 22, Conf rang A
+    - Publication dans Wired, discussions sur HackerNews
+    - Si c'est pas suffisant, je suis preneur d'une transition
+  - Traduire les figures
+    - Toujours pas convaincu
+- Dépôt ADUM
+  - Titre de la thèse
+    - Ré-identification sans coordination dans les types de données répliquées sans conflits (CRDTs)
+    - Coordination-free re-identification in Conflict-free Replicated Data Types (CRDTs)
+  - Mots clés
+    - CRDT, Réplication optimiste, Pair-à-pair, Collaboration, Convergence, Optimisation
+    - CRDT, Optimistic replication, Peer-to-peer, Collaboration, Convergence, Optimisation
+  - Date soutenance
+    - 16/12/2022
+  - Adresse complète
+    - Loria, 615 rue du Jardin Botanique, 54600 Villers-Lès-Nancy
+  - Salle
+    - A008
+  - Heure soutenance
+    - 14h
+  - Jury
+    - Olivier
+      - Professeur
+      - Directeur de thèse
+      - Université de Lorraine
+      - Loria, 615, Rue du Jardin Botanique, 54600 Villers-Lès-Nancy
+      - olivier.perrin@loria.fr
+      - HDR
+    - Hanifa
+      - Mme Boucheneb Hanifa
+      - Professeure
+      - Rapporteure
+      - Demande visio
+      - Polytechnique Montréal
+      - 2500, chemin de Polytechnique, QC H3T 1J4
+      - Montréal (Québec)
+      - hanifa.boucheneb@polymtl.ca
+      - Équivalence HDR
+    - Davide
+      - M Frey Davide
+      - Chargé de Recherche
+      - Rapporteur
+      - Inria Rennes - Bretagne Atlantique
+      - IRISA/Inria, Campus universitaire de Beaulieu, 263 Avenue Général Leclerc, 35000 Rennes
+      - davide.frey@inria.fr
+      - HDR
+    - Hala
+      - Mme Skaf-Molli Hala
+      - Maîtresse de conférences
+      - Examinatrice
+      - Nantes Université
+      - LS2N, Faculté des Sciences et des Techniques, 2 rue de la Houssinière - Bât. 34, 44300 Nantes
+      - hala.skaf@univ-nantes.fr
+      - HDR
+    - Stephan
+      - M Merz Stephan
+      - Directeur de recherche
+      - Examinateur
+      - Inria Nancy - Grand Est
+      - Loria, 615, Rue du Jardin Botanique, 54600 Villers-Lès-Nancy
+      - stephan.merz@loria.fr
+      - HDR
+    - Gérald
+      - M Oster Gérald
+      - Maître de conférences
+      - Co-encadrant de thèse
+      - Université de Lorraine
+      - Loria, 615, Rue du Jardin Botanique, 54600 Villers-Lès-Nancy
+      - gerald.oster@loria.fr
+      - Pas HDR
+  - Résumé FR
+    #+BEGIN_NOTE
+Un système collaboratif permet à plusieurs utilisateur-rices de créer ensemble un contenu. Afin de supporter des collaborations impliquant des millions d’utilisateurs, ces systèmes adoptent une architecture décentralisée pour garantir leur haute disponibilité, tolérance aux pannes et capacité de passage à l’échelle. Cependant, ces sytèmes échouent à garantir la confidentialité des données, souveraineté des données, pérennité et résistance à la censure. Pour répondre à ce problème, la littérature propose la conception d’applications Local-First Software (LFS) : des applications collaboratives pair-à-pair (P2P).
+Une pierre angulaire des applications LFS sont les Conflict-free Replicated Data Types (CRDTs). Il s’agit de nouvelles spécifications des types de données, tels que l’Ensemble ou la Séquence, permettant à un ensemble de noeuds de répliquer une donnée. Les CRDTs permettent aux noeuds de consulter et de modifier la donnée sans coordination préalable, et incorporent un mécanisme de résolution de conflits pour intégrer les modifications concurrentes. Cependant, les CRDTs pour le type Séquence souffrent d’une croissance monotone du surcoût de leur mécanisme de résolution de conflits. Pouvons-nous proposer un mécanisme de réduction du surcoût des CRDTs pour le type Séquence qui soit compatible avec les applications LFS ? Dans cette thèse, nous proposons un nouveau CRDT pour le type Séquence, RenamableLogootSplit. Ce CRDT intègre un mécanisme de renommage qui minimise périodiquement le surcoût de son mécanisme de résolution de conflits ainsi qu’un mécanisme de résolution de conflits pour intégrer les modifications concurrentes à un renommage. Finalement, nous proposons un mécanisme de Garbage Collection (GC) qui supprime à terme le propre surcoût du mécanisme de renommage.
+    #+END_NOTE
+  - Résumé EN
+    #+BEGIN_NOTE
+A collaborative system enables multiple users to work together to create content. To support collaborations involving millions of users, these systems adopt a decentralised architecture to ensure high availability, fault tolerance and scalability. However, these systems fail to guarantee the data confidentiality, data sovereignty, longevity and resistance to censorship. To address this problem, the literature proposes the design of Local-First Software (LFS) applications : collaborative peer-to-peer applications.
+A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs). CRDTs are new specifications of data types, e.g. Set or Sequence, enabling a set of nodes to replicate a data. CRDTs enable nodes to access and modify the data without prior coordination, and incorporate a conflict resolution mechanism to integrate concurrent modifications. However, Sequence CRDTs suffer from a monotonous growth in the overhead of their conflict resolution mechanism. Can we propose a mechanism for reducing the overhead of Sequence-type CRDTs that is compatible with LFS applications? In this thesis, we propose a novel CRDT for the Sequence type, RenamableLogootSplit. This CRDT embeds a renaming mechanism that periodically minimizes the overhead of its conflict resolution mechanism as well as a conflict resolution mechanism to integrate concurrent modifications to a rename. Finally, we propose a mechanism of Garbage Collection (GC) that eventually removes the own overhead of the renaming mechanism.
+    #+END_NOTE
+- Thèse : Préparer slides pour réunion de <2022-10-21 Fri>
+  - Travail depuis la dernière réunion
+    - Rédaction de la conclusion et de l'intro du manuscrit
+    - Réunions avec Gérald et Olivier pour retours sur ces chapitres et l'état de l'art
+  - Plan
+    - Meme manuscrit
+      - Expliquer qu'a déposé une 1ère version du manuscrit
+      - Mais qu'il reste des modifs à apporter
+	- Annexes
+	- Abstract/Résumé
+	- Figures
+	- Typos
+	- 2-3 "WTF" en commentaires
+      - Envoi du manuscrit aux rapporteur-rices semaine pro
+	- <2022-10-28 Fri> date limite
+    - Questions
+      - Plan de la présentation et volume horaire par partie ?
+      - Zoom sur 1 ou 2 perspectives ?
+** Semaine du <2022-10-24 Mon> au <2022-10-28 Fri>
+*** Planned
+**** DONE Thèse : Retravailler *Conclusion* du chapitre *MUTE*
+- Reformuler résumé du chapitre et refaire apparaître mes contributions
+- Présenter plusieurs limites et perspectives
+  - Conscience de groupe/changement
+  - Droits d'accès
+**** DONE Thèse : Retravailler *Modèle de données du document texte*
+- Pas clair que le titre soit un CRDT synchronisé par opérations
+  - Et pas état ?
+- Pas clair que la date soit aussi un CRDT synchronisé par opérations
+  - Et pas état ?
+- Absence de limites/perspectives
+  - Ajouter support de Rich Text à la Peritext
+    - Markdown limité (image ? mise en page ?)
+    - Langage à balises, modifications concurrentes peuvent produire un entrelacement invalide de balises
+  - Document multimédia
+    - Texte n'est qu'un format de document
+    - Pourrait permettre d'intégrer d'autres types de document
+      - TODO list
+      - Sondage
+      - Figure
+      - Code
+**** DONE Thèse : Rédiger annexe *Entrelacement d'insertions concurrentes dans Treedoc*
+**** DONE Thèse : Unifier l'utilisation de /nodeSeq/
+- Dans ma définition des structures de données, utilise généralement /seq/
+- Dans le texte, utilise généralement /nodeSeq/
+- À vérifier et unifier
+- Je pense sur /nodeSeq/ pour plus de clarté
+**** IN-PROGRESS Thèse : Rédiger annexe *Algorithmes renameId*
+**** IN-PROGRESS Thèse : Rédiger annexe *Algorithmes revertRenameId*
+**** IN-PROGRESS Thèse : Rework /renameId/ et /revertRenameId/ pour adopter formalisme à base de pattern matching
+**** TODO Thèse : Rework figures chapitre *RLS*
+- Mettre à jour les figures avec le formalisme utilisé pour état de l'art
+**** TODO Thèse : Rework figures chapitre *MUTE*
+- Mettre à jour les figures avec le formalisme utilisé pour état de l'art
+**** TODO Thèse : Transformer *Présentation de l'approche* en intro du chapitre RLS
+**** TODO Thèse : Ajouter plan du chapitre RLS à la fin de *Présentation de l'approche*
+- Reformuler la partie /intro rename/ pour dire qu'on se focalise sur opé ren vs. opés ins et rmv
+- Reformuler la partie /ren concurrentes/ pour retirer la mention d'hypothèse
+**** TODO Thèse : Rework section *Gestion des opérations concurrentes au renommage*
+- Utiliser formalisme de l'algo (par exemple \oplus)
+- Faire référence aux lignes concernées dans l'algo
+**** TODO Thèse : Rework section *Annulation de l'opération de renommage*
+- Utiliser formalisme de l'algo
+- Faire référence aux lignes concernées dans l'algo
+**** TODO Thèse : Transformer *Mécanisme de GC des anciens états* en section
+**** TODO Thèse : Ajouter plan de section au début de *Validation*
+**** TODO Thèse : Intégrer retours sur complexités
+**** TODO Thèse : Ajouter plan de section au début de *Discussion*
+**** TODO Thèse : Ajouter plan de section au début de *Comparaison avec approches existantes*
+**** TODO Thèse : Repasser sur *Comparaison avec approches existantes*
+- Maintenant que je présente Core-Nebula et LSEQ dans l'état de l'art, peut être nécessaire de reformuler cette partie
+- À défaut, acknowledge que j'en parle précédemment et présenter ça sous forme de rappel
+**** TODO Thèse : Reformuler mécanisme de GC
+- Pour définir les /potentielles époques courantes/, je repose sur la notion de stabilité causale
+  - Je prends l'opération rename maximale qui est causalement stable
+  - Et je compose l'ensemble des /potentielles époques courantes/ en ne conservant que l'époque de cette opération et les époques supérieures
+- Gérald m'a fait remarqué que si j'ai une livraison out-of-order, peut avoir une opération rename "causalement stable" mais pas toutes les opérations précédentes
+  - Dans le sens où cette opération rename a été observée par tout les noeuds
+  - Ils ne peuvent donc plus émettre d'opérations concurrentes à cette opération rename
+  - Mais en tant que noeud, je peux toujours recevoir une ancienne opération dont je n'avais pas encore connaissance et qui nécessite des époques antérieures pour être intégrée
+- Reformuler la définition des potentielles époques courantes pour indiquer qu'on prend comme base l'époque maximale pour laquelle
+  - L'opération rename associée est causalement stable
+  - Toutes les opérations antérieures et concurrentes à l'opération rename associée ont été livrées
+- Voir comment vérifier cette 2nde condition dans le cas d'une livraison out of order
+**** TODO Thèse : Rework section *Processus d'intégration d'une opération*
+- Cette section me paraît faire tâche en l'état
+  - Algos peu compréhensibles
+  - Redite de ce qui apparaît déjà auparavant dans les exemples
+  - Revoir si apporte quelque chose
+- Si apporte qqch, voir si peut facilement l'améliorer
+- Sinon, la retirer ?
+**** TODO Thèse : Ajouter discussion sur la présence de tombstones dans RLS
+- Inclure la discussion qu'on avait eu avec les reviewers concernant le fait que les anciens états correspondent à des tombstones
+*** Done
+- Thèse : Retravailler *Conclusion* du chapitre *MUTE*
+  - [-] Reformuler résumé du chapitre et refaire apparaître mes contributions
+  - Limites et perspectives
+    - [-] Conscience de groupe/changement
+      - De moins en moins convaincu de la pertinence de ce que je peux apporter sur le sujet
+    - [X] Droits d'accès
+  - Qu'est-ce que je pourrais choisir d'autre comme perspective ?
+    - [X] Topologie réseau ?
+- Thèse : Retravailler *Modèle de données du document texte*
+  - [-] Titre synchronisé par opérations
+    - Nope, par états
+  - [-] Date synchronisé par opérations
+    - Nope, par états
+  - [X] Ajouter support de Rich Text
+  - [X] Ajouter support document multimédia
+- Thèse : Modifs globales
+  - État de l'art
+    - Ajout notion de churn dans system model
+    - Correction définition concurrence
+    - Reformulation à propos des métadonnées liées aux modèles de synchronisation, de façon à indiquer qu'on en parle qu'à l'écrit
 * Backlog-manuscrit
 ** TODO Thèse : Ajouter partie *État de l'art* de MUTE
 - Pourrait se comparer rapidement à GDocs, Etherpad, Cryptpad, Serenity Notes
@@ -26784,18 +26999,6 @@ Matthieu Nicolas
 - PA pourrait p-e être une porte d'entrée pour nous auprès de Framasoft**** TODO Thèse : Rédiger /generateId()/
 - Pourrait MàJ /generateId()/ pour LogootSplit dans section *blocs*
 - Après avoir introduit notion d'intervalles d'identifiants
-** TODO Thèse : Reformuler mécanisme de GC
-- Pour définir les /potentielles époques courantes/, je repose sur la notion de stabilité causale
-  - Je prends l'opération rename maximale qui est causalement stable
-  - Et je compose l'ensemble des /potentielles époques courantes/ en ne conservant que l'époque de cette opération et les époques supérieures
-- Gérald m'a fait remarqué que si j'ai une livraison out-of-order, peut avoir une opération rename "causalement stable" mais pas toutes les opérations précédentes
-  - Dans le sens où cette opération rename a été observée par tout les noeuds
-  - Ils ne peuvent donc plus émettre d'opérations concurrentes à cette opération rename
-  - Mais en tant que noeud, je peux toujours recevoir une ancienne opération dont je n'avais pas encore connaissance et qui nécessite des époques antérieures pour être intégrée
-- Reformuler la définition des potentielles époques courantes pour indiquer qu'on prend comme base l'époque maximale pour laquelle
-  - L'opération rename associée est causalement stable
-  - Toutes les opérations antérieures et concurrentes à l'opération rename associée ont été livrées
-- Voir comment vérifier cette 2nde condition dans le cas d'une livraison out of order
 ** TODO Thèse : Illustrer utilité de reporter transition vers nouvelle époque cible
 ** TODO Thèse : Ajouter algorithme de /getPathBetweenEpochs()/
 - Dans l'algorithme /insRemote()/, je décris comment on traite une insertion distante
