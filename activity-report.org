@@ -26917,9 +26917,31 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
 - Dans le texte, utilise généralement /nodeSeq/
 - À vérifier et unifier
 - Je pense sur /nodeSeq/ pour plus de clarté
-**** IN-PROGRESS Thèse : Rédiger annexe *Algorithmes renameId*
-**** IN-PROGRESS Thèse : Rédiger annexe *Algorithmes revertRenameId*
-**** IN-PROGRESS Thèse : Rework /renameId/ et /revertRenameId/ pour adopter formalisme à base de pattern matching
+**** DONE Thèse : Rework /renameId/ et /revertRenameId/ pour adopter formalisme à base de pattern matching
+**** DONE Thèse : Rédiger annexe *Algorithmes renameId*
+**** DONE Thèse : Rework section *Processus d'intégration d'une opération*
+- Cette section me paraît faire tâche en l'état
+  - Algos peu compréhensibles
+  - Nécessiterait de définir les types de données de ses paramètres et de son retour
+  - Redite de ce qui apparaît déjà auparavant dans les exemples
+  - Revoir si apporte quelque chose
+- Si apporte qqch, voir si peut facilement l'améliorer
+- Sinon, la retirer ?
+**** DONE Thèse : Transformer *Mécanisme de GC des anciens états* en section
+**** DONE Thèse : Reformuler mécanisme de GC
+- Pour définir les /potentielles époques courantes/, je repose sur la notion de stabilité causale
+  - Je prends l'opération rename maximale qui est causalement stable
+  - Et je compose l'ensemble des /potentielles époques courantes/ en ne conservant que l'époque de cette opération et les époques supérieures
+- Gérald m'a fait remarqué que si j'ai une livraison out-of-order, peut avoir une opération rename "causalement stable" mais pas toutes les opérations précédentes
+  - Dans le sens où cette opération rename a été observée par tout les noeuds
+  - Ils ne peuvent donc plus émettre d'opérations concurrentes à cette opération rename
+  - Mais en tant que noeud, je peux toujours recevoir une ancienne opération dont je n'avais pas encore connaissance et qui nécessite des époques antérieures pour être intégrée
+- Reformuler la définition des potentielles époques courantes pour indiquer qu'on prend comme base l'époque maximale pour laquelle
+  - L'opération rename associée est causalement stable
+  - Toutes les opérations antérieures et concurrentes à l'opération rename associée ont été livrées
+- Voir comment vérifier cette 2nde condition dans le cas d'une livraison out of order
+**** DONE Thèse : Rédiger annexe *Algorithmes revertRenameId*
+**** DONE Thèse : Ajouter définition de Dot
 **** TODO Thèse : Rework figures chapitre *RLS*
 - Mettre à jour les figures avec le formalisme utilisé pour état de l'art
 **** TODO Thèse : Rework figures chapitre *MUTE*
@@ -26934,7 +26956,6 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
 **** TODO Thèse : Rework section *Annulation de l'opération de renommage*
 - Utiliser formalisme de l'algo
 - Faire référence aux lignes concernées dans l'algo
-**** TODO Thèse : Transformer *Mécanisme de GC des anciens états* en section
 **** TODO Thèse : Ajouter plan de section au début de *Validation*
 **** TODO Thèse : Intégrer retours sur complexités
 **** TODO Thèse : Ajouter plan de section au début de *Discussion*
@@ -26942,25 +26963,11 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
 **** TODO Thèse : Repasser sur *Comparaison avec approches existantes*
 - Maintenant que je présente Core-Nebula et LSEQ dans l'état de l'art, peut être nécessaire de reformuler cette partie
 - À défaut, acknowledge que j'en parle précédemment et présenter ça sous forme de rappel
-**** TODO Thèse : Reformuler mécanisme de GC
-- Pour définir les /potentielles époques courantes/, je repose sur la notion de stabilité causale
-  - Je prends l'opération rename maximale qui est causalement stable
-  - Et je compose l'ensemble des /potentielles époques courantes/ en ne conservant que l'époque de cette opération et les époques supérieures
-- Gérald m'a fait remarqué que si j'ai une livraison out-of-order, peut avoir une opération rename "causalement stable" mais pas toutes les opérations précédentes
-  - Dans le sens où cette opération rename a été observée par tout les noeuds
-  - Ils ne peuvent donc plus émettre d'opérations concurrentes à cette opération rename
-  - Mais en tant que noeud, je peux toujours recevoir une ancienne opération dont je n'avais pas encore connaissance et qui nécessite des époques antérieures pour être intégrée
-- Reformuler la définition des potentielles époques courantes pour indiquer qu'on prend comme base l'époque maximale pour laquelle
-  - L'opération rename associée est causalement stable
-  - Toutes les opérations antérieures et concurrentes à l'opération rename associée ont été livrées
-- Voir comment vérifier cette 2nde condition dans le cas d'une livraison out of order
-**** TODO Thèse : Rework section *Processus d'intégration d'une opération*
-- Cette section me paraît faire tâche en l'état
-  - Algos peu compréhensibles
-  - Redite de ce qui apparaît déjà auparavant dans les exemples
-  - Revoir si apporte quelque chose
-- Si apporte qqch, voir si peut facilement l'améliorer
-- Sinon, la retirer ?
+**** TODO Thèse : Repasser sur *Couche livraison* de MUTE
+- Me semble l'avoir écrit très rapidement pour meet la deadline
+- Voir si matière à améliorer
+**** TODO Thèse : Aérer chapitres *Etat de l'art*, *RLS* et *MUTE*
+- Ou supprimer saut à la ligne des autres chapitres
 **** TODO Thèse : Ajouter discussion sur la présence de tombstones dans RLS
 - Inclure la discussion qu'on avait eu avec les reviewers concernant le fait que les anciens états correspondent à des tombstones
 *** Done
@@ -26984,6 +26991,8 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
     - Ajout notion de churn dans system model
     - Correction définition concurrence
     - Reformulation à propos des métadonnées liées aux modèles de synchronisation, de façon à indiquer qu'on en parle qu'à l'écrit
+  - RLS
+    - Suppression de la section *Processus d'intégration d'une opération*
 * Backlog-manuscrit
 ** TODO Thèse : Ajouter partie *État de l'art* de MUTE
 - Pourrait se comparer rapidement à GDocs, Etherpad, Cryptpad, Serenity Notes
