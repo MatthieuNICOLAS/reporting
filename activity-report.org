@@ -26942,34 +26942,41 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
 - Voir comment vérifier cette 2nde condition dans le cas d'une livraison out of order
 **** DONE Thèse : Rédiger annexe *Algorithmes revertRenameId*
 **** DONE Thèse : Ajouter définition de Dot
-**** TODO Thèse : Rework figures chapitre *RLS*
+**** DONE Thèse : Rework figures chapitre *RLS*
 - Mettre à jour les figures avec le formalisme utilisé pour état de l'art
-**** TODO Thèse : Rework figures chapitre *MUTE*
-- Mettre à jour les figures avec le formalisme utilisé pour état de l'art
-**** TODO Thèse : Transformer *Présentation de l'approche* en intro du chapitre RLS
-**** TODO Thèse : Ajouter plan du chapitre RLS à la fin de *Présentation de l'approche*
+**** DONE Thèse : Revoir /offset/ dans exemples de LogootSplit
+- Autoriser la valeur 0 ?
+**** DONE Thèse : Nommer opérations
+- Utiliser /ren/ dans figures, /rename/ dans texte
+- Voir pour faire pareil pour /ins/ et /rmv/
+**** DONE Thèse : Transformer *Présentation de l'approche* en intro du chapitre RLS
+**** DONE Thèse : Ajouter plan du chapitre RLS à la fin de *Présentation de l'approche*
 - Reformuler la partie /intro rename/ pour dire qu'on se focalise sur opé ren vs. opés ins et rmv
 - Reformuler la partie /ren concurrentes/ pour retirer la mention d'hypothèse
-**** TODO Thèse : Rework section *Gestion des opérations concurrentes au renommage*
+**** DONE Thèse : Rework section *Gestion des opérations concurrentes au renommage*
 - Utiliser formalisme de l'algo (par exemple \oplus)
 - Faire référence aux lignes concernées dans l'algo
-**** TODO Thèse : Rework section *Annulation de l'opération de renommage*
+**** DONE Thèse : Rework section *Annulation de l'opération de renommage*
 - Utiliser formalisme de l'algo
 - Faire référence aux lignes concernées dans l'algo
-**** TODO Thèse : Ajouter plan de section au début de *Validation*
-**** TODO Thèse : Intégrer retours sur complexités
-**** TODO Thèse : Ajouter plan de section au début de *Discussion*
-**** TODO Thèse : Ajouter plan de section au début de *Comparaison avec approches existantes*
-**** TODO Thèse : Repasser sur *Comparaison avec approches existantes*
+**** DONE Thèse : Ajouter plan de section au début de *Validation*
+**** DONE Thèse : Intégrer retours sur complexités
+**** DONE Thèse : Ajouter plan de section au début de *Comparaison avec approches existantes*
+**** DONE Thèse : Repasser sur *Comparaison avec approches existantes*
 - Maintenant que je présente Core-Nebula et LSEQ dans l'état de l'art, peut être nécessaire de reformuler cette partie
 - À défaut, acknowledge que j'en parle précédemment et présenter ça sous forme de rappel
-**** TODO Thèse : Repasser sur *Couche livraison* de MUTE
+**** DONE Thèse : Revoir définition Dot dans chapitre MUTE
+- Définit précédemment Dot
+- Plutôt que de faire une nouvelle définition, rappeler
+**** DONE Thèse : Rework figures chapitre *MUTE*
+- Mettre à jour les figures avec le formalisme utilisé pour état de l'art
+**** DONE Thèse : Repasser sur *Couche livraison* de MUTE
 - Me semble l'avoir écrit très rapidement pour meet la deadline
 - Voir si matière à améliorer
-**** TODO Thèse : Aérer chapitres *Etat de l'art*, *RLS* et *MUTE*
+**** DONE Thèse : Ajouter couleurs aux figures
+- Revoir pour remettre des couleurs dans les figures de l'état de RLS
+**** DONE Thèse : Aérer chapitres *Etat de l'art*, *RLS* et *MUTE*
 - Ou supprimer saut à la ligne des autres chapitres
-**** TODO Thèse : Ajouter discussion sur la présence de tombstones dans RLS
-- Inclure la discussion qu'on avait eu avec les reviewers concernant le fait que les anciens états correspondent à des tombstones
 *** Done
 - Thèse : Retravailler *Conclusion* du chapitre *MUTE*
   - [-] Reformuler résumé du chapitre et refaire apparaître mes contributions
@@ -26993,7 +27000,95 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
     - Reformulation à propos des métadonnées liées aux modèles de synchronisation, de façon à indiquer qu'on en parle qu'à l'écrit
   - RLS
     - Suppression de la section *Processus d'intégration d'une opération*
+- Thèse : Rework figures chapitre *MUTE*
+  - [X] Couche livraison - exactement 1 exemplaire
+  - [X] Couche livraison - causal remove
+  - [X] Couche livraison - epoch based
+  - [X] Couche livraison - anti-entropy
+** Semaine du <2022-11-07 Mon> au <2022-11-18 Fri>
+*** Planned
+**** DONE PoleEmploi : Mettre à jour profil
+- Lors de mon entretien, mon conseiller m'avait fait remarqué ne pas avoir rempli mon profil
+- S'en occuper avant la formation
+**** DONE PoleEmploi : Suivre formation
+- A lieu le <2022-11-08 Tue> à 09h30
+**** DONE Thèse : S'inscrire à la qualification
+**** TODO LinkedIn : Mettre à jour profil
+- Serait cool d'actualiser mon profil LinkedIn tant qu'à faire
+**** TODO GitHubPage : Créer site perso
+- Thomas m'expliquait que c'était conseillé, voire indispensable, de posséder sa page perso dans le milieu académique
+- Voir pour réaliser ma page avec générateur de sites statiques
+  - Voir du côté de Hugo
+*** Done
+- PoleEmploi : Mettre à jour profil
+  - Ajout des expériences
+  - Ajout des compétences
+  - Ajout CV exhaustif
+  - Profil rendu visible
+- PoleEmploi : Suivre formation
+  - Sers à présenter le service d'aide à la recherche d'emploi pour les cadres autonomes
+  - Aide à la mobilité
+    - Si
+      - entretien d'embauche pour CDD + de 3 mois
+      - reprise d'emploi de + de 3 mois
+    - En fonction de l'allocation
+      - Prise en charge partielle du billet de train dans mon cas
+    - Peut aussi avoir des réductions de TER pour entretiens
+    - Aides uniquement piur déplacements sur territoire
+  - Aide au logement
+    - Sur le site Action Logement
+      - Toujours pour le territoire
+    - Réseau SAM pour être hébergé chez des bénévoles
+  - Accompagnement EMI: international
+    - Peut contacter ce service pour être aidé pour la recherche d'emploi à l'étranger
+** Semaine du <2022-11-21 Mon> au <2022-11-25 Fri>
+*** Planned
+**** DONE Soutenance : Définir plan
+**** TODO Soutenance : Réaliser Intro
+**** TODO Soutenance : Réaliser Problématiques
+**** TODO Soutenance : Réaliser RLS - État de l'art
+**** TODO Soutenance : Réaliser RLS - Présentation
+**** TODO Soutenance : Réaliser RLS - Renommage basique
+**** TODO Soutenance : Réaliser RLS - Gestion des opérations /ins/ et /rmv/ concurrentes
+**** TODO Soutenance : Réaliser RLS - Gestion des opérations /ren/ concurrentes
+**** TODO Soutenance : Réaliser RLS - Mécanisme de GC
+**** TODO Soutenance : Réaliser RLS - Évaluation
+**** TODO Soutenance : Réaliser RLS - Conclusion
+**** TODO Soutenance : Réaliser Conclusion et Perspectivves
+**** TODO LinkedIn : Mettre à jour profil
+- Serait cool d'actualiser mon profil LinkedIn tant qu'à faire
+**** TODO GitHubPage : Créer site perso
+- Thomas m'expliquait que c'était conseillé, voire indispensable, de posséder sa page perso dans le milieu académique
+- Voir pour réaliser ma page avec générateur de sites statiques
+  - Voir du côté de Hugo
+*** Done
+- Soutenance : Définir plan
+  - Pour le moment, pars sur le plan suivant
+    - Applications collaboratives cloud-based vers applications collaboratives P2P, sans autorités centrales (intro) : 5min
+    - Problématiques : 5min
+    - RLS : 45min
+      - LS (état de l'art) : 5min
+      - Présentation : 2min
+      - Renommage basique : 3min
+      - Gestion des opérations /ins/ et /rmv/ concurrentes : 5min
+      - Gestion des opérations /ren/ concurrentes : 10min
+      - Mécanisme de GC : 5min
+      - Évaluation : 10min
+      - Conclusion : 5min
+    - Conclusion et perspectives : 5min
+  - Dépasse allégrement les 45min d'estimate
+  - Verrais pour scrap des sections ou en raccourcir si dépasse effectivement les 45min
+    - Mécanisme de GC
+      - Pas forcément nécessaire
+      - Ou alors suffit de donner l'intuition et pas le présenter en détails
+    - Évaluation
+      - Peut mentionner la présence d'une analyse en complexité en temps dans le manuscrit
+      - Mais focus la présentation sur évaluation expérimentale
+  - Un peu de mal à voir pour le moment la transition de la conclusion liée à RLS à la conclusion globale
 * Backlog-manuscrit
+** TODO Thèse : Ajouter plan de section au début de *Discussion*
+** TODO Thèse : Ajouter discussion sur la présence de tombstones dans RLS
+- Inclure la discussion qu'on avait eu avec les reviewers concernant le fait que les anciens états correspondent à des tombstones
 ** TODO Thèse : Ajouter partie *État de l'art* de MUTE
 - Pourrait se comparer rapidement à GDocs, Etherpad, Cryptpad, Serenity Notes
 ** TODO Thèse : Rédiger /generateId()/
