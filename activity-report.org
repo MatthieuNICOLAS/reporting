@@ -27044,9 +27044,10 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
 ** Semaine du <2022-11-21 Mon> au <2022-11-25 Fri>
 *** Planned
 **** DONE Soutenance : Définir plan
-**** TODO Soutenance : Réaliser Intro
-**** TODO Soutenance : Réaliser Problématiques
-**** TODO Soutenance : Réaliser RLS - État de l'art
+**** DONE Soutenance : Setup repo
+**** DONE Soutenance : Réaliser Intro
+**** DONE Soutenance : Réaliser Problématiques
+**** IN-PROGRESS Soutenance : Réaliser RLS - État de l'art
 **** TODO Soutenance : Réaliser RLS - Présentation
 **** TODO Soutenance : Réaliser RLS - Renommage basique
 **** TODO Soutenance : Réaliser RLS - Gestion des opérations /ins/ et /rmv/ concurrentes
@@ -27054,7 +27055,7 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
 **** TODO Soutenance : Réaliser RLS - Mécanisme de GC
 **** TODO Soutenance : Réaliser RLS - Évaluation
 **** TODO Soutenance : Réaliser RLS - Conclusion
-**** TODO Soutenance : Réaliser Conclusion et Perspectivves
+**** TODO Soutenance : Réaliser Conclusion et Perspectives
 **** TODO LinkedIn : Mettre à jour profil
 - Serait cool d'actualiser mon profil LinkedIn tant qu'à faire
 **** TODO GitHubPage : Créer site perso
@@ -27085,6 +27086,170 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
       - Peut mentionner la présence d'une analyse en complexité en temps dans le manuscrit
       - Mais focus la présentation sur évaluation expérimentale
   - Un peu de mal à voir pour le moment la transition de la conclusion liée à RLS à la conclusion globale
+- Soutenance : Setup repo
+  - Disponible à l'adresse : https://github.com/MatthieuNICOLAS/2021-phd-defense
+- Soutenance : Réaliser Intro
+  - Slides
+    - Applications collaboratives se sont démocratisées avec le Web 2.0
+      - GDocs, Wikipédia, Quora, GitHub rassemblent des dizaines de millions d'utilisateur-rices
+      - r/Place, TwitchPlaysPokemon : collaborations ponctuelles de millions d'utilisateur-rices
+    - Pour supporter un tel nombre d'utilisateur-rices, applications adoptent une architecture décentralisée
+      - Illustrer
+      - Offre propriétés de disponibilité, tolérance aux pannes et capacité de passage à l'échelle
+    - Mais les applications précédemment citées
+      - Reposent sur des serveurs pour héberger les données et effectuer les tâches
+      - Serveurs appartiennent à des autorités centrales
+    - De ce fait, ces applications ne respectent pas un ensemble de propriétés additionnelles
+      - Confidentialité et souveraineté des données, pérennité, résistance à la censure
+      - Jugeons toutefois ces propriétés nécessaires
+    - Comment concevoir applications assurant l'ensemble de ces propriétés ?
+    - Applications collaboratives P2P
+      - Pairs (appareils des utilisateur-rices) au centre du système
+      - Serveurs limités à un simple rôle de support de la collaboration, facilement remplaçables
+      - Constat aussi réalisé dans LFS
+  - Un peu de mal à voir comment enchaîner d'ici
+    - Dans manuscrit, parle de réplication ici
+    - Et à partir de là, identifie les contraintes menant aux CRDTs
+      - Toujours disponible
+      - Cohérent à terme
+      - Large échelle
+      - Churn
+    - J'ai peur que ça fasse lourd et long dans la présentation
+- Soutenance : Réaliser Problématiques
+  - La problématique liée à MUTE me gêne
+    - En fait, c'est la même que celle présentée dans l'intro
+      - La présenter comme une perspective de recherche de l'équipe Coast ?
+    - Un peu étrange de la remettre sur le tapis ensuite
+    - En découler ?
+      - Plutôt que de présenter une appli P2P random, utiliser MUTE ?
+      - Expliquer qu'il s'agit d'un projet au niveau de l'équipe, que dans le manuscrit je le présente et détaille mes contributions
+      - Mais qu'on va s'intéresser uniquement à ma contribution principale portant sur la réplication de données
+- Soutenance : Réaliser RLS - État de l'art
+  - Je n'ai pas mentionné la notion de conflits dans l'intro
+  - Comment l'introduire ?
+    - [X] Partir du type Séquence ?
+      - Définir le type Séquence
+      - Montrer un exemple de conflit
+      - Introduire les CRDTs
+      - Présenter LogootSplit
+      - Présenter les limites de LogootSplit
+      - Présenter les travaux existants
+      - Récapituler l'inadéquation de ces approches aux applications LFS
+    - [-] Partir des CRDTs ?
+- Thèse : Rapport Hanifa
+  - Reçu rapport d'Hanifa
+  - Retour/Critique porte sur l'absence de l'approche OT dans l'état de l'art
+    - Absence de comparaison entre OT et CRDT
+    - Ou rien qui justifie pourquoi on ne considère pas cette approche dans cette thèse
+** Semaine du <2022-11-28 Mon> au <2022-12-02 Fri>
+*** Planned
+**** DONE Soutenance : Réaliser RLS - État de l'art
+**** DONE Soutenance : Réaliser RLS - Présentation
+**** DONE Soutenance : Réaliser RLS - Renommage basique
+**** DONE Soutenance : Réaliser RLS - Gestion des opérations /ins/ et /rmv/ concurrentes
+**** DONE Soutenance : Réaliser RLS - Gestion des opérations /ren/ concurrentes
+**** DONE Soutenance : Contacter Sophie
+- Sophie est en télétravail pour un petit moment semblerait
+- La contacter par mail pour au sujet des déplacements du jury
+  - Davide Frey
+  - Hala Skaf-Molli
+**** DONE Soutenance : Contacter Nathalie
+**** DONE Soutenance : Réaliser RLS - Évaluation
+**** DONE Soutenance : Réaliser RLS - Conclusion
+**** DONE Soutenance : Réaliser Conclusion et Perspectives
+**** TODO Soutenance : Réaliser RLS - Mécanisme de GC
+**** TODO Soutenance : Voir comment introduire modèle de livraison
+- Lors du PhD day, je ne mentionnais pas le modèle de livraison de RLS
+- Je l'aborde par contre dans le manuscrit
+- Voir si j'en parle dans la présentation
+  - Je serai plutôt pour
+  - À voir si j'ai le temps
+- Dans ce cas, où l'introduire ?
+**** TODO Soutenance : Préparer backup slides sur OT vs. CRDT
+- Rapport de Hanifa met l'accent sur l'absence d'OT dans mon manuscrit
+- Voir pour préparer quelques backup slides à ce sujet
+- Comparaison OT vs. CRDT
+  - CRDT viable en P2P
+  - CRDT permet spécification forte de la séquence répliquée, vérifier OT à ce sujet
+- OT et RLS
+  - Utilise OT : les fonctions de transformation d'un identifiant d'une époque à l'autre
+  - Juste pas clair si l'algorithme de contrôle utilisé est un algorithme connu ou un nouveau
+    - Repose sur ET et IT des opérations /rename/
+**** TODO LinkedIn : Mettre à jour profil
+- Serait cool d'actualiser mon profil LinkedIn tant qu'à faire
+**** TODO GitHubPage : Créer site perso
+- Thomas m'expliquait que c'était conseillé, voire indispensable, de posséder sa page perso dans le milieu académique
+- Voir pour réaliser ma page avec générateur de sites statiques
+  - Voir du côté de Hugo
+*** Done
+- Thèse : Rapport Hanifa
+  - Un axe de comparaison possible entre l'approche OT et l'approche CRDT est la spécification des séquences répliquées
+    - Est-ce que des fonctions de transformations permettent de satisfaire la spécification forte des séquences répliquées ?
+- Soutenance : Réaliser RLS - Présentation
+  - Slides
+    - RenamableLogootSplit
+      - CRDT qui incorpore un mécanisme de renommage
+      - Prend la forme d'une nouvelle opération rename
+      - Respecte les propriétés
+	- Déterminisme
+	- Préservation de l'intention
+	- Préservation de la séquence (unicité, ordre)
+	- Commutativité (avec /ins/, /rmv/ et elle-même)
+- Thèse : Rapport Davide
+  - Ses remarques
+    - Intro
+      - Pas clair qu'est-ce qui appartient à mes contributions et qu'est-ce qui appartient au contexte
+      - A surtout d'être le cas dans la partie sur MUTE
+    - Etat de l'art
+      - Pas clair dans la figure 2.28 (page 72) que l'abscisse est en milliers
+      - Pas clair pourquoi on peut se passer de /prepare/ pour les pure-op based CRDTs
+      - Pas clair pourquoi un delta est un état
+      - Pas clair pourquoi le couple <etats du CRDT,couche livraison> est un sup-demi-treillis
+	- Y a l'air d'y avoir confusion entre protocole de livraison et états de la couche de livraison ici pour le lecteur
+      - Utilise Dot sans l'avoir défini (page 50 et 51)
+	- Vestiges de l'ancienne version, suffit de remplacer par identifiant page 50 et paires page 51
+      - Partie /limites de LS/ (page 60) considérée pas claire
+	- En quoi ?
+    - RLS
+      - Déplore absence de preuves pour les algorithmes
+      - Déplore absence d'évaluations des améliorations proposées dans la section Discussion
+      - Trouve les pseudo-codes difficiles à lire
+	- Pas clair que /pos/ est la valeur de /pos/ du 1er tuple du 1er id
+	- Pas clair que /<pos,nId,nSeq,i>/ correspond au résultat du ième id renommé
+      - Trouve section sur /revertRenameId/ difficile (pages 78-83)
+	- Propose de reposer sur la figure pour simplifier compréhension
+	- J'ai l'impression que c'est déjà ce que je fais
+      - Pas clair la différence entre /local/ et /remote/ (pages 93-96)
+      - Pas clair non plus ce qui est compris dans /remote/ (pages 93-96)
+      - Pas clair quand les renommages sont déclenchés dans la partie évaluation
+    - MUTE
+      - Pas clair ce que je propose par un document multimédia composé de plusieurs CRDTs (page 120)
+      - Pas clair ce à quoi sert le mécanisme d'anti-entropie (page 124)
+      - Pas clair à quelle complexité spatiale je fais référence dans section 4.3.2 (page 124)
+      - Pas clair s'il y a a une seule ou plusieurs couches livraisons (pages 125-131)
+	- Devrait expliciter qu'on a une pour LS, une pour RLS
+      - Pas clair l'intérêt d'utiliser un IVV au lieu d'un VV pour MUTE (page 127)
+- Soutenance : Contacter Sophie
+  - A envoyé mail pour lui demander la procédure et informations nécessaires <2022-11-30 Wed>
+  - François m'a plutôt recommandé de voir avec Nathalie Fritz
+  - A vu avec elle et a entrepris les démarches
+  - A dit à Sophie que je voyais avec Nathalie
+- Soutenance : Contacter Nathalie
+  - A vu avec elle comment ça se passait
+  - M'a envoyé les formulaires que doivent compléter et renvoyer Hala et Davide
+  - A envoyé le mail d'invit à Hala et Davide avec les documents et instructions, et avec Nathalie en CC pour les accompagner
+- Soutenance : Réaliser RLS - Évaluation
+  - Jusqu'où détailler les résultats obtenus ?
+  - A une variété de benchmarks
+    - [X] Surcoût mémoire du CRDT en fonction de si GC ou non
+    - [X] Surcoût mémoire du CRDT en fonction du nombre de noeuds de renommage
+    - [X] Surcoût en calculs du CRDT pour les opérations /ins/ et /rmv/
+    - [X] Surcoût en calculs du CRDT pour les opérations /ren/
+    - [X] Coût rejeu du journal des opérations
+    - [-] Impact fréquence des opérations /ren/ sur performances
+  - Lesquels présenter, et dans quel ordre ?
+- Soutenance : Réaliser RLS - Conclusion
+  -
 * Backlog-manuscrit
 ** TODO Thèse : Ajouter plan de section au début de *Discussion*
 ** TODO Thèse : Ajouter discussion sur la présence de tombstones dans RLS
