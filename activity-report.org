@@ -27249,7 +27249,73 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
     - [-] Impact fréquence des opérations /ren/ sur performances
   - Lesquels présenter, et dans quel ordre ?
 - Soutenance : Réaliser RLS - Conclusion
-  -
+** Semaine du <2022-12-05 Mon> au <2022-12-09 Fri>
+*** Planned
+**** TODO Soutenance : Animer slide *Opération rename*
+**** TODO Soutenance : Animer slide *Intégration opérations ins & rmv concurrentes*
+**** TODO Soutenance : Animer slide *Correction intégration opérations ins & rmv concurrentes*
+- En profiter pour la découper
+  - Une slide sur le système d'époque
+    - Époque d'origine
+    - rename génère nouvelle époque
+    - opérations taggées avec époque de génération
+  - Une slide sur renameId
+    - Préciser qu'utilise le même algo pour intégrer rename distant
+**** TODO Soutenance : Animer slide *Opérations rename concurrentes*
+**** TODO Soutenance : Animer slide *Résolution de conflits entre opérations rename concurrentes*
+- Splitter en deux au passage ?
+  - Une sur aspect système des opérations rename
+  - Une sur algo intégration d'une opération
+    - Animer pour expliciter ce que j'ai montré (appliquer effet opérations rename), ce que je vais ignorer (calcul du PPAC), et ce que je vais présenter (époque cible, annuler effet opérations rename)
+**** TODO Soutenance : Animer slide *Choisir époque cible*
+**** TODO Soutenance : Animer slide *Annuler effet opération rename*
+- Ajouter qu'on identifie le cas en faisant du pattern matching
+**** TODO Soutenance : Animer slide *Opérations rename concurrentes*
+**** TODO Soutenance : Animer slide *Absence jeu de données*
+**** TODO Soutenance : Animer slide *Simulation - Architecture*
+**** TODO Soutenance : Animer slide *Simulation - Modifications*
+**** TODO Soutenance : Animer slide *Simulation - Mécanisme de renommage*
+**** TODO Soutenance : Animer slide *Simulation - Sorties*
+**** TODO Soutenance : Animer slide *Convergence*
+**** TODO Soutenance : Animer slide *Surcoût en métadonnées - 1 noeud de renommage*
+**** TODO Soutenance : Animer slide *Surcoût en métadonnées - 1 à 4 noeuds de renommage*
+**** TODO Soutenance : Animer slide *Surcoût en calculs - Opérations ins & rmv*
+**** TODO Soutenance : Animer slide *Surcoût en calculs - Opération ren*
+**** TODO Soutenance : Animer slide *Surcoût en calculs - Vue globale*
+**** TODO Soutenance : Animer slide *Conclusion*
+**** TODO Soutenance : Animer slide *Conclusion générale*
+**** TODO Soutenance : Animer slide *Perspective*
+- Profiter pour reformuler les perspectives sous forme de questions
+**** TODO Soutenance : Animer slide *Ouverture*
+**** TODO Soutenance : Retravailler intro
+- Introduit la problématique globale au bout de 5min
+- Mais la problématiqu de RLS au bout de 15-20min
+- Voir pour annoncer plus tôt cette dernière
+**** TODO Soutenance : Réaliser RLS - Mécanisme de GC
+**** TODO Soutenance : Voir comment introduire modèle de livraison
+- Lors du PhD day, je ne mentionnais pas le modèle de livraison de RLS
+- Je l'aborde par contre dans le manuscrit
+- Voir si j'en parle dans la présentation
+  - Je serai plutôt pour
+  - À voir si j'ai le temps
+- Dans ce cas, où l'introduire ?
+**** TODO Soutenance : Préparer backup slides sur OT vs. CRDT
+- Rapport de Hanifa met l'accent sur l'absence d'OT dans mon manuscrit
+- Voir pour préparer quelques backup slides à ce sujet
+- Comparaison OT vs. CRDT
+  - CRDT viable en P2P
+  - CRDT permet spécification forte de la séquence répliquée, vérifier OT à ce sujet
+- OT et RLS
+  - Utilise OT : les fonctions de transformation d'un identifiant d'une époque à l'autre
+  - Juste pas clair si l'algorithme de contrôle utilisé est un algorithme connu ou un nouveau
+    - Repose sur ET et IT des opérations /rename/
+**** TODO LinkedIn : Mettre à jour profil
+- Serait cool d'actualiser mon profil LinkedIn tant qu'à faire
+**** TODO GitHubPage : Créer site perso
+- Thomas m'expliquait que c'était conseillé, voire indispensable, de posséder sa page perso dans le milieu académique
+- Voir pour réaliser ma page avec générateur de sites statiques
+  - Voir du côté de Hugo
+*** Done
 * Backlog-manuscrit
 ** TODO Thèse : Ajouter plan de section au début de *Discussion*
 ** TODO Thèse : Ajouter discussion sur la présence de tombstones dans RLS
