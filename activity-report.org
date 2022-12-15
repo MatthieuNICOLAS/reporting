@@ -27494,7 +27494,8 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
 - Devrait montrer intégration de modifications dans ordres différents
 - Et insister sur le fait qu'on doit obtenir un état équivalent à terme
 - Nécessite un mécanisme de résolution de conflits
-**** IN-PROGRESS Soutenance : Réaliser RLS - Mécanisme de GC
+**** DONE Soutenance : Réaliser RLS - Mécanisme de GC
+**** IN-PROGRESS Soutenance : Intégrer retours du <2022-12-14 Wed>
 **** TODO Soutenance : Réaliser backup-slide *Cas 3 de revertRenameId*
 **** TODO Soutenance : Réaliser backup-slide *Modèle de livraison LS*
 **** TODO Soutenance : Réaliser backup-slide *Modèle de livraison RLS*
@@ -27526,6 +27527,41 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
 - Voir pour réaliser ma page avec générateur de sites statiques
   - Voir du côté de Hugo**** IN-PROGRESS Soutenance : Animer slide *Opérations rename concurrentes*
 *** Done
+- Répétition
+  - Retours
+    - Écrire phrases sur slides
+    - Slide 2
+      - Titre -> Exemple d'application LFS
+    - Slide 3
+      - Insister sur l'absence de coordination
+    - Slide 4
+      - Ajouter mentions mémoire, calculs, bande-passante
+    - Après slide problématique, ajouter plan haut niveau
+    - Slide 6
+      - Absence de séquence jusque là
+      - Représenter séquence avec index et séquence avec identifiants
+    - Slide 10
+      - Rajouter mentions mémoire, calculs, bande-passante
+    - Ajouter slide
+      - Pour faire transition du surcoût au renommage
+      - Approche naive à base de coordination
+      - Rappeler que nous on veut se passer de coordination (P2P)
+    - Slide 11
+      - Faire apparaître notion de consensus
+    - Slide 19
+      - Animer recherche du prédecesseur
+    - Slide 22
+      - Ajouter arbre des époques de la slide 24
+    - Slide 25
+      - A supprimé
+    - Slide 26
+      - Améliorer animations, notamment recherche grâce à index
+    - Supprimer slide 27
+    - Ajouter slide synthèse après GC
+    - Slide 33
+      - Préciser qu'expériences reproductibles
+    - Slide 41
+      - Déplacer ici les figures sur perfs de rename et de rejeu de log
 * Backlog-manuscrit
 ** TODO Thèse : Ajouter plan de section au début de *Discussion*
 ** TODO Thèse : Ajouter discussion sur la présence de tombstones dans RLS
