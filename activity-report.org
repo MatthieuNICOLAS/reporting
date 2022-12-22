@@ -27435,6 +27435,13 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
       - Garder cadre
 ** Semaine du <2022-12-12 Mon> au <2022-12-16 Fri>
 *** Planned
+**** CANCELLED Soutenance : Voir comment introduire modèle de livraison
+- Lors du PhD day, je ne mentionnais pas le modèle de livraison de RLS
+- Je l'aborde par contre dans le manuscrit
+- Voir si j'en parle dans la présentation
+  - Je serai plutôt pour
+  - À voir si j'ai le temps
+- Dans ce cas, où l'introduire ?
 **** DONE Soutenance : Prendre en compte retours de pré-soutenance
 - Démarrer directement slide 6
 - Retirer slide séquence pour mettre directement LS
@@ -27495,22 +27502,15 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
 - Et insister sur le fait qu'on doit obtenir un état équivalent à terme
 - Nécessite un mécanisme de résolution de conflits
 **** DONE Soutenance : Réaliser RLS - Mécanisme de GC
-**** IN-PROGRESS Soutenance : Intégrer retours du <2022-12-14 Wed>
-**** TODO Soutenance : Réaliser backup-slide *Cas 3 de revertRenameId*
-**** TODO Soutenance : Réaliser backup-slide *Modèle de livraison LS*
-**** TODO Soutenance : Réaliser backup-slide *Modèle de livraison RLS*
-**** TODO Soutenance : Réaliser backup-slide *Complexité en temps opérations ins, rmv et ren*
-**** TODO Soutenance : Réaliser backup-slide *Complexité en temps mécanisme de GC*
-**** TODO Soutenance : Réaliser backup-slide *Complexité SWIM*
-**** TODO Soutenance : Réaliser backup-slide *Impact fréquence opération ren*
-**** TODO Soutenance : Voir comment introduire modèle de livraison
-- Lors du PhD day, je ne mentionnais pas le modèle de livraison de RLS
-- Je l'aborde par contre dans le manuscrit
-- Voir si j'en parle dans la présentation
-  - Je serai plutôt pour
-  - À voir si j'ai le temps
-- Dans ce cas, où l'introduire ?
-**** TODO Soutenance : Préparer backup slides sur OT vs. CRDT
+**** DONE Soutenance : Intégrer retours du <2022-12-14 Wed>
+**** DONE Soutenance : Réaliser backup-slide *Modèle de livraison LS*
+**** DONE Soutenance : Réaliser backup-slide *Modèle de livraison RLS*
+**** DONE Soutenance : Réaliser backup-slide *Complexité en temps opérations ins, rmv et ren*
+**** DONE Soutenance : Réaliser backup-slide *Complexité en temps mécanisme de GC*
+**** DONE Soutenance : Réaliser backup-slide *Impact fréquence opération ren*
+**** CANCELLED Soutenance : Réaliser backup-slide *Cas 3 de revertRenameId*
+**** CANCELLED Soutenance : Réaliser backup-slide *Complexité SWIM*
+**** CANCELLED Soutenance : Préparer backup slides sur OT vs. CRDT
 - Rapport de Hanifa met l'accent sur l'absence d'OT dans mon manuscrit
 - Voir pour préparer quelques backup slides à ce sujet
 - Comparaison OT vs. CRDT
@@ -27530,38 +27530,228 @@ A cornerstone of LFS applications are Conflict-free Replicated Data Types (CRDTs
 - Répétition
   - Retours
     - Écrire phrases sur slides
-    - Slide 2
+    - [X] Slide 2
       - Titre -> Exemple d'application LFS
-    - Slide 3
+    - [X] Slide 3
       - Insister sur l'absence de coordination
-    - Slide 4
+    - [X] Slide 4
       - Ajouter mentions mémoire, calculs, bande-passante
-    - Après slide problématique, ajouter plan haut niveau
-    - Slide 6
+    - [X] Après slide problématique, ajouter plan haut niveau
+    - [X] Slide 6
       - Absence de séquence jusque là
       - Représenter séquence avec index et séquence avec identifiants
-    - Slide 10
+    - [X] Slide 10
       - Rajouter mentions mémoire, calculs, bande-passante
-    - Ajouter slide
+    - [X] Ajouter slide
       - Pour faire transition du surcoût au renommage
       - Approche naive à base de coordination
       - Rappeler que nous on veut se passer de coordination (P2P)
-    - Slide 11
+    - [-] Slide 11
       - Faire apparaître notion de consensus
-    - Slide 19
+    - [-] Slide 19
       - Animer recherche du prédecesseur
-    - Slide 22
+    - [-] Slide 22
       - Ajouter arbre des époques de la slide 24
-    - Slide 25
-      - A supprimé
-    - Slide 26
+    - [X] Slide 25
+      - À supprimer
+    - [X] Slide 26
       - Améliorer animations, notamment recherche grâce à index
-    - Supprimer slide 27
-    - Ajouter slide synthèse après GC
-    - Slide 33
+    - [X] Retravailler slide 27.5 pour meilleure transition
+    - [X] Ajouter slide synthèse après GC
+    - [-] Slide 32
+      - Remplacer wall of text par diagramme répartition des opérations
+    - [-] Slide 33
       - Préciser qu'expériences reproductibles
-    - Slide 41
+    - [X] Slide 41
       - Déplacer ici les figures sur perfs de rename et de rejeu de log
+** Semaine du <2022-12-19 Mon> au <2022-12-20 Tue>
+*** Planned
+**** TODO Manuscrit<<major>> : Préciser plus clairement les contributions dans l'introduction
+- The introduction could be a little clearer in describing the contributions and providing a global picture.
+In particular, in Section 1.2 it is not clear which of the cited papers are the candidate's and which are
+related work.
+**** TODO Manuscrit<<major>> : Décrire plus précisément le benchmark en fin de section 2.4.5
+- Chapter 2, albeit very interesting contains some unclear sections (see details in the appendix). But
+what I found most disturbing is that the discussion about it Figure 2.28 states that metadata represents
+99% of the storage space after some time, but it seems to me that this is the case even after less than
+10 operations. Is the plot correct?
+**** TODO Manuscrit<<major>> : Expliciter la notation des algorithmes
+- Second, I found the pseudocode particularly hard to read and not sufficiently discussed in the text.
+This may be because I am not an expert in CRDTs, but for example, it took me a while to understand
+that the variable $pos$ in Algorithm 2 is element $pos$ of the first tuple in the identifier $firstId$. A
+notation like firstId.pos would have been much easier to understand.
+**** TODO Manuscrit<<major>> : Expliciter la correspondance entre l'offset d'un id après renommage et son index dans /renIds/
+- Similarly, it took me a while to
+understand why the offset of the tuple generated at line 20 of Algorithm 2 is $i$, the index of $id_i$. I
+would appreciate seeing a clearer explanation of the algorithm since the Ph.D. thesis does not have a
+page limit like a published paper.
+**** TODO Manuscrit<<major>> : Lier directement les bullets points aux exemples
+- I also found section 3.2.3 particularly hard to read. I suggest referring directly to examples from the
+figures when describing the bullet points on page 79 and the management of cases that follows. I only
+understood those clearly when I got to the examples at the end of the section. Like before the pseudo-
+code and the description of the algorithm require some effort to follow. A clearer although possibly more
+verbose explanation would have been helpful.
+**** TODO Manuscrit<<major>> : Annoncer plus tôt que la stabilité causale nécessite un protocole de membership
+- Some descriptions could also be improved by restructuring the text, for example, the last paragraph
+of Section 3.3 states that the detection of causally stable epochs relies on the use of a group-member-
+ship protocol. It would have been better to state this requirement up front.
+**** TODO Manuscrit<<major>> : Clarifier que le protocole de membership n'a pas d'incidence sur la fig 3.11
+- Moreover, I could not help wondering about the impact of the membership protocol on the example in Figure 3.11.
+**** TODO Manuscrit<<major>> : Aborder stabilité causale dans système réel dans évaluation
+- Yet, I wonder if it wouldn't be possible and better to evaluate the actual ability of nodes to detect
+causally stable operations
+**** TODO Manuscrit<<major>> : Expliciter le gain offert par RLS en métadonnées comparé à LS
+- Also, I was expecting Section 3.5 to evaluate the gain in storage space
+employed for metadata with respect to what was shown in Figure 2.28.
+**** TODO Manuscrit<<major>> : Expliciter que l'évaluation de MUTE est en dehors du scope de cette thèse
+- Finally, it would have been nice to have an empirical evaluation of the design choices and improve-
+ments presented in Chapter 4.
+**** TODO Manuscrit : Ajouter citation pour définition 10
+- page 13: Definition 10: need citation.
+**** TODO Manuscrit : Ajouter explication pour read
+- page 15: you should explain why you assume that a read is invoked after each add or remove.
+**** TODO Manuscrit : Vérifier citation [44]
+- page 23: is [44] a good citation in this context?
+**** TODO Manuscrit : Améliorer présentation Pure CRDT
+- page 24: what is a Pure CRDT (synchronized by operation) [41]?
+This part is unclear, first, you say you need two functions but then you say you can omit the first, but
+it's not clear when
+**** TODO Manuscrit : Ajouter citation pour snapshot
+- Page 26: what is a " mécanisme d’instantané"? is it a snapshot? A citation is needed here.
+**** TODO Manuscrit : Préciser le défaut de la livraison causale
+- Page 26: "Cependant, ce patron repose sur l’hypothèse d’une livraison causale des opérations et n’est donc pas
+optimal." Clarify what you mean by this.
+**** TODO Manuscrit : Préciser notion de delta qui est aussi un état
+- page 27: unclear how delta is a state. A difference between states is not a state as far as I can tell
+**** TODO Manuscrit : Rappeler définition *Convergence forte*
+- page 28: "convergence forte": recall the definition (Def. 15)
+**** TODO Manuscrit : Expliciter notion de CRDT pour les CRDTs synchro par opérations
+- page 28: I do not understand this statement: le couple ⟨etats du CRDT,couche livraison⟩ qui forme un sup-demi-
+treillis dans le cadre de ce modèle de synchronisation. What does it mean for a bcast protocol to be part
+of a lattice?
+**** TODO Manuscrit : Expliciter pourquoi la livraison causale ne passe pas à l'échelle
+- page 33: the text after Def. 23 is unclear. You should say clearly why causal delivery does not scale.
+**** TODO Manuscrit : Remplacer l'utilisation précoce de la notion de dot
+- page 50: the text mentions the concept of "dot" but this is never defined before Chapter 4.
+**** TODO Manuscrit : Améliorer 2.4.5
+- Section 2.4.5 should be made clearer.
+**** TODO Manuscrit : Incorporer LSEQ dans synthèse de l'état de l'art
+- The synthesis in Section 2.6 ignores refs [82] and [83].
+**** TODO Manuscrit : Reformuler l'annonce qu'on utilise des données obtenues par simulation
+- It is unclear to say that the dataset is generated by simulation, say that it is a simulated execution
+maybe.
+**** TODO Manuscrit : Préciser notion d'opérations locales et distantes
+- The distinction between local and remote operations is unclear in figure 3.13 and its description in the
+text. What is taken in into account in distant operations? Is dissemination to other nodes included? Or
+are distant operations those that have been issued by other nodes?
+**** TODO Manuscrit : Préciser quand ont lieu les opérations /rename/
+- It is not clear where rename operations take place in Figure 3.13. Is it after 30k operations? This is
+never stated clearly.
+**** TODO Manuscrit : Vérifier et retirer le cas échéant la phrase suivante
+The last sentence that starts on page 95 appears out of place. It repeats what was already said without
+adding any content.
+**** TODO Manuscrit : Clarifier la notion de meta-CRDT
+- I am not sure I understand the suggestion outlined in 4.3.1 of adding a meta-CRDT that controls the
+integration of additional CRDTs into a given shared document. How would these multiple CRDTs and
+the meta CRDT be visible to the user?
+**** TODO Manuscrit : Éclaircir confusion entre les mécanismes d'anti-entropie
+- The use of the term state "etat" in the description of the anti-entropy mechanism generates confusion.
+First I understood the mechanism had the objective to discover new nodes and update node-member-
+ship lists, then the mention of state suggested that it is also used to synchronize the state of the shared
+document, but the last sentences confirmed my first interpretation.
+**** TODO Manuscrit : Expliciter/introduire au préalable la complexité spatiale de SWIM
+- The Synthesis of Section 4.3.2 mentions a mechanism whose spatial complexity is O(n), but the section
+makes no mention of spatial complexity. The only other mention of spatial complexity refers to the
+epoch-based delivery mechanism discussed in Section 4.4.3.
+**** TODO Manuscrit : Préciser qu'on a utilise la couche livraison adaptée à chaque CRDT
+- Regarding the delivery layer, I understood it implements the same guarantees for both protocols but
+the original version of LogootSplit does not have the same requirements. Did you use the same delivery
+layer for both protocols? Does this have an impact on the results?
+**** TODO Manuscrit : Préciser les bénéfices de la livraison dans le désordre
+- 4.4.1 Mentions the possibility of removing FIFO delivery by replacing the version vector with an internal
+version vector recording data for intervals (check). Would this lead to any advantage for MUTE?
+**** TODO Manuscrit : Fix typos
+- page 83: footnote 25. Missing full stop before "Ainsi"
+- ne le fassent ressurgirent -> ressurgir
+- sup-demi-trellis -> sup-demi-treillis
+- page 56 : rmv abrège rmv
+**** TODO LinkedIn : Mettre à jour profil
+- Serait cool d'actualiser mon profil LinkedIn tant qu'à faire
+**** TODO GitHubPage : Créer site perso
+- Thomas m'expliquait que c'était conseillé, voire indispensable, de posséder sa page perso dans le milieu académique
+- Voir pour réaliser ma page avec générateur de sites statiques
+  - Voir du côté de Hugo**** IN-PROGRESS Soutenance : Animer slide *Opérations rename concurrentes*
+*** Done
+- Préparation répétition
+  - [X] Slide synthèse après GC
+  - [X] Perfs rename sur slide de Limites
+  - [X] Slide transition surcoût/renommage
+  - [X] Vérifier rapport RLS w/o GC vs. LS
+  - Créer salon pour délibération
+- Répétition
+  - Questions
+    - Plan B si problème d'Internet
+      - Appel téléphonique ?
+    - Slide *Exemple de renameId*
+      - Afficher l'état de B ?
+      - Ou finalement, ça peut porter plus à confusion ?
+      - Et ce qui nous intéresse, c'est juste l'opération
+  - Retours
+    - [X] Global
+      - Faire apparaître à terme les refs
+    - Slide 2
+      - Aller plus vite
+    - Slide 5
+      - Préciser à l'oral qu'il y a plus de contribs dans le papier
+    - [X] Slide 8
+      - Faire apparaître "ordre lexicographique"
+      - Faire apparaître "étendre" et highlight fA10
+    - Slide 13
+      - À 18min
+      - Peut mieux faire
+    - [-] Slide 18
+      - Faire ressortir les époques
+      - Préciser que c'est le même scénario
+    - [X] Slide 21
+      - Highlight dans renIds iB10fA10
+      - Highlight index (même couleur que iA21)
+      - Highlight les parties dans l'id à époque A2
+    - [X] Slide 24
+      - Besoins
+	- Désigner une opération rename comme prioritaire à l'aide des époques
+	- Appliquer l'opération rename depuis une autre époque que son époque de génération
+    - [X] Slide 25
+      - Animer flèche rouge au fur et à mesure
+    - [X] Slide 29.5
+      - Plutôt formuler en "On arrive à ren en concurrence"
+      - "Mais" plutôt "conserver les renIds"
+    - Slide 31
+      - À 41min
+    - [ ] Slide 34-37
+      - Minimiser
+      - Simulations en 2 phases
+      - Renommages avec un ou plusieurs noeuds
+    - Slide 40
+      - Peut juster donner la conclusion générale si manque de temps
+      - Sinon détailler
+    - [X] Slide 41
+      - Highlight RLS
+    - [X] Slide 42
+      - Peut ajouter "Malheureusement, on a pas gagné sur le temps global"
+- Lien soutenance
+  - [X] Envoyer les liens au jury
+  - [X] Envoyer le lien aux invités
+    - Vic
+    - Clément
+    - François
+    - Claudia
+    - Abir
+    - PA
+    - Quentin
+    - JP
+    - Jérémie
+    - Cédric
+    - Alex?
 * Backlog-manuscrit
 ** TODO Thèse : Ajouter plan de section au début de *Discussion*
 ** TODO Thèse : Ajouter discussion sur la présence de tombstones dans RLS
